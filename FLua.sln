@@ -1,0 +1,48 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "FLua.Parser", "FLua.Parser\FLua.Parser.fsproj", "{78643626-7BA3-4A30-9843-02901C220857}"
+EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "FLua.Cli", "FLua.Cli\FLua.Cli.fsproj", "{A6D05419-43BF-459A-AD74-34554B73F30E}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|Any CPU = Release|Any CPU
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{78643626-7BA3-4A30-9843-02901C220857}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{78643626-7BA3-4A30-9843-02901C220857}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{78643626-7BA3-4A30-9843-02901C220857}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{78643626-7BA3-4A30-9843-02901C220857}.Debug|x64.Build.0 = Debug|Any CPU
+		{78643626-7BA3-4A30-9843-02901C220857}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{78643626-7BA3-4A30-9843-02901C220857}.Debug|x86.Build.0 = Debug|Any CPU
+		{78643626-7BA3-4A30-9843-02901C220857}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{78643626-7BA3-4A30-9843-02901C220857}.Release|Any CPU.Build.0 = Release|Any CPU
+		{78643626-7BA3-4A30-9843-02901C220857}.Release|x64.ActiveCfg = Release|Any CPU
+		{78643626-7BA3-4A30-9843-02901C220857}.Release|x64.Build.0 = Release|Any CPU
+		{78643626-7BA3-4A30-9843-02901C220857}.Release|x86.ActiveCfg = Release|Any CPU
+		{78643626-7BA3-4A30-9843-02901C220857}.Release|x86.Build.0 = Release|Any CPU
+		{A6D05419-43BF-459A-AD74-34554B73F30E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A6D05419-43BF-459A-AD74-34554B73F30E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A6D05419-43BF-459A-AD74-34554B73F30E}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{A6D05419-43BF-459A-AD74-34554B73F30E}.Debug|x64.Build.0 = Debug|Any CPU
+		{A6D05419-43BF-459A-AD74-34554B73F30E}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{A6D05419-43BF-459A-AD74-34554B73F30E}.Debug|x86.Build.0 = Debug|Any CPU
+		{A6D05419-43BF-459A-AD74-34554B73F30E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A6D05419-43BF-459A-AD74-34554B73F30E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A6D05419-43BF-459A-AD74-34554B73F30E}.Release|x64.ActiveCfg = Release|Any CPU
+		{A6D05419-43BF-459A-AD74-34554B73F30E}.Release|x64.Build.0 = Release|Any CPU
+		{A6D05419-43BF-459A-AD74-34554B73F30E}.Release|x86.ActiveCfg = Release|Any CPU
+		{A6D05419-43BF-459A-AD74-34554B73F30E}.Release|x86.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
