@@ -41,7 +41,7 @@ let ws = spaces
 let keyword kw = pstring kw >>? notFollowedBy (satisfy isIdentifierChar) .>> ws
 let symbol s = pstring s .>> ws
 let identifier = pIdentifier |>> (function Identifier s -> s | _ -> failwith "impossible") .>> ws
-let exprList = sepBy1 expr (symbol ",")
+// exprList will be defined after expr is initialized
 let varList = sepBy1 expr (symbol ",")
 
 // ============================================================================
@@ -95,7 +95,7 @@ let pTableConstructor : Parser<Expr, unit> =
 
 // Function call parser
 let pFunctionCall : Parser<Expr, unit> =
-    pVariable .>>. between (pstring "(" >>. ws) (ws >>. pstring ")") (opt exprList)
+    pVariable .>>. between (pstring "(" >>. ws) (ws >>. pstring ")") (opt (sepBy1 expr (symbol ",")))
     |>> fun (func, argsOpt) ->
         let args = argsOpt |> Option.defaultValue []
         FunctionCall(func, args)
@@ -115,7 +115,7 @@ let pPrimaryBase : Parser<Expr, unit> =
 let pPostfixOp =
     choice [
         // Method call: :identifier(args)
-        pstring ":" >>. ws >>. identifier .>>. between (pstring "(" >>. ws) (ws >>. pstring ")") (opt exprList)
+        pstring ":" >>. ws >>. identifier .>>. between (pstring "(" >>. ws) (ws >>. pstring ")") (opt (sepBy1 expr (symbol ",")))
         |>> fun (methodName, argsOpt) -> fun expr ->
             let args = argsOpt |> Option.defaultValue []
             MethodCall(expr, methodName, args)
@@ -129,7 +129,7 @@ let pPostfixOp =
         |>> fun key -> fun expr -> TableAccess(expr, key)
         
         // Function call: (args)
-        between (pstring "(" >>. ws) (ws >>. pstring ")") (opt exprList)
+        between (pstring "(" >>. ws) (ws >>. pstring ")") (opt (sepBy1 expr (symbol ",")))
         |>> fun argsOpt -> fun expr ->
             let args = argsOpt |> Option.defaultValue []
             FunctionCall(expr, args)
@@ -210,11 +210,11 @@ let buildExprParser() =
 
 // Statement parsers
 let pAssignment =
-    varList .>>. (symbol "=" >>. exprList)
+    varList .>>. (symbol "=" >>. sepBy1 expr (symbol ","))
     |>> fun (vars, exprs) -> Assignment(vars, exprs)
 
 let pLocalAssignment =
-    keyword "local" >>. sepBy1 identifier (symbol ",") .>>. opt (symbol "=" >>. exprList)
+    keyword "local" >>. sepBy1 identifier (symbol ",") .>>. opt (symbol "=" >>. sepBy1 expr (symbol ","))
     |>> fun (names, exprsOpt) ->
         let parameters = names |> List.map (fun name -> (name, FLua.Parser.Attribute.NoAttribute))
         LocalAssignment(parameters, exprsOpt)
@@ -233,7 +233,7 @@ let pBreak =
     keyword "break" >>% Break
 
 let pReturn =
-    keyword "return" >>. opt exprList
+    keyword "return" >>. opt (sepBy1 expr (symbol ","))
     |>> Return
 
 let pLabel =
@@ -275,7 +275,7 @@ let pNumericFor =
 let pGenericFor =
     pipe3
         (keyword "for" >>. sepBy1 identifier (symbol ",") .>> keyword "in")
-        (exprList .>> keyword "do")
+        (sepBy1 expr (symbol ",") .>> keyword "do") 
         (block .>> keyword "end")
         (fun vars exprs body ->
             let parameters = vars |> List.map (fun name -> (name, FLua.Parser.Attribute.NoAttribute))
@@ -341,6 +341,8 @@ let blockImpl =
 // Main statement parser - tries all statement types in order
 let statementImpl =
     ws >>. choice [
+        attempt pGenericFor           // Try generic for FIRST  
+        attempt pNumericFor
         attempt pFunctionDefStmt
         attempt pReturn
         attempt pBreak
@@ -348,8 +350,6 @@ let statementImpl =
         attempt pGoto
         attempt pLocalFunctionDef
         attempt pLocalAssignment
-        attempt pGenericFor
-        attempt pNumericFor
         attempt pIf
         attempt pWhile
         attempt pRepeat
@@ -364,7 +364,7 @@ let statementImpl =
 // ============================================================================
 
 // Initialize functionExprRef FIRST because buildExprParser() depends on functionExpr
-do functionExprRef := (keyword "function" >>. pFunctionDefSimple .>> ws .>> keyword "end" |>> fun funcDef -> FunctionDef funcDef)
+do functionExprRef := (keyword "function" >>. pFunctionDef .>> ws .>> keyword "end" |>> fun funcDef -> FunctionDef funcDef)
 
 // Now initialize the rest
 do exprRef := buildExprParser()

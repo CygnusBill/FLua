@@ -22,6 +22,8 @@ type ReplState = {
 let createInitialState () =
     let env = FLua.Interpreter.Environment.GlobalEnvironment.createStandard ()
     FLua.Interpreter.Environment.GlobalEnvironment.addMathLibrary env.Globals
+    FLua.Interpreter.Environment.GlobalEnvironment.addStringLibrary env.Globals
+    FLua.Interpreter.Environment.GlobalEnvironment.addIOLibrary env.Globals
     { Environment = env; IncompleteInput = None }
 
 /// Print the FLua banner
@@ -219,53 +221,34 @@ let evaluateInput (state: ReplState) (input: string) =
             Environment = state.Environment
             ReturnValues = None
             BreakFlag = false
+            GotoLabel = None
         }
         
         try
             let resultState = InterpreterCore.execBlock interpreterState stmtAst
             
-            // Check if this is a single function call statement
-            let isFunctionCallStmt = 
+            // Check if this is a single function call statement or expression statement
+            let (isFunctionCallStmt, isExpressionStmt) = 
                 match stmtAst with
-                | [FunctionCallStmt _] -> true
-                | _ -> false
+                | [FunctionCallStmt (FunctionCall _)] -> (true, false)   // Real function call
+                | [FunctionCallStmt (MethodCall _)] -> (true, false)     // Real method call
+                | [FunctionCallStmt _] -> (false, true)  // Other expression wrapped as statement
+                | _ -> (false, false)
             
             match resultState.ReturnValues with
             | Some values when not values.IsEmpty ->
                 let valueStrings = values |> List.map LuaValue.toString
                 printfn "=> %s" (String.Join(", ", valueStrings))
-            | _ when isFunctionCallStmt ->
-                // For function call statements, get all return values directly
+            | _ when isExpressionStmt ->
+                // This is an expression wrapped as a statement - evaluate and display the result
                 match stmtAst with
-                | [FunctionCallStmt funcCall] ->
-                    try
-                        match funcCall with
-                        | FunctionCall (funcExpr, argExprs) ->
-                            let funcVal = InterpreterCore.evalExpr interpreterState funcExpr
-                            let argVals = argExprs |> List.map (InterpreterCore.evalExpr interpreterState)
-                            let results = InterpreterCore.callFunction interpreterState funcVal argVals
-                            match results with
-                            | [] -> printfn "=> nil"
-                            | values ->
-                                let valueStrings = values |> List.map LuaValue.toString
-                                printfn "=> %s" (String.Join(", ", valueStrings))
-                        | MethodCall (objExpr, methodName, argExprs) ->
-                            let objVal = InterpreterCore.evalExpr interpreterState objExpr
-                            let argVals = objVal :: (argExprs |> List.map (InterpreterCore.evalExpr interpreterState))
-                            match objVal with
-                            | LuaTable table ->
-                                let methodVal = LuaTable.get table (LuaString methodName)
-                                let results = InterpreterCore.callFunction interpreterState methodVal argVals
-                                match results with
-                                | [] -> printfn "=> nil"
-                                | values ->
-                                    let valueStrings = values |> List.map LuaValue.toString
-                                    printfn "=> %s" (String.Join(", ", valueStrings))
-                            | _ -> printfn "=> nil"  // Method call on non-table
-                        | _ -> ()  // Other function call types
-                    with
-                    | _ -> ()  // If evaluation fails, don't show return value
+                | [FunctionCallStmt expr] ->
+                    let result = InterpreterCore.evalExpr interpreterState expr
+                    printfn "= %s" (LuaValue.toString result)
                 | _ -> ()
+            | _ when isFunctionCallStmt ->
+                // Function call statements don't return values, just show => nil
+                printfn "=> nil"
             | _ -> ()  // No output for other statements without return
             
             // Update REPL state with any changes to the environment
@@ -287,6 +270,7 @@ let evaluateInput (state: ReplState) (input: string) =
                 Environment = state.Environment
                 ReturnValues = None
                 BreakFlag = false
+                GotoLabel = None
             }
             
             try

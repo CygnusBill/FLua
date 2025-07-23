@@ -211,7 +211,7 @@ let tests = testList "Parser Tests" [
             testExpr "function with parameters" "function(a, b) end" (FunctionDef { Parameters = [Param ("a", FLua.Parser.Attribute.NoAttribute); Param ("b", FLua.Parser.Attribute.NoAttribute)]; IsVararg = false; Body = [] })
             testExpr "function with vararg" "function(...) end" (FunctionDef { Parameters = [VarargParam]; IsVararg = true; Body = [] })
             testExpr "function with params and vararg" "function(a, b, ...) end" (FunctionDef { Parameters = [Param ("a", FLua.Parser.Attribute.NoAttribute); Param ("b", FLua.Parser.Attribute.NoAttribute); VarargParam]; IsVararg = true; Body = [] })
-            // testExpr "function with body" "function(x) return x + 1 end" (FunctionDef { Parameters = [Param ("x", FLua.Parser.Attribute.NoAttribute)]; IsVararg = false; Body = [Return (Some [Binary(Var "x", Add, Literal (Literal.Integer 1I))])] })
+            testExpr "function with body" "function(x) return x + 1 end" (FunctionDef { Parameters = [Param ("x", FLua.Parser.Attribute.NoAttribute)]; IsVararg = false; Body = [Return (Some [Binary(Var "x", Add, Literal (Literal.Integer 1I))])] })
         ]
     ]
 
@@ -283,6 +283,7 @@ let tests = testList "Parser Tests" [
                     (GenericFor([("k", FLua.Parser.Attribute.NoAttribute); ("v", FLua.Parser.Attribute.NoAttribute)], 
                                [Var "t"], []))
                 
+                // TEMPORARILY DISABLED: Parser issue with expressions in generic for
                 // testStmt "generic for with function call" "for k, v in pairs(t) do end"
                 //     (GenericFor([("k", FLua.Parser.Attribute.NoAttribute); ("v", FLua.Parser.Attribute.NoAttribute)], 
                 //                [FunctionCall(Var "pairs", [Var "t"])], []))
@@ -325,11 +326,10 @@ let tests = testList "Parser Tests" [
             ]
         ]
         
-        // TODO: Fix remaining tech debt
-        // 1. Generic for with function calls: "for k, v in pairs(t) do end" 
-        //    Issue: Parser conflict between pGenericFor and pNumericFor
-        // 2. Function expressions with bodies: "function(x) return x + 1 end"
-        //    Issue: Need different parser architecture for expression vs statement contexts
+        
+        // Remaining parser features to implement:
+        // 1. Function expressions with bodies (need expression context parsing)
+        // 2. Generic for with function calls (parser conflict resolution)
         
         testList "Integration Tests - Multiple Features" [
             testExpr "method call with table constructor" "obj:create({x = 1, y = 2})" 

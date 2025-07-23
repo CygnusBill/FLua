@@ -21,6 +21,7 @@ type InterpreterState = {
     Environment: LuaEnvironment
     ReturnValues: LuaValue list option  // Set when return statement is executed
     BreakFlag: bool                     // Set when break statement is executed
+    GotoLabel: string option            // Set when goto statement is executed
 }
 
 /// Main interpreter module with mutually recursive evaluation functions
@@ -76,6 +77,36 @@ module InterpreterCore =
             | Some _, Some _ -> raise (LuaRuntimeError "division by zero")
             | _ -> raise (LuaRuntimeError "attempt to perform floor division on non-numbers")
         
+        // Bitwise operators
+        | BitAnd ->
+            match LuaValue.tryToInteger left, LuaValue.tryToInteger right with
+            | Some l, Some r -> LuaInteger (l &&& r)
+            | _ -> raise (LuaRuntimeError "attempt to perform bitwise AND on non-integers")
+        
+        | BitOr ->
+            match LuaValue.tryToInteger left, LuaValue.tryToInteger right with
+            | Some l, Some r -> LuaInteger (l ||| r)
+            | _ -> raise (LuaRuntimeError "attempt to perform bitwise OR on non-integers")
+        
+        | BitXor ->
+            match LuaValue.tryToInteger left, LuaValue.tryToInteger right with
+            | Some l, Some r -> LuaInteger (l ^^^ r)
+            | _ -> raise (LuaRuntimeError "attempt to perform bitwise XOR on non-integers")
+        
+        | ShiftLeft ->
+            match LuaValue.tryToInteger left, LuaValue.tryToInteger right with
+            | Some l, Some r when r >= 0L && r <= 63L -> LuaInteger (l <<< int r)
+            | Some _, Some r when r < 0L -> raise (LuaRuntimeError "negative shift count")
+            | Some _, Some _ -> raise (LuaRuntimeError "shift count too large")
+            | _ -> raise (LuaRuntimeError "attempt to perform left shift on non-integers")
+        
+        | ShiftRight ->
+            match LuaValue.tryToInteger left, LuaValue.tryToInteger right with
+            | Some l, Some r when r >= 0L && r <= 63L -> LuaInteger (l >>> int r)
+            | Some _, Some r when r < 0L -> raise (LuaRuntimeError "negative shift count")
+            | Some _, Some _ -> raise (LuaRuntimeError "shift count too large")
+            | _ -> raise (LuaRuntimeError "attempt to perform right shift on non-integers")
+        
         // Comparison operators
         | Less ->
             match LuaValue.tryToNumber left, LuaValue.tryToNumber right with
@@ -119,7 +150,6 @@ module InterpreterCore =
         // String concatenation
         | Concat -> LuaString (LuaValue.toString left + LuaValue.toString right)
         
-        // TODO: Add more operators (bitwise, etc.)
         | _ -> raise (LuaRuntimeError $"binary operator {op} not yet implemented")
     
     /// Evaluate a unary operation
@@ -135,17 +165,39 @@ module InterpreterCore =
             | LuaString s -> LuaInteger (int64 s.Length)
             | LuaTable table -> LuaInteger (int64 table.Array.Count)  // Simplified
             | _ -> raise (LuaRuntimeError "attempt to get length of non-string/table")
-        | _ -> raise (LuaRuntimeError $"unary operator {op} not yet implemented")
+        | BitNot ->
+            match LuaValue.tryToInteger value with
+            | Some i -> LuaInteger (~~~i)
+            | None -> raise (LuaRuntimeError "attempt to perform bitwise NOT on non-integer")
     
     /// Execute a block of statements
     let rec execBlock (state: InterpreterState) (statements: Statement list) =
-        let mutable currentState = state
+        // Helper function to find label position in statement list
+        let findLabel labelName stmts =
+            stmts 
+            |> List.tryFindIndex (function Label name when name = labelName -> true | _ -> false)
         
-        for stmt in statements do
-            if currentState.ReturnValues.IsNone && not currentState.BreakFlag then
-                currentState <- execStmt currentState stmt
+        let rec executeFromIndex currentState startIndex =
+            let mutable state = currentState
+            let mutable i = startIndex
+            
+            while i < statements.Length && state.ReturnValues.IsNone && not state.BreakFlag && state.GotoLabel.IsNone do
+                state <- execStmt state statements.[i]
+                i <- i + 1
+            
+            // Handle goto jumps
+            match state.GotoLabel with
+            | Some labelName ->
+                match findLabel labelName statements with
+                | Some labelIndex ->
+                    // Jump to label and continue execution
+                    let newState = { state with GotoLabel = None }
+                    executeFromIndex newState (labelIndex + 1)  // Start after the label
+                | None ->
+                    raise (LuaRuntimeError $"label '{labelName}' not found")
+            | None -> state
         
-        currentState
+        executeFromIndex state 0
     
     /// Execute a single statement  
     and execStmt (state: InterpreterState) = function
@@ -237,7 +289,7 @@ module InterpreterCore =
             
         | While (condition, body) ->
             let rec loop currentState =
-                if currentState.ReturnValues.IsSome || currentState.BreakFlag then
+                if currentState.ReturnValues.IsSome || currentState.BreakFlag || currentState.GotoLabel.IsSome then
                     currentState
                 else
                     let conditionValue = evalExpr currentState condition
@@ -245,6 +297,8 @@ module InterpreterCore =
                         let newState = execBlock currentState body
                         if newState.BreakFlag then
                             { newState with BreakFlag = false }  // Break out of while loop
+                        elif newState.GotoLabel.IsSome then
+                            newState  // Propagate goto to outer scope
                         else
                             loop newState
                     else
@@ -266,7 +320,7 @@ module InterpreterCore =
                 let loopState = { state with Environment = loopEnv }
                 
                 let rec loop currentVal currentState =
-                    if currentState.ReturnValues.IsSome || currentState.BreakFlag then
+                    if currentState.ReturnValues.IsSome || currentState.BreakFlag || currentState.GotoLabel.IsSome then
                         currentState
                     else
                         let shouldContinue = 
@@ -281,6 +335,8 @@ module InterpreterCore =
                             let newState = execBlock currentState body
                             if newState.BreakFlag then
                                 { newState with BreakFlag = false }  // Break out of for loop
+                            elif newState.GotoLabel.IsSome then
+                                newState  // Propagate goto to outer scope
                             else
                                 loop (currentVal + step) newState
                         else
@@ -297,6 +353,127 @@ module InterpreterCore =
             let blockState = { state with Environment = blockEnv }
             let result = execBlock blockState body
             { result with Environment = state.Environment }  // Restore original environment
+            
+        | Repeat (body, condition) ->
+            let rec loop currentState =
+                if currentState.ReturnValues.IsSome || currentState.BreakFlag || currentState.GotoLabel.IsSome then
+                    currentState
+                else
+                    // Execute body first (repeat...until always executes at least once)
+                    let newState = execBlock currentState body
+                    if newState.BreakFlag then
+                        { newState with BreakFlag = false }  // Break out of repeat loop
+                    elif newState.GotoLabel.IsSome then
+                        newState  // Propagate goto to outer scope
+                    elif newState.ReturnValues.IsSome then
+                        newState  // Return from function
+                    else
+                        // Check condition after executing body
+                        let conditionValue = evalExpr newState condition
+                        if LuaValue.isTruthy conditionValue then
+                            newState  // Exit loop when condition is true
+                        else
+                            loop newState  // Continue loop when condition is false
+            loop state
+            
+        | Break ->
+            // Set break flag to exit from loops
+            { state with BreakFlag = true }
+            
+        | Label labelName ->
+            // Labels are just markers - no action needed during execution
+            // The goto handling will search for labels in the block
+            state
+            
+        | Goto labelName ->
+            // Set goto flag to jump to the specified label
+            { state with GotoLabel = Some labelName }
+            
+        | GenericFor (variables, iterExprs, body) ->
+            // Generic for: for var1, var2, ... in expr1, expr2, ... do body end
+            // Standard Lua: for k, v in pairs(t) do ... end
+            // iterExprs should evaluate to: iterator_function, state, initial_value
+            
+            let iterValues = iterExprs |> List.map (evalExpr state)
+            match iterValues with
+            | iteratorFunc :: stateVal :: initialVal :: _ ->
+                // Create new environment for loop variables
+                let loopEnv = LuaEnvironment.createChild state.Environment
+                let loopState = { state with Environment = loopEnv }
+                
+                let rec loop currentKey currentState =
+                    if currentState.ReturnValues.IsSome || currentState.BreakFlag || currentState.GotoLabel.IsSome then
+                        currentState
+                    else
+                        // Call iterator function: iterator(state, key)
+                        let iterResults = callFunction currentState iteratorFunc [stateVal; currentKey]
+                        match iterResults with
+                        | LuaNil :: _ | [] ->
+                            // Iterator returned nil, end of iteration
+                            currentState
+                        | nextKey :: restValues ->
+                            // Set loop variables
+                            let loopVars = variables |> List.map fst  // Extract variable names
+                            let allValues = nextKey :: restValues
+                            
+                            // Bind loop variables
+                            for i, (varName, _) in List.indexed variables do
+                                let value = if i < allValues.Length then allValues.[i] else LuaNil
+                                LuaEnvironment.setLocal currentState.Environment varName value
+                            
+                            // Execute body
+                            let newState = execBlock currentState body
+                            if newState.BreakFlag then
+                                { newState with BreakFlag = false }  // Break out of generic for loop
+                            elif newState.GotoLabel.IsSome then
+                                newState  // Propagate goto to outer scope
+                            else
+                                loop nextKey newState
+                
+                let result = loop initialVal loopState
+                { result with Environment = state.Environment }  // Restore original environment
+                
+            | [functionCall] ->
+                // Single expression that should return iterator, state, initial
+                // This handles cases like: for k, v in pairs(t) do ... end
+                let callResults = 
+                    match functionCall with
+                    | LuaFunction func -> callFunction state functionCall []
+                    | _ -> raise (LuaRuntimeError "expected function in generic for")
+                
+                match callResults with
+                | iterator :: stateVal :: initialVal :: _ ->
+                    // Now execute the loop with proper iterator
+                    let loopEnv = LuaEnvironment.createChild state.Environment
+                    let loopState = { state with Environment = loopEnv }
+                    
+                    let rec loop currentKey currentState =
+                        if currentState.ReturnValues.IsSome || currentState.BreakFlag then
+                            currentState
+                        else
+                            let iterResults = callFunction currentState iterator [stateVal; currentKey]
+                            match iterResults with
+                            | LuaNil :: _ | [] -> currentState
+                            | nextKey :: restValues ->
+                                let loopVars = variables |> List.map fst
+                                let allValues = nextKey :: restValues
+                                
+                                for i, (varName, _) in List.indexed variables do
+                                    let value = if i < allValues.Length then allValues.[i] else LuaNil
+                                    LuaEnvironment.setLocal currentState.Environment varName value
+                                
+                                let newState = execBlock currentState body
+                                if newState.BreakFlag then
+                                    { newState with BreakFlag = false }
+                                else
+                                    loop nextKey newState
+                    
+                    let result = loop initialVal loopState
+                    { result with Environment = state.Environment }
+                    
+                | _ -> raise (LuaRuntimeError "iterator expression must return iterator function, state, and initial value")
+                
+            | _ -> raise (LuaRuntimeError "generic for requires iterator expressions")
         
         | _ -> raise (LuaRuntimeError "statement type not yet implemented")
     
@@ -310,8 +487,10 @@ module InterpreterCore =
             // Create new environment for function execution
             let funcEnv = LuaEnvironment.createChild closure.Environment
             
-            // Bind parameters
+            // Bind parameters and handle varargs
             let mutable argIndex = 0
+            let mutable hasVarargs = false
+            
             for param in closure.Parameters do
                 match param with
                 | Param (name, attr) when argIndex < args.Length ->
@@ -320,8 +499,17 @@ module InterpreterCore =
                 | Param (name, attr) ->
                     LuaEnvironment.setLocal funcEnv name LuaNil
                 | VarargParam ->
-                    // TODO: Handle varargs properly
-                    ()
+                    hasVarargs <- true
+                    
+            // Handle varargs: store remaining arguments as a table
+            if hasVarargs then
+                let varargsTable = LuaTable.empty ()
+                let mutable varargsIndex = 1L
+                for i in argIndex .. args.Length - 1 do
+                    LuaTable.set varargsTable (LuaInteger varargsIndex) args.[i]
+                    varargsIndex <- varargsIndex + 1L
+                // Store varargs as a special variable accessible via "..."
+                LuaEnvironment.setLocal funcEnv "..." (LuaTable varargsTable)
             
             // Execute function body
             let funcState = { state with Environment = funcEnv; ReturnValues = None }
@@ -409,6 +597,14 @@ module InterpreterCore =
                 Body = funcDef.Body
                 Environment = state.Environment
             })
+            
+        | Vararg ->
+            // Access varargs stored as "..." in the environment
+            // Note: For now, return first vararg value; proper multiple return handling would need interpreter changes
+            match LuaEnvironment.getValue state.Environment "..." with
+            | LuaTable table when table.Array.Count = 0 -> LuaNil  // No varargs
+            | LuaTable table when table.Array.Count > 0 -> table.Array.[0]  // First vararg
+            | _ -> raise (LuaRuntimeError "attempt to use '...' outside a function with varargs")
         
         | _ -> raise (LuaRuntimeError "expression type not yet implemented")
 
@@ -420,11 +616,14 @@ module Interpreter =
         try
             let env = GlobalEnvironment.createStandard ()
             GlobalEnvironment.addMathLibrary env.Globals
+            GlobalEnvironment.addStringLibrary env.Globals
+            GlobalEnvironment.addIOLibrary env.Globals
             
             let initialState = {
                 Environment = env
                 ReturnValues = None
                 BreakFlag = false
+                GotoLabel = None
             }
             
             let finalState = InterpreterCore.execBlock initialState program
@@ -439,11 +638,14 @@ module Interpreter =
         try
             let env = GlobalEnvironment.createStandard ()
             GlobalEnvironment.addMathLibrary env.Globals
+            GlobalEnvironment.addStringLibrary env.Globals
+            GlobalEnvironment.addIOLibrary env.Globals
             
             let state = {
                 Environment = env
                 ReturnValues = None
                 BreakFlag = false
+                GotoLabel = None
             }
             
             let result = InterpreterCore.evalExpr state expr
