@@ -6,7 +6,8 @@ open FLua.Parser.Lexer
 
 [<EntryPoint>]
 let main argv =
-    let filePath = "LuaTests/api.lua"
+    let luaDir = "LuaTests"
+    let files = Directory.GetFiles(luaDir, "*.lua")
     let parser =
         many (
             attempt pShebang
@@ -19,11 +20,16 @@ let main argv =
             <|> pIdentifier
             <|> pSymbol
         )
-    let result = runParserOnFile parser () filePath Encoding.UTF8
-    match result with
-    | Success(tokens, _, _) ->
-        tokens |> List.iter (fun t -> printfn $"(%d{t.Line},%d{t.Column}): %A{t.Token}")
-        0
-    | Failure(msg, err, _) ->
-        printfn $"Lexer error at %A{err.Position}: %s{msg}"
-        1
+    let mutable anyError = false
+    for filePath in files do
+        let fileName = Path.GetFileName(filePath)
+        printfn $"START: {fileName}"
+        let result = runParserOnFile parser () filePath Encoding.UTF8
+        match result with
+        | Success(_, _, _) ->
+            printfn $"FINISH: {fileName}"
+        | Failure(msg, err, _) ->
+            anyError <- true
+            printfn $"ERROR: {fileName}"
+            printfn $"Lexer error at %A{err.Position}: %s{msg}"
+    if anyError then 1 else 0

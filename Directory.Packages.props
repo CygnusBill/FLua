@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project>
+  <PropertyGroup>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageVersion Include="FSharp.Core" Version="9.0.300-beta.25258.110" />
+    <PackageVersion Include="FParsec" Version="1.1.1" />
+    <PackageVersion Include="Expecto" Version="10.1.0" />
+  </ItemGroup>
+</Project> 

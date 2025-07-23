@@ -1,6 +1,7 @@
 module FLua.Parser.Lexer
 
 open FParsec
+open System.Numerics
 
 // Helper for identifier characters
 let isIdentifierChar c = isLetter c || isDigit c || c = '_'
@@ -9,7 +10,7 @@ let isIdentifierChar c = isLetter c || isDigit c || c = '_'
 type Token =
     | Identifier of string
     | Number of float
-    | Integer of int64
+    | Integer of BigInteger
     | String of string
     | Keyword of string
     | Symbol of string
@@ -31,53 +32,83 @@ let luaKeywords =
     ]
 
 // Parser for keywords
-let pKeyword: Parser<TokenWithPos, unit> =
+let pKeyword: Parser<Token, unit> =
     luaKeywords
     |> List.map (fun kw ->
         attempt (
-            getPosition .>>. (pstring kw >>? notFollowedBy (satisfy isIdentifierChar))
-            |>> fun (pos, _) -> { Token = Keyword kw; Line = int pos.Line; Column = int pos.Column }
+            pstring kw >>? notFollowedBy (satisfy isIdentifierChar)
+            |>> fun _ -> Keyword kw
         ))
     |> choice
 
 // Parser for shebang line (#!... to end of line)
-let pShebang: Parser<TokenWithPos, unit> =
-    getPosition .>>. (attempt (pstring "#!" >>. skipRestOfLine true))
-    |>> fun (pos, _) -> { Token = Whitespace; Line = int pos.Line; Column = int pos.Column }
+let pShebang: Parser<Token, unit> =
+    attempt (pstring "#!" >>. skipRestOfLine true)
+    |>> fun _ -> Whitespace
 
 // Parser for single-line comments (--... to end of line)
-let pSingleLineComment: Parser<TokenWithPos, unit> =
-    getPosition .>>. (attempt (pstring "--" >>. skipRestOfLine true))
-    |>> fun (pos, _) -> { Token = Whitespace; Line = int pos.Line; Column = int pos.Column }
+let pSingleLineComment: Parser<Token, unit> =
+    attempt (pstring "--" >>. skipRestOfLine true)
+    |>> fun _ -> Whitespace
 
 // Parser for angle-bracketed attributes (e.g., <const>)
-let pAngleAttribute: Parser<TokenWithPos, unit> =
-    getPosition .>>. (attempt (between (pchar '<') (pchar '>') (manyChars (noneOf ">\n\r"))))
-    |>> fun (pos, _) -> { Token = Whitespace; Line = int pos.Line; Column = int pos.Column }
+let pAngleAttribute: Parser<Token, unit> =
+    attempt (between (pchar '<') (pchar '>') (manyChars (noneOf ">\n\r")))
+    |>> fun _ -> Whitespace
 
 // Parser for whitespace (spaces, tabs, newlines)
-let pWhitespace: Parser<TokenWithPos, unit> =
-    getPosition .>>. skipMany1 (anyOf " \t\r\n")
-    |>> fun (pos, _) -> { Token = Whitespace; Line = int pos.Line; Column = int pos.Column }
+let pWhitespace: Parser<Token, unit> =
+    skipMany1 (anyOf " \t\r\n")
+    |>> fun _ -> Whitespace
 
 // Parser for identifiers (not keywords)
 let isIdentifierFirstChar c = isLetter c || c = '_'
-let pIdentifier: Parser<TokenWithPos, unit> =
-    getPosition .>>. many1Satisfy2L isIdentifierFirstChar isIdentifierChar "identifier"
-    |>> fun (pos, s) -> { Token = Identifier s; Line = int pos.Line; Column = int pos.Column }
+let pIdentifier: Parser<Token, unit> =
+    many1Satisfy2L isIdentifierFirstChar isIdentifierChar "identifier"
+    |>> Identifier
 
 // Parser for numbers (integer or float, including hex)
-let pNumber: Parser<TokenWithPos, unit> =
+let pNumber: Parser<Token, unit> =
+    // Hexadecimal float: 0x1.5
+    let pHexFloat =
+        attempt (
+            pstringCI "0x" >>. many1Satisfy isHex .>>. pchar '.' .>>. manySatisfy isHex
+        )
+        |>> fun ((intPart, _), fracPart) ->
+            let intVal = BigInteger.Parse(intPart, System.Globalization.NumberStyles.AllowHexSpecifier) |> float
+            let fracVal =
+                if fracPart = "" then 0.0
+                else
+                    fracPart
+                    |> Seq.mapi (fun i c -> float (System.Convert.ToInt32(string c, 16)) / (16. ** float (i + 1)))
+                    |> Seq.sum
+            let value = intVal + fracVal
+            Number value
     let pHex =
-        attempt (pstringCI "0x" >>. many1Satisfy isHex) |>> (fun s -> Integer(System.Convert.ToInt64(s, 16)))
-    let pInt = pint64 |>> Integer
-    let pFloat = pfloat |>> Number
-    let pNum = attempt pHex <|> attempt pFloat <|> pInt
-    getPosition .>>. pNum
-    |>> fun (pos, t) -> { Token = t; Line = int pos.Line; Column = int pos.Column }
+        attempt (pstringCI "0x" >>. many1Satisfy isHex)
+        |>> (fun s -> 
+            // Parse as unsigned by ensuring we don't treat it as signed
+            // Add a leading zero if the first digit would make it negative
+            let hexStr = if s.Length > 0 && "89abcdefABCDEF".Contains(s.[0]) then "0" + s else s
+            let value = BigInteger.Parse(hexStr, System.Globalization.NumberStyles.HexNumber)
+            Integer value)
+    let pFloat = 
+        attempt (
+            notFollowedBy (pchar '-') >>. 
+            many1Satisfy isDigit .>>. pchar '.' .>>. many1Satisfy isDigit
+        )
+        |>> (fun ((intPart, _), fracPart) -> 
+            let floatStr = intPart + "." + fracPart
+            let n = float floatStr
+            Number n)
+    let pInt =
+        notFollowedBy (pchar '-') >>.
+        many1Satisfy isDigit |>> (fun s -> Integer(BigInteger.Parse(s)))
+    let pNum = attempt pHexFloat <|> attempt pHex <|> attempt pFloat <|> pInt
+    pNum
 
 // Parser for strings (single, double, or long bracket, with basic escapes and line continuation)
-let pString: Parser<TokenWithPos, unit> =
+let pString: Parser<Token, unit> =
     let lineContinuation =
         attempt (pchar '\\' .>> followedBy newline >>. (newline <|> (pchar '\r' >>. opt (pchar '\n') >>% '\n')))
         >>% ""
@@ -88,8 +119,29 @@ let pString: Parser<TokenWithPos, unit> =
             if value > 255 then failwithf "Decimal escape out of range: \\%s" digits
             else string (char value)
         )
+    let hexEscape =
+        attempt (pstring "\\x" >>. manyMinMaxSatisfyL 2 2 isHex "hex escape")
+        |>> (fun hex ->
+            let value = System.Convert.ToInt32(hex, 16)
+            if value > 255 then failwithf "Hex escape out of range: \\x%s" hex
+            else string (char value)
+        )
+    let unicodeEscape =
+        attempt (pstring "\\u{" >>. many1Satisfy isHex .>> pchar '}')
+        >>= fun hex ->
+            let value = System.Convert.ToInt32(hex, 16)
+            if value < 0x0 || value > 0x10FFFF || (value >= 0xD800 && value <= 0xDFFF) then
+                fail $"Unicode escape out of range: \\u{{%s{hex}}}"
+            else
+                preturn (System.Char.ConvertFromUtf32(value))
+    let zEscape =
+        attempt (pstring "\\z" >>. skipMany (satisfy System.Char.IsWhiteSpace))
+        >>% ""
     let escape =
-        decimalEscape
+        zEscape
+        <|> unicodeEscape
+        <|> hexEscape
+        <|> decimalEscape
         <|> (pchar '\\' >>.
             (anyOf "\\\"'abfnrtv" |>> function
                 | '\\' -> "\\"
@@ -111,10 +163,23 @@ let pString: Parser<TokenWithPos, unit> =
                 <|> escape
                 <|> normalChar quote
             ))
+    // Long bracket string: [=*[ ... ]=*]
+    let longBracketString : Parser<string, unit> =
+        let openBracket =
+            pchar '[' >>. manyChars (pchar '=') .>> pchar '['
+        let closeBracket n =
+            pchar ']' >>. skipString (String.replicate n "=") >>. pchar ']'
+        let content n =
+            manyCharsTill anyChar (attempt (closeBracket n))
+        attempt (
+            openBracket >>= fun eqs ->
+                let n = eqs.Length in
+                content n
+        )
     let pShortString = quotedString '"' <|> quotedString '\''
-    // TODO: Add support for long bracket strings
-    getPosition .>>. pShortString
-    |>> fun (pos, s) -> { Token = String s; Line = int pos.Line; Column = int pos.Column }
+    let pLongString = longBracketString
+    let pAnyString = attempt pLongString <|> pShortString
+    pAnyString |>> String
 
 // List of Lua symbols (longest first for greedy matching)
 let luaSymbols =
@@ -125,13 +190,13 @@ let luaSymbols =
     ]
 
 // Parser for symbols
-let pSymbol: Parser<TokenWithPos, unit> =
+let pSymbol: Parser<Token, unit> =
     luaSymbols
     |> List.map (fun sym ->
-        attempt (getPosition .>>. pstring sym)
-        |>> fun (pos, _) -> { Token = Symbol sym; Line = int pos.Line; Column = int pos.Column })
+        attempt (pstring sym)
+        |>> fun _ -> Symbol sym)
     |> choice
 
 // Parser for comments (stub)
-let pComment: Parser<TokenWithPos, unit> =
+let pComment: Parser<Token, unit> =
     fail "Comment parser not implemented" 

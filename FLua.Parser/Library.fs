@@ -2,6 +2,13 @@
 
 // Abstract Syntax Tree (AST) for Lua 5.4
 
+open System.Numerics
+
+type Attribute =
+    | NoAttribute
+    | Const
+    | Close
+
 /// Represents a Lua identifier (variable/function name)
 type Identifier = string
 
@@ -9,7 +16,7 @@ type Identifier = string
  type Literal =
     | Nil
     | Boolean of bool
-    | Integer of int64
+    | Integer of BigInteger
     | Float of float
     | String of string
 
@@ -73,7 +80,7 @@ type Identifier = string
 
 /// Represents a function parameter
  and Parameter =
-    | Param of Identifier
+    | Param of (Identifier * Attribute)
     | VarargParam
 
 /// Represents a block (sequence of statements)
@@ -83,7 +90,7 @@ type Identifier = string
  and Statement =
     | Empty
     | Assignment of Expr list * Expr list
-    | LocalAssignment of Identifier list * Expr list option
+    | LocalAssignment of (Identifier * Attribute) list * Expr list option
     | FunctionCallStmt of Expr
     | Label of Identifier
     | Goto of Identifier
@@ -93,7 +100,7 @@ type Identifier = string
     | Repeat of Block * Expr
     | If of (Expr * Block) list * Block option
     | NumericFor of Identifier * Expr * Expr * Expr option * Block
-    | GenericFor of Identifier list * Expr list * Block
+    | GenericFor of (Identifier * Attribute) list * Expr list * Block
     | FunctionDefStmt of Identifier list * FunctionDef // supports t.a.b.c:f
     | LocalFunctionDef of Identifier * FunctionDef
     | Return of Expr list option
