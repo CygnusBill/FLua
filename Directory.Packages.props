@@ -7,5 +7,9 @@
     <PackageVersion Include="FSharp.Core" Version="9.0.300-beta.25258.110" />
     <PackageVersion Include="FParsec" Version="1.1.1" />
     <PackageVersion Include="Expecto" Version="10.1.0" />
+    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />
+    <PackageVersion Include="MSTest.TestAdapter" Version="3.1.1" />
+    <PackageVersion Include="MSTest.TestFramework" Version="3.1.1" />
+    <PackageVersion Include="coverlet.collector" Version="6.0.0" />
   </ItemGroup>
 </Project> 

@@ -23,6 +23,7 @@
 module FLua.Parser.Parser
 
 open FParsec
+open FLua.Ast
 open FLua.Parser
 open FLua.Parser.Lexer
 
@@ -52,27 +53,27 @@ let varList = sepBy1 expr (symbol ",")
 let pLiteral : Parser<Expr, unit> =
     choice [
         pNumber |>> (function
-            | Integer i -> Literal (Literal.Integer i)
-            | Number n -> Literal (Literal.Float n)
+            | Integer i -> Expr.Literal (Literal.Integer i)
+            | Number n -> Expr.Literal (Literal.Float n)
             | t -> failwithf "pNumber returned unexpected token: %A" t)
         pString |>> (function
-            | String s -> Literal (Literal.String s)
+            | String s -> Expr.Literal (Literal.String s)
             | t -> failwithf "pString returned unexpected token: %A" t)
-        (attempt (pstring "nil" >>? notFollowedBy (satisfy isIdentifierChar)) >>% Literal Literal.Nil)
-        (attempt (pstring "true" >>? notFollowedBy (satisfy isIdentifierChar)) >>% Literal (Literal.Boolean true))
-        (attempt (pstring "false" >>? notFollowedBy (satisfy isIdentifierChar)) >>% Literal (Literal.Boolean false))
+        (attempt (pstring "nil" >>? notFollowedBy (satisfy isIdentifierChar)) >>% Expr.Literal Literal.Nil)
+        (attempt (pstring "true" >>? notFollowedBy (satisfy isIdentifierChar)) >>% Expr.Literal (Literal.Boolean true))
+        (attempt (pstring "false" >>? notFollowedBy (satisfy isIdentifierChar)) >>% Expr.Literal (Literal.Boolean false))
     ]
 
 let pVariable : Parser<Expr, unit> =
     pIdentifier |>> (function 
-        | Identifier s -> Var s 
+        | Identifier s -> Expr.Var s 
         | _ -> failwith "impossible")
 
 let pVararg : Parser<Expr, unit> =
-    pstring "..." >>% Vararg
+    pstring "..." >>% Expr.Vararg
 
 let pParenExpr : Parser<Expr, unit> =
-    between (pstring "(" >>. ws) (ws >>. pstring ")") expr |>> Paren
+    between (pstring "(" >>. ws) (ws >>. pstring ")") expr |>> Expr.Paren
 
 // Table constructor parser
 let pTableConstructor : Parser<Expr, unit> =
@@ -80,25 +81,25 @@ let pTableConstructor : Parser<Expr, unit> =
         choice [
             // [expr] = expr (KeyField)
             attempt (between (pstring "[" >>. ws) (ws >>. pstring "]") expr .>> ws .>> symbol "=" .>>. expr)
-            |>> fun (key, value) -> KeyField(key, value)
+            |>> fun (key, value) -> TableField.KeyField(key, value)
             
             // identifier = expr (NamedField)  
             attempt (identifier .>> symbol "=" .>>. expr)
-            |>> fun (name, value) -> NamedField(name, value)
+            |>> fun (name, value) -> TableField.NamedField(name, value)
             
             // expr (ExprField)
-            expr |>> ExprField
+            expr |>> TableField.ExprField
         ]
     
     between (pstring "{" >>. ws) (ws >>. pstring "}") (sepBy pTableField (symbol ","))
-    |>> fun fields -> TableConstructor fields
+    |>> fun fields -> Expr.TableConstructor fields
 
 // Function call parser
 let pFunctionCall : Parser<Expr, unit> =
     pVariable .>>. between (pstring "(" >>. ws) (ws >>. pstring ")") (opt (sepBy1 expr (symbol ",")))
     |>> fun (func, argsOpt) ->
         let args = argsOpt |> Option.defaultValue []
-        FunctionCall(func, args)
+        Expr.FunctionCall(func, args)
 
 // Primary expressions without postfix operations
 let pPrimaryBase : Parser<Expr, unit> =
@@ -118,21 +119,21 @@ let pPostfixOp =
         pstring ":" >>. ws >>. identifier .>>. between (pstring "(" >>. ws) (ws >>. pstring ")") (opt (sepBy1 expr (symbol ",")))
         |>> fun (methodName, argsOpt) -> fun expr ->
             let args = argsOpt |> Option.defaultValue []
-            MethodCall(expr, methodName, args)
+            Expr.MethodCall(expr, methodName, args)
         
         // Dot access: .identifier
         pstring "." >>. ws >>. identifier
-        |>> fun key -> fun expr -> TableAccess(expr, Literal (Literal.String key))
+        |>> fun key -> fun expr -> Expr.TableAccess(expr, Expr.Literal (Literal.String key))
         
         // Bracket access: [expr]
         between (pstring "[" >>. ws) (ws >>. pstring "]") expr
-        |>> fun key -> fun expr -> TableAccess(expr, key)
+        |>> fun key -> fun expr -> Expr.TableAccess(expr, key)
         
         // Function call: (args)
         between (pstring "(" >>. ws) (ws >>. pstring ")") (opt (sepBy1 expr (symbol ",")))
         |>> fun argsOpt -> fun expr ->
             let args = argsOpt |> Option.defaultValue []
-            FunctionCall(expr, args)
+            Expr.FunctionCall(expr, args)
     ]
 
 // Postfix expression parser (handles chaining of table access and function calls)
@@ -154,171 +155,199 @@ let buildExprParser() =
     opp.TermParser <- pPrimary
     
     // Unary operators (highest precedence)
-    opp.AddOperator(PrefixOperator("not", ws, 12, true, fun x -> Unary(Not, x)))
-    opp.AddOperator(PrefixOperator("#", ws, 12, true, fun x -> Unary(Length, x)))
-    opp.AddOperator(PrefixOperator("-", ws, 12, true, fun x -> Unary(Negate, x)))
-    opp.AddOperator(PrefixOperator("~", ws, 12, true, fun x -> Unary(BitNot, x)))
+    opp.AddOperator(PrefixOperator("not", ws, 12, true, fun x -> Expr.Unary(UnaryOp.Not, x)))
+    opp.AddOperator(PrefixOperator("#", ws, 12, true, fun x -> Expr.Unary(UnaryOp.Length, x)))
+    opp.AddOperator(PrefixOperator("-", ws, 12, true, fun x -> Expr.Unary(UnaryOp.Negate, x)))
+    opp.AddOperator(PrefixOperator("~", ws, 12, true, fun x -> Expr.Unary(UnaryOp.BitNot, x)))
     
     // Power (right associative)
-    opp.AddOperator(InfixOperator("^", ws, 11, Associativity.Right, fun x y -> Binary(x, Power, y)))
+    opp.AddOperator(InfixOperator("^", ws, 11, Associativity.Right, fun x y -> Expr.Binary(x, BinaryOp.Power, y)))
     
     // Multiplicative operators (left associative)
-    opp.AddOperator(InfixOperator("*", ws, 10, Associativity.Left, fun x y -> Binary(x, Multiply, y)))
-    opp.AddOperator(InfixOperator("//", ws, 10, Associativity.Left, fun x y -> Binary(x, FloorDiv, y)))
-    opp.AddOperator(InfixOperator("/", ws, 10, Associativity.Left, fun x y -> Binary(x, FloatDiv, y)))
-    opp.AddOperator(InfixOperator("%", ws, 10, Associativity.Left, fun x y -> Binary(x, Modulo, y)))
+    opp.AddOperator(InfixOperator("*", ws, 10, Associativity.Left, fun x y -> Expr.Binary(x, BinaryOp.Multiply, y)))
+    opp.AddOperator(InfixOperator("//", ws, 10, Associativity.Left, fun x y -> Expr.Binary(x, BinaryOp.FloorDiv, y)))
+    opp.AddOperator(InfixOperator("/", ws, 10, Associativity.Left, fun x y -> Expr.Binary(x, BinaryOp.FloatDiv, y)))
+    opp.AddOperator(InfixOperator("%", ws, 10, Associativity.Left, fun x y -> Expr.Binary(x, BinaryOp.Modulo, y)))
     
     // Additive operators (left associative)  
-    opp.AddOperator(InfixOperator("+", ws, 9, Associativity.Left, fun x y -> Binary(x, Add, y)))
-    opp.AddOperator(InfixOperator("-", ws, 9, Associativity.Left, fun x y -> Binary(x, Subtract, y)))
+    opp.AddOperator(InfixOperator("+", ws, 9, Associativity.Left, fun x y -> Expr.Binary(x, BinaryOp.Add, y)))
+    opp.AddOperator(InfixOperator("-", ws, 9, Associativity.Left, fun x y -> Expr.Binary(x, BinaryOp.Subtract, y)))
     
     // String concatenation (right associative)
-    opp.AddOperator(InfixOperator("..", ws, 8, Associativity.Right, fun x y -> Binary(x, Concat, y)))
+    opp.AddOperator(InfixOperator("..", ws, 8, Associativity.Right, fun x y -> Expr.Binary(x, BinaryOp.Concat, y)))
     
     // Shift operators (left associative)
-    opp.AddOperator(InfixOperator("<<", ws, 7, Associativity.Left, fun x y -> Binary(x, ShiftLeft, y)))
-    opp.AddOperator(InfixOperator(">>", ws, 7, Associativity.Left, fun x y -> Binary(x, ShiftRight, y)))
+    opp.AddOperator(InfixOperator("<<", ws, 7, Associativity.Left, fun x y -> Expr.Binary(x, BinaryOp.ShiftLeft, y)))
+    opp.AddOperator(InfixOperator(">>", ws, 7, Associativity.Left, fun x y -> Expr.Binary(x, BinaryOp.ShiftRight, y)))
     
     // Bitwise AND (left associative)
-    opp.AddOperator(InfixOperator("&", ws, 6, Associativity.Left, fun x y -> Binary(x, BitAnd, y)))
+    opp.AddOperator(InfixOperator("&", ws, 6, Associativity.Left, fun x y -> Expr.Binary(x, BinaryOp.BitAnd, y)))
     
     // Bitwise OR (left associative) 
-    opp.AddOperator(InfixOperator("|", ws, 5, Associativity.Left, fun x y -> Binary(x, BitOr, y)))
+    opp.AddOperator(InfixOperator("|", ws, 5, Associativity.Left, fun x y -> Expr.Binary(x, BinaryOp.BitOr, y)))
     
     // Bitwise XOR (left associative)
-    opp.AddOperator(InfixOperator("~", ws, 4, Associativity.Left, fun x y -> Binary(x, BitXor, y)))
+    opp.AddOperator(InfixOperator("~", ws, 4, Associativity.Left, fun x y -> Expr.Binary(x, BinaryOp.BitXor, y)))
     
     // Comparison operators (non-associative)
-    opp.AddOperator(InfixOperator("<", ws, 3, Associativity.None, fun x y -> Binary(x, Less, y)))
-    opp.AddOperator(InfixOperator(">", ws, 3, Associativity.None, fun x y -> Binary(x, Greater, y)))
-    opp.AddOperator(InfixOperator("<=", ws, 3, Associativity.None, fun x y -> Binary(x, LessEqual, y)))
-    opp.AddOperator(InfixOperator(">=", ws, 3, Associativity.None, fun x y -> Binary(x, GreaterEqual, y)))
-    opp.AddOperator(InfixOperator("==", ws, 3, Associativity.None, fun x y -> Binary(x, Equal, y)))
-    opp.AddOperator(InfixOperator("~=", ws, 3, Associativity.None, fun x y -> Binary(x, NotEqual, y)))
+    opp.AddOperator(InfixOperator("<", ws, 3, Associativity.None, fun x y -> Expr.Binary(x, BinaryOp.Less, y)))
+    opp.AddOperator(InfixOperator(">", ws, 3, Associativity.None, fun x y -> Expr.Binary(x, BinaryOp.Greater, y)))
+    opp.AddOperator(InfixOperator("<=", ws, 3, Associativity.None, fun x y -> Expr.Binary(x, BinaryOp.LessEqual, y)))
+    opp.AddOperator(InfixOperator(">=", ws, 3, Associativity.None, fun x y -> Expr.Binary(x, BinaryOp.GreaterEqual, y)))
+    opp.AddOperator(InfixOperator("==", ws, 3, Associativity.None, fun x y -> Expr.Binary(x, BinaryOp.Equal, y)))
+    opp.AddOperator(InfixOperator("~=", ws, 3, Associativity.None, fun x y -> Expr.Binary(x, BinaryOp.NotEqual, y)))
     
     // Logical AND (left associative)
-    opp.AddOperator(InfixOperator("and", ws, 2, Associativity.Left, fun x y -> Binary(x, And, y)))
+    opp.AddOperator(InfixOperator("and", ws, 2, Associativity.Left, fun x y -> Expr.Binary(x, BinaryOp.And, y)))
     
-    // Logical OR (left associative, lowest precedence)
-    opp.AddOperator(InfixOperator("or", ws, 1, Associativity.Left, fun x y -> Binary(x, Or, y)))
+    // Logical OR (left associative)
+    opp.AddOperator(InfixOperator("or", ws, 1, Associativity.Left, fun x y -> Expr.Binary(x, BinaryOp.Or, y)))
     
     opp.ExpressionParser
+
+// Initialize expression parser
+do exprRef := buildExprParser()
 
 // ============================================================================
 // STATEMENT PARSERS
 // ============================================================================
 
-// Statement parsers
+// Assignment statement: var1, var2, ... = expr1, expr2, ...
 let pAssignment =
-    varList .>>. (symbol "=" >>. sepBy1 expr (symbol ","))
-    |>> fun (vars, exprs) -> Assignment(vars, exprs)
+    varList .>> symbol "=" .>>. sepBy1 expr (symbol ",")
+    |>> Statement.Assignment
 
+// Local variable declaration: local var1, var2, ... = expr1, expr2, ...
 let pLocalAssignment =
-    keyword "local" >>. sepBy1 identifier (symbol ",") .>>. opt (symbol "=" >>. sepBy1 expr (symbol ","))
-    |>> fun (names, exprsOpt) ->
-        let parameters = names |> List.map (fun name -> (name, FLua.Parser.Attribute.NoAttribute))
-        LocalAssignment(parameters, exprsOpt)
+    keyword "local" >>. sepBy1 (identifier .>>. preturn Attribute.NoAttribute) (symbol ",")
+    .>>. opt (symbol "=" >>. sepBy1 expr (symbol ","))
+    |>> Statement.LocalAssignment
 
-let pFunctionCallStmt =
-    expr |>> FunctionCallStmt
+// Function call statement - only match expressions that are actually function calls
+let pFunctionCallStmt = 
+    expr >>= fun e ->
+        match e with
+        | Expr.FunctionCall _ -> preturn (Statement.FunctionCall e)
+        | Expr.MethodCall _ -> preturn (Statement.FunctionCall e)
+        | _ -> fail "Not a function call"
 
-let pEmpty =
-    symbol ";" >>% Empty
+// Empty statement (just a semicolon)
+let pEmptyStmt = symbol ";" >>% Statement.Empty
 
+// Do block: do ... end
 let pDoBlock =
     keyword "do" >>. block .>> keyword "end"
-    |>> DoBlock
+    |>> Statement.DoBlock
 
-let pBreak =
-    keyword "break" >>% Break
+// Break statement
+let pBreakStmt = keyword "break" >>% Statement.Break
 
-let pReturn =
+// Return statement: return expr1, expr2, ...
+let pReturnStmt =
     keyword "return" >>. opt (sepBy1 expr (symbol ","))
-    |>> Return
+    |>> Statement.Return
 
-let pLabel =
-    between (pstring "::" >>. ws) (ws >>. pstring "::") identifier
-    |>> Label
+// Label statement: ::name::
+let pLabelStmt =
+    between (pstring "::" >>. ws) (ws .>> pstring "::") identifier
+    |>> Statement.Label
 
-let pGoto =
+// Goto statement: goto name
+let pGotoStmt =
     keyword "goto" >>. identifier
-    |>> Goto
+    |>> Statement.Goto
 
-// Control flow statements
-let pIf =
-    let pIfClause = (keyword "if" >>. expr .>> keyword "then") .>>. block
-    let pElseIfClause = (keyword "elseif" >>. expr .>> keyword "then") .>>. block
-    let pElseClause = keyword "else" >>. block
+// If statement: if expr then block [elseif expr then block]* [else block] end
+let pIfStmt =
+    let elseifClause = keyword "elseif" >>. expr .>> keyword "then" .>>. block
+    let elseClause = keyword "else" >>. block
     
-    pIfClause .>>. many pElseIfClause .>>. opt pElseClause .>> keyword "end"
-    |>> fun (((ifCond, ifBlock), elseIfClauses), elseBlock) ->
-        let allClauses = (ifCond, ifBlock) :: elseIfClauses
-        If(allClauses, elseBlock)
-
-let pWhile =
-    keyword "while" >>. expr .>> keyword "do" .>>. block .>> keyword "end"
-    |>> fun (condition, body) -> While(condition, body)
-
-let pRepeat =
-    keyword "repeat" >>. block .>> keyword "until" .>>. expr
-    |>> fun (body, condition) -> Repeat(body, condition)
-
-// For loops
-let pNumericFor =
-    pipe4
-        (keyword "for" >>. identifier .>> symbol "=")
-        (expr .>> symbol ",")
-        expr
-        (opt (symbol "," >>. expr) .>> keyword "do" .>>. block .>> keyword "end")
-        (fun varName start stop (step, body) -> NumericFor(varName, start, stop, step, body))
-
-let pGenericFor =
     pipe3
-        (keyword "for" >>. sepBy1 identifier (symbol ",") .>> keyword "in")
-        (sepBy1 expr (symbol ",") .>> keyword "do") 
-        (block .>> keyword "end")
-        (fun vars exprs body ->
-            let parameters = vars |> List.map (fun name -> (name, FLua.Parser.Attribute.NoAttribute))
-            GenericFor(parameters, exprs, body))
+        (keyword "if" >>. expr .>> keyword "then" .>>. block)
+        (many elseifClause)
+        (opt elseClause .>> keyword "end")
+        (fun firstClause elseifClauses elseBlock ->
+            Statement.If(firstClause :: elseifClauses, elseBlock))
 
-// Function definition parsers
-let pParameter = 
-    choice [
-        attempt (pstring "..." >>% VarargParam)
-        identifier |>> fun name -> Param (name, FLua.Parser.Attribute.NoAttribute)
-    ]
+// While statement: while expr do block end
+let pWhileStmt =
+    keyword "while" >>. expr .>> keyword "do" .>>. block .>> keyword "end"
+    |>> Statement.While
 
-let pParameterList =
-    sepBy (choice [
-        attempt (pstring "..." >>% VarargParam)
-        (identifier |>> fun name -> Param (name, Attribute.NoAttribute))
-    ]) (symbol ",")
-    |>> fun parameters ->
-        let hasVararg = parameters |> List.exists (function VarargParam -> true | Param _ -> false)
-        (parameters, hasVararg)
+// Repeat statement: repeat block until expr
+let pRepeatStmt =
+    keyword "repeat" >>. block .>> keyword "until" .>>. expr
+    |>> fun (body, condition) -> Statement.Repeat(body, condition)
 
+// Numeric for statement: for name = start, end [, step] do block end
+let pNumericForStmt =
+    keyword "for" >>. identifier .>> symbol "=" .>>. expr .>> symbol "," .>>. expr
+    .>>. opt (symbol "," >>. expr)
+    .>> keyword "do" .>>. block .>> keyword "end"
+    |>> fun ((((name, start), endExpr), stepExpr), body) ->
+        Statement.NumericFor(name, start, endExpr, stepExpr, body)
+
+// Generic for statement: for name1, name2, ... in expr1, expr2, ... do block end
+let pGenericForStmt =
+    keyword "for" >>. sepBy1 (identifier .>>. preturn Attribute.NoAttribute) (symbol ",")
+    .>> keyword "in" .>>. sepBy1 expr (symbol ",")
+    .>> keyword "do" .>>. block .>> keyword "end"
+    |>> fun ((names, exprs), body) ->
+        Statement.GenericFor(names, exprs, body)
+
+// Function parameter list: (name1, name2, ..., [...])
+let pParamList =
+    let param = identifier .>>. preturn Attribute.NoAttribute |>> Parameter.Named
+    let varargParam = pstring "..." >>% Parameter.Vararg
+    
+    between (symbol "(") (symbol ")") 
+        (sepEndBy param (symbol ",") .>>. opt (symbol "..." >>% true))
+    |>> fun (parameters, isVararg) ->
+        match isVararg with
+        | Some _ -> parameters @ [Parameter.Vararg]
+        | None -> parameters
+
+// Function definition body (without the 'end' keyword)
+let pFunctionDefBody =
+    pParamList .>>. block
+    |>> fun (parameters, body) ->
+        { 
+            Parameters = parameters
+            IsVararg = List.exists (function Parameter.Vararg -> true | _ -> false) parameters
+            Body = body
+        }
+
+// Simple function definition: function name(params) body end
 let pFunctionDefSimple =
-    between (pstring "(" >>. ws) (ws >>. pstring ")") pParameterList 
-    |>> fun (parameters, hasVararg) -> { Parameters = parameters; IsVararg = hasVararg; Body = [] }
+    keyword "function" >>. identifier .>>. pFunctionDefBody .>> keyword "end"
+    |>> fun (name, def) ->
+        Statement.FunctionDef([name], def)
 
-let pFunctionDef =
-    between (pstring "(" >>. ws) (ws >>. pstring ")") pParameterList .>> ws .>>. block
-    |>> fun ((parameters, hasVararg), body) -> { Parameters = parameters; IsVararg = hasVararg; Body = body }
+// Method or table function definition: function tbl.name(params) or function tbl:name(params)
+let pFunctionDefComplex =
+    keyword "function" >>. identifier .>>. many1 (
+        (pstring "." >>. ws >>. identifier |>> fun name -> "." + name) <|>
+        (pstring ":" >>. ws >>. identifier |>> fun name -> ":" + name)
+    ) .>>. pFunctionDefBody .>> keyword "end"
+    |>> fun ((first, rest), def) ->
+        // Process the path (tbl.a.b or tbl:c)
+        let path = first :: (rest |> List.map (fun s -> 
+            if s.[0] = '.' then s.[1..] else s.[1..]
+        ))
+        Statement.FunctionDef(path, def)
 
-// Parse qualified names like "obj.method" or "a.b.c.method"
-let pQualifiedName =
-    sepBy1 identifier (pstring ".")
-
-let pFunctionDefStmt =
-    keyword "function" >>. pQualifiedName .>>. pFunctionDef .>> ws .>> keyword "end"
-    |>> fun (names, funcDef) -> FunctionDefStmt(names, funcDef)
-
+// Local function definition: local function name(params) body end
 let pLocalFunctionDef =
-    keyword "local" >>. keyword "function" >>. identifier .>>. pFunctionDef .>> ws .>> keyword "end"
-    |>> fun (name, funcDef) -> LocalFunctionDef(name, funcDef)
+    keyword "local" >>. keyword "function" >>. identifier .>>. pFunctionDefBody .>> keyword "end"
+    |>> Statement.LocalFunctionDef
+
+// Function expression: function(params) body end
+do functionExprRef :=
+    keyword "function" >>. pFunctionDefBody .>> keyword "end"
+    |>> Expr.FunctionDef
 
 // ============================================================================
-// BLOCK PARSER
+// BLOCK PARSER WITH PROPER TERMINATION
 // ============================================================================
 
 // Block parser that stops at termination keywords
@@ -334,43 +363,31 @@ let blockImpl =
     
     manyTill statement terminator
 
-// ============================================================================
-// STATEMENT IMPLEMENTATION
-// ============================================================================
-
-// Main statement parser - tries all statement types in order
+// Statement parser with proper ordering
 let statementImpl =
     ws >>. choice [
-        attempt pGenericFor           // Try generic for FIRST  
-        attempt pNumericFor
-        attempt pFunctionDefStmt
-        attempt pReturn
-        attempt pBreak
-        attempt pLabel
-        attempt pGoto
+        attempt pGenericForStmt       // Try generic for FIRST to avoid conflicts
+        attempt pNumericForStmt
         attempt pLocalFunctionDef
+        attempt pFunctionDefComplex
+        attempt pFunctionDefSimple
+        attempt pReturnStmt
+        attempt pBreakStmt
+        attempt pLabelStmt
+        attempt pGotoStmt
         attempt pLocalAssignment
-        attempt pIf
-        attempt pWhile
-        attempt pRepeat
+        attempt pIfStmt
+        attempt pWhileStmt
+        attempt pRepeatStmt
         attempt pDoBlock
         attempt pAssignment
         attempt pFunctionCallStmt
-        pEmpty
+        pEmptyStmt
     ] .>> ws
 
-// ============================================================================
-// INITIALIZATION
-// ============================================================================
-
-// Initialize functionExprRef FIRST because buildExprParser() depends on functionExpr
-do functionExprRef := (keyword "function" >>. pFunctionDef .>> ws .>> keyword "end" |>> fun funcDef -> FunctionDef funcDef)
-
-// Now initialize the rest
-do exprRef := buildExprParser()
+// Initialize the parsers in correct order
 do blockRef := blockImpl
 do statementRef := statementImpl
 
-// Top-level parser
-let luaFile: Parser<Block, unit> =
-    spaces >>. block .>> spaces .>> eof 
+// Lua file parser (entire program)
+let luaFile = ws >>. block .>> ws .>> eof 

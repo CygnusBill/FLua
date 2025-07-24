@@ -10,6 +10,11 @@
     <Compile Include="Library.fs" />
     <Compile Include="Lexer.fs" />
     <Compile Include="Parser.fs" />
+    <Compile Include="ParserHelper.fs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\FLua.Ast\FLua.Ast.fsproj" />
   </ItemGroup>
 
   <ItemGroup>

@@ -12,6 +12,7 @@
     <PackageReference Include="FSharp.Core" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\FLua.Ast\FLua.Ast.fsproj" />
     <ProjectReference Include="..\FLua.Parser\FLua.Parser.fsproj" />
   </ItemGroup>
 </Project>
