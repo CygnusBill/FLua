@@ -1,0 +1,302 @@
+using System;
+using System.Linq;
+using FLua.Ast;
+using FLua.Runtime;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+namespace FLua.Runtime.Tests
+{
+    [TestClass]
+    public class HighPriorityFeaturesTests
+    {
+        [TestClass]
+        public class VariableAttributesTests
+        {
+            [TestMethod]
+            public void TestConstVariableEnforcement()
+            {
+                var env = new EnhancedLuaEnvironment();
+                
+                // Set a const variable
+                env.SetVariableWithAttribute("x", new LuaInteger(42), Attribute.Const);
+                
+                // Verify we can read it
+                Assert.AreEqual(42L, ((LuaInteger)env.GetVariable("x")).Value);
+                
+                // Verify we cannot modify it
+                Assert.ThrowsException<LuaRuntimeException>(() =>
+                {
+                    env.SetVariable("x", new LuaInteger(100));
+                }, "Should not be able to assign to const variable");
+            }
+
+            [TestMethod]
+            public void TestToBeClosedVariables()
+            {
+                var env = new EnhancedLuaEnvironment();
+                bool closeCalled = false;
+                
+                // Create a table with __close metamethod
+                var table = new LuaTable();
+                var metatable = new LuaTable();
+                metatable.Set(new LuaString("__close"), new LuaUserFunction(args =>
+                {
+                    closeCalled = true;
+                    return Array.Empty<LuaValue>();
+                }));
+                table.Metatable = metatable;
+                
+                // Set as to-be-closed variable
+                env.SetVariableWithAttribute("resource", table, Attribute.Close);
+                
+                // Close to-be-closed variables
+                env.CloseToBeClosedVariables();
+                
+                Assert.IsTrue(closeCalled, "__close metamethod should have been called");
+            }
+
+            [TestMethod]
+            public void TestWarnFunction()
+            {
+                var env = LuaEnvironment.CreateStandardEnvironment();
+                var warnFunc = (LuaFunction)env.GetVariable("warn");
+                
+                // Test basic warning
+                var result = warnFunc.Call(new[] { new LuaString("test warning") });
+                Assert.AreEqual(0, result.Length); // warn returns nothing
+                
+                // Test with control parameter
+                var result2 = warnFunc.Call(new[] { new LuaString("test warning"), new LuaString("@on") });
+                Assert.AreEqual(0, result2.Length);
+            }
+        }
+
+        [TestClass]
+        public class LuaPatternsTests
+        {
+            [TestMethod]
+            public void TestBasicPatternMatching()
+            {
+                // Test plain text search
+                var match = LuaPatterns.Find("hello world", "world", 1, plain: true);
+                Assert.IsNotNull(match);
+                Assert.AreEqual(7, match.Start);
+                Assert.AreEqual(12, match.End);
+            }
+
+            [TestMethod]
+            public void TestPatternWithCaptures()
+            {
+                // Test pattern with captures
+                var match = LuaPatterns.Find("hello world", "(w+) (w+)", 1, plain: false);
+                Assert.IsNotNull(match);
+                Assert.AreEqual(2, match.Captures.Count);
+            }
+
+            [TestMethod]
+            public void TestCharacterClasses()
+            {
+                // Test digit character class
+                var match = LuaPatterns.Find("abc123def", "%d+", 1, plain: false);
+                Assert.IsNotNull(match);
+                Assert.AreEqual(4, match.Start); // Position of "123"
+            }
+
+            [TestMethod]
+            public void TestPatternAnchors()
+            {
+                // Test start anchor
+                var match1 = LuaPatterns.Find("hello", "^hello", 1, plain: false);
+                Assert.IsNotNull(match1);
+                
+                var match2 = LuaPatterns.Find("hello", "^ello", 1, plain: false);
+                Assert.IsNull(match2);
+                
+                // Test end anchor
+                var match3 = LuaPatterns.Find("hello", "llo$", 1, plain: false);
+                Assert.IsNotNull(match3);
+            }
+
+            [TestMethod]
+            public void TestGSub()
+            {
+                var (result, count) = LuaPatterns.GSub("hello world", "l", "L", 2);
+                Assert.AreEqual("heLLo world", result);
+                Assert.AreEqual(2, count);
+            }
+        }
+
+        [TestClass]
+        public class EnhancedCoroutineTests
+        {
+            [TestMethod]
+            public void TestContinuationCoroutineCreation()
+            {
+                var env = new LuaEnvironment();
+                ContinuationCoroutineLib.AddContinuationCoroutineLibrary(env);
+                
+                var coroutineTable = env.GetVariable("coroutine").AsTable!;
+                var createFunc = (LuaFunction)coroutineTable.Get(new LuaString("create"));
+                
+                var testFunc = new LuaUserFunction(args =>
+                {
+                    return new[] { new LuaString("Hello from coroutine!") };
+                });
+                
+                var result = createFunc.Call(new[] { testFunc });
+                
+                Assert.AreEqual(1, result.Length);
+                Assert.IsInstanceOfType(result[0], typeof(ContinuationCoroutine));
+            }
+
+            [TestMethod]
+            public void TestCoroutineStatusProgression()
+            {
+                var env = new LuaEnvironment();
+                ContinuationCoroutineLib.AddContinuationCoroutineLibrary(env);
+                
+                var coroutineTable = env.GetVariable("coroutine").AsTable!;
+                var createFunc = (LuaFunction)coroutineTable.Get(new LuaString("create"));
+                var statusFunc = (LuaFunction)coroutineTable.Get(new LuaString("status"));
+                var resumeFunc = (LuaFunction)coroutineTable.Get(new LuaString("resume"));
+                
+                var testFunc = new LuaUserFunction(args => new[] { new LuaString("done") });
+                
+                // Create coroutine
+                var createResult = createFunc.Call(new[] { testFunc });
+                var coroutine = createResult[0];
+                
+                // Initial status should be suspended
+                var status1 = statusFunc.Call(new[] { coroutine });
+                Assert.AreEqual("suspended", ((LuaString)status1[0]).Value);
+                
+                // Resume coroutine
+                var resumeResult = resumeFunc.Call(new[] { coroutine });
+                Assert.IsTrue(((LuaBoolean)resumeResult[0]).Value); // Success
+                
+                // Status should now be dead (completed)
+                var status2 = statusFunc.Call(new[] { coroutine });
+                Assert.AreEqual("dead", ((LuaString)status2[0]).Value);
+            }
+
+            [TestMethod]
+            public void TestCoroutineWrapFunctionality()
+            {
+                var env = new LuaEnvironment();
+                ContinuationCoroutineLib.AddContinuationCoroutineLibrary(env);
+                
+                var coroutineTable = env.GetVariable("coroutine").AsTable!;
+                var wrapFunc = (LuaFunction)coroutineTable.Get(new LuaString("wrap"));
+                
+                var testFunc = new LuaUserFunction(args =>
+                {
+                    var input = args.Length > 0 ? ((LuaInteger)args[0]).Value : 0;
+                    return new[] { new LuaInteger(input * 2) };
+                });
+                
+                var wrapResult = wrapFunc.Call(new[] { testFunc });
+                var wrappedFunc = (LuaFunction)wrapResult[0];
+                
+                // Call the wrapped function
+                var callResult = wrappedFunc.Call(new[] { new LuaInteger(21) });
+                
+                Assert.AreEqual(1, callResult.Length);
+                Assert.AreEqual(42L, ((LuaInteger)callResult[0]).Value);
+            }
+
+            [TestMethod]
+            public void TestCoroutineRunningDetection()
+            {
+                var env = new LuaEnvironment();
+                ContinuationCoroutineLib.AddContinuationCoroutineLibrary(env);
+                
+                var coroutineTable = env.GetVariable("coroutine").AsTable!;
+                var runningFunc = (LuaFunction)coroutineTable.Get(new LuaString("running"));
+                var isYieldableFunc = (LuaFunction)coroutineTable.Get(new LuaString("isyieldable"));
+                
+                // Outside coroutine context
+                var running1 = runningFunc.Call(Array.Empty<LuaValue>());
+                Assert.AreEqual(2, running1.Length);
+                Assert.IsInstanceOfType(running1[0], typeof(LuaNil)); // No coroutine running
+                Assert.IsTrue(((LuaBoolean)running1[1]).Value); // Is main thread
+                
+                var yieldable1 = isYieldableFunc.Call(Array.Empty<LuaValue>());
+                Assert.IsFalse(((LuaBoolean)yieldable1[0]).Value); // Cannot yield in main thread
+            }
+        }
+
+        [TestClass]
+        public class IntegrationTests
+        {
+            [TestMethod]
+            public void TestVariableAttributesWithScoping()
+            {
+                var env = new EnhancedLuaEnvironment();
+                
+                // Set const in outer scope
+                env.SetVariableWithAttribute("CONST_VALUE", new LuaInteger(100), Attribute.Const);
+                
+                // Create child environment
+                var childEnv = new EnhancedLuaEnvironment(env);
+                
+                // Should be able to read const from parent
+                Assert.AreEqual(100L, ((LuaInteger)childEnv.GetVariable("CONST_VALUE")).Value);
+                
+                // Should not be able to modify const in child
+                Assert.ThrowsException<LuaRuntimeException>(() =>
+                {
+                    childEnv.SetVariable("CONST_VALUE", new LuaInteger(200));
+                });
+            }
+
+            [TestMethod]
+            public void TestMultipleToBeClosedVariables()
+            {
+                var env = new EnhancedLuaEnvironment();
+                var closeOrder = new List<int>();
+                
+                // Create multiple to-be-closed variables
+                for (int i = 1; i <= 3; i++)
+                {
+                    var table = new LuaTable();
+                    var metatable = new LuaTable();
+                    var index = i; // Capture for closure
+                    metatable.Set(new LuaString("__close"), new LuaUserFunction(args =>
+                    {
+                        closeOrder.Add(index);
+                        return Array.Empty<LuaValue>();
+                    }));
+                    table.Metatable = metatable;
+                    
+                    env.SetVariableWithAttribute($"resource{i}", table, Attribute.Close);
+                }
+                
+                // Close all - should be in LIFO order (3, 2, 1)
+                env.CloseToBeClosedVariables();
+                
+                CollectionAssert.AreEqual(new[] { 3, 2, 1 }, closeOrder);
+            }
+
+            [TestMethod]
+            public void TestLuaPatternsInStringLibrary()
+            {
+                // This would test the updated string library functions
+                // that now use true Lua patterns instead of regex
+                
+                var env = LuaEnvironment.CreateStandardEnvironment();
+                var stringTable = env.GetVariable("string").AsTable!;
+                var findFunc = (LuaFunction)stringTable.Get(new LuaString("find"));
+                
+                // Test pattern matching
+                var result = findFunc.Call(new[] {
+                    new LuaString("hello123world"),
+                    new LuaString("%d+") // Lua pattern for digits
+                });
+                
+                Assert.IsTrue(result.Length >= 2);
+                Assert.AreEqual(6L, ((LuaInteger)result[0]).Value); // Start position
+                Assert.AreEqual(9L, ((LuaInteger)result[1]).Value);  // End position
+            }
+        }
+    }
+}

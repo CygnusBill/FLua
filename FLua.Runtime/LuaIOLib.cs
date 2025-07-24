@@ -78,13 +78,147 @@ namespace FLua.Runtime
                         throw new LuaRuntimeException($"invalid mode '{mode}' for 'open'");
                 }
                 
-                var fileHandle = new LuaFileHandle(stream, filename, mode);
+                var fileHandle = CreateFileHandle(stream, filename, mode);
                 return new LuaValue[] { fileHandle };
             }
             catch (Exception ex)
             {
                 return new LuaValue[] { LuaNil.Instance, new LuaString(ex.Message) };
             }
+        }
+        
+        /// <summary>
+        /// Creates a file handle as a table with methods
+        /// </summary>
+        private static LuaTable CreateFileHandle(Stream stream, string filename, string mode)
+        {
+            var fileHandle = new LuaTable();
+            var handle = new LuaFileHandle(stream, filename, mode);
+            
+            // Add methods to the file handle table
+            fileHandle.Set(new LuaString("write"), new BuiltinFunction(args =>
+            {
+                if (handle.IsClosed)
+                    throw new LuaRuntimeException("attempt to use a closed file");
+                
+                try
+                {
+                    using var writer = new StreamWriter(handle.Stream, Encoding.UTF8, 1024, true);
+                    
+                    // Skip the first argument (self)
+                    for (int i = 1; i < args.Length; i++)
+                    {
+                        writer.Write(args[i].AsString);
+                    }
+                    
+                    writer.Flush();
+                    return new[] { fileHandle };
+                }
+                catch (Exception ex)
+                {
+                    return new LuaValue[] { LuaNil.Instance, new LuaString(ex.Message) };
+                }
+            }));
+            
+            fileHandle.Set(new LuaString("read"), new BuiltinFunction(args =>
+            {
+                if (handle.IsClosed)
+                    throw new LuaRuntimeException("attempt to use a closed file");
+                
+                try
+                {
+                    using var reader = new StreamReader(handle.Stream, Encoding.UTF8, false, 1024, true);
+                    
+                    if (args.Length <= 1) // Only self argument
+                    {
+                        // Read a line by default
+                        var line = reader.ReadLine();
+                        return line != null ? new LuaValue[] { new LuaString(line) } : new LuaValue[] { LuaNil.Instance };
+                    }
+                    
+                    var results = new List<LuaValue>();
+                    
+                    for (int i = 1; i < args.Length; i++) // Skip self
+                    {
+                        var format = args[i];
+                        
+                        if (format is LuaString str)
+                        {
+                            switch (str.Value)
+                            {
+                                case "*l":
+                                case "*line":
+                                    var line = reader.ReadLine();
+                                    results.Add(line != null ? new LuaString(line) : LuaNil.Instance);
+                                    break;
+                                case "*a":
+                                case "*all":
+                                    var all = reader.ReadToEnd();
+                                    results.Add(new LuaString(all));
+                                    break;
+                                default:
+                                    results.Add(LuaNil.Instance);
+                                    break;
+                            }
+                        }
+                        else if (format.AsInteger.HasValue)
+                        {
+                            // Read specified number of characters
+                            var count = (int)format.AsInteger.Value;
+                            var buffer = new char[count];
+                            var actualRead = reader.Read(buffer, 0, count);
+                            if (actualRead > 0)
+                                results.Add(new LuaString(new string(buffer, 0, actualRead)));
+                            else
+                                results.Add(LuaNil.Instance);
+                        }
+                        else
+                        {
+                            results.Add(LuaNil.Instance);
+                        }
+                    }
+                    
+                    return results.ToArray();
+                }
+                catch (Exception ex)
+                {
+                    throw new LuaRuntimeException($"read error: {ex.Message}");
+                }
+            }));
+            
+            fileHandle.Set(new LuaString("close"), new BuiltinFunction(args =>
+            {
+                try
+                {
+                    handle.Close();
+                    return new LuaValue[] { new LuaBoolean(true) };
+                }
+                catch (Exception ex)
+                {
+                    return new LuaValue[] { LuaNil.Instance, new LuaString(ex.Message) };
+                }
+            }));
+            
+            fileHandle.Set(new LuaString("flush"), new BuiltinFunction(args =>
+            {
+                if (handle.IsClosed)
+                    throw new LuaRuntimeException("attempt to use a closed file");
+                
+                try
+                {
+                    handle.Stream.Flush();
+                    return new[] { new LuaBoolean(true) };
+                }
+                catch (Exception ex)
+                {
+                    return new LuaValue[] { LuaNil.Instance, new LuaString(ex.Message) };
+                }
+            }));
+            
+            // Store the actual handle for internal use
+            fileHandle.Set(new LuaString("_handle"), handle);
+            
+            return fileHandle;
         }
         
         private static LuaValue[] Close(LuaValue[] args)
@@ -97,7 +231,23 @@ namespace FLua.Runtime
             }
             
             var fileHandle = args[0];
-            if (fileHandle is LuaFileHandle handle)
+            if (fileHandle is LuaTable table)
+            {
+                var handleValue = table.Get(new LuaString("_handle"));
+                if (handleValue is LuaFileHandle handle)
+                {
+                    try
+                    {
+                        handle.Close();
+                        return new LuaValue[] { new LuaBoolean(true) };
+                    }
+                    catch (Exception ex)
+                    {
+                        return new LuaValue[] { LuaNil.Instance, new LuaString(ex.Message) };
+                    }
+                }
+            }
+            else if (fileHandle is LuaFileHandle handle)
             {
                 try
                 {
@@ -337,7 +487,18 @@ namespace FLua.Runtime
                 return new[] { LuaNil.Instance };
             
             var value = args[0];
-            if (value is LuaFileHandle handle)
+            if (value is LuaTable table)
+            {
+                var handleValue = table.Get(new LuaString("_handle"));
+                if (handleValue is LuaFileHandle handle)
+                {
+                    if (handle.IsClosed)
+                        return new LuaValue[] { new LuaString("closed file") };
+                    else
+                        return new LuaValue[] { new LuaString("file") };
+                }
+            }
+            else if (value is LuaFileHandle handle)
             {
                 if (handle.IsClosed)
                     return new LuaValue[] { new LuaString("closed file") };

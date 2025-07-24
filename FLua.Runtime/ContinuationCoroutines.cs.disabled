@@ -1,0 +1,481 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using FLua.Ast;
+using FLua.Runtime;
+using Microsoft.FSharp.Collections;
+
+namespace FLua.Runtime
+{
+    /// <summary>
+    /// Continuation-based coroutine implementation that can properly suspend and resume
+    /// </summary>
+    public class ContinuationCoroutine : LuaValue
+    {
+        private readonly LuaFunction _function;
+        private CoroutineState _state = CoroutineState.Suspended;
+        private ExecutionContinuation? _continuation;
+        private LuaValue[]? _yieldedValues;
+        private bool _hasStarted;
+        private LuaValue[]? _finalResults;
+
+        public enum CoroutineState
+        {
+            Suspended,
+            Running, 
+            Dead,
+            Normal
+        }
+
+        [ThreadStatic]
+        public static ContinuationCoroutine? CurrentCoroutine;
+
+        public ContinuationCoroutine(LuaFunction function)
+        {
+            _function = function ?? throw new ArgumentNullException(nameof(function));
+        }
+
+        public string Status => _state switch
+        {
+            CoroutineState.Suspended => "suspended",
+            CoroutineState.Running => "running",
+            CoroutineState.Dead => "dead", 
+            CoroutineState.Normal => "normal",
+            _ => "unknown"
+        };
+
+        /// <summary>
+        /// Resumes the coroutine with given arguments
+        /// </summary>
+        public LuaValue[] Resume(LuaValue[] args)
+        {
+            if (_state == CoroutineState.Dead)
+                return new LuaValue[] { new LuaBoolean(false), new LuaString("cannot resume dead coroutine") };
+
+            if (_state == CoroutineState.Running)
+                return new LuaValue[] { new LuaBoolean(false), new LuaString("cannot resume running coroutine") };
+
+            var previousCoroutine = CurrentCoroutine;
+            CurrentCoroutine = this;
+            _state = CoroutineState.Running;
+
+            try
+            {
+                LuaValue[] results;
+
+                if (!_hasStarted)
+                {
+                    // First resume - start execution
+                    _hasStarted = true;
+                    results = StartExecution(args);
+                }
+                else if (_continuation != null)
+                {
+                    // Resume from continuation
+                    results = _continuation.Resume(args);
+                }
+                else
+                {
+                    // Already completed
+                    _state = CoroutineState.Dead;
+                    return new LuaValue[] { new LuaBoolean(true) };
+                }
+
+                if (_continuation == null)
+                {
+                    // Execution completed
+                    _state = CoroutineState.Dead;
+                    _finalResults = results;
+                    return PrependSuccess(results);
+                }
+                else
+                {
+                    // Execution yielded
+                    _state = CoroutineState.Suspended;
+                    return PrependSuccess(_yieldedValues ?? Array.Empty<LuaValue>());
+                }
+            }
+            catch (CoroutineYieldException yieldEx)
+            {
+                _yieldedValues = yieldEx.Values;
+                _state = CoroutineState.Suspended;
+                return PrependSuccess(yieldEx.Values);
+            }
+            catch (LuaRuntimeException ex)
+            {
+                _state = CoroutineState.Dead;
+                return new LuaValue[] { new LuaBoolean(false), new LuaString(ex.Message) };
+            }
+            finally
+            {
+                CurrentCoroutine = previousCoroutine;
+            }
+        }
+
+        /// <summary>
+        /// Starts execution of the coroutine
+        /// </summary>
+        private LuaValue[] StartExecution(LuaValue[] args)
+        {
+            if (_function is ContinuationAwareFunction contFunc)
+            {
+                return contFunc.CallWithContinuation(args, continuation =>
+                {
+                    _continuation = continuation;
+                });
+            }
+            else
+            {
+                // For regular functions, just call them
+                var results = _function.Call(args);
+                _continuation = null; // No continuation needed
+                return results;
+            }
+        }
+
+        /// <summary>
+        /// Yields the coroutine with given values
+        /// </summary>
+        public static LuaValue[] Yield(LuaValue[] values)
+        {
+            if (CurrentCoroutine == null)
+                throw new LuaRuntimeException("attempt to yield from outside a coroutine");
+
+            throw new CoroutineYieldException(values);
+        }
+
+        private static LuaValue[] PrependSuccess(LuaValue[] results)
+        {
+            var newResults = new LuaValue[results.Length + 1];
+            newResults[0] = new LuaBoolean(true);
+            Array.Copy(results, 0, newResults, 1, results.Length);
+            return newResults;
+        }
+
+        public override string ToString() => $"thread: {GetHashCode():x8}";
+    }
+
+    /// <summary>
+    /// Represents an execution continuation that can be resumed
+    /// </summary>
+    public abstract class ExecutionContinuation
+    {
+        public abstract LuaValue[] Resume(LuaValue[] args);
+    }
+
+    /// <summary>
+    /// Continuation for function execution
+    /// </summary>
+    public class FunctionContinuation : ExecutionContinuation
+    {
+        private readonly Func<LuaValue[], LuaValue[]> _resumeFunc;
+
+        public FunctionContinuation(Func<LuaValue[], LuaValue[]> resumeFunc)
+        {
+            _resumeFunc = resumeFunc;
+        }
+
+        public override LuaValue[] Resume(LuaValue[] args)
+        {
+            return _resumeFunc(args);
+        }
+    }
+
+    /// <summary>
+    /// A function that can be suspended and resumed via continuations
+    /// </summary>
+    public abstract class ContinuationAwareFunction : LuaFunction
+    {
+        public abstract LuaValue[] CallWithContinuation(LuaValue[] args, Action<ExecutionContinuation?> setContinuation);
+
+        public override LuaValue[] Call(LuaValue[] arguments)
+        {
+            return CallWithContinuation(arguments, _ => { });
+        }
+    }
+
+    /// <summary>
+    /// A user-defined function that supports continuations
+    /// </summary>
+    public class ContinuationUserFunction : ContinuationAwareFunction
+    {
+        private readonly Block _body;
+        private readonly Parameter[] _parameters;
+        private readonly LuaEnvironment _closureEnvironment;
+
+        public ContinuationUserFunction(Block body, Parameter[] parameters, LuaEnvironment closureEnvironment)
+        {
+            _body = body;
+            _parameters = parameters;
+            _closureEnvironment = closureEnvironment;
+        }
+
+        public override LuaValue[] CallWithContinuation(LuaValue[] args, Action<ExecutionContinuation?> setContinuation)
+        {
+            // Create new environment for function execution
+            var funcEnv = new LuaEnvironment(_closureEnvironment);
+
+            // Bind parameters
+            for (int i = 0; i < _parameters.Length && i < args.Length; i++)
+            {
+                if (_parameters[i] is Parameter.Named named)
+                {
+                    funcEnv.SetLocalVariable(named.Item1, args[i]);
+                }
+            }
+
+            // Execute the function body with continuation support
+            var executor = new ContinuationExecutor(funcEnv);
+            return executor.ExecuteStatements(_body, setContinuation);
+        }
+    }
+
+    /// <summary>
+    /// Executes statements with continuation support
+    /// </summary>
+    public class ContinuationExecutor
+    {
+        private readonly LuaEnvironment _environment;
+
+        public ContinuationExecutor(LuaEnvironment environment)
+        {
+            _environment = environment;
+        }
+
+        /// <summary>
+        /// Executes a list of statements with continuation support
+        /// </summary>
+        public LuaValue[] ExecuteStatements(Block statements, Action<ExecutionContinuation?> setContinuation)
+        {
+            try
+            {
+                for (int i = 0; i < statements.Length; i++)
+                {
+                    var stmt = statements[i];
+                    var result = ExecuteStatement(stmt, statements, i, setContinuation);
+                    
+                    if (result.IsReturn)
+                    {
+                        setContinuation(null); // No continuation needed
+                        return result.ReturnValues ?? Array.Empty<LuaValue>();
+                    }
+
+                    if (result.HasYielded)
+                    {
+                        // Create continuation for remaining statements
+                        var remainingStatements = statements.Skip(i + 1).ToArray();
+                        if (remainingStatements.Length > 0)
+                        {
+                            var continuation = new FunctionContinuation(resumeArgs =>
+                            {
+                                return ExecuteStatements(remainingStatements, setContinuation);
+                            });
+                            setContinuation(continuation);
+                        }
+                        else
+                        {
+                            setContinuation(null);
+                        }
+                        
+                        return Array.Empty<LuaValue>();
+                    }
+                }
+
+                setContinuation(null);
+                return Array.Empty<LuaValue>();
+            }
+            catch (CoroutineYieldException)
+            {
+                // Let yield exceptions bubble up
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Executes a single statement
+        /// </summary>
+        private StatementExecutionResult ExecuteStatement(Statement stmt, Block allStatements, int currentIndex, Action<ExecutionContinuation?> setContinuation)
+        {
+            if (stmt.IsFunctionCall)
+            {
+                var funcCall = (Statement.FunctionCall)stmt;
+                EvaluateExpression(funcCall.Item);
+                return new StatementExecutionResult();
+            }
+            else if (stmt.IsReturn)
+            {
+                var returnStmt = (Statement.Return)stmt;
+                LuaValue[] values = Array.Empty<LuaValue>();
+                
+                if (returnStmt.Item != null && FSharpOption<FSharpList<Expr>>.get_IsSome(returnStmt.Item))
+                {
+                    values = returnStmt.Item.Value.ToArray().Select(EvaluateExpression).ToArray();
+                }
+                
+                return new StatementExecutionResult { IsReturn = true, ReturnValues = values };
+            }
+            // Add more statement types as needed
+            
+            return new StatementExecutionResult();
+        }
+
+        /// <summary>
+        /// Evaluates an expression
+        /// </summary>
+        private LuaValue EvaluateExpression(Expr expr)
+        {
+            if (expr.IsVar)
+            {
+                var variable = (Expr.Var)expr;
+                return _environment.GetVariable(variable.Item);
+            }
+            else if (expr.IsLiteral)
+            {
+                var literal = (Expr.Literal)expr;
+                return EvaluateLiteral(literal.Item);
+            }
+            else if (expr.IsFunctionCall)
+            {
+                var funcCall = (Expr.FunctionCall)expr;
+                var func = EvaluateExpression(funcCall.Item1);
+                var args = funcCall.Item2.ToArray().Select(EvaluateExpression).ToArray();
+
+                if (func is LuaFunction function)
+                {
+                    var results = function.Call(args);
+                    return results.Length > 0 ? results[0] : LuaNil.Instance;
+                }
+                
+                throw new LuaRuntimeException("Attempt to call non-function");
+            }
+            
+            return LuaNil.Instance;
+        }
+
+        private LuaValue EvaluateLiteral(Literal literal)
+        {
+            if (literal.IsNil) return LuaNil.Instance;
+            if (literal.IsBoolean) return new LuaBoolean(((Literal.Boolean)literal).Item);
+            if (literal.IsInteger) return new LuaInteger((long)((Literal.Integer)literal).Item);
+            if (literal.IsFloat) return new LuaNumber(((Literal.Float)literal).Item);
+            if (literal.IsString) return new LuaString(((Literal.String)literal).Item);
+            
+            return LuaNil.Instance;
+        }
+    }
+
+    /// <summary>
+    /// Result of executing a statement
+    /// </summary>
+    public class StatementExecutionResult
+    {
+        public bool IsReturn { get; set; }
+        public LuaValue[]? ReturnValues { get; set; }
+        public bool HasYielded { get; set; }
+        public bool BreakFlag { get; set; }
+        public string? GotoLabel { get; set; }
+    }
+
+    /// <summary>
+    /// Enhanced coroutine library using continuation-based coroutines
+    /// </summary>
+    public static class ContinuationCoroutineLib
+    {
+        public static void AddContinuationCoroutineLibrary(LuaEnvironment env)
+        {
+            var coroutineTable = new LuaTable();
+            
+            coroutineTable.Set(new LuaString("create"), new BuiltinFunction(Create));
+            coroutineTable.Set(new LuaString("resume"), new BuiltinFunction(Resume));
+            coroutineTable.Set(new LuaString("yield"), new BuiltinFunction(Yield));
+            coroutineTable.Set(new LuaString("status"), new BuiltinFunction(Status));
+            coroutineTable.Set(new LuaString("running"), new BuiltinFunction(Running));
+            coroutineTable.Set(new LuaString("isyieldable"), new BuiltinFunction(IsYieldable));
+            coroutineTable.Set(new LuaString("wrap"), new BuiltinFunction(Wrap));
+            coroutineTable.Set(new LuaString("close"), new BuiltinFunction(Close));
+            
+            env.SetVariable("coroutine", coroutineTable);
+        }
+
+        private static LuaValue[] Create(LuaValue[] args)
+        {
+            if (args.Length == 0 || !(args[0] is LuaFunction func))
+                throw new LuaRuntimeException("bad argument #1 to 'create' (function expected)");
+            
+            return new LuaValue[] { new ContinuationCoroutine(func) };
+        }
+
+        private static LuaValue[] Resume(LuaValue[] args)
+        {
+            if (args.Length == 0 || !(args[0] is ContinuationCoroutine co))
+                throw new LuaRuntimeException("bad argument #1 to 'resume' (coroutine expected)");
+            
+            var resumeArgs = args.Length > 1 ? args.Skip(1).ToArray() : Array.Empty<LuaValue>();
+            return co.Resume(resumeArgs);
+        }
+
+        private static LuaValue[] Yield(LuaValue[] args)
+        {
+            return ContinuationCoroutine.Yield(args);
+        }
+
+        private static LuaValue[] Status(LuaValue[] args)
+        {
+            if (args.Length == 0 || !(args[0] is ContinuationCoroutine co))
+                throw new LuaRuntimeException("bad argument #1 to 'status' (coroutine expected)");
+            
+            return new LuaValue[] { new LuaString(co.Status) };
+        }
+
+        private static LuaValue[] Running(LuaValue[] args)
+        {
+            var current = ContinuationCoroutine.CurrentCoroutine;
+            if (current != null)
+                return new LuaValue[] { current, new LuaBoolean(false) };
+            
+            return new LuaValue[] { LuaNil.Instance, new LuaBoolean(true) };
+        }
+
+        private static LuaValue[] IsYieldable(LuaValue[] args)
+        {
+            return new LuaValue[] { new LuaBoolean(ContinuationCoroutine.CurrentCoroutine != null) };
+        }
+
+        private static LuaValue[] Wrap(LuaValue[] args)
+        {
+            if (args.Length == 0 || !(args[0] is LuaFunction func))
+                throw new LuaRuntimeException("bad argument #1 to 'wrap' (function expected)");
+            
+            var coroutine = new ContinuationCoroutine(func);
+            
+            var wrapper = new LuaUserFunction(wrapArgs =>
+            {
+                var results = coroutine.Resume(wrapArgs);
+                
+                if (results.Length > 0 && results[0] is LuaBoolean success && !success.Value)
+                {
+                    var errorMessage = results.Length > 1 ? results[1].AsString : "coroutine error";
+                    throw new LuaRuntimeException(errorMessage);
+                }
+                
+                return results.Length > 1 ? results.Skip(1).ToArray() : Array.Empty<LuaValue>();
+            });
+            
+            return new LuaValue[] { wrapper };
+        }
+
+        private static LuaValue[] Close(LuaValue[] args)
+        {
+            if (args.Length == 0 || !(args[0] is ContinuationCoroutine co))
+                throw new LuaRuntimeException("bad argument #1 to 'close' (coroutine expected)");
+            
+            if (co.Status != "dead")
+            {
+                // In a full implementation, this would force close the coroutine
+                return new LuaValue[] { new LuaBoolean(true) };
+            }
+            
+            return new LuaValue[] { new LuaBoolean(false), new LuaString("cannot close dead coroutine") };
+        }
+    }
+}

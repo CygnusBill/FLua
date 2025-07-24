@@ -129,21 +129,21 @@ let pPrimaryBase : Parser<Expr, unit> =
 let pPostfixOp =
     choice [
         // Method call: :identifier(args)
-        pstring ":" >>. ws >>. identifier .>>. between (pstring "(" >>. ws) (ws >>. pstring ")") (opt (sepBy1 expr (symbol ",")))
+        pstring ":" >>. ws >>. identifier .>>. between (pstring "(" >>. ws) (ws >>. pstring ")" >>. ws) (opt (sepBy1 expr (symbol ",")))
         |>> fun (methodName, argsOpt) -> fun expr ->
             let args = argsOpt |> Option.defaultValue []
             Expr.MethodCall(expr, methodName, args)
         
         // Dot access: .identifier
-        pstring "." >>. ws >>. identifier
+        pstring "." >>. ws >>. identifier .>> ws
         |>> fun key -> fun expr -> Expr.TableAccess(expr, Expr.Literal (Literal.String key))
         
         // Bracket access: [expr]
-        between (pstring "[" >>. ws) (ws >>. pstring "]") expr
+        between (pstring "[" >>. ws) (ws >>. pstring "]" >>. ws) expr
         |>> fun key -> fun expr -> Expr.TableAccess(expr, key)
         
         // Function call: (args)
-        between (pstring "(" >>. ws) (ws >>. pstring ")") (opt (sepBy1 expr (symbol ",")))
+        between (pstring "(" >>. ws) (ws >>. pstring ")" >>. ws) (opt (sepBy1 expr (symbol ",")))
         |>> fun argsOpt -> fun expr ->
             let args = argsOpt |> Option.defaultValue []
             Expr.FunctionCall(expr, args)
@@ -393,8 +393,8 @@ let statementImpl =
         attempt pWhileStmt
         attempt pRepeatStmt
         attempt pDoBlock
+        attempt pFunctionCallStmt    // Try function calls BEFORE assignments
         attempt pAssignment
-        attempt pFunctionCallStmt
         pEmptyStmt
     ] .>> ws
 

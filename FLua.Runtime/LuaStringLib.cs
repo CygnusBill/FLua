@@ -260,49 +260,23 @@ namespace FLua.Runtime
             
             try
             {
-                int index;
-                if (plain)
-                {
-                    // Plain text search
-                    index = str.IndexOf(pattern, start - 1, StringComparison.Ordinal);
-                }
-                else
-                {
-                    // Convert Lua pattern to .NET regex (simplified)
-                    var regexPattern = ConvertLuaPatternToRegex(pattern);
-                    var regex = new Regex(regexPattern);
-                    var match = regex.Match(str, start - 1);
-                    
-                    if (match.Success)
-                    {
-                        index = match.Index;
-                        var results = new List<LuaValue>
-                        {
-                            new LuaInteger(index + 1), // Convert to 1-based
-                            new LuaInteger(index + match.Length) // End position
-                        };
-                        
-                        // Add captured groups
-                        for (int i = 1; i < match.Groups.Count; i++)
-                        {
-                            results.Add(new LuaString(match.Groups[i].Value));
-                        }
-                        
-                        return results.ToArray();
-                    }
-                    else
-                    {
-                        return new[] { LuaNil.Instance };
-                    }
-                }
+                var match = LuaPatterns.Find(str, pattern, start, plain);
                 
-                if (index >= 0)
+                if (match != null)
                 {
-                    return new[]
+                    var results = new List<LuaValue>
                     {
-                        new LuaInteger(index + 1), // Convert to 1-based
-                        new LuaInteger(index + pattern.Length)
+                        new LuaInteger(match.Start), // Already 1-based
+                        new LuaInteger(match.End)    // Already 1-based
                     };
+                    
+                    // Add captured groups
+                    foreach (var capture in match.Captures)
+                    {
+                        results.Add(new LuaString(capture));
+                    }
+                    
+                    return results.ToArray();
                 }
             }
             catch (ArgumentException)

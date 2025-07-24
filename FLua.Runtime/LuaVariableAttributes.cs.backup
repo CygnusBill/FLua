@@ -1,0 +1,272 @@
+using System;
+using System.Collections.Generic;
+using FLua.Ast;
+
+namespace FLua.Runtime
+{
+    /// <summary>
+    /// Represents a Lua 5.4 variable with attributes
+    /// </summary>
+    public class LuaVariable
+    {
+        public LuaValue Value { get; set; }
+        public Attribute Attribute { get; }
+        public bool IsClosed { get; private set; }
+        
+        public LuaVariable(LuaValue value, Attribute attribute = Attribute.NoAttribute)
+        {
+            Value = value;
+            Attribute = attribute;
+            IsClosed = false;
+        }
+        
+        /// <summary>
+        /// Checks if this variable can be assigned to
+        /// </summary>
+        public bool CanAssign()
+        {
+            return Attribute != Attribute.Const;
+        }
+        
+        /// <summary>
+        /// Closes a to-be-closed variable, calling its __close metamethod if present
+        /// </summary>
+        public void Close()
+        {
+            if (IsClosed || Attribute != Attribute.Close)
+                return;
+                
+            IsClosed = true;
+            
+            // Call __close metamethod if the value has one
+            if (Value is LuaTable table && table.Metatable != null)
+            {
+                var closeMethod = table.Metatable.RawGet(new LuaString("__close"));
+                if (closeMethod is LuaFunction closeFunc)
+                {
+                    try
+                    {
+                        // Call __close(value, nil) - nil indicates normal close, not error
+                        closeFunc.Call(new[] { Value, LuaNil.Instance });
+                    }
+                    catch (LuaRuntimeException)
+                    {
+                        // Ignore errors in __close metamethod during normal close
+                        // In a full implementation, these would be collected and reported
+                    }
+                }
+            }
+        }
+        
+        /// <summary>
+        /// Closes a to-be-closed variable with an error
+        /// </summary>
+        public void CloseWithError(LuaValue error)
+        {
+            if (IsClosed || Attribute != Attribute.Close)
+                return;
+                
+            IsClosed = true;
+            
+            // Call __close metamethod with error
+            if (Value is LuaTable table && table.Metatable != null)
+            {
+                var closeMethod = table.Metatable.RawGet(new LuaString("__close"));
+                if (closeMethod is LuaFunction closeFunc)
+                {
+                    try
+                    {
+                        // Call __close(value, error)
+                        closeFunc.Call(new[] { Value, error });
+                    }
+                    catch (LuaRuntimeException closeError)
+                    {
+                        // In a full implementation, this error would be added to a pending error list
+                        // For now, we'll just ignore it
+                    }
+                }
+            }
+        }
+    }
+    
+    /// <summary>
+    /// Enhanced environment that supports variable attributes
+    /// </summary>
+    public class EnhancedLuaEnvironment : LuaEnvironment
+    {
+        private readonly Dictionary<string, LuaVariable> _variables = new Dictionary<string, LuaVariable>();
+        private readonly EnhancedLuaEnvironment? _parent;
+        private readonly List<LuaVariable> _toBeClosedVariables = new List<LuaVariable>();
+        
+        public EnhancedLuaEnvironment(EnhancedLuaEnvironment? parent = null) : base(parent)
+        {
+            _parent = parent;
+        }
+        
+        /// <summary>
+        /// Sets a variable with attributes
+        /// </summary>
+        public void SetVariableWithAttribute(string name, LuaValue value, Attribute attribute)
+        {
+            // Check if variable already exists and is const
+            if (_variables.TryGetValue(name, out var existingVar))
+            {
+                if (!existingVar.CanAssign())
+                {
+                    throw new LuaRuntimeException($"attempt to assign to const variable '{name}'");
+                }
+                
+                // Close the old variable if it was to-be-closed
+                if (existingVar.Attribute == Attribute.Close)
+                {
+                    existingVar.Close();
+                    _toBeClosedVariables.Remove(existingVar);
+                }
+            }
+            
+            // Create new variable
+            var variable = new LuaVariable(value, attribute);
+            _variables[name] = variable;
+            
+            // Add to to-be-closed list if needed
+            if (attribute == Attribute.Close)
+            {
+                _toBeClosedVariables.Add(variable);
+            }
+            
+            // Also set in base environment for compatibility
+            base.SetLocalVariable(name, value);
+        }
+        
+        /// <summary>
+        /// Sets a local variable with attributes
+        /// </summary>
+        public void SetLocalVariableWithAttribute(string name, LuaValue value, Attribute attribute)
+        {
+            SetVariableWithAttribute(name, value, attribute);
+        }
+        
+        /// <summary>
+        /// Gets a variable value, checking for const violations
+        /// </summary>
+        public override LuaValue GetVariable(string name)
+        {
+            if (_variables.TryGetValue(name, out var variable))
+            {
+                return variable.Value;
+            }
+            
+            return base.GetVariable(name);
+        }
+        
+        /// <summary>
+        /// Sets a variable value, checking for const violations
+        /// </summary>
+        public override void SetVariable(string name, LuaValue value)
+        {
+            // Check local variables first
+            if (_variables.TryGetValue(name, out var variable))
+            {
+                if (!variable.CanAssign())
+                {
+                    throw new LuaRuntimeException($"attempt to assign to const variable '{name}'");
+                }
+                
+                variable.Value = value;
+                base.SetVariable(name, value); // Keep base environment in sync
+                return;
+            }
+            
+            // Check parent environments
+            if (_parent != null && _parent.HasVariableWithAttribute(name))
+            {
+                _parent.SetVariable(name, value);
+                return;
+            }
+            
+            // New variable - set normally
+            base.SetVariable(name, value);
+        }
+        
+        /// <summary>
+        /// Checks if a variable exists with attributes in this environment or parents
+        /// </summary>
+        public bool HasVariableWithAttribute(string name)
+        {
+            if (_variables.ContainsKey(name))
+                return true;
+                
+            return _parent?.HasVariableWithAttribute(name) ?? false;
+        }
+        
+        /// <summary>
+        /// Closes all to-be-closed variables in reverse order (LIFO)
+        /// </summary>
+        public void CloseToBeClosedVariables()
+        {
+            // Close in reverse order (LIFO - last declared, first closed)
+            for (int i = _toBeClosedVariables.Count - 1; i >= 0; i--)
+            {
+                _toBeClosedVariables[i].Close();
+            }
+            _toBeClosedVariables.Clear();
+        }
+        
+        /// <summary>
+        /// Closes all to-be-closed variables with an error
+        /// </summary>
+        public void CloseToBeClosedVariablesWithError(LuaValue error)
+        {
+            // Close in reverse order (LIFO - last declared, first closed)
+            for (int i = _toBeClosedVariables.Count - 1; i >= 0; i--)
+            {
+                _toBeClosedVariables[i].CloseWithError(error);
+            }
+            _toBeClosedVariables.Clear();
+        }
+        
+        /// <summary>
+        /// Creates a standard enhanced environment with built-in functions
+        /// </summary>
+        public static new EnhancedLuaEnvironment CreateStandardEnvironment()
+        {
+            var env = new EnhancedLuaEnvironment();
+            
+            // Copy all standard functions from base implementation
+            var baseEnv = LuaEnvironment.CreateStandardEnvironment();
+            
+            // Add basic functions
+            env.SetVariableWithAttribute("print", baseEnv.GetVariable("print"), Attribute.NoAttribute);
+            env.SetVariableWithAttribute("type", baseEnv.GetVariable("type"), Attribute.NoAttribute);
+            env.SetVariableWithAttribute("tostring", baseEnv.GetVariable("tostring"), Attribute.NoAttribute);
+            env.SetVariableWithAttribute("tonumber", baseEnv.GetVariable("tonumber"), Attribute.NoAttribute);
+            env.SetVariableWithAttribute("assert", baseEnv.GetVariable("assert"), Attribute.NoAttribute);
+            env.SetVariableWithAttribute("pcall", baseEnv.GetVariable("pcall"), Attribute.NoAttribute);
+            env.SetVariableWithAttribute("xpcall", baseEnv.GetVariable("xpcall"), Attribute.NoAttribute);
+            env.SetVariableWithAttribute("error", baseEnv.GetVariable("error"), Attribute.NoAttribute);
+            env.SetVariableWithAttribute("pairs", baseEnv.GetVariable("pairs"), Attribute.NoAttribute);
+            env.SetVariableWithAttribute("ipairs", baseEnv.GetVariable("ipairs"), Attribute.NoAttribute);
+            env.SetVariableWithAttribute("next", baseEnv.GetVariable("next"), Attribute.NoAttribute);
+            env.SetVariableWithAttribute("rawget", baseEnv.GetVariable("rawget"), Attribute.NoAttribute);
+            env.SetVariableWithAttribute("rawset", baseEnv.GetVariable("rawset"), Attribute.NoAttribute);
+            env.SetVariableWithAttribute("rawequal", baseEnv.GetVariable("rawequal"), Attribute.NoAttribute);
+            env.SetVariableWithAttribute("rawlen", baseEnv.GetVariable("rawlen"), Attribute.NoAttribute);
+            env.SetVariableWithAttribute("setmetatable", baseEnv.GetVariable("setmetatable"), Attribute.NoAttribute);
+            env.SetVariableWithAttribute("getmetatable", baseEnv.GetVariable("getmetatable"), Attribute.NoAttribute);
+            env.SetVariableWithAttribute("select", baseEnv.GetVariable("select"), Attribute.NoAttribute);
+            env.SetVariableWithAttribute("unpack", baseEnv.GetVariable("unpack"), Attribute.NoAttribute);
+            
+            // Add standard libraries
+            env.SetVariableWithAttribute("math", baseEnv.GetVariable("math"), Attribute.NoAttribute);
+            env.SetVariableWithAttribute("string", baseEnv.GetVariable("string"), Attribute.NoAttribute);
+            env.SetVariableWithAttribute("table", baseEnv.GetVariable("table"), Attribute.NoAttribute);
+            env.SetVariableWithAttribute("io", baseEnv.GetVariable("io"), Attribute.NoAttribute);
+            env.SetVariableWithAttribute("os", baseEnv.GetVariable("os"), Attribute.NoAttribute);
+            env.SetVariableWithAttribute("utf8", baseEnv.GetVariable("utf8"), Attribute.NoAttribute);
+            env.SetVariableWithAttribute("debug", baseEnv.GetVariable("debug"), Attribute.NoAttribute);
+            env.SetVariableWithAttribute("coroutine", baseEnv.GetVariable("coroutine"), Attribute.NoAttribute);
+            
+            return env;
+        }
+    }
+}

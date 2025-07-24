@@ -1,5 +1,6 @@
 using System;
 using System.Globalization;
+using System.IO;
 
 namespace FLua.Runtime
 {
@@ -29,6 +30,9 @@ namespace FLua.Runtime
             
             // Process functions
             osTable.Set(new LuaString("exit"), new BuiltinFunction(Exit));
+            
+            // File system functions
+            osTable.Set(new LuaString("remove"), new BuiltinFunction(Remove));
             
             // System information
             osTable.Set(new LuaString("tmpname"), new BuiltinFunction(TmpName));
@@ -237,6 +241,40 @@ namespace FLua.Runtime
             
             // This line will never be reached, but needed for compiler
             return Array.Empty<LuaValue>();
+        }
+        
+        #endregion
+        
+        #region File System Functions
+        
+        private static LuaValue[] Remove(LuaValue[] args)
+        {
+            if (args.Length == 0)
+                throw new LuaRuntimeException("bad argument #1 to 'remove' (string expected)");
+            
+            var filename = args[0].AsString;
+            
+            try
+            {
+                if (File.Exists(filename))
+                {
+                    File.Delete(filename);
+                    return new[] { new LuaBoolean(true) };
+                }
+                else if (Directory.Exists(filename))
+                {
+                    Directory.Delete(filename);
+                    return new[] { new LuaBoolean(true) };
+                }
+                else
+                {
+                    return new LuaValue[] { LuaNil.Instance, new LuaString($"No such file or directory: {filename}") };
+                }
+            }
+            catch (Exception ex)
+            {
+                return new LuaValue[] { LuaNil.Instance, new LuaString(ex.Message) };
+            }
         }
         
         #endregion
