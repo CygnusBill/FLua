@@ -128,6 +128,12 @@ namespace FLua.Runtime
             
             // Add standard libraries
             LuaCoroutineLib.AddCoroutineLibrary(env);
+            LuaMathLib.AddMathLibrary(env);
+            LuaStringLib.AddStringLibrary(env);
+            LuaTableLib.AddTableLibrary(env);
+            LuaIOLib.AddIOLibrary(env);
+            LuaOSLib.AddOSLibrary(env);
+            LuaUTF8Lib.AddUTF8Library(env);
             
             return env;
         }
