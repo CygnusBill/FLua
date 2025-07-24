@@ -48,8 +48,22 @@ let pShebang: Parser<Token, unit> =
 
 // Parser for single-line comments (--... to end of line)
 let pSingleLineComment: Parser<Token, unit> =
-    attempt (pstring "--" >>. skipRestOfLine true)
-    |>> fun _ -> Whitespace
+    attempt (pstring "--" >>. manyCharsTill anyChar (eof <|> (newline >>% ())))
+    |>> Comment
+
+// Parser for multi-line comments (--[[ ... ]] and --[=[ ... ]=])
+let pMultiLineComment: Parser<Token, unit> =
+    let openBracket =
+        pstring "--[" >>. manyChars (pchar '=') .>> pchar '['
+    let closeBracket n =
+        pstring "]" >>. pstring (String.replicate n "=") >>. pstring "]"
+    let content n =
+        manyCharsTill anyChar (attempt (closeBracket n))
+    attempt (
+        openBracket >>= fun eqs ->
+            let n = eqs.Length in
+            content n |>> Comment
+    )
 
 // Parser for angle-bracketed attributes (e.g., <const>)
 let pAngleAttribute: Parser<Token, unit> =
@@ -197,6 +211,9 @@ let pSymbol: Parser<Token, unit> =
         |>> fun _ -> Symbol sym)
     |> choice
 
-// Parser for comments (stub)
+// Parser for comments (now properly implemented)
 let pComment: Parser<Token, unit> =
-    fail "Comment parser not implemented" 
+    choice [
+        attempt pMultiLineComment
+        pSingleLineComment
+    ] 

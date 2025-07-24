@@ -189,8 +189,7 @@ publish_project() {
         -p:StripSymbols=true \
         -p:PublishTrimmed=true \
         -p:TrimMode=partial \
-        -p:PublishSingleFile=false \
-        --no-restore
+        -p:PublishSingleFile=false
     
     print_success "$project_name published successfully"
 }

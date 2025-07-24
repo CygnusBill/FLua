@@ -38,7 +38,20 @@ let block, blockRef = createParserForwardedToRef<Block, unit>()
 let functionExpr, functionExprRef = createParserForwardedToRef<Expr, unit>()
 
 // Basic helper parsers
-let ws = spaces
+let ws = 
+    let wsChar = anyOf " \t\r\n"
+    let singleLineComment = pstring "--" >>. skipRestOfLine true
+    let multiLineComment = 
+        let openBracket = pstring "--[" >>. manyChars (pchar '=') .>> pchar '['
+        let closeBracket n = pstring "]" >>. pstring (String.replicate n "=") >>. pstring "]"
+        let content n = manyCharsTill anyChar (attempt (closeBracket n))
+        attempt (
+            openBracket >>= fun eqs ->
+                let n = eqs.Length in
+                content n >>% ()
+        )
+    let comment = attempt multiLineComment <|> singleLineComment
+    skipMany (skipMany1 wsChar <|> comment)
 let keyword kw = pstring kw >>? notFollowedBy (satisfy isIdentifierChar) .>> ws
 let symbol s = pstring s .>> ws
 let identifier = pIdentifier |>> (function Identifier s -> s | _ -> failwith "impossible") .>> ws
