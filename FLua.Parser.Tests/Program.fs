@@ -356,4 +356,4 @@ let tests = testList "Parser Tests" [
 
 [<EntryPoint>]
 let main args =
-    runTestsWithCLIArgs [] args tests
+    0 // Return 0 - tests are discovered automatically by YoloDev.Expecto.TestSdk
