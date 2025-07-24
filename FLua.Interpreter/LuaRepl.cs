@@ -169,6 +169,21 @@ namespace FLua.Interpreter
             Console.WriteLine();
             Console.WriteLine("🔹 Built-in functions:");
             Console.WriteLine("   print(), type(), tostring(), tonumber(), pairs(), ipairs()");
+            Console.WriteLine("   pcall(), error(), setmetatable(), getmetatable()");
+            Console.WriteLine();
+            Console.WriteLine("🔹 Standard Libraries:");
+            Console.WriteLine("   📐 math.*     - sin(), cos(), tan(), sqrt(), floor(), ceil()");
+            Console.WriteLine("                   abs(), max(), min(), pi, huge, random()");
+            Console.WriteLine("   📝 string.*   - len(), sub(), upper(), lower(), find()");
+            Console.WriteLine("                   gsub(), format(), char(), byte()");
+            Console.WriteLine("   📋 table.*    - insert(), remove(), concat(), sort()");
+            Console.WriteLine("                   pack(), unpack(), move()");
+            Console.WriteLine("   📁 io.*       - open(), close(), read(), write(), flush()");
+            Console.WriteLine("                   input(), output(), lines()");
+            Console.WriteLine("   🕐 os.*       - time(), date(), clock(), getenv()");
+            Console.WriteLine("                   exit(), tmpname(), difftime()");
+            Console.WriteLine("   🔤 utf8.*     - len(), char(), codepoint(), offset()");
+            Console.WriteLine("   ⚡ coroutine.* - create(), resume(), yield(), status()");
             Console.WriteLine();
         }
         
