@@ -1,116 +1,148 @@
 # FLua Publishing Script
 
-This script automates the process of publishing FLua REPL and CLI as AOT-compiled, self-contained executables.
+This script automates the process of publishing FLua CLI (with integrated REPL) as AOT-compiled, self-contained executables for multiple platforms.
 
 ## Usage
 
 ```bash
-./publish.sh [runtime|--all] [configuration] [output_dir]
+./publish.sh [command]
 ```
 
-## Arguments
+## Commands
 
-- **runtime**: Target runtime platform (default: `osx-arm64`)
-- **--all**: Build for all supported runtimes
-- **configuration**: Build configuration (default: `Release`)
-- **output_dir**: Output directory (default: `./publish`)
+- **(no arguments)**: Full build and publish for all supported platforms
+- **clean**: Clean previous builds only
+- **test**: Build and test only (no publishing)
 
 ## Supported Runtimes
 
-- `osx-arm64` - macOS Apple Silicon (M1/M2/M3)
-- `osx-x64` - macOS Intel
 - `linux-x64` - Linux x64
 - `linux-arm64` - Linux ARM64
+- `osx-x64` - macOS Intel
+- `osx-arm64` - macOS Apple Silicon (M1/M2/M3)
 - `win-x64` - Windows x64
 - `win-arm64` - Windows ARM64
 
 ## Examples
 
 ```bash
-# Use defaults (macOS ARM64, Release build)
+# Full publish for all platforms (recommended)
 ./publish.sh
 
-# Build for all supported runtimes
-./publish.sh --all
+# Clean previous builds
+./publish.sh clean
 
-# Build all runtimes in Debug mode
-./publish.sh --all Debug
-
-# Linux x64 build
-./publish.sh linux-x64
-
-# Windows x64 Debug build
-./publish.sh win-x64 Debug
-
-# macOS Intel with custom output directory
-./publish.sh osx-x64 Release ./dist
-
-# Show help
-./publish.sh --help
+# Build and test only
+./publish.sh test
 ```
 
 ## Features
 
+- ✅ **Multi-Platform**: Automatically builds for all major platforms
 - ✅ **AOT Compilation**: Creates native executables with fast startup
 - ✅ **Self-Contained**: No .NET runtime required on target machine
-- ✅ **Multi-Platform**: Supports all major platforms
-- ✅ **Colored Output**: Easy to read status messages
-- ✅ **Error Handling**: Validates inputs and handles errors gracefully
-- ✅ **Size Reporting**: Shows executable sizes after compilation
-- ✅ **Optional Testing**: Prompts to test the REPL after publishing (single runtime only)
-- ✅ **Batch Building**: `--all` flag builds for all supported platforms at once
+- ✅ **Optimized**: Uses PublishAot, trimming, and symbol stripping for minimal size
+- ✅ **Package Creation**: Automatically creates distribution packages
+- ✅ **Progress Tracking**: Colored output with clear progress indicators
+- ✅ **Error Handling**: Comprehensive validation and error recovery
+- ✅ **Testing**: Includes automated testing of published executables
 
 ## Output Structure
 
-### Single Runtime Build
+After running `./publish.sh`, you'll get:
+
 ```
 ./publish/
-├── Repl/
-│   ├── FLua.Repl           # Main REPL executable
-│   ├── FLua.Repl.dSYM/     # Debug symbols (macOS)
-│   └── [support files]
-└── Cli/
-    ├── FLua.Cli            # Main CLI executable
-    ├── FLua.Cli.dSYM/      # Debug symbols (macOS)
-    └── [support files]
+├── linux-x64/
+│   └── flua              # Linux x64 executable
+├── linux-arm64/
+│   └── flua              # Linux ARM64 executable
+├── osx-x64/
+│   └── flua              # macOS Intel executable
+├── osx-arm64/
+│   └── flua              # macOS Apple Silicon executable
+├── win-x64/
+│   └── flua.exe          # Windows x64 executable
+├── win-arm64/
+│   └── flua.exe          # Windows ARM64 executable
+└── packages/
+    ├── flua-linux-x64.tar.gz
+    ├── flua-linux-arm64.tar.gz
+    ├── flua-osx-x64.tar.gz
+    ├── flua-osx-arm64.tar.gz
+    ├── flua-win-x64.tar.gz
+    └── flua-win-arm64.tar.gz
 ```
 
-### Multi-Runtime Build (--all flag)
+## Usage of Published Binaries
+
+The `flua` executable combines both REPL and script execution functionality:
+
+### Interactive REPL Mode
+```bash
+# Start interactive REPL (no arguments)
+./flua
+
+lua> 1 + 2 * 3
+= 7
+lua> print("Hello, World!")
+Hello, World!
+lua> .quit
 ```
-./publish/
-├── osx-arm64/
-│   ├── Repl/FLua.Repl
-│   └── Cli/FLua.Cli
-├── osx-x64/
-│   ├── Repl/FLua.Repl
-│   └── Cli/FLua.Cli
-├── linux-x64/
-│   ├── Repl/FLua.Repl
-│   └── Cli/FLua.Cli
-├── linux-arm64/
-│   ├── Repl/FLua.Repl
-│   └── Cli/FLua.Cli
-├── win-x64/
-│   ├── Repl/FLua.Repl.exe
-│   └── Cli/FLua.Cli.exe
-└── win-arm64/
-    ├── Repl/FLua.Repl.exe
-    └── Cli/FLua.Cli.exe
+
+### Script Execution Mode
+```bash
+# Execute a Lua script file
+./flua script.lua
+
+# Show help
+./flua --help
+
+# Show version
+./flua --version
+
+# Verbose script execution
+./flua --verbose script.lua
 ```
 
 ## Typical File Sizes
 
-- **Executable**: ~4.3MB (self-contained, no dependencies)
-- **Debug Symbols**: ~16MB (can be stripped for distribution)
+- **Executable**: ~3-5MB per platform (self-contained, no dependencies)
+- **Package**: ~1-2MB compressed (varies by platform)
 
 ## Requirements
 
 - .NET SDK (version 10.0 or later)
-- Target platform toolchain (for cross-compilation)
+- `tar` command (for package creation)
+- `git` command (optional, for version information)
 
-## Notes
+## Distribution
 
-- The script automatically cleans the output directory before publishing
-- All executables are optimized for size and performance
-- Cross-compilation may require additional setup depending on the target platform
-- Debug symbols are included but can be removed to reduce distribution size 
+The script creates both individual executables and compressed distribution packages:
+
+1. **Individual Executables**: Use the `publish/[platform]/flua` files directly
+2. **Distribution Packages**: Use the `publish/packages/flua-[platform].tar.gz` files for easy distribution
+
+## Platform-Specific Notes
+
+- **macOS**: Executables may need to be signed for distribution
+- **Windows**: `.exe` extension is automatically added
+- **Linux**: Executables have no extension, mark as executable with `chmod +x`
+
+## Example Distribution
+
+```bash
+# Extract package on target system
+tar -xzf flua-linux-x64.tar.gz
+cd linux-x64
+
+# Make executable (Linux/macOS)
+chmod +x flua
+
+# Test installation
+./flua --version
+./flua --help
+
+# Start REPL
+./flua
+``` 

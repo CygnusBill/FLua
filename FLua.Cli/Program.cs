@@ -9,20 +9,32 @@ namespace FLua.Cli
     {
         static int Main(string[] args)
         {
+            // If no arguments provided, enter REPL mode
             if (args.Length == 0)
             {
-                Console.WriteLine("FLua Compiler");
-                Console.WriteLine("Usage: flua <filename> [options]");
-                Console.WriteLine("Options:");
-                Console.WriteLine("  -o <output>   Specify output file");
-                Console.WriteLine("  -run          Run the script instead of compiling");
-                Console.WriteLine("  -v            Verbose output");
+                var repl = new LuaRepl();
+                repl.Run();
                 return 0;
             }
 
+            // Handle help flag
+            if (args[0] == "--help" || args[0] == "-h")
+            {
+                ShowHelp();
+                return 0;
+            }
+
+            // Handle version flag
+            if (args[0] == "--version" || args[0] == "-v")
+            {
+                Console.WriteLine("FLua - A Lua implementation in F# and C#");
+                Console.WriteLine("Version: 1.0.0");
+                return 0;
+            }
+
+            // File execution mode
             string filename = args[0];
-            bool runMode = Array.IndexOf(args, "-run") >= 0;
-            bool verbose = Array.IndexOf(args, "-v") >= 0;
+            bool verbose = Array.IndexOf(args, "--verbose") >= 0;
 
             if (!File.Exists(filename))
             {
@@ -34,25 +46,14 @@ namespace FLua.Cli
             {
                 string code = File.ReadAllText(filename);
                 
-                if (runMode)
+                // Execute the script using the interpreter
+                var interpreter = new LuaInterpreter();
+                var result = interpreter.ExecuteCode(code);
+                
+                // Only output if there's a return value and verbose mode is on
+                if (verbose && result.Length > 0 && result[0] != LuaNil.Instance)
                 {
-                    // Run the script using the interpreter
-                    var interpreter = new LuaInterpreter();
-                    var result = interpreter.ExecuteCode(code);
-                    
-                    if (result.Length > 0 && result[0] != LuaNil.Instance)
-                    {
-                        Console.WriteLine(result[0]);
-                    }
-                }
-                else
-                {
-                    // For now, just print that compilation is not yet implemented
-                    Console.WriteLine("Compilation to native code is not yet implemented");
-                    
-                    // In the future, this would compile the Lua code to IL/native code
-                    // var compiler = new LuaCompiler();
-                    // compiler.CompileToAssembly(code, outputPath);
+                    Console.WriteLine($"Script returned: {result[0]}");
                 }
                 
                 return 0;
@@ -66,6 +67,28 @@ namespace FLua.Cli
                 }
                 return 1;
             }
+        }
+
+        static void ShowHelp()
+        {
+            Console.WriteLine("FLua - A Lua implementation in F# and C#");
+            Console.WriteLine();
+            Console.WriteLine("Usage:");
+            Console.WriteLine("  flua                    Enter interactive REPL mode");
+            Console.WriteLine("  flua <script.lua>       Execute a Lua script file");
+            Console.WriteLine("  flua [options]");
+            Console.WriteLine();
+            Console.WriteLine("Options:");
+            Console.WriteLine("  -h, --help             Show this help message");
+            Console.WriteLine("  -v, --version          Show version information");
+            Console.WriteLine("      --verbose          Show verbose output when executing files");
+            Console.WriteLine();
+            Console.WriteLine("Examples:");
+            Console.WriteLine("  flua                   # Start interactive REPL");
+            Console.WriteLine("  flua script.lua        # Run script.lua");
+            Console.WriteLine("  flua --verbose test.lua # Run test.lua with verbose output");
+            Console.WriteLine();
+            Console.WriteLine("In REPL mode, use .help for REPL-specific commands.");
         }
     }
 }

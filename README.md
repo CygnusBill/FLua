@@ -7,7 +7,10 @@ A comprehensive Lua 5.4 parser and interpreter implementation in F# using FParse
 ### **Interactive REPL (Recommended)**
 ```bash
 # Start the interactive Lua REPL
-dotnet run --project FLua.Repl
+dotnet run --project FLua.Cli
+
+# Or after building:
+./flua
 
 # Try some Lua code:
 lua> 1 + 2 * 3
@@ -30,10 +33,16 @@ dotnet run --project FLua.Parser.Tests
 dotnet run --project FLua.Interpreter.Tests
 ```
 
-### **Parse Lua Files** 
+### **Execute Lua Files** 
 ```bash
-# Parse and validate Lua files (parser only)
-dotnet run --project FLua.Cli -- LuaTests/
+# Execute a Lua script file
+dotnet run --project FLua.Cli -- script.lua
+
+# Or after building:
+./flua script.lua
+
+# Show help
+./flua --help
 ```
 
 ## 🎯 Usage Examples
@@ -223,20 +232,18 @@ dotnet run --project FLua.Interpreter.Tests
 
 ```
 FLua/
-├── FLua.Parser/           # Core parser library
-│   ├── Library.fs         # AST definitions
-│   ├── Lexer.fs          # Character-level token parsers  
-│   ├── Parser.fs         # Main parser implementation
-│   └── FLua.Parser.fsproj
-├── FLua.Interpreter/      # Lua interpreter
-│   ├── Values.fs         # Runtime value system
-│   ├── Environment.fs    # Built-in functions and environment
-│   ├── Interpreter.fs    # Expression evaluation and statement execution
-│   └── FLua.Interpreter.fsproj
-├── FLua.Repl/            # Interactive REPL
-├── FLua.Parser.Tests/    # Parser test suite
-├── FLua.Interpreter.Tests/ # Interpreter test suite
-└── FLua.Cli/             # Command-line file parser
+├── FLua.Ast/             # AST type definitions
+├── FLua.Parser/          # Core parser library
+│   ├── Lexer.fs         # Tokenizer
+│   ├── Parser.fs        # Main parser implementation
+│   └── ParserHelper.fs  # Parser utilities
+├── FLua.Runtime/         # Runtime libraries and values
+├── FLua.Interpreter/     # Lua interpreter
+│   ├── LuaInterpreter.cs # Core interpreter
+│   └── LuaRepl.cs       # REPL implementation
+├── FLua.Cli/            # Command-line interface with integrated REPL
+├── FLua.Parser.Tests/   # Parser test suite
+└── FLua.Interpreter.Tests/ # Interpreter test suite
 ```
 
 ## Status

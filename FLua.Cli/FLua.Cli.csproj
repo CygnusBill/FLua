@@ -6,6 +6,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <RootNamespace>FLua.Cli</RootNamespace>
+    <AssemblyName>flua</AssemblyName>
     <PublishAot>true</PublishAot>
   </PropertyGroup>
 
