@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using FLua.Interpreter;
+using FLua.Runtime;
 
 namespace FLua.Cli
 {

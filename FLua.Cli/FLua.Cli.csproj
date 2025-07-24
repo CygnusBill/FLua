@@ -11,6 +11,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\FLua.Interpreter\FLua.Interpreter.csproj" />
+    <ProjectReference Include="..\FLua.Runtime\FLua.Runtime.csproj" />
   </ItemGroup>
 
 </Project>

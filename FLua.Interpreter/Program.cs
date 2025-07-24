@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using FLua.Parser;
+using FLua.Runtime;
 
 namespace FLua.Interpreter
 {
@@ -71,7 +72,7 @@ namespace FLua.Interpreter
             try
             {
                 var results = interpreter.ExecuteCode(code);
-                string result = results.Length > 0 ? results[0].ToString() : "nil";
+                string result = results.Length > 0 ? (results[0].ToString() ?? "nil") : "nil";
                 Console.WriteLine($"Code: {code} => {result}");
                 
                 if (result != expected)

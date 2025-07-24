@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using FLua.Ast;
 using FLua.Parser;
+using FLua.Runtime;
 using Microsoft.FSharp.Collections;
 using Microsoft.FSharp.Core;
 

@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace FLua.Interpreter
+namespace FLua.Runtime
 {
     /// <summary>
     /// Represents a Lua execution environment with variable scopes
@@ -183,7 +183,7 @@ namespace FLua.Interpreter
                 }
             }
             
-            return new[] { new LuaString(args[0].ToString()) };
+            return new[] { new LuaString(args[0].ToString() ?? string.Empty) };
         }
         
         /// <summary>
@@ -251,12 +251,8 @@ namespace FLua.Interpreter
         /// </summary>
         private static LuaValue[] Error(LuaValue[] args)
         {
-            string message = args.Length > 0 ? args[0].ToString() : "error";
-            if (message != null)
-            {
-                throw new LuaRuntimeException(message);
-            }
-            throw new LuaRuntimeException("error");
+            string message = args.Length > 0 ? (args[0].ToString() ?? "error") : "error";
+            throw new LuaRuntimeException(message);
         }
         
         /// <summary>

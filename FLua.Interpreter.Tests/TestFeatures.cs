@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using FLua.Interpreter;
+using FLua.Runtime;
 
 namespace FLua.Interpreter.Tests
 {

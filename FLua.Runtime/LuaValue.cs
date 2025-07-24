@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Numerics;
 
-namespace FLua.Interpreter
+namespace FLua.Runtime
 {
     /// <summary>
     /// Represents a runtime Lua value
@@ -13,9 +13,9 @@ namespace FLua.Interpreter
 
         public virtual double? AsNumber => null;
         public virtual long? AsInteger => null;
-        public virtual string AsString => ToString();
-        public virtual LuaTable AsTable => null;
-        public virtual LuaFunction AsFunction => null;
+        public virtual string AsString => ToString() ?? string.Empty;
+        public virtual LuaTable? AsTable => null;
+        public virtual LuaFunction? AsFunction => null;
 
         public virtual bool IsTruthy => true;
         
@@ -142,7 +142,7 @@ namespace FLua.Interpreter
             set => _metatable = value; 
         }
 
-        public override LuaTable AsTable => this;
+        public override LuaTable? AsTable => this;
 
         public LuaValue Get(LuaValue key)
         {
@@ -331,7 +331,7 @@ namespace FLua.Interpreter
     /// </summary>
     public abstract class LuaFunction : LuaValue
     {
-        public override LuaFunction AsFunction => this;
+        public override LuaFunction? AsFunction => this;
         public abstract LuaValue[] Call(LuaValue[] arguments);
         public override string ToString() => "function";
     }

@@ -1,6 +1,6 @@
 using System;
 
-namespace FLua.Interpreter
+namespace FLua.Runtime
 {
     /// <summary>
     /// Exception thrown during Lua execution

@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace FLua.Interpreter
+namespace FLua.Runtime
 {
     /// <summary>
     /// Represents a Lua coroutine
