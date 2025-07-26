@@ -67,6 +67,8 @@ dotnet test FLua.VariableAttributes.Tests
    - Uses forward references to handle circular dependencies
 
 3. **FLua.Runtime/** - Core runtime system (C#)
+   - **CRITICAL REQUIREMENT**: All runtime functionality used by either the interpreter or future compiled code MUST be implemented here
+   - This ensures no code duplication and consistent runtime behavior
    - `LuaValue.cs`: Type hierarchy (nil, bool, number, string, table, function)
    - `LuaEnvironment.cs`: Variable scoping and environment chains
    - `LuaTable.cs`: Optimized table implementation with array/hash parts
@@ -91,6 +93,35 @@ dotnet test FLua.VariableAttributes.Tests
 - **Environment Chain**: Lexical scoping via parent environment references
 - **Closure Support**: Proper upvalue capture and environment binding
 - **Multiple Returns**: Lists for multiple assignment/return values
+
+## Architectural Principles
+
+### Runtime Library Separation
+
+**Critical Design Decision**: The FLua.Runtime project serves as the single source of truth for all runtime functionality. This architectural principle ensures:
+
+1. **No Code Duplication**: Both the interpreter and future compiler use the same runtime
+2. **Consistent Behavior**: Same LuaValue operations whether interpreted or compiled
+3. **Maintainability**: Bug fixes and improvements benefit both execution models
+4. **Clear Boundaries**: Parser → AST → Runtime (used by both Interpreter and Compiler)
+
+#### What Belongs in FLua.Runtime:
+- LuaValue type system and operations
+- Built-in libraries (string, table, math, io, os, etc.)
+- Environment and variable management
+- Coroutine implementation
+- Error handling and exceptions
+- Module system (require/package)
+- Any functionality called at runtime
+
+#### What Does NOT Belong in FLua.Runtime:
+- AST types (FLua.Ast)
+- Parsing logic (FLua.Parser)
+- AST evaluation/interpretation (FLua.Interpreter)
+- Code generation (Future FLua.Compiler)
+- CLI handling (FLua.Cli)
+
+This separation is crucial for the planned compiler, as it will generate code that calls into the same FLua.Runtime library that the interpreter uses.
 
 ## Common Development Tasks
 
