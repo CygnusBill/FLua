@@ -9,7 +9,7 @@ class Program
         try
         {
             // Load the compiled Lua library
-            var assembly = Assembly.LoadFile("/Users/bill/Repos/FLua/test_simple_return.dll");
+            var assembly = Assembly.LoadFile("/Users/bill/Repos/FLua/test_local_function.dll");
             var luaScriptType = assembly.GetType("CompiledLuaScript.LuaScript");
             var executeMethod = luaScriptType.GetMethod("Execute");
             

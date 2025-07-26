@@ -195,6 +195,13 @@ public class CSharpCodeGenerator
             var body = FSharpListToList(((Statement.DoBlock)statement).Item);
             GenerateDoBlock(body);
         }
+        else if (statement.IsLocalFunctionDef)
+        {
+            var localFunc = (Statement.LocalFunctionDef)statement;
+            var name = localFunc.Item1;
+            var funcDef = localFunc.Item2;
+            GenerateLocalFunctionDef(name, funcDef);
+        }
         else
         {
             WriteLine($"// TODO: Implement {statement.GetType().Name}");
@@ -304,6 +311,59 @@ public class CSharpCodeGenerator
         GenerateBlock(body);
         DecreaseIndent();
         WriteLine("}");
+    }
+
+    private void GenerateLocalFunctionDef(string name, FunctionDef funcDef)
+    {
+        // Generate a C# local function
+        Write($"LuaValue[] {SanitizeIdentifier(name)}(params LuaValue[] args) ");
+        WriteLine("{");
+        IncreaseIndent();
+        
+        // Extract parameters
+        var parameters = FSharpListToList(funcDef.Parameters);
+        var paramNames = new List<string>();
+        int paramIndex = 0;
+        
+        foreach (var param in parameters)
+        {
+            if (param.IsNamed)
+            {
+                var namedParam = (Parameter.Named)param;
+                var paramName = namedParam.Item1;
+                paramNames.Add(paramName);
+                
+                // Assign parameter value from args array
+                WriteLine($"var {SanitizeIdentifier(paramName)} = args.Length > {paramIndex} ? args[{paramIndex}] : LuaValue.Nil;");
+                WriteLine($"env.SetVariable(\"{paramName}\", {SanitizeIdentifier(paramName)});");
+                paramIndex++;
+            }
+            else if (param.IsVararg)
+            {
+                // Handle varargs - store remaining arguments
+                WriteLine($"var varargs = new LuaValue[Math.Max(0, args.Length - {paramIndex})];");
+                WriteLine($"if (args.Length > {paramIndex}) Array.Copy(args, {paramIndex}, varargs, 0, args.Length - {paramIndex});");
+                // TODO: Set up varargs access
+            }
+        }
+        
+        // Generate function body
+        var body = FSharpListToList(funcDef.Body);
+        GenerateBlock(body);
+        
+        // Default return if no explicit return - check if last statement is return
+        bool hasReturn = body.Count > 0 && body[body.Count - 1].IsReturn;
+        if (!hasReturn)
+        {
+            WriteLine("return new LuaValue[0];");
+        }
+        
+        DecreaseIndent();
+        WriteLine("}");
+        
+        // Create a LuaUserFunction wrapper and store it in the environment
+        WriteLine($"var {SanitizeIdentifier(name)}_func = new LuaUserFunction({SanitizeIdentifier(name)});");
+        WriteLine($"env.SetVariable(\"{name}\", {SanitizeIdentifier(name)}_func);");
     }
 
     private void GenerateExpression(Expr expr)
