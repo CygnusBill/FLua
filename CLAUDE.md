@@ -221,8 +221,88 @@ During parser development, attempts to add custom error messages for table const
 - Lua 5.4 feature parity
 - Compiler backend (using FLua parser)
 
+## Compiler Development
+
+### FLua.Compiler Project Overview
+The compiler project provides Lua-to-C# compilation using Roslyn for code generation.
+
+#### Architecture
+- **ILuaCompiler Interface**: Defines contract for compiler backends
+- **RoslynLuaCompiler**: Main compiler implementation using Roslyn
+- **RoslynCodeGenerator**: Uses Roslyn syntax factory for structured code generation (preferred)
+- **CSharpCodeGenerator**: String-based code generation (legacy, kept for reference)
+
+#### Key Features Implemented
+1. **Local Variables**: With proper scoping and name mangling for shadowing
+2. **Binary Operations**: All arithmetic, comparison, logical, and string operations
+3. **Function Calls**: Both statement and expression contexts
+4. **Local Functions**: With proper closure support via LuaUserFunction
+5. **Return Statements**: Including multiple return values
+6. **Console Applications**: Using LuaConsoleRunner for standalone executables
+7. **Do Blocks**: For explicit scoping
+
+#### Console Application Support
+Console apps are compiled with `--console` flag and use `LuaConsoleRunner`:
+```bash
+# Compile as console app
+dotnet run --project FLua.Cli -- compile script.lua --target ConsoleApp
+
+# Run compiled console app
+dotnet script.dll
+```
+
+The `LuaConsoleRunner` provides:
+- Standard environment setup
+- Command line argument passing via `arg` table
+- Exit code handling from return values
+- Exception handling with proper error messages
+
+#### Testing Standards
+Following Lee Copeland testing methodologies:
+- Boundary value analysis
+- Equivalence partitioning
+- Error condition testing
+- Decision table testing
+- State transition testing
+
+### Pending Compiler Features
+High Priority:
+- Control structures (if/while/for)
+- Table support (literals, indexing, methods)
+- Multiple assignment from function calls
+
+Medium Priority:
+- AOT/standalone executable support (PublishSingleFile)
+- Improved error messages with source location
+- IL.Emit backend for size optimization
+
+### Build and Test Commands
+```bash
+# Build compiler
+dotnet build FLua.Compiler/FLua.Compiler.csproj
+
+# Run compiler tests (minimal suite that works)
+dotnet test FLua.Compiler.Tests.Minimal/FLua.Compiler.Tests.Minimal.csproj
+
+# Compile a Lua script
+dotnet run --project FLua.Cli -- compile script.lua [--target Library|ConsoleApp]
+
+# Run compiled script (requires FLua.Runtime.dll in same directory)
+dotnet script.dll
+```
+
+### Current Status (as of last session)
+- **Completed**: Roslyn-based code generator with syntax factory
+- **Completed**: Console application support with LuaConsoleRunner
+- **Completed**: Local functions with proper closure support
+- **Completed**: Variable shadowing with name mangling
+- **All 6 compiler tests passing** in FLua.Compiler.Tests.Minimal
+- **Next Priority**: Control structures (if/while/for) and table support
+
 ## Important Files
 - `FLua-Gap-Analysis.md`: Detailed compatibility analysis
 - `PARSER_KNOWN_ISSUES.md`: Known parser limitations
 - `test_*.lua`: Various test scripts for specific features
 - `LuaTests/`: Official Lua test suite (for compatibility testing)
+- `ARCHITECTURE_COMPLIANCE_REPORT.md`: Architectural analysis and compliance status
+- `TODO_COMPILER.md`: Compiler development task list and progress tracking
