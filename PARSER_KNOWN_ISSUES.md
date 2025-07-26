@@ -83,8 +83,21 @@ end
 
 **Status**: FIXED - Single underscore now works as an identifier.
 
+## Function Calls with Long Strings (FIXED)
+
+**Issue**: The parser was failing to recognize function calls with long string literals when there are no parentheses.
+
+**Status**: FIXED - Long string function calls now work correctly.
+
+## Shebang Support (FIXED)
+
+**Issue**: The parser didn't support shebang lines (`#!/usr/bin/env lua`) at the start of files.
+
+**Status**: FIXED - Shebang lines are now properly ignored when they appear as the first line of a file.
+
 ## Other Notes
 
 - All escape sequences are now working correctly (decimal, hex, unicode, line continuation)
-- Method calls with long strings work properly
+- Method calls with long strings work properly  
+- Shebang lines are supported (first line only)
 - The literals.lua test from the official Lua test suite should now pass further

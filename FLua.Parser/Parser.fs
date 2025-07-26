@@ -739,5 +739,9 @@ let statementImpl =
 do blockRef := blockImpl
 do statementRef := statementImpl
 
+// Shebang line parser (only valid at start of file)
+let pShebang = 
+    attempt (pstring "#!" >>. restOfLine true) <|> preturn ""
+
 // Lua file parser (entire program)
-let luaFile = ws >>. block .>> ws .>> eof 
+let luaFile = pShebang >>. ws >>. block .>> ws .>> eof 
