@@ -525,35 +525,7 @@ namespace FLua.Runtime
         /// </summary>
         private static LuaValue? TryInvokeMetamethod(LuaValue left, LuaValue right, string metamethod)
         {
-            // Try left operand first
-            if (left is LuaTable leftTable && leftTable.Metatable != null)
-            {
-                var meta = leftTable.Metatable.RawGet(new LuaString(metamethod));
-                if (meta is LuaFunction func)
-                {
-                    var result = func.Call(new[] { left, right });
-                    if (result.Length > 0)
-                    {
-                        return result[0];
-                    }
-                }
-            }
-
-            // Try right operand if left didn't have the metamethod
-            if (right is LuaTable rightTable && rightTable.Metatable != null)
-            {
-                var meta = rightTable.Metatable.RawGet(new LuaString(metamethod));
-                if (meta is LuaFunction func)
-                {
-                    var result = func.Call(new[] { left, right });
-                    if (result.Length > 0)
-                    {
-                        return result[0];
-                    }
-                }
-            }
-
-            return null;
+            return LuaMetamethods.InvokeBinaryMetamethod(left, right, metamethod);
         }
 
         /// <summary>
@@ -561,20 +533,7 @@ namespace FLua.Runtime
         /// </summary>
         private static LuaValue? TryInvokeUnaryMetamethod(LuaValue value, string metamethod)
         {
-            if (value is LuaTable table && table.Metatable != null)
-            {
-                var meta = table.Metatable.RawGet(new LuaString(metamethod));
-                if (meta is LuaFunction func)
-                {
-                    var result = func.Call(new[] { value });
-                    if (result.Length > 0)
-                    {
-                        return result[0];
-                    }
-                }
-            }
-
-            return null;
+            return LuaMetamethods.InvokeUnaryMetamethod(value, metamethod);
         }
 
         #endregion
