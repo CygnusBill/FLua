@@ -17,6 +17,17 @@ public class CSharpCodeGenerator
     private int _indentLevel;
     private int _labelCounter;
     private int _tempVarCounter;
+    
+    // Scope tracking for variable name mangling
+    private class Scope
+    {
+        public Dictionary<string, string> Variables { get; } = new Dictionary<string, string>();
+        public Scope? Parent { get; set; }
+    }
+    
+    private Scope _currentScope = new Scope();
+    private int _scopeDepth = 0;
+    private int _variableCounter = 0;
 
     public CSharpCodeGenerator()
     {
@@ -230,12 +241,15 @@ public class CSharpCodeGenerator
             var (varName, attr) = vars[i];
             var value = exprs != null && i < exprs.Count ? exprs[i] : Expr.CreateLiteral(Literal.CreateNil());
             
-            Write($"var {SanitizeIdentifier(varName)} = ");
+            // Get mangled name for the variable
+            var mangledName = GetOrCreateMangledName(varName);
+            
+            Write($"var {SanitizeIdentifier(mangledName)} = ");
             GenerateExpression(value);
             WriteLine(";");
             
             // Also store in environment for global access
-            WriteLine($"env.SetVariable(\"{varName}\", {SanitizeIdentifier(varName)});");
+            WriteLine($"env.SetVariable(\"{varName}\", {SanitizeIdentifier(mangledName)});");
         }
     }
 
@@ -276,7 +290,9 @@ public class CSharpCodeGenerator
             WriteLine(".IsTruthy)");
             WriteLine("{");
             IncreaseIndent();
+            EnterScope();
             GenerateBlock(body);
+            ExitScope();
             DecreaseIndent();
             WriteLine("}");
         }
@@ -286,7 +302,9 @@ public class CSharpCodeGenerator
             WriteLine("else");
             WriteLine("{");
             IncreaseIndent();
+            EnterScope();
             GenerateBlock(elseBlock);
+            ExitScope();
             DecreaseIndent();
             WriteLine("}");
         }
@@ -299,7 +317,9 @@ public class CSharpCodeGenerator
         WriteLine(".IsTruthy)");
         WriteLine("{");
         IncreaseIndent();
+        EnterScope();
         GenerateBlock(body);
+        ExitScope();
         DecreaseIndent();
         WriteLine("}");
     }
@@ -308,17 +328,25 @@ public class CSharpCodeGenerator
     {
         WriteLine("{");
         IncreaseIndent();
+        EnterScope();
         GenerateBlock(body);
+        ExitScope();
         DecreaseIndent();
         WriteLine("}");
     }
 
     private void GenerateLocalFunctionDef(string name, FunctionDef funcDef)
     {
+        // Get mangled name for the function
+        var mangledName = GetOrCreateMangledName(name);
+        
         // Generate a C# local function
-        Write($"LuaValue[] {SanitizeIdentifier(name)}(params LuaValue[] args) ");
+        Write($"LuaValue[] {SanitizeIdentifier(mangledName)}(params LuaValue[] args) ");
         WriteLine("{");
         IncreaseIndent();
+        
+        // Enter new scope for function parameters
+        EnterScope();
         
         // Extract parameters
         var parameters = FSharpListToList(funcDef.Parameters);
@@ -333,9 +361,12 @@ public class CSharpCodeGenerator
                 var paramName = namedParam.Item1;
                 paramNames.Add(paramName);
                 
+                // Get mangled name for parameter
+                var paramMangledName = GetOrCreateMangledName(paramName);
+                
                 // Assign parameter value from args array
-                WriteLine($"var {SanitizeIdentifier(paramName)} = args.Length > {paramIndex} ? args[{paramIndex}] : LuaValue.Nil;");
-                WriteLine($"env.SetVariable(\"{paramName}\", {SanitizeIdentifier(paramName)});");
+                WriteLine($"var {SanitizeIdentifier(paramMangledName)} = args.Length > {paramIndex} ? args[{paramIndex}] : LuaValue.Nil;");
+                WriteLine($"env.SetVariable(\"{paramName}\", {SanitizeIdentifier(paramMangledName)});");
                 paramIndex++;
             }
             else if (param.IsVararg)
@@ -358,12 +389,15 @@ public class CSharpCodeGenerator
             WriteLine("return new LuaValue[0];");
         }
         
+        // Exit function scope
+        ExitScope();
+        
         DecreaseIndent();
         WriteLine("}");
         
         // Create a LuaUserFunction wrapper and store it in the environment
-        WriteLine($"var {SanitizeIdentifier(name)}_func = new LuaUserFunction({SanitizeIdentifier(name)});");
-        WriteLine($"env.SetVariable(\"{name}\", {SanitizeIdentifier(name)}_func);");
+        WriteLine($"var {SanitizeIdentifier(mangledName)}_func = new LuaUserFunction({SanitizeIdentifier(mangledName)});");
+        WriteLine($"env.SetVariable(\"{name}\", {SanitizeIdentifier(mangledName)}_func);");
     }
 
     private void GenerateExpression(Expr expr)
@@ -376,7 +410,31 @@ public class CSharpCodeGenerator
         else if (expr.IsVar)
         {
             var name = ((Expr.Var)expr).Item;
-            Write($"env.GetVariable(\"{name}\")");
+            var mangledName = ResolveVariableName(name);
+            
+            // Check if it's a local variable in any scope
+            bool isLocal = false;
+            var scope = _currentScope;
+            while (scope != null)
+            {
+                if (scope.Variables.ContainsKey(name))
+                {
+                    isLocal = true;
+                    break;
+                }
+                scope = scope.Parent;
+            }
+            
+            if (isLocal)
+            {
+                // Use the local C# variable directly
+                Write(SanitizeIdentifier(mangledName));
+            }
+            else
+            {
+                // Global variable - get from environment
+                Write($"env.GetVariable(\"{name}\")");
+            }
         }
         else if (expr.IsBinary)
         {
@@ -517,6 +575,78 @@ public class CSharpCodeGenerator
         GenerateExpression(key);
         Write(")");
     }
+
+    #region Scope Management
+    
+    private void EnterScope()
+    {
+        var newScope = new Scope { Parent = _currentScope };
+        _currentScope = newScope;
+        _scopeDepth++;
+    }
+    
+    private void ExitScope()
+    {
+        if (_currentScope.Parent != null)
+        {
+            _currentScope = _currentScope.Parent;
+            _scopeDepth--;
+        }
+    }
+    
+    private string GetOrCreateMangledName(string varName)
+    {
+        // Check if variable exists in current scope
+        if (_currentScope.Variables.TryGetValue(varName, out var mangledName))
+        {
+            return mangledName;
+        }
+        
+        // Check if variable exists in any parent scope
+        bool needsMangling = false;
+        var scope = _currentScope.Parent;
+        while (scope != null)
+        {
+            if (scope.Variables.ContainsKey(varName))
+            {
+                needsMangling = true;
+                break;
+            }
+            scope = scope.Parent;
+        }
+        
+        // Create mangled name if needed
+        if (needsMangling)
+        {
+            mangledName = $"{varName}_{++_variableCounter}";
+        }
+        else
+        {
+            mangledName = varName;
+        }
+        
+        _currentScope.Variables[varName] = mangledName;
+        return mangledName;
+    }
+    
+    private string ResolveVariableName(string varName)
+    {
+        // Look up variable in current scope and parent scopes
+        var scope = _currentScope;
+        while (scope != null)
+        {
+            if (scope.Variables.TryGetValue(varName, out var mangledName))
+            {
+                return mangledName;
+            }
+            scope = scope.Parent;
+        }
+        
+        // If not found in any scope, return original name (for globals)
+        return varName;
+    }
+    
+    #endregion
 
     private static string SanitizeIdentifier(string name)
     {
