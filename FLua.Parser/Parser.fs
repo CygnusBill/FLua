@@ -269,29 +269,52 @@ let private pHexNumber : Parser<Expr, unit> =
     attempt hexFloatWithExp <|> attempt hexFloatNoExp <|> hexInt
 
 let private pDecimalNumber : Parser<Expr, unit> =
+    // Scientific notation exponent parser
+    let exponent = 
+        anyOf "eE" >>. opt (anyOf "+-") .>>. many1Satisfy isDigit
+        |>> (fun (sign, digits) ->
+            match sign with
+            | Some s -> string s + digits
+            | None -> digits)
+    
     let decFloatWithInt = 
-        attempt (many1Satisfy isDigit .>>. pchar '.' .>>. many1Satisfy isDigit)
-        |>> (fun ((intPart, _), fracPart) -> 
-            let floatStr = intPart + "." + fracPart
+        attempt (many1Satisfy isDigit .>>. pchar '.' .>>. many1Satisfy isDigit .>>. opt exponent)
+        |>> (fun (((intPart, _), fracPart), exp) -> 
+            let floatStr = 
+                match exp with
+                | Some e -> intPart + "." + fracPart + "e" + e
+                | None -> intPart + "." + fracPart
             Expr.Literal (Literal.Float (float floatStr)))
     
     let decFloatNoInt =
-        attempt (pchar '.' >>. many1Satisfy isDigit)
-        |>> (fun fracPart ->
-            let floatStr = "0." + fracPart
+        attempt (pchar '.' >>. many1Satisfy isDigit .>>. opt exponent)
+        |>> (fun (fracPart, exp) ->
+            let floatStr = 
+                match exp with
+                | Some e -> "0." + fracPart + "e" + e
+                | None -> "0." + fracPart
             Expr.Literal (Literal.Float (float floatStr)))
     
     let decFloatTrailing =
-        attempt (many1Satisfy isDigit .>> pchar '.' .>> notFollowedBy (satisfy isDigit))
-        |>> (fun intPart ->
-            let floatStr = intPart + ".0"
+        attempt (many1Satisfy isDigit .>> pchar '.' .>> notFollowedBy (satisfy isDigit) .>>. opt exponent)
+        |>> (fun (intPart, exp) ->
+            let floatStr = 
+                match exp with
+                | Some e -> intPart + ".0e" + e
+                | None -> intPart + ".0"
+            Expr.Literal (Literal.Float (float floatStr)))
+    
+    let decIntWithExp =
+        attempt (many1Satisfy isDigit .>>. exponent)
+        |>> (fun (intPart, exp) ->
+            let floatStr = intPart + "e" + exp
             Expr.Literal (Literal.Float (float floatStr)))
     
     let decInt = 
         many1Satisfy isDigit
         |>> (fun s -> Expr.Literal (Literal.Integer (bigint.Parse s)))
     
-    attempt decFloatWithInt <|> attempt decFloatNoInt <|> attempt decFloatTrailing <|> decInt
+    attempt decFloatWithInt <|> attempt decFloatNoInt <|> attempt decFloatTrailing <|> attempt decIntWithExp <|> decInt
 
 let private pNumberLiteral : Parser<Expr, unit> =
     attempt pHexNumber <|> pDecimalNumber
