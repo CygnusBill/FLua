@@ -172,9 +172,37 @@ See `FLua-Gap-Analysis.md` for comprehensive compatibility status.
 - LuaTests/ contains official Lua test suite files
 - Test frameworks chosen to match language: Expecto for F#, xUnit for C#
 
+## Error and Warning System Design
+
+### Current Limitations
+The current error reporting system has several limitations that will need systematic addressing:
+
+**Parser Error Control:**
+- FParsec's error handling doesn't always surface the most helpful errors
+- Custom error messages get lost in the parser combinator chain  
+- Generic parser errors lack domain-specific context
+- Error message priority and propagation issues
+
+**Structured Error Reporting Needs:**
+- Error codes and severity levels
+- Multiple errors/warnings in a single pass
+- Source location tracking with line/column info
+- Context-aware suggestions and fix hints
+
+**Future Architecture Requirements:**
+- Separate error collection system alongside parsing
+- Post-processing step to improve/contextualize messages
+- Configurable error/warning levels and suppression  
+- Error recovery to continue parsing after failures
+- Integration points for IDE language servers
+
+**Lessons Learned:**
+During parser development, attempts to add custom error messages for table constructor syntax (`pairs{1,2,3}` in for loops) revealed that error message control is non-trivial and requires dedicated design effort rather than ad-hoc solutions.
+
 ## Backlog
 
 ### High Priority
+- Design and implement structured error/warning system
 - Improved error messages (better line/column info, context)
 - Improved warning messages (unused variables, shadowing)
 - Implement load() function for dynamic code loading

@@ -593,6 +593,10 @@ let pLabelStmt =
     between (pstring "::" >>. ws) (ws .>> pstring "::") identifier
     |>> Statement.Label
 
+// NOTE: Attempted to add custom error messages for table constructor calls in for/if,
+// but FParsec's error handling system makes this complex. The workaround is simple enough
+// that custom errors aren't worth the implementation complexity.
+
 // Goto statement: goto name
 let pGotoStmt =
     keyword "goto" >>. identifier
@@ -637,8 +641,6 @@ let pNumericForStmt =
 
 // Generic for statement: for name1 [<attr>], name2 [<attr>], ... in expr1, expr2, ... do block end
 let pGenericForStmt : Parser<Statement, unit> =
-    // Known limitation: function calls with table constructors (no parentheses) fail in for loops
-    // due to FParsec forward reference issues. Workaround: use parentheses - pairs({1,2,3})
     attempt (keyword "for" >>. sepBy1 pVariableWithAttribute (symbol ",")
     .>> keyword "in") .>>. sepBy1 expr (symbol ",")
     .>> keyword "do" .>>. block .>> keyword "end"
