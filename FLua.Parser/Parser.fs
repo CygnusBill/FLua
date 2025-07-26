@@ -402,6 +402,9 @@ let pPrimaryBase : Parser<Expr, unit> =
     ] .>> ws
 
 // Table access and function call postfix operations
+// TODO: Review parser ordering and overlapping conditions - potential technical debt
+// The order of these parsers is critical and fragile. Consider refactoring to make
+// the precedence and conflicts more explicit and maintainable.
 let pPostfixOp =
     choice [
         // Method syntax - must be followed by arguments
@@ -434,17 +437,18 @@ let pPostfixOp =
         pstring "." >>. ws >>. identifier .>> ws
         |>> fun key -> fun expr -> Expr.TableAccess(expr, Expr.Literal (Literal.String key))
         
-        // Bracket access: [expr]
-        between (pstring "[" >>. ws) (ws >>. pstring "]" >>. ws) expr
-        |>> fun key -> fun expr -> Expr.TableAccess(expr, key)
-        
         // Function call with string literal (no parentheses): func "string" or func [[string]]
+        // Must come before bracket access to handle long strings [[...]]
         attempt pLiteral
         >>= fun lit ->
             match lit with
             | Expr.Literal (Literal.String s) as stringLit -> 
                 preturn (fun expr -> Expr.FunctionCall(expr, [stringLit]))
             | _ -> fail "Expected string literal"
+        
+        // Bracket access: [expr] - but not [[
+        attempt (pstring "[" >>. notFollowedBy (pstring "[") >>. ws >>. expr .>> ws .>> pstring "]")
+        |>> fun key -> fun expr -> Expr.TableAccess(expr, key)
         
         // Function call with table constructor (no parentheses): func {table}
         attempt pTableConstructor
