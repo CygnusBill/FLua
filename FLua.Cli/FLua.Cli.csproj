@@ -13,6 +13,12 @@
   <ItemGroup>
     <ProjectReference Include="..\FLua.Interpreter\FLua.Interpreter.csproj" />
     <ProjectReference Include="..\FLua.Runtime\FLua.Runtime.csproj" />
+    <ProjectReference Include="..\FLua.Compiler\FLua.Compiler.csproj" />
+    <ProjectReference Include="..\FLua.Parser\FLua.Parser.fsproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="CommandLineParser" />
   </ItemGroup>
 
 </Project>
