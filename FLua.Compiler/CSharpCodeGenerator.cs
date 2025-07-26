@@ -266,7 +266,7 @@ public class CSharpCodeGenerator
             }
             
             GenerateExpression(condition);
-            WriteLine(".IsTruthy())");
+            WriteLine(".IsTruthy)");
             WriteLine("{");
             IncreaseIndent();
             GenerateBlock(body);
@@ -289,7 +289,7 @@ public class CSharpCodeGenerator
     {
         Write("while (");
         GenerateExpression(condition);
-        WriteLine(".IsTruthy())");
+        WriteLine(".IsTruthy)");
         WriteLine("{");
         IncreaseIndent();
         GenerateBlock(body);
@@ -398,18 +398,18 @@ public class CSharpCodeGenerator
         if (op.IsAdd) operatorMethod = "Add";
         else if (op.IsSubtract) operatorMethod = "Subtract";
         else if (op.IsMultiply) operatorMethod = "Multiply";
-        else if (op.IsFloatDiv) operatorMethod = "Divide";
+        else if (op.IsFloatDiv) operatorMethod = "FloatDivide";
         else if (op.IsModulo) operatorMethod = "Modulo";
         else if (op.IsPower) operatorMethod = "Power";
-        else if (op.IsConcat) operatorMethod = "Concatenate";
+        else if (op.IsConcat) operatorMethod = "Concat";
         else if (op.IsEqual) operatorMethod = "Equal";
         else if (op.IsNotEqual) operatorMethod = "NotEqual";
-        else if (op.IsLess) operatorMethod = "LessThan";
+        else if (op.IsLess) operatorMethod = "Less";
         else if (op.IsLessEqual) operatorMethod = "LessEqual";
-        else if (op.IsGreater) operatorMethod = "GreaterThan";
+        else if (op.IsGreater) operatorMethod = "Greater";
         else if (op.IsGreaterEqual) operatorMethod = "GreaterEqual";
-        else if (op.IsAnd) operatorMethod = "LogicalAnd";
-        else if (op.IsOr) operatorMethod = "LogicalOr";
+        else if (op.IsAnd) operatorMethod = "And";
+        else if (op.IsOr) operatorMethod = "Or";
         else operatorMethod = "Unknown";
 
         Write($"LuaOperations.{operatorMethod}(");

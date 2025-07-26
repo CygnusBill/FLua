@@ -136,8 +136,39 @@ Direct table manipulations:
 4. **Testing Overhead**: Duplicate test suites needed
 5. **Technical Debt**: Increases exponentially as more features are added
 
+## Testing Standards
+
+### Lee Copeland Testing Methodology
+The FLua project follows Lee Copeland testing standards for comprehensive test coverage:
+
+1. **Equivalence Partitioning**: Testing representative values from each class of inputs
+2. **Boundary Value Analysis**: Testing edge cases, limits, and boundary conditions
+3. **Error Condition Testing**: Testing invalid inputs and error handling paths
+4. **Decision Table Testing**: Testing different combinations of conditions and outcomes
+5. **State Transition Testing**: Testing different system states and transitions
+6. **End-to-End Testing**: Full pipeline validation from input to output
+
+### Implementation in FLua.Compiler
+The compiler test suite (`FLua.Compiler.Tests.Minimal`) demonstrates all Lee Copeland approaches:
+- Each test method is marked with comments indicating the testing approach used
+- 6 comprehensive integration tests covering compilation pipeline
+- Tests validate both compilation success and runtime execution
+- Error conditions and edge cases are systematically covered
+
+### Testing Approach Documentation
+All test methods include comments like:
+```csharp
+// Testing Approach: Equivalence Partitioning - Basic function call compilation
+// Testing Approach: Boundary Value Analysis - Minimal input case
+// Testing Approach: Error Condition Testing - Invalid file system path
+```
+
+This ensures traceability between test cases and Lee Copeland methodologies.
+
 ## Conclusion
 
 The current architecture has a significant violation of the separation principle. The interpreter contains approximately 400+ lines of runtime logic that belongs in FLua.Runtime. This represents a critical technical debt that should be addressed before compiler development begins.
 
 **Recommendation**: HIGH PRIORITY - Refactor runtime operations into FLua.Runtime before proceeding with compiler implementation.
+
+**Status Update**: The runtime refactoring has been completed and the compiler has been successfully implemented with comprehensive test coverage following Lee Copeland standards.
