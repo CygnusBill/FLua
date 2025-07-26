@@ -161,7 +161,15 @@ public class CSharpCodeGenerator
         {
             var expr = ((Statement.FunctionCall)statement).Item;
             Write("");
-            GenerateExpression(expr);
+            if (expr.IsFunctionCall)
+            {
+                var funcCallExpr = (Expr.FunctionCall)expr;
+                GenerateFunctionCall(funcCallExpr.Item1, FSharpListToList(funcCallExpr.Item2), asStatement: true);
+            }
+            else
+            {
+                GenerateExpression(expr);
+            }
             WriteLine(";");
         }
         else if (statement.IsReturn)
@@ -215,7 +223,12 @@ public class CSharpCodeGenerator
             var (varName, attr) = vars[i];
             var value = exprs != null && i < exprs.Count ? exprs[i] : Expr.CreateLiteral(Literal.CreateNil());
             
-            WriteLine($"var {SanitizeIdentifier(varName)} = LuaValue.From({GenerateExpressionToString(value)});");
+            Write($"var {SanitizeIdentifier(varName)} = ");
+            GenerateExpression(value);
+            WriteLine(";");
+            
+            // Also store in environment for global access
+            WriteLine($"env.SetVariable(\"{varName}\", {SanitizeIdentifier(varName)});");
         }
     }
 
@@ -360,22 +373,22 @@ public class CSharpCodeGenerator
         else if (literal.IsBoolean)
         {
             var value = ((Literal.Boolean)literal).Item;
-            Write($"new LuaValue({value.ToString().ToLower()})");
+            Write($"new LuaBoolean({value.ToString().ToLower()})");
         }
         else if (literal.IsInteger)
         {
             var value = ((Literal.Integer)literal).Item;
-            Write($"new LuaValue({value})");
+            Write($"new LuaInteger({value})");
         }
         else if (literal.IsFloat)
         {
             var value = ((Literal.Float)literal).Item;
-            Write($"new LuaValue({value}d)");
+            Write($"new LuaNumber({value}d)");
         }
         else if (literal.IsString)
         {
             var value = ((Literal.String)literal).Item;
-            Write($"new LuaValue({EscapeString(value)})");
+            Write($"new LuaString({EscapeString(value)})");
         }
     }
 
@@ -420,16 +433,21 @@ public class CSharpCodeGenerator
         Write(")");
     }
 
-    private void GenerateFunctionCall(Expr func, IList<Expr> args)
+    private void GenerateFunctionCall(Expr func, IList<Expr> args, bool asStatement = false)
     {
+        Write("((LuaFunction)");
         GenerateExpression(func);
-        Write(".Call(new LuaValue[] { ");
+        Write(").Call(new LuaValue[] { ");
         for (int i = 0; i < args.Count; i++)
         {
             if (i > 0) Write(", ");
             GenerateExpression(args[i]);
         }
         Write(" })");
+        if (!asStatement)
+        {
+            Write("[0]");
+        }
     }
 
     private void GenerateTableAccess(Expr table, Expr key)

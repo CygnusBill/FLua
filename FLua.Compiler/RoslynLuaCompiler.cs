@@ -30,6 +30,13 @@ public class RoslynLuaCompiler : ILuaCompiler
             // Generate C# code from Lua AST
             var csharpCode = GenerateCSharpCode(ast, options);
             
+            // Debug: Write generated C# code to file for inspection
+            if (options.IncludeDebugInfo)
+            {
+                var debugFile = Path.ChangeExtension(options.OutputPath, ".cs");
+                File.WriteAllText(debugFile, csharpCode);
+            }
+            
             // Compile using Roslyn
             return CompileWithRoslyn(csharpCode, options);
         }
@@ -106,6 +113,10 @@ public class RoslynLuaCompiler : ILuaCompiler
             MetadataReference.CreateFromFile(typeof(object).Assembly.Location),
             MetadataReference.CreateFromFile(typeof(Console).Assembly.Location),
             MetadataReference.CreateFromFile(typeof(System.Linq.Enumerable).Assembly.Location),
+            MetadataReference.CreateFromFile(typeof(System.Collections.Generic.List<>).Assembly.Location),
+            
+            // Find System.Runtime assembly
+            MetadataReference.CreateFromFile(Path.Combine(Path.GetDirectoryName(typeof(object).Assembly.Location)!, "System.Runtime.dll")),
             
             // FLua runtime reference
             MetadataReference.CreateFromFile(typeof(FLua.Runtime.LuaValue).Assembly.Location),
