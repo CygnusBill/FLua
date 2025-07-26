@@ -325,9 +325,10 @@ namespace FLua.Compiler
         private ExpressionSyntax GenerateFunctionCall(Expr func, IList<Expr> args)
         {
             // Generate: ((LuaFunction)func).Call(new LuaValue[] { args })
-            var funcExpr = CastExpression(
-                IdentifierName("LuaFunction"),
-                ParenthesizedExpression(GenerateExpression(func)));
+            var funcExpr = ParenthesizedExpression(
+                CastExpression(
+                    IdentifierName("LuaFunction"),
+                    GenerateExpression(func)));
             
             var argExpressions = args.Select(arg => GenerateExpression(arg)).ToArray();
             
@@ -548,16 +549,20 @@ namespace FLua.Compiler
             statements.Add(funcDecl);
             
             // Create LuaUserFunction wrapper
+            var wrapperVarName = $"{SanitizeIdentifier(mangledName)}_func";
             var wrapperDecl = LocalDeclarationStatement(
                 VariableDeclaration(IdentifierName("var"))
                     .AddVariables(
-                        VariableDeclarator(Identifier($"{SanitizeIdentifier(mangledName)}_func"))
+                        VariableDeclarator(Identifier(wrapperVarName))
                             .WithInitializer(EqualsValueClause(
                                 ObjectCreationExpression(IdentifierName("LuaUserFunction"))
                                     .AddArgumentListArguments(
                                         Argument(IdentifierName(SanitizeIdentifier(mangledName))))))));
             
             statements.Add(wrapperDecl);
+            
+            // Store the wrapped function variable in the scope
+            _currentScope.Variables[name] = wrapperVarName;
             
             // env.SetVariable("name", mangledName_func);
             var setFuncCall = ExpressionStatement(
@@ -568,7 +573,7 @@ namespace FLua.Compiler
                         IdentifierName("SetVariable")))
                 .AddArgumentListArguments(
                     Argument(LiteralExpression(SyntaxKind.StringLiteralExpression, Literal(name))),
-                    Argument(IdentifierName($"{SanitizeIdentifier(mangledName)}_func"))));
+                    Argument(IdentifierName(wrapperVarName))));
             
             statements.Add(setFuncCall);
             
