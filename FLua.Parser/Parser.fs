@@ -63,12 +63,23 @@ let ws =
 let keyword kw = pstring kw >>? notFollowedBy (satisfy isIdentifierChar) .>> ws
 let symbol s = pstring s .>> ws
 
-// Identifier parser - FIXED TO HANDLE SINGLE CHARACTERS
+// Reserved words that cannot be used as identifiers
+let reservedWords = 
+    Set.ofList ["and"; "break"; "do"; "else"; "elseif"; "end"; 
+                "false"; "for"; "function"; "if"; "in"; "local"; 
+                "nil"; "not"; "or"; "repeat"; "return"; "then"; 
+                "true"; "until"; "while"]
+
+// Identifier parser - FIXED TO HANDLE SINGLE CHARACTERS AND REJECT RESERVED WORDS
 let pIdentifier : Parser<string, unit> =
     let identifierWithoutWs = 
         satisfy isIdentifierFirstChar >>= fun first ->
             manySatisfy isIdentifierChar >>= fun rest ->
-                preturn (string first + rest)
+                let ident = string first + rest
+                if Set.contains ident reservedWords then
+                    fail $"'{ident}' is a reserved word"
+                else
+                    preturn ident
     identifierWithoutWs .>> ws <?> "identifier"
 
 let identifier = pIdentifier
