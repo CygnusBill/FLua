@@ -51,8 +51,12 @@ public class RoslynLuaCompiler : ILuaCompiler
 
     private string GenerateCSharpCode(IList<Statement> ast, CompilerOptions options)
     {
-        var generator = new CSharpCodeGenerator();
-        return generator.Generate(ast, options);
+        // Use the new Roslyn-based code generator
+        var generator = new RoslynCodeGenerator();
+        var syntaxTree = generator.Generate(ast, options);
+        
+        // Convert syntax tree to string
+        return syntaxTree.ToFullString();
     }
 
     private CompilationResult CompileWithRoslyn(string csharpCode, CompilerOptions options)
