@@ -11,9 +11,9 @@ namespace FLua.Runtime
     {
         public static LuaValue Nil => LuaNil.Instance;
 
-        public virtual double? AsNumber => null;
-        public virtual long? AsInteger => null;
-        public virtual string AsString => ToString() ?? string.Empty;
+        public virtual double? AsNumber => LuaTypeConversion.ToNumber(this);
+        public virtual long? AsInteger => LuaTypeConversion.ToInteger(this);
+        public virtual string AsString => LuaTypeConversion.ToString(this);
         public virtual LuaTable? AsTable => null;
         public virtual LuaFunction? AsFunction => null;
 
@@ -85,6 +85,7 @@ namespace FLua.Runtime
             Value = value;
         }
 
+        // These overrides provide direct access without conversion overhead
         public override double? AsNumber => Value;
         public override long? AsInteger => Value;
         public override string ToString() => Value.ToString();
@@ -102,8 +103,9 @@ namespace FLua.Runtime
             Value = value;
         }
 
+        // These overrides provide direct access without conversion overhead
         public override double? AsNumber => Value;
-        public override long? AsInteger => Math.Floor(Value) == Value ? (long)Value : null;
+        public override long? AsInteger => Math.Floor(Value) == Value && Value >= long.MinValue && Value <= long.MaxValue ? (long)Value : null;
         public override string ToString() => Value.ToString();
     }
 
@@ -119,8 +121,9 @@ namespace FLua.Runtime
             Value = value ?? string.Empty;
         }
 
-        public override double? AsNumber => double.TryParse(Value, out var result) ? result : null;
-        public override long? AsInteger => long.TryParse(Value, out var result) ? result : null;
+        // String conversions are handled by LuaTypeConversion for consistency
+        public override double? AsNumber => LuaTypeConversion.ToNumber(this);
+        public override long? AsInteger => LuaTypeConversion.ToInteger(this);
         public override string AsString => Value;
         public override string ToString() => Value;
     }

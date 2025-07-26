@@ -1,0 +1,635 @@
+using System;
+using FLua.Ast;
+
+namespace FLua.Runtime
+{
+    /// <summary>
+    /// Provides all runtime operations for Lua values.
+    /// This ensures consistent behavior between interpreter and future compiler.
+    /// </summary>
+    public static class LuaOperations
+    {
+        #region Binary Operations
+
+        /// <summary>
+        /// Performs addition on two Lua values
+        /// </summary>
+        public static LuaValue Add(LuaValue left, LuaValue right)
+        {
+            // Check for metamethods first
+            var metamethodResult = TryInvokeMetamethod(left, right, "__add");
+            if (metamethodResult != null)
+                return metamethodResult;
+
+            // Preserve integer type when both operands are integers
+            if (left.AsInteger.HasValue && right.AsInteger.HasValue)
+            {
+                try
+                {
+                    long result = checked(left.AsInteger.Value + right.AsInteger.Value);
+                    return new LuaInteger(result);
+                }
+                catch (OverflowException)
+                {
+                    // Fall back to floating point
+                    return new LuaNumber((double)left.AsInteger.Value + (double)right.AsInteger.Value);
+                }
+            }
+            else if (left.AsNumber.HasValue && right.AsNumber.HasValue)
+            {
+                return new LuaNumber(left.AsNumber.Value + right.AsNumber.Value);
+            }
+
+            throw new LuaRuntimeException("Attempt to add non-numbers");
+        }
+
+        /// <summary>
+        /// Performs subtraction on two Lua values
+        /// </summary>
+        public static LuaValue Subtract(LuaValue left, LuaValue right)
+        {
+            // Check for metamethods first
+            var metamethodResult = TryInvokeMetamethod(left, right, "__sub");
+            if (metamethodResult != null)
+                return metamethodResult;
+
+            // Preserve integer type when both operands are integers
+            if (left.AsInteger.HasValue && right.AsInteger.HasValue)
+            {
+                try
+                {
+                    long result = checked(left.AsInteger.Value - right.AsInteger.Value);
+                    return new LuaInteger(result);
+                }
+                catch (OverflowException)
+                {
+                    // Fall back to floating point
+                    return new LuaNumber((double)left.AsInteger.Value - (double)right.AsInteger.Value);
+                }
+            }
+            else if (left.AsNumber.HasValue && right.AsNumber.HasValue)
+            {
+                return new LuaNumber(left.AsNumber.Value - right.AsNumber.Value);
+            }
+
+            throw new LuaRuntimeException("Attempt to subtract non-numbers");
+        }
+
+        /// <summary>
+        /// Performs multiplication on two Lua values
+        /// </summary>
+        public static LuaValue Multiply(LuaValue left, LuaValue right)
+        {
+            // Check for metamethods first
+            var metamethodResult = TryInvokeMetamethod(left, right, "__mul");
+            if (metamethodResult != null)
+                return metamethodResult;
+
+            // Preserve integer type when both operands are integers
+            if (left.AsInteger.HasValue && right.AsInteger.HasValue)
+            {
+                try
+                {
+                    long result = checked(left.AsInteger.Value * right.AsInteger.Value);
+                    return new LuaInteger(result);
+                }
+                catch (OverflowException)
+                {
+                    // Fall back to floating point
+                    return new LuaNumber((double)left.AsInteger.Value * (double)right.AsInteger.Value);
+                }
+            }
+            else if (left.AsNumber.HasValue && right.AsNumber.HasValue)
+            {
+                return new LuaNumber(left.AsNumber.Value * right.AsNumber.Value);
+            }
+
+            throw new LuaRuntimeException("Attempt to multiply non-numbers");
+        }
+
+        /// <summary>
+        /// Performs floating-point division on two Lua values
+        /// </summary>
+        public static LuaValue FloatDivide(LuaValue left, LuaValue right)
+        {
+            // Check for metamethods first
+            var metamethodResult = TryInvokeMetamethod(left, right, "__div");
+            if (metamethodResult != null)
+                return metamethodResult;
+
+            if (left.AsNumber.HasValue && right.AsNumber.HasValue)
+            {
+                if (right.AsNumber.Value == 0)
+                {
+                    throw new LuaRuntimeException("Division by zero");
+                }
+
+                return new LuaNumber(left.AsNumber.Value / right.AsNumber.Value);
+            }
+
+            throw new LuaRuntimeException("Attempt to divide non-numbers");
+        }
+
+        /// <summary>
+        /// Performs floor division on two Lua values
+        /// </summary>
+        public static LuaValue FloorDivide(LuaValue left, LuaValue right)
+        {
+            // Check for metamethods first
+            var metamethodResult = TryInvokeMetamethod(left, right, "__idiv");
+            if (metamethodResult != null)
+                return metamethodResult;
+
+            if (left.AsNumber.HasValue && right.AsNumber.HasValue)
+            {
+                if (right.AsNumber.Value == 0)
+                {
+                    throw new LuaRuntimeException("Division by zero");
+                }
+
+                return new LuaNumber(Math.Floor(left.AsNumber.Value / right.AsNumber.Value));
+            }
+
+            throw new LuaRuntimeException("Attempt to perform floor division on non-numbers");
+        }
+
+        /// <summary>
+        /// Performs modulo operation on two Lua values
+        /// </summary>
+        public static LuaValue Modulo(LuaValue left, LuaValue right)
+        {
+            // Check for metamethods first
+            var metamethodResult = TryInvokeMetamethod(left, right, "__mod");
+            if (metamethodResult != null)
+                return metamethodResult;
+
+            if (left.AsNumber.HasValue && right.AsNumber.HasValue)
+            {
+                if (right.AsNumber.Value == 0)
+                {
+                    throw new LuaRuntimeException("Modulo by zero");
+                }
+
+                return new LuaNumber(left.AsNumber.Value % right.AsNumber.Value);
+            }
+
+            throw new LuaRuntimeException("Attempt to perform modulo on non-numbers");
+        }
+
+        /// <summary>
+        /// Performs power operation on two Lua values
+        /// </summary>
+        public static LuaValue Power(LuaValue left, LuaValue right)
+        {
+            // Check for metamethods first
+            var metamethodResult = TryInvokeMetamethod(left, right, "__pow");
+            if (metamethodResult != null)
+                return metamethodResult;
+
+            if (left.AsNumber.HasValue && right.AsNumber.HasValue)
+            {
+                return new LuaNumber(Math.Pow(left.AsNumber.Value, right.AsNumber.Value));
+            }
+
+            throw new LuaRuntimeException("Attempt to perform power operation on non-numbers");
+        }
+
+        /// <summary>
+        /// Performs string concatenation on two Lua values
+        /// </summary>
+        public static LuaValue Concat(LuaValue left, LuaValue right)
+        {
+            // Check for metamethods first
+            var metamethodResult = TryInvokeMetamethod(left, right, "__concat");
+            if (metamethodResult != null)
+                return metamethodResult;
+
+            var leftStr = LuaTypeConversion.ToConcatString(left);
+            var rightStr = LuaTypeConversion.ToConcatString(right);
+            
+            if (leftStr == null || rightStr == null)
+            {
+                throw new LuaRuntimeException($"attempt to concatenate a {LuaTypeConversion.GetTypeName(leftStr == null ? left : right)} value");
+            }
+
+            return new LuaString(leftStr + rightStr);
+        }
+
+        #region Comparison Operations
+
+        /// <summary>
+        /// Performs equality comparison on two Lua values
+        /// </summary>
+        public static LuaValue Equal(LuaValue left, LuaValue right)
+        {
+            // Check for metamethods first
+            var metamethodResult = TryInvokeMetamethod(left, right, "__eq");
+            if (metamethodResult != null)
+                return metamethodResult;
+
+            // Simple equality check for now
+            return new LuaBoolean(left.ToString() == right.ToString());
+        }
+
+        /// <summary>
+        /// Performs inequality comparison on two Lua values
+        /// </summary>
+        public static LuaValue NotEqual(LuaValue left, LuaValue right)
+        {
+            // Lua doesn't have a __ne metamethod, so we just negate __eq
+            var equalResult = Equal(left, right);
+            if (equalResult is LuaBoolean boolResult)
+            {
+                return new LuaBoolean(!boolResult.Value);
+            }
+            return new LuaBoolean(false);
+        }
+
+        /// <summary>
+        /// Performs less-than comparison on two Lua values
+        /// </summary>
+        public static LuaValue Less(LuaValue left, LuaValue right)
+        {
+            // Check for metamethods first
+            var metamethodResult = TryInvokeMetamethod(left, right, "__lt");
+            if (metamethodResult != null)
+                return metamethodResult;
+
+            if (left.AsNumber.HasValue && right.AsNumber.HasValue)
+            {
+                return new LuaBoolean(left.AsNumber.Value < right.AsNumber.Value);
+            }
+            else if (left is LuaString leftStr && right is LuaString rightStr)
+            {
+                return new LuaBoolean(leftStr.Value.CompareTo(rightStr.Value) < 0);
+            }
+
+            throw new LuaRuntimeException("Attempt to compare incompatible types");
+        }
+
+        /// <summary>
+        /// Performs less-than-or-equal comparison on two Lua values
+        /// </summary>
+        public static LuaValue LessEqual(LuaValue left, LuaValue right)
+        {
+            // Check for metamethods first
+            var metamethodResult = TryInvokeMetamethod(left, right, "__le");
+            if (metamethodResult != null)
+                return metamethodResult;
+
+            if (left.AsNumber.HasValue && right.AsNumber.HasValue)
+            {
+                return new LuaBoolean(left.AsNumber.Value <= right.AsNumber.Value);
+            }
+            else if (left is LuaString leftStr && right is LuaString rightStr)
+            {
+                return new LuaBoolean(leftStr.Value.CompareTo(rightStr.Value) <= 0);
+            }
+
+            throw new LuaRuntimeException("Attempt to compare incompatible types");
+        }
+
+        /// <summary>
+        /// Performs greater-than comparison on two Lua values
+        /// </summary>
+        public static LuaValue Greater(LuaValue left, LuaValue right)
+        {
+            // Lua implements a > b as b < a
+            return Less(right, left);
+        }
+
+        /// <summary>
+        /// Performs greater-than-or-equal comparison on two Lua values
+        /// </summary>
+        public static LuaValue GreaterEqual(LuaValue left, LuaValue right)
+        {
+            // Lua implements a >= b as b <= a
+            return LessEqual(right, left);
+        }
+
+        #endregion
+
+        #region Logical Operations
+
+        /// <summary>
+        /// Performs logical AND operation on two Lua values
+        /// </summary>
+        public static LuaValue And(LuaValue left, LuaValue right)
+        {
+            // In Lua, 'and' returns the first value if it's falsy, otherwise the second value
+            return LuaValue.IsValueTruthy(left) ? right : left;
+        }
+
+        /// <summary>
+        /// Performs logical OR operation on two Lua values
+        /// </summary>
+        public static LuaValue Or(LuaValue left, LuaValue right)
+        {
+            // In Lua, 'or' returns the first value if it's truthy, otherwise the second value
+            return LuaValue.IsValueTruthy(left) ? left : right;
+        }
+
+        #endregion
+
+        #region Bitwise Operations
+
+        /// <summary>
+        /// Performs bitwise AND operation on two Lua values
+        /// </summary>
+        public static LuaValue BitAnd(LuaValue left, LuaValue right)
+        {
+            // Check for metamethods first
+            var metamethodResult = TryInvokeMetamethod(left, right, "__band");
+            if (metamethodResult != null)
+                return metamethodResult;
+
+            if (left.AsInteger.HasValue && right.AsInteger.HasValue)
+            {
+                return new LuaInteger(left.AsInteger.Value & right.AsInteger.Value);
+            }
+
+            throw new LuaRuntimeException("Attempt to perform bitwise AND on non-integers");
+        }
+
+        /// <summary>
+        /// Performs bitwise OR operation on two Lua values
+        /// </summary>
+        public static LuaValue BitOr(LuaValue left, LuaValue right)
+        {
+            // Check for metamethods first
+            var metamethodResult = TryInvokeMetamethod(left, right, "__bor");
+            if (metamethodResult != null)
+                return metamethodResult;
+
+            if (left.AsInteger.HasValue && right.AsInteger.HasValue)
+            {
+                return new LuaInteger(left.AsInteger.Value | right.AsInteger.Value);
+            }
+
+            throw new LuaRuntimeException("Attempt to perform bitwise OR on non-integers");
+        }
+
+        /// <summary>
+        /// Performs bitwise XOR operation on two Lua values
+        /// </summary>
+        public static LuaValue BitXor(LuaValue left, LuaValue right)
+        {
+            // Check for metamethods first
+            var metamethodResult = TryInvokeMetamethod(left, right, "__bxor");
+            if (metamethodResult != null)
+                return metamethodResult;
+
+            if (left.AsInteger.HasValue && right.AsInteger.HasValue)
+            {
+                return new LuaInteger(left.AsInteger.Value ^ right.AsInteger.Value);
+            }
+
+            throw new LuaRuntimeException("Attempt to perform bitwise XOR on non-integers");
+        }
+
+        /// <summary>
+        /// Performs left shift operation on two Lua values
+        /// </summary>
+        public static LuaValue ShiftLeft(LuaValue left, LuaValue right)
+        {
+            // Check for metamethods first
+            var metamethodResult = TryInvokeMetamethod(left, right, "__shl");
+            if (metamethodResult != null)
+                return metamethodResult;
+
+            if (left.AsInteger.HasValue && right.AsInteger.HasValue)
+            {
+                var shift = right.AsInteger.Value;
+                if (shift < 0)
+                {
+                    throw new LuaRuntimeException("Negative shift count");
+                }
+                if (shift > 63)
+                {
+                    throw new LuaRuntimeException("Shift count too large");
+                }
+
+                return new LuaInteger(left.AsInteger.Value << (int)shift);
+            }
+
+            throw new LuaRuntimeException("Attempt to perform left shift on non-integers");
+        }
+
+        /// <summary>
+        /// Performs right shift operation on two Lua values
+        /// </summary>
+        public static LuaValue ShiftRight(LuaValue left, LuaValue right)
+        {
+            // Check for metamethods first
+            var metamethodResult = TryInvokeMetamethod(left, right, "__shr");
+            if (metamethodResult != null)
+                return metamethodResult;
+
+            if (left.AsInteger.HasValue && right.AsInteger.HasValue)
+            {
+                var shift = right.AsInteger.Value;
+                if (shift < 0)
+                {
+                    throw new LuaRuntimeException("Negative shift count");
+                }
+                if (shift > 63)
+                {
+                    throw new LuaRuntimeException("Shift count too large");
+                }
+
+                return new LuaInteger(left.AsInteger.Value >> (int)shift);
+            }
+
+            throw new LuaRuntimeException("Attempt to perform right shift on non-integers");
+        }
+
+        #endregion
+
+        #endregion
+
+        #region Unary Operations
+
+        /// <summary>
+        /// Performs logical NOT operation on a Lua value
+        /// </summary>
+        public static LuaValue Not(LuaValue value)
+        {
+            // 'not' has no metamethod in Lua
+            return new LuaBoolean(!LuaValue.IsValueTruthy(value));
+        }
+
+        /// <summary>
+        /// Performs negation on a Lua value
+        /// </summary>
+        public static LuaValue Negate(LuaValue value)
+        {
+            // Check for metamethods first
+            var metamethodResult = TryInvokeUnaryMetamethod(value, "__unm");
+            if (metamethodResult != null)
+                return metamethodResult;
+
+            if (value.AsNumber.HasValue)
+            {
+                return new LuaNumber(-value.AsNumber.Value);
+            }
+
+            throw new LuaRuntimeException("Attempt to negate non-number");
+        }
+
+        /// <summary>
+        /// Gets the length of a Lua value
+        /// </summary>
+        public static LuaValue Length(LuaValue value)
+        {
+            // Check for metamethods first
+            var metamethodResult = TryInvokeUnaryMetamethod(value, "__len");
+            if (metamethodResult != null)
+                return metamethodResult;
+
+            if (value is LuaString str)
+            {
+                return new LuaInteger(str.Value.Length);
+            }
+            else if (value is LuaTable table)
+            {
+                return new LuaInteger(table.Array.Count);
+            }
+
+            throw new LuaRuntimeException("Attempt to get length of non-string/table");
+        }
+
+        /// <summary>
+        /// Performs bitwise NOT operation on a Lua value
+        /// </summary>
+        public static LuaValue BitNot(LuaValue value)
+        {
+            // Check for metamethods first
+            var metamethodResult = TryInvokeUnaryMetamethod(value, "__bnot");
+            if (metamethodResult != null)
+                return metamethodResult;
+
+            if (value.AsInteger.HasValue)
+            {
+                return new LuaInteger(~value.AsInteger.Value);
+            }
+
+            throw new LuaRuntimeException("Attempt to perform bitwise NOT on non-integer");
+        }
+
+        #endregion
+
+        #region Metamethod Support
+
+        /// <summary>
+        /// Attempts to invoke a binary metamethod on two values
+        /// </summary>
+        private static LuaValue? TryInvokeMetamethod(LuaValue left, LuaValue right, string metamethod)
+        {
+            // Try left operand first
+            if (left is LuaTable leftTable && leftTable.Metatable != null)
+            {
+                var meta = leftTable.Metatable.RawGet(new LuaString(metamethod));
+                if (meta is LuaFunction func)
+                {
+                    var result = func.Call(new[] { left, right });
+                    if (result.Length > 0)
+                    {
+                        return result[0];
+                    }
+                }
+            }
+
+            // Try right operand if left didn't have the metamethod
+            if (right is LuaTable rightTable && rightTable.Metatable != null)
+            {
+                var meta = rightTable.Metatable.RawGet(new LuaString(metamethod));
+                if (meta is LuaFunction func)
+                {
+                    var result = func.Call(new[] { left, right });
+                    if (result.Length > 0)
+                    {
+                        return result[0];
+                    }
+                }
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Attempts to invoke a unary metamethod on a value
+        /// </summary>
+        private static LuaValue? TryInvokeUnaryMetamethod(LuaValue value, string metamethod)
+        {
+            if (value is LuaTable table && table.Metatable != null)
+            {
+                var meta = table.Metatable.RawGet(new LuaString(metamethod));
+                if (meta is LuaFunction func)
+                {
+                    var result = func.Call(new[] { value });
+                    if (result.Length > 0)
+                    {
+                        return result[0];
+                    }
+                }
+            }
+
+            return null;
+        }
+
+        #endregion
+
+        #region Operation Dispatch
+
+        /// <summary>
+        /// Evaluates a binary operation based on the operator type
+        /// </summary>
+        public static LuaValue EvaluateBinaryOp(LuaValue left, BinaryOp op, LuaValue right)
+        {
+            switch (op.Tag)
+            {
+                case 0: return Add(left, right);          // Add
+                case 1: return Subtract(left, right);     // Subtract
+                case 2: return Multiply(left, right);     // Multiply
+                case 3: return FloatDivide(left, right);  // FloatDiv
+                case 4: return FloorDivide(left, right);  // FloorDiv
+                case 5: return Modulo(left, right);       // Modulo
+                case 6: return Power(left, right);        // Power
+                case 7: return Concat(left, right);       // Concat
+                case 8: return Less(left, right);         // Less
+                case 9: return LessEqual(left, right);    // LessEqual
+                case 10: return Greater(left, right);     // Greater
+                case 11: return GreaterEqual(left, right);// GreaterEqual
+                case 12: return Equal(left, right);       // Equal
+                case 13: return NotEqual(left, right);    // NotEqual
+                case 14: return And(left, right);         // And
+                case 15: return Or(left, right);          // Or
+                case 16: return BitAnd(left, right);      // BitAnd
+                case 17: return BitOr(left, right);       // BitOr
+                case 18: return BitXor(left, right);      // BitXor
+                case 19: return ShiftLeft(left, right);   // ShiftLeft
+                case 20: return ShiftRight(left, right);  // ShiftRight
+                default:
+                    throw new NotImplementedException($"Binary operator not implemented: {op}");
+            }
+        }
+
+        /// <summary>
+        /// Evaluates a unary operation based on the operator type
+        /// </summary>
+        public static LuaValue EvaluateUnaryOp(UnaryOp op, LuaValue value)
+        {
+            switch (op.Tag)
+            {
+                case 0: return Negate(value);    // Negate
+                case 1: return Not(value);       // Not
+                case 2: return Length(value);    // Length
+                case 3: return BitNot(value);    // BitNot
+                default:
+                    throw new NotImplementedException($"Unary operator not implemented: {op}");
+            }
+        }
+
+        #endregion
+    }
+}

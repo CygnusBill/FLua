@@ -1,4 +1,4 @@
-module FLua.Parser.Tests.ParserComprehensiveTests
+module ComprehensiveTests
 
 open System
 open System.Numerics
@@ -25,28 +25,28 @@ let parseFailure parser input =
 let hexLiteralTests =
     testList "Hex literal parsing" [
         testCase "Standard hex values" <| fun () ->
-            let result = parseSuccess pNumberLiteral "0xFF"
+            let result = parseSuccess expr "0xFF"
             match result with
             | Expr.Literal(Literal.Integer(value)) -> 
                 Expect.equal value (bigint 255) "0xFF should be 255"
             | _ -> failtest "Expected integer literal"
         
         testCase "Max Int64 value" <| fun () ->
-            let result = parseSuccess pNumberLiteral "0x7fffffffffffffff"
+            let result = parseSuccess expr "0x7fffffffffffffff"
             match result with
             | Expr.Literal(Literal.Integer(value)) -> 
                 Expect.equal value (bigint Int64.MaxValue) "Should parse max int64"
             | _ -> failtest "Expected integer literal"
         
         testCase "Min Int64 value (was causing overflow)" <| fun () ->
-            let result = parseSuccess pNumberLiteral "0x8000000000000000"
+            let result = parseSuccess expr "0x8000000000000000"
             match result with
             | Expr.Literal(Literal.Integer(value)) -> 
                 Expect.equal value (bigint Int64.MinValue) "Should parse min int64"
             | _ -> failtest "Expected integer literal"
         
         testCase "-1 as hex" <| fun () ->
-            let result = parseSuccess pNumberLiteral "0xffffffffffffffff"
+            let result = parseSuccess expr "0xffffffffffffffff"
             match result with
             | Expr.Literal(Literal.Integer(value)) -> 
                 Expect.equal value (bigint -1L) "0xffffffffffffffff should be -1"
@@ -57,20 +57,20 @@ let hexLiteralTests =
 let decimalNumberTests =
     testList "Decimal number parsing" [
         testCase "Numbers starting with dot" <| fun () ->
-            let test1 = parseSuccess pNumberLiteral ".5"
+            let test1 = parseSuccess expr ".5"
             match test1 with
             | Expr.Literal(Literal.Float(value)) -> 
                 Expect.floatClose Accuracy.high value 0.5 ".5 should be 0.5"
             | _ -> failtest "Expected float literal"
             
-            let test2 = parseSuccess pNumberLiteral ".123"
+            let test2 = parseSuccess expr ".123"
             match test2 with
             | Expr.Literal(Literal.Float(value)) -> 
                 Expect.floatClose Accuracy.high value 0.123 ".123 should be 0.123"
             | _ -> failtest "Expected float literal"
         
         testCase "Numbers ending with dot" <| fun () ->
-            let result = parseSuccess pNumberLiteral "3."
+            let result = parseSuccess expr "3."
             match result with
             | Expr.Literal(Literal.Float(value)) -> 
                 Expect.floatClose Accuracy.high value 3.0 "3. should be 3.0"
@@ -81,21 +81,21 @@ let decimalNumberTests =
 let scientificNotationTests =
     testList "Scientific notation parsing" [
         testCase "Positive exponent" <| fun () ->
-            let result = parseSuccess pNumberLiteral "1E5"
+            let result = parseSuccess expr "1E5"
             match result with
             | Expr.Literal(Literal.Float(value)) -> 
                 Expect.floatClose Accuracy.high value 100000.0 "1E5 should be 100000"
             | _ -> failtest "Expected float literal"
         
         testCase "Negative exponent" <| fun () ->
-            let result = parseSuccess pNumberLiteral "1e-5"
+            let result = parseSuccess expr "1e-5"
             match result with
             | Expr.Literal(Literal.Float(value)) -> 
                 Expect.floatClose Accuracy.high value 0.00001 "1e-5 should be 0.00001"
             | _ -> failtest "Expected float literal"
         
         testCase "Explicit positive exponent" <| fun () ->
-            let result = parseSuccess pNumberLiteral "3.14E+2"
+            let result = parseSuccess expr "3.14E+2"
             match result with
             | Expr.Literal(Literal.Float(value)) -> 
                 Expect.floatClose Accuracy.high value 314.0 "3.14E+2 should be 314"
@@ -106,20 +106,32 @@ let scientificNotationTests =
 let longStringTests =
     testList "Long string parsing" [
         testCase "Initial newline removal" <| fun () ->
-            Expect.equal (parseSuccess pString "[[\nHello]]") "Hello" 
-                "Should remove initial \\n"
-            Expect.equal (parseSuccess pString "[[\r\nHello]]") "Hello" 
-                "Should remove initial \\r\\n"
-            Expect.equal (parseSuccess pString "[[\rHello]]") "Hello" 
-                "Should remove initial \\r"
+            match parseSuccess expr "[[\nHello]]" with
+            | Expr.Literal(Literal.String(s)) -> 
+                Expect.equal s "Hello" "Should remove initial \\n"
+            | _ -> failtest "Expected string literal"
+            
+            match parseSuccess expr "[[\r\nHello]]" with
+            | Expr.Literal(Literal.String(s)) -> 
+                Expect.equal s "Hello" "Should remove initial \\r\\n"
+            | _ -> failtest "Expected string literal"
+            
+            match parseSuccess expr "[[\rHello]]" with
+            | Expr.Literal(Literal.String(s)) -> 
+                Expect.equal s "Hello" "Should remove initial \\r"
+            | _ -> failtest "Expected string literal"
         
         testCase "No initial newline" <| fun () ->
-            Expect.equal (parseSuccess pString "[[Hello]]") "Hello" 
-                "Should not modify string without initial newline"
+            match parseSuccess expr "[[Hello]]" with
+            | Expr.Literal(Literal.String(s)) -> 
+                Expect.equal s "Hello" "Should not modify string without initial newline"
+            | _ -> failtest "Expected string literal"
         
         testCase "Nested brackets" <| fun () ->
-            Expect.equal (parseSuccess pString "[=[\nTest]=]") "Test" 
-                "Should handle nested bracket syntax"
+            match parseSuccess expr "[=[\nTest]=]" with
+            | Expr.Literal(Literal.String(s)) -> 
+                Expect.equal s "Test" "Should handle nested bracket syntax"
+            | _ -> failtest "Expected string literal"
     ]
 
 [<Tests>]
@@ -149,20 +161,28 @@ let identifierTests =
 let stringEscapeTests =
     testList "String escape sequences" [
         testCase "Basic escapes" <| fun () ->
-            Expect.equal (parseSuccess pString "\"\\n\\t\\r\"") "\n\t\r" 
-                "Should parse basic escape sequences"
+            match parseSuccess expr "\"\\n\\t\\r\"" with
+            | Expr.Literal(Literal.String(s)) -> 
+                Expect.equal s "\n\t\r" "Should parse basic escape sequences"
+            | _ -> failtest "Expected string literal"
         
         testCase "Hex escape" <| fun () ->
-            Expect.equal (parseSuccess pString "\"\\x41\"") "A" 
-                "\\x41 should be 'A'"
+            match parseSuccess expr "\"\\x41\"" with
+            | Expr.Literal(Literal.String(s)) -> 
+                Expect.equal s "A" "\\x41 should be 'A'"
+            | _ -> failtest "Expected string literal"
         
         testCase "Decimal escape" <| fun () ->
-            Expect.equal (parseSuccess pString "\"\\65\"") "A" 
-                "\\65 should be 'A'"
+            match parseSuccess expr "\"\\65\"" with
+            | Expr.Literal(Literal.String(s)) -> 
+                Expect.equal s "A" "\\65 should be 'A'"
+            | _ -> failtest "Expected string literal"
         
         testCase "Unicode escape" <| fun () ->
-            Expect.equal (parseSuccess pString "\"\\u{41}\"") "A" 
-                "\\u{41} should be 'A'"
+            match parseSuccess expr "\"\\u{41}\"" with
+            | Expr.Literal(Literal.String(s)) -> 
+                Expect.equal s "A" "\\u{41} should be 'A'"
+            | _ -> failtest "Expected string literal"
     ]
 
 [<Tests>]
