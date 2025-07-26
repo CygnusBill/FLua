@@ -108,9 +108,10 @@ namespace FLua.Interpreter
         private void PrintBanner()
         {
             Console.WriteLine();
-            Console.WriteLine("🚀 FLua Interactive REPL v2.0 (C#)");
+            Console.WriteLine("🚀 FLua Interactive REPL v2.1 (C#)");
             Console.WriteLine("====================================");
             Console.WriteLine("C# implementation of Lua interpreter");
+            Console.WriteLine("✨ Now with full module system support!");
             Console.WriteLine();
             Console.WriteLine("Commands:");
             Console.WriteLine("  .help     - Show help");
@@ -171,6 +172,12 @@ namespace FLua.Interpreter
             Console.WriteLine("   print(), type(), tostring(), tonumber(), pairs(), ipairs()");
             Console.WriteLine("   pcall(), error(), setmetatable(), getmetatable()");
             Console.WriteLine();
+            Console.WriteLine("🔹 Module System (✨ NEW):");
+            Console.WriteLine("   📦 require()    - Load modules: require('math'), require('string')");
+            Console.WriteLine("   📚 package.*   - loaded, path, searchers, searchpath()");
+            Console.WriteLine("   📋 Examples:   local math = require('math')");
+            Console.WriteLine("                  local str = require('string')");
+            Console.WriteLine();
             Console.WriteLine("🔹 Standard Libraries:");
             Console.WriteLine("   📐 math.*     - sin(), cos(), tan(), sqrt(), floor(), ceil()");
             Console.WriteLine("                   abs(), max(), min(), pi, huge, random()");
@@ -184,6 +191,7 @@ namespace FLua.Interpreter
             Console.WriteLine("                   exit(), tmpname(), difftime()");
             Console.WriteLine("   🔤 utf8.*     - len(), char(), codepoint(), offset()");
             Console.WriteLine("   ⚡ coroutine.* - create(), resume(), yield(), status()");
+            Console.WriteLine("                   running(), wrap(), isyieldable(), close()");
             Console.WriteLine();
         }
         

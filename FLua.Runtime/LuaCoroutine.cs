@@ -176,6 +176,21 @@ namespace FLua.Runtime
             return newResults;
         }
         
+        /// <summary>
+        /// Closes a coroutine (Lua 5.4 feature)
+        /// </summary>
+        public void Close()
+        {
+            if (_status == CoroutineStatus.Dead)
+                return; // Already closed
+            
+            // Force the coroutine to dead status
+            _status = CoroutineStatus.Dead;
+            
+            // In a full implementation, this would also call any to-be-closed variables
+            // and handle cleanup properly
+        }
+        
         public override string ToString() => $"thread: {GetHashCode():x8}";
     }
     

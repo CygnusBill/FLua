@@ -81,31 +81,53 @@ let pIdentifier: Parser<Token, unit> =
     many1Satisfy2L isIdentifierFirstChar isIdentifierChar "identifier"
     |>> Identifier
 
-// Parser for numbers (integer or float, including hex)
+// Parser for numbers (integer or float, including hex with binary exponent)
 let pNumber: Parser<Token, unit> =
-    // Hexadecimal float: 0x1.5
-    let pHexFloat =
+    // Hexadecimal float with optional binary exponent: 0x1.5p-3
+    let pHexFloatWithExponent =
         attempt (
-            pstringCI "0x" >>. many1Satisfy isHex .>>. pchar '.' .>>. manySatisfy isHex
+            pstringCI "0x" >>. 
+            many1Satisfy isHex .>>. 
+            opt (pchar '.' >>. manySatisfy isHex) .>>.
+            opt (anyOf "pP" >>. opt (anyOf "+-") .>>. many1Satisfy isDigit)
         )
-        |>> fun ((intPart, _), fracPart) ->
+        |>> fun ((intPart, fracPart), expPart) ->
+            // Parse integer part
             let intVal = BigInteger.Parse(intPart, System.Globalization.NumberStyles.AllowHexSpecifier) |> float
+            
+            // Parse fractional part if present
             let fracVal =
-                if fracPart = "" then 0.0
-                else
-                    fracPart
+                match fracPart with
+                | Some (frac) when frac <> "" ->
+                    frac
                     |> Seq.mapi (fun i c -> float (System.Convert.ToInt32(string c, 16)) / (16. ** float (i + 1)))
                     |> Seq.sum
-            let value = intVal + fracVal
-            Number value
+                | _ -> 0.0
+            
+            let mantissa = intVal + fracVal
+            
+            // Parse binary exponent if present
+            let finalValue =
+                match expPart with
+                | Some (sign, exp) ->
+                    let expValue = int exp
+                    let expSign = match sign with | Some '-' -> -1 | _ -> 1
+                    mantissa * (2.0 ** float (expSign * expValue))
+                | None -> mantissa
+            
+            Number finalValue
+    
+    // Regular hexadecimal integer: 0x123
     let pHex =
-        attempt (pstringCI "0x" >>. many1Satisfy isHex)
+        attempt (
+            pstringCI "0x" >>. many1Satisfy isHex .>> 
+            notFollowedBy (anyOf "pP.")  // Make sure it's not a float
+        )
         |>> (fun s -> 
-            // Parse as unsigned by ensuring we don't treat it as signed
-            // Add a leading zero if the first digit would make it negative
-            let hexStr = if s.Length > 0 && "89abcdefABCDEF".Contains(s.[0]) then "0" + s else s
-            let value = BigInteger.Parse(hexStr, System.Globalization.NumberStyles.HexNumber)
+            let value = BigInteger.Parse(s, System.Globalization.NumberStyles.HexNumber)
             Integer value)
+    
+    // Regular decimal float: 123.456
     let pFloat = 
         attempt (
             notFollowedBy (pchar '-') >>. 
@@ -115,10 +137,14 @@ let pNumber: Parser<Token, unit> =
             let floatStr = intPart + "." + fracPart
             let n = float floatStr
             Number n)
+    
+    // Regular decimal integer: 123
     let pInt =
         notFollowedBy (pchar '-') >>.
         many1Satisfy isDigit |>> (fun s -> Integer(BigInteger.Parse(s)))
-    let pNum = attempt pHexFloat <|> attempt pHex <|> attempt pFloat <|> pInt
+    
+    // Try hex float with exponent first, then hex int, then decimal float, then decimal int
+    let pNum = attempt pHexFloatWithExponent <|> attempt pHex <|> attempt pFloat <|> pInt
     pNum
 
 // Parser for strings (single, double, or long bracket, with basic escapes and line continuation)

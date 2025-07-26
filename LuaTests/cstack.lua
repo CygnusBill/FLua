@@ -1,5 +1,5 @@
 -- $Id: testes/cstack.lua $
--- See Copyright Notice in file lua.h
+-- See Copyright Notice in file all.lua
 
 
 local tracegc = require"tracegc"

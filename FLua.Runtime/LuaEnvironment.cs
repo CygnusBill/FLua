@@ -13,6 +13,7 @@ namespace FLua.Runtime
         private readonly LuaEnvironment? _parent;
         private readonly Dictionary<string, LuaVariable> _variables = new Dictionary<string, LuaVariable>();
         private readonly List<LuaVariable> _toBeClosedVariables = new List<LuaVariable>();
+
         public LuaTable Globals { get; }
         private bool _disposed = false;
 
@@ -62,19 +63,30 @@ namespace FLua.Runtime
             // If variable exists in local scope, update it
             if (_variables.TryGetValue(name, out var variable))
             {
+                // This will throw an exception if the variable is const
                 variable.SetValue(value);
                 return;
             }
 
             // If variable exists in parent scope, update it there
-            if (_parent != null && _parent.HasVariable(name))
+            if (_parent != null && _parent.HasLocalVariable(name))
             {
                 _parent.SetVariable(name, value);
                 return;
             }
 
-            // Otherwise, set in global table
+
+
+            // Set in global table
             Globals.Set(new LuaString(name), value);
+        }
+
+        /// <summary>
+        /// Checks if a variable exists in local scope only
+        /// </summary>
+        private bool HasLocalVariable(string name)
+        {
+            return _variables.ContainsKey(name);
         }
 
         /// <summary>
@@ -144,6 +156,8 @@ namespace FLua.Runtime
             }
         }
 
+
+
         /// <summary>
         /// Creates a standard Lua environment with built-in functions
         /// </summary>
@@ -185,6 +199,12 @@ namespace FLua.Runtime
             env.SetVariable("select", new BuiltinFunction(Select));
             env.SetVariable("unpack", new BuiltinFunction(Unpack));
             
+            // Garbage collection (stub implementation)
+            env.SetVariable("collectgarbage", new BuiltinFunction(CollectGarbage));
+            
+            // Dynamic loading (simplified - no actual compilation)
+            env.SetVariable("load", new BuiltinFunction(Load));
+            
             // Add standard libraries
             LuaCoroutineLib.AddCoroutineLibrary(env);
             LuaMathLib.AddMathLibrary(env);
@@ -194,6 +214,9 @@ namespace FLua.Runtime
             LuaOSLib.AddOSLibrary(env);
             LuaUTF8Lib.AddUTF8Library(env);
             LuaDebugLib.AddDebugLibrary(env);
+            
+            // Add package library and require function
+            LuaPackageLib.AddPackageLibrary(env);
             
             return env;
         }
@@ -804,6 +827,67 @@ namespace FLua.Runtime
             }
             
             return Array.Empty<LuaValue>();
+        }
+        
+        /// <summary>
+        /// Implements the collectgarbage function (stub implementation)
+        /// </summary>
+        private static LuaValue[] CollectGarbage(LuaValue[] args)
+        {
+            // In a real Lua implementation, this would control the garbage collector
+            // For now, we'll just run .NET's garbage collector for some options
+            
+            string option = "collect";
+            if (args.Length > 0 && args[0] is LuaString str)
+            {
+                option = str.Value;
+            }
+            
+            switch (option)
+            {
+                case "collect":
+                    // Force a garbage collection
+                    GC.Collect();
+                    return new LuaValue[] { new LuaInteger(0) }; // Return 0 for compatibility
+                    
+                case "stop":
+                case "restart":
+                case "step":
+                    // These don't map well to .NET GC, just return success
+                    return new LuaValue[] { new LuaInteger(0) };
+                    
+                case "count":
+                    // Return memory usage in KB
+                    long memoryUsed = GC.GetTotalMemory(false) / 1024;
+                    return new LuaValue[] { new LuaNumber(memoryUsed) };
+                    
+                case "isrunning":
+                    // .NET GC is always running
+                    return new LuaValue[] { new LuaBoolean(true) };
+                    
+                default:
+                    // Unknown option, return nil
+                    return new LuaValue[] { LuaNil.Instance };
+            }
+        }
+        
+        /// <summary>
+        /// Implements the load function (simplified - no actual compilation)
+        /// </summary>
+        private static LuaValue[] Load(LuaValue[] args)
+        {
+            if (args.Length == 0)
+                return new LuaValue[] { LuaNil.Instance, new LuaString("no chunk to load") };
+            
+            // For now, we'll just return an error since we don't support dynamic compilation
+            // In a full implementation, this would parse and compile Lua code
+            if (args[0] is LuaString code)
+            {
+                // Return nil and an error message
+                return new LuaValue[] { LuaNil.Instance, new LuaString("dynamic loading not supported") };
+            }
+            
+            return new LuaValue[] { LuaNil.Instance, new LuaString("bad argument #1 to 'load' (string expected)") };
         }
     }
 

@@ -1,5 +1,5 @@
 -- $Id: testes/verybig.lua $
--- See Copyright Notice in file lua.h
+-- See Copyright Notice in file all.lua
 
 print "testing RK"
 
