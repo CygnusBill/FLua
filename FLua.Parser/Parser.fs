@@ -260,10 +260,18 @@ let private pHexNumber : Parser<Expr, unit> =
     let hexInt = 
         attempt (pstringCI "0x" >>. many1Satisfy isHex)
         |>> (fun hexStr -> 
-            // Parse hex string as unsigned by prepending "0" to ensure positive
-            let paddedHex = if hexStr.Length % 2 = 1 then "0" + hexStr else hexStr
-            let value = System.Numerics.BigInteger.Parse("0" + paddedHex, System.Globalization.NumberStyles.HexNumber)
-            Expr.Literal (Literal.Integer value))
+            // Parse as unsigned 64-bit then interpret as signed
+            // This handles cases like 0x8000000000000000 correctly as Int64.MinValue
+            try
+                let value = System.Convert.ToUInt64(hexStr, 16)
+                let signedValue = int64 value
+                Expr.Literal (Literal.Integer (bigint signedValue))
+            with
+            | :? System.OverflowException ->
+                // Hex literal too large for 64 bits - parse as BigInteger and truncate
+                let bigValue = System.Numerics.BigInteger.Parse(hexStr, System.Globalization.NumberStyles.HexNumber)
+                let truncated = int64 (bigValue &&& bigint 0xFFFFFFFFFFFFFFFFL)
+                Expr.Literal (Literal.Integer (bigint truncated)))
     
     // Try hex float with exponent first, then hex float without exp, then hex int
     attempt hexFloatWithExp <|> attempt hexFloatNoExp <|> hexInt
