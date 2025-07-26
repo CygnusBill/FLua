@@ -69,8 +69,9 @@ This report documents the status of running the official Lua 5.4 test suite agai
 - **Impact**: String formatting tests fail
 
 ### 5. Module System
-- **Issue**: `require()` and module loading not implemented
-- **Impact**: Cannot test files that depend on other modules (e.g., bitwise.lua needs bwcoercion)
+- **Status**: ✅ Module system IS implemented (require, package.path, searchers)
+- **Current Issue**: `_ENV = nil` in modules causes "Attempt to index non-table" error
+- **Impact**: bitwise.lua fails when loading bwcoercion.lua module
 
 ## Test File Status
 
@@ -79,7 +80,7 @@ This report documents the status of running the official Lua 5.4 test suite agai
 | literals.lua | ⚠️ Partial | Needs load(), some syntax issues fixed |
 | strings.lua | ⚠️ Partial | Integer overflow, string.format() |
 | math.lua | ⚠️ Partial | Scientific notation fixed, other issues remain |
-| bitwise.lua | ❌ Failed | Missing module system |
+| bitwise.lua | ❌ Failed | _ENV = nil handling, string.packsize |
 | Other files | 🔍 Not tested | Pending investigation |
 
 ## Recommendations
