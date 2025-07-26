@@ -19,8 +19,49 @@ namespace FLua.Interpreter
         public LuaInterpreter()
         {
             _environment = LuaEnvironment.CreateStandardEnvironment();
+            
+            // Configure the package library to use this interpreter for loading files
+            LuaPackageLib.LuaFileLoader = LoadLuaModule;
         }
 
+        /// <summary>
+        /// Loads a Lua module from source code
+        /// </summary>
+        /// <param name="code">The Lua source code</param>
+        /// <param name="moduleName">The name of the module (for error reporting)</param>
+        /// <returns>The result of executing the module</returns>
+        private LuaValue[] LoadLuaModule(string code, string moduleName)
+        {
+            try
+            {
+                // Parse the Lua code
+                var ast = ParserHelper.ParseString(code);
+                
+                // Create a new environment for the module
+                var moduleEnv = _environment.CreateChild();
+                
+                // Execute the module in its own environment
+                var previousEnv = _environment;
+                _environment = moduleEnv;
+                
+                try
+                {
+                    var result = ExecuteStatements(ast);
+                    
+                    // Return the module's result or true if no explicit return
+                    return result.Length > 0 ? result : new[] { new LuaBoolean(true) };
+                }
+                finally
+                {
+                    _environment = previousEnv;
+                }
+            }
+            catch (Exception ex) when (!(ex is LuaRuntimeException))
+            {
+                throw new LuaRuntimeException($"syntax error in module '{moduleName}': {ex.Message}");
+            }
+        }
+        
         /// <summary>
         /// Evaluates a Lua expression and returns the result
         /// </summary>
@@ -101,6 +142,35 @@ namespace FLua.Interpreter
         }
 
         /// <summary>
+        /// Executes a block of statements in a new scope, properly handling to-be-closed variables
+        /// </summary>
+        private StatementResult ExecuteBlock(FSharpList<Statement> statements)
+        {
+            // Create a new child environment for the block
+            var childEnv = _environment.CreateChild();
+            var prevEnv = _environment;
+            _environment = childEnv;
+            
+            try
+            {
+                var result = ExecuteStatementsWithResult(statements);
+                
+                // Close to-be-closed variables before exiting the scope
+                _environment.CloseToBeClosedVariables();
+                
+                return result;
+            }
+            finally
+            {
+                // Restore the previous environment
+                _environment = prevEnv;
+                
+                // Dispose the child environment to ensure cleanup
+                childEnv.Dispose();
+            }
+        }
+
+        /// <summary>
         /// Executes a single Lua statement
         /// </summary>
         private StatementResult ExecuteStatement(Statement stmt)
@@ -109,6 +179,7 @@ namespace FLua.Interpreter
             {
                 return new StatementResult();
             }
+
             else if (stmt.IsLocalAssignment)
             {
                 var localAssign = (Statement.LocalAssignment)stmt;
@@ -137,12 +208,12 @@ namespace FLua.Interpreter
                     }
                 }
                 
-                // Assign values to variables
+                // Assign values to variables with proper attribute handling
                 for (int i = 0; i < variables.Length; i++)
                 {
-                    var (name, _) = variables[i];
+                    var (name, attribute) = variables[i];
                     var value = i < values.Length ? values[i] : LuaNil.Instance;
-                    _environment.SetLocalVariable(name, value);
+                    _environment.SetLocalVariable(name, value, attribute);
                 }
                 
                 return new StatementResult();
@@ -206,7 +277,14 @@ namespace FLua.Interpreter
                     if (varExpr.IsVar)
                     {
                         var varName = ((Expr.Var)varExpr).Item;
-                        _environment.SetVariable(varName, value);
+                        try
+                        {
+                            _environment.SetVariable(varName, value);
+                        }
+                        catch (LuaRuntimeException ex) when (ex.Message.Contains("const"))
+                        {
+                            throw new LuaRuntimeException($"attempt to change const variable '{varName}'");
+                        }
                     }
                     else if (varExpr.IsTableAccess)
                     {
@@ -244,14 +322,14 @@ namespace FLua.Interpreter
                     if (LuaValue.IsValueTruthy(conditionValue))
                     {
                         // Execute this block
-                        return ExecuteStatementsWithResult(block);
+                        return ExecuteBlock(block);
                     }
                 }
                 
                 // If no condition matched, execute else block if present
                 if (FSharpOption<FSharpList<Statement>>.get_IsSome(elseBlock))
                 {
-                    return ExecuteStatementsWithResult(elseBlock.Value);
+                    return ExecuteBlock(elseBlock.Value);
                 }
                 
                 return new StatementResult();
@@ -275,7 +353,7 @@ namespace FLua.Interpreter
                     }
                     
                     // Execute the body
-                    result = ExecuteStatementsWithResult(body);
+                    result = ExecuteBlock(body);
                     
                     // Check for control flow interruptions
                     if (result.ReturnValues != null || result.GotoLabel != null)
@@ -304,7 +382,7 @@ namespace FLua.Interpreter
                 do
                 {
                     // Execute the body
-                    result = ExecuteStatementsWithResult(body);
+                    result = ExecuteBlock(body);
                     
                     // Check for control flow interruptions
                     if (result.ReturnValues != null || result.GotoLabel != null)
@@ -333,25 +411,8 @@ namespace FLua.Interpreter
                 var doBlockStmt = (Statement.DoBlock)stmt;
                 var body = doBlockStmt.Item;
                 
-                // Create a new environment for the do block
-                var blockEnv = new LuaEnvironment(_environment);
-                var originalEnv = _environment;
-                
-                try
-                {
-                    // Set the new environment
-                    _environment = blockEnv;
-                    
-                    // Execute the block
-                    var result = ExecuteStatementsWithResult(body);
-                    
-                    return result;
-                }
-                finally
-                {
-                    // Restore the original environment
-                    _environment = originalEnv;
-                }
+                // Execute the block using ExecuteBlock to properly handle to-be-closed variables
+                return ExecuteBlock(body);
             }
             else if (stmt.IsBreak)
             {
@@ -385,10 +446,11 @@ namespace FLua.Interpreter
                             {
                                 var namedParam = (Parameter.Named)param;
                                 var paramName = namedParam.Item1;
+                                var attribute = namedParam.Item2;
                                 
                                 // Set parameter value or nil if not enough arguments
                                 var value = paramIndex < args.Length ? args[paramIndex] : LuaNil.Instance;
-                                _environment.SetLocalVariable(paramName, value);
+                                _environment.SetLocalVariable(paramName, value, attribute);
                                 paramIndex++;
                             }
                             else if (param.IsVararg)
@@ -456,10 +518,11 @@ namespace FLua.Interpreter
                             {
                                 var namedParam = (Parameter.Named)param;
                                 var paramName = namedParam.Item1;
+                                var attribute = namedParam.Item2;
                                 
                                 // Set parameter value or nil if not enough arguments
                                 var value = paramIndex < args.Length ? args[paramIndex] : LuaNil.Instance;
-                                _environment.SetLocalVariable(paramName, value);
+                                _environment.SetLocalVariable(paramName, value, attribute);
                                 paramIndex++;
                             }
                             else if (param.IsVararg)
@@ -651,11 +714,30 @@ namespace FLua.Interpreter
                 var body = forStmt.Item3;
                 
                 // Evaluate iterator expressions
-                var iterValues = iterExprs.ToArray().Select(EvaluateExpr).ToArray();
+                var iterExprArray = iterExprs.ToArray();
+                var iterValues = new List<LuaValue>();
                 
-                if (iterValues.Length < 3)
+                // Evaluate each expression
+                for (int i = 0; i < iterExprArray.Length; i++)
                 {
-                    throw new LuaRuntimeException("Generic for requires iterator function, state, and initial value");
+                    var expr = iterExprArray[i];
+                    
+                    // If this is the last expression, use all return values
+                    if (i == iterExprArray.Length - 1)
+                    {
+                        var results = EvaluateExprWithMultipleReturns(expr);
+                        iterValues.AddRange(results);
+                    }
+                    else
+                    {
+                        iterValues.Add(EvaluateExpr(expr));
+                    }
+                }
+                
+                // Pad with nil if needed
+                while (iterValues.Count < 3)
+                {
+                    iterValues.Add(LuaNil.Instance);
                 }
                 
                 // Get iterator function, state, and initial value
@@ -1034,31 +1116,73 @@ namespace FLua.Interpreter
             // Standard operations if no metamethod was found or applied
             if (op == BinaryOp.Add)
             {
-                if (left.AsNumber.HasValue && right.AsNumber.HasValue)
+            // Preserve integer type when both operands are integers
+            if (left.AsInteger.HasValue && right.AsInteger.HasValue)
+            {
+                try
                 {
-                    return new LuaNumber(left.AsNumber.Value + right.AsNumber.Value);
+                    long result = checked(left.AsInteger.Value + right.AsInteger.Value);
+                        return new LuaInteger(result);
                 }
-                
-                throw new LuaRuntimeException("Attempt to add non-numbers");
+                catch (OverflowException)
+                {
+                    // Fall back to floating point
+                    return new LuaNumber((double)left.AsInteger.Value + (double)right.AsInteger.Value);
+                }
             }
+            else if (left.AsNumber.HasValue && right.AsNumber.HasValue)
+            {
+                return new LuaNumber(left.AsNumber.Value + right.AsNumber.Value);
+            }
+            
+            throw new LuaRuntimeException("Attempt to add non-numbers");
+        }
             else if (op == BinaryOp.Subtract)
             {
-                if (left.AsNumber.HasValue && right.AsNumber.HasValue)
+            // Preserve integer type when both operands are integers
+            if (left.AsInteger.HasValue && right.AsInteger.HasValue)
+            {
+                try
                 {
-                    return new LuaNumber(left.AsNumber.Value - right.AsNumber.Value);
+                    long result = checked(left.AsInteger.Value - right.AsInteger.Value);
+                        return new LuaInteger(result);
                 }
-                
-                throw new LuaRuntimeException("Attempt to subtract non-numbers");
+                catch (OverflowException)
+                {
+                    // Fall back to floating point
+                    return new LuaNumber((double)left.AsInteger.Value - (double)right.AsInteger.Value);
+                }
             }
+            else if (left.AsNumber.HasValue && right.AsNumber.HasValue)
+            {
+                return new LuaNumber(left.AsNumber.Value - right.AsNumber.Value);
+            }
+            
+            throw new LuaRuntimeException("Attempt to subtract non-numbers");
+        }
             else if (op == BinaryOp.Multiply)
             {
-                if (left.AsNumber.HasValue && right.AsNumber.HasValue)
+            // Preserve integer type when both operands are integers
+            if (left.AsInteger.HasValue && right.AsInteger.HasValue)
+            {
+                try
                 {
-                    return new LuaNumber(left.AsNumber.Value * right.AsNumber.Value);
+                    long result = checked(left.AsInteger.Value * right.AsInteger.Value);
+                        return new LuaInteger(result);
                 }
-                
-                throw new LuaRuntimeException("Attempt to multiply non-numbers");
+                catch (OverflowException)
+                {
+                    // Fall back to floating point
+                    return new LuaNumber((double)left.AsInteger.Value * (double)right.AsInteger.Value);
+                }
             }
+            else if (left.AsNumber.HasValue && right.AsNumber.HasValue)
+            {
+                return new LuaNumber(left.AsNumber.Value * right.AsNumber.Value);
+            }
+            
+            throw new LuaRuntimeException("Attempt to multiply non-numbers");
+        }
             else if (op == BinaryOp.FloatDiv)
             {
                 if (left.AsNumber.HasValue && right.AsNumber.HasValue)
