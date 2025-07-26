@@ -11,50 +11,12 @@ namespace FLua.Runtime
     public static class LuaMetamethods
     {
         /// <summary>
-        /// Maps binary operators to their corresponding metamethod names
-        /// </summary>
-        private static readonly Dictionary<int, string?> BinaryMetamethods = new Dictionary<int, string?>
-        {
-            { 0, "__add" },       // Add
-            { 1, "__sub" },       // Subtract
-            { 2, "__mul" },       // Multiply
-            { 3, "__div" },       // FloatDiv
-            { 4, "__idiv" },      // FloorDiv
-            { 5, "__mod" },       // Modulo
-            { 6, "__pow" },       // Power
-            { 7, "__concat" },    // Concat
-            { 8, "__lt" },        // Less
-            { 9, "__le" },        // LessEqual
-            { 10, null },         // Greater (uses __lt with swapped operands)
-            { 11, null },         // GreaterEqual (uses __le with swapped operands)
-            { 12, "__eq" },       // Equal
-            { 13, null },         // NotEqual (uses __eq and negates)
-            { 14, null },         // And (no metamethod)
-            { 15, null },         // Or (no metamethod)
-            { 16, "__band" },     // BitAnd
-            { 17, "__bor" },      // BitOr
-            { 18, "__bxor" },     // BitXor
-            { 19, "__shl" },      // ShiftLeft
-            { 20, "__shr" },      // ShiftRight
-        };
-
-        /// <summary>
-        /// Maps unary operators to their corresponding metamethod names
-        /// </summary>
-        private static readonly Dictionary<int, string?> UnaryMetamethods = new Dictionary<int, string?>
-        {
-            { 0, "__unm" },       // Negate
-            { 1, null },          // Not (no metamethod)
-            { 2, "__len" },       // Length
-            { 3, "__bnot" },      // BitNot
-        };
-
-        /// <summary>
         /// Gets the metamethod name for a binary operator
         /// </summary>
         public static string? GetMetamethodName(BinaryOp op)
         {
-            return BinaryMetamethods.TryGetValue(op.Tag, out var name) ? name : null;
+            // Use extension method for deterministic lookup
+            return op.GetMetamethodName();
         }
 
         /// <summary>
@@ -62,7 +24,8 @@ namespace FLua.Runtime
         /// </summary>
         public static string? GetMetamethodName(UnaryOp op)
         {
-            return UnaryMetamethods.TryGetValue(op.Tag, out var name) ? name : null;
+            // Use extension method for deterministic lookup
+            return op.GetMetamethodName();
         }
 
         /// <summary>

@@ -404,9 +404,11 @@ namespace FLua.Runtime
                 {
                     throw new LuaRuntimeException("Negative shift count");
                 }
-                if (shift > 63)
+                
+                // Lua behavior: shifts >= 64 bits result in 0
+                if (shift >= 64)
                 {
-                    throw new LuaRuntimeException("Shift count too large");
+                    return new LuaInteger(0);
                 }
 
                 return new LuaInteger(left.AsInteger.Value << (int)shift);
@@ -432,9 +434,11 @@ namespace FLua.Runtime
                 {
                     throw new LuaRuntimeException("Negative shift count");
                 }
-                if (shift > 63)
+                
+                // Lua behavior: shifts >= 64 bits result in 0
+                if (shift >= 64)
                 {
-                    throw new LuaRuntimeException("Shift count too large");
+                    return new LuaInteger(0);
                 }
 
                 return new LuaInteger(left.AsInteger.Value >> (int)shift);
@@ -545,32 +549,8 @@ namespace FLua.Runtime
         /// </summary>
         public static LuaValue EvaluateBinaryOp(LuaValue left, BinaryOp op, LuaValue right)
         {
-            switch (op.Tag)
-            {
-                case 0: return Add(left, right);          // Add
-                case 1: return Subtract(left, right);     // Subtract
-                case 2: return Multiply(left, right);     // Multiply
-                case 3: return FloatDivide(left, right);  // FloatDiv
-                case 4: return FloorDivide(left, right);  // FloorDiv
-                case 5: return Modulo(left, right);       // Modulo
-                case 6: return Power(left, right);        // Power
-                case 7: return Concat(left, right);       // Concat
-                case 8: return Less(left, right);         // Less
-                case 9: return LessEqual(left, right);    // LessEqual
-                case 10: return Greater(left, right);     // Greater
-                case 11: return GreaterEqual(left, right);// GreaterEqual
-                case 12: return Equal(left, right);       // Equal
-                case 13: return NotEqual(left, right);    // NotEqual
-                case 14: return And(left, right);         // And
-                case 15: return Or(left, right);          // Or
-                case 16: return BitAnd(left, right);      // BitAnd
-                case 17: return BitOr(left, right);       // BitOr
-                case 18: return BitXor(left, right);      // BitXor
-                case 19: return ShiftLeft(left, right);   // ShiftLeft
-                case 20: return ShiftRight(left, right);  // ShiftRight
-                default:
-                    throw new NotImplementedException($"Binary operator not implemented: {op}");
-            }
+            // Use extension method for deterministic evaluation
+            return op.Evaluate(left, right);
         }
 
         /// <summary>
@@ -578,15 +558,8 @@ namespace FLua.Runtime
         /// </summary>
         public static LuaValue EvaluateUnaryOp(UnaryOp op, LuaValue value)
         {
-            switch (op.Tag)
-            {
-                case 0: return Negate(value);    // Negate
-                case 1: return Not(value);       // Not
-                case 2: return Length(value);    // Length
-                case 3: return BitNot(value);    // BitNot
-                default:
-                    throw new NotImplementedException($"Unary operator not implemented: {op}");
-            }
+            // Use extension method for deterministic evaluation
+            return op.Evaluate(value);
         }
 
         #endregion
