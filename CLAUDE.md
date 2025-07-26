@@ -166,10 +166,11 @@ echo "print('test')" | dotnet run --project FLua.Cli
 See `FLua-Gap-Analysis.md` for comprehensive compatibility status.
 
 ## Testing Philosophy
-- Parser tests focus on AST correctness
+- Parser tests use Expecto (F# functional testing framework) for AST correctness
 - Interpreter tests verify execution semantics
-- Runtime tests check standard library behavior
+- Runtime tests use xUnit for standard library behavior
 - LuaTests/ contains official Lua test suite files
+- Test frameworks chosen to match language: Expecto for F#, xUnit for C#
 
 ## Important Files
 - `FLua-Gap-Analysis.md`: Detailed compatibility analysis
