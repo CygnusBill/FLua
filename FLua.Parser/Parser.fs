@@ -633,8 +633,10 @@ let pNumericForStmt =
 
 // Generic for statement: for name1 [<attr>], name2 [<attr>], ... in expr1, expr2, ... do block end
 let pGenericForStmt : Parser<Statement, unit> =
+    // Known limitation: function calls with table constructors (no parentheses) fail in for loops
+    // due to FParsec forward reference issues. Workaround: use parentheses - pairs({1,2,3})
     attempt (keyword "for" >>. sepBy1 pVariableWithAttribute (symbol ",")
-    .>> keyword "in") .>>. sepBy1 lazyExpr (symbol ",")
+    .>> keyword "in") .>>. sepBy1 expr (symbol ",")
     .>> keyword "do" .>>. block .>> keyword "end"
     |>> fun ((names, exprs), body) ->
         Statement.GenericFor(names, exprs, body)

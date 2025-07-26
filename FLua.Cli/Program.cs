@@ -9,7 +9,39 @@ namespace FLua.Cli
     {
         static int Main(string[] args)
         {
-            // If no arguments provided, enter REPL mode
+            // Check if stdin has input (piped data)
+            bool hasStdinInput = false;
+            try
+            {
+                hasStdinInput = Console.IsInputRedirected;
+            }
+            catch
+            {
+                // Some environments might not support IsInputRedirected
+                hasStdinInput = false;
+            }
+
+            // If stdin has input and no file argument, read from stdin
+            if (hasStdinInput && args.Length == 0)
+            {
+                try
+                {
+                    string code = Console.In.ReadToEnd();
+                    if (!string.IsNullOrWhiteSpace(code))
+                    {
+                        var interpreter = new LuaInterpreter();
+                        var result = interpreter.ExecuteCode(code);
+                        return 0;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.Error.WriteLine($"Error: {ex.Message}");
+                    return 1;
+                }
+            }
+
+            // If no arguments provided and no stdin, enter REPL mode
             if (args.Length == 0)
             {
                 var repl = new LuaRepl();
@@ -36,15 +68,24 @@ namespace FLua.Cli
             string filename = args[0];
             bool verbose = Array.IndexOf(args, "--verbose") >= 0;
 
-            if (!File.Exists(filename))
-            {
-                Console.Error.WriteLine($"Error: File '{filename}' not found");
-                return 1;
-            }
-
             try
             {
-                string code = File.ReadAllText(filename);
+                string code;
+                
+                // Support "-" as stdin
+                if (filename == "-")
+                {
+                    code = Console.In.ReadToEnd();
+                }
+                else
+                {
+                    if (!File.Exists(filename))
+                    {
+                        Console.Error.WriteLine($"Error: File '{filename}' not found");
+                        return 1;
+                    }
+                    code = File.ReadAllText(filename);
+                }
                 
                 // Execute the script using the interpreter
                 var interpreter = new LuaInterpreter();
@@ -76,7 +117,12 @@ namespace FLua.Cli
             Console.WriteLine("Usage:");
             Console.WriteLine("  flua                    Enter interactive REPL mode");
             Console.WriteLine("  flua <script.lua>       Execute a Lua script file");
+            Console.WriteLine("  flua -                  Read and execute code from stdin");
             Console.WriteLine("  flua [options]");
+            Console.WriteLine();
+            Console.WriteLine("Piping:");
+            Console.WriteLine("  echo 'print(42)' | flua");
+            Console.WriteLine("  cat script.lua | flua");
             Console.WriteLine();
             Console.WriteLine("Options:");
             Console.WriteLine("  -h, --help             Show this help message");

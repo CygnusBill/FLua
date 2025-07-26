@@ -172,6 +172,27 @@ See `FLua-Gap-Analysis.md` for comprehensive compatibility status.
 - LuaTests/ contains official Lua test suite files
 - Test frameworks chosen to match language: Expecto for F#, xUnit for C#
 
+## Backlog
+
+### High Priority
+- Improved error messages (better line/column info, context)
+- Improved warning messages (unused variables, shadowing)
+- Implement load() function for dynamic code loading
+- Binary chunks and bytecode support
+
+### Medium Priority
+- Weak tables and weak references
+- Complete debug library implementation
+- Fix _ENV = nil handling in modules
+- Package preload functionality
+- Missing metamethods (__gc, __mode)
+
+### Future Enhancements
+- Performance optimizations
+- Better debugging support
+- Lua 5.4 feature parity
+- Compiler backend (using FLua parser)
+
 ## Important Files
 - `FLua-Gap-Analysis.md`: Detailed compatibility analysis
 - `PARSER_KNOWN_ISSUES.md`: Known parser limitations
