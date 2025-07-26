@@ -1246,3 +1246,6 @@ MigrationBackup/
 # Ionide (cross platform F# VS Code tools) working folder
 .ionide/
 
+
+# Claude AI assistant local settings
+.claude/
