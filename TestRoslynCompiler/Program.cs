@@ -19,21 +19,27 @@ class Program
         try
         {
             var luaFile = args[0];
-            var outputFile = Path.ChangeExtension(luaFile, ".dll");
+            var isConsole = args.Length > 1 && args[1] == "--console";
+            var outputFile = Path.ChangeExtension(luaFile, ".dll"); // Always .dll on .NET Core
             
             // Read Lua source
             var source = File.ReadAllText(luaFile);
-            Console.WriteLine($"Compiling {luaFile} with Roslyn code generator...");
+            Console.WriteLine($"Compiling {luaFile} as {(isConsole ? "console app" : "library")} with Roslyn code generator...");
             
             // Parse
             var ast = ParserHelper.ParseString(source);
             var astList = ListModule.ToArray(ast).ToList();
             
+            // Determine target based on command line arg
+            var target = args.Length > 1 && args[1] == "--console" 
+                ? CompilationTarget.ConsoleApp 
+                : CompilationTarget.Library;
+            
             // Compile with Roslyn backend
             var compiler = new RoslynLuaCompiler();
             var options = new CompilerOptions(
                 OutputPath: outputFile,
-                Target: CompilationTarget.Library,
+                Target: target,
                 Optimization: OptimizationLevel.Debug,
                 IncludeDebugInfo: true,
                 AssemblyName: Path.GetFileNameWithoutExtension(outputFile)

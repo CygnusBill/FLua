@@ -40,10 +40,20 @@ namespace FLua.Compiler
             // Create the Execute method
             var executeMethod = CreateExecuteMethod(block);
             
+            // Create class members
+            var classMembers = new List<MemberDeclarationSyntax> { executeMethod };
+            
+            // Add Main method for console applications
+            if (options.Target == CompilationTarget.ConsoleApp)
+            {
+                var mainMethod = CreateMainMethod();
+                classMembers.Add(mainMethod);
+            }
+            
             // Create the LuaScript class
             var luaScriptClass = ClassDeclaration("LuaScript")
                 .AddModifiers(Token(SyntaxKind.PublicKeyword), Token(SyntaxKind.StaticKeyword))
-                .AddMembers(executeMethod);
+                .AddMembers(classMembers.ToArray());
             
             // Create the namespace
             var namespaceDecl = NamespaceDeclaration(ParseName(options.AssemblyName ?? "CompiledLuaScript"))
@@ -97,6 +107,35 @@ namespace FLua.Compiler
             
             // Create method body
             method = method.WithBody(Block(statements));
+            
+            return method;
+        }
+        
+        private MethodDeclarationSyntax CreateMainMethod()
+        {
+            // Create: public static int Main(string[] args)
+            var method = MethodDeclaration(
+                    PredefinedType(Token(SyntaxKind.IntKeyword)),
+                    "Main")
+                .AddModifiers(Token(SyntaxKind.PublicKeyword), Token(SyntaxKind.StaticKeyword))
+                .AddParameterListParameters(
+                    Parameter(Identifier("args"))
+                        .WithType(ArrayType(PredefinedType(Token(SyntaxKind.StringKeyword)))
+                            .WithRankSpecifiers(SingletonList(ArrayRankSpecifier()))));
+            
+            // Create: return LuaConsoleRunner.Run(Execute, args);
+            var runCall = ReturnStatement(
+                InvocationExpression(
+                    MemberAccessExpression(
+                        SyntaxKind.SimpleMemberAccessExpression,
+                        IdentifierName("LuaConsoleRunner"),
+                        IdentifierName("Run")))
+                    .AddArgumentListArguments(
+                        Argument(IdentifierName("Execute")),
+                        Argument(IdentifierName("args"))));
+            
+            // Create method body
+            method = method.WithBody(Block(runCall));
             
             return method;
         }

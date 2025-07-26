@@ -104,27 +104,15 @@ public class CSharpCodeGenerator
 
     private void GenerateConsoleMainMethod(IList<Statement> block)
     {
-        WriteLine("public static void Main(string[] args)");
+        // First generate the Execute method
+        GenerateLibraryEntryPoint(block);
+        
+        // Then generate the Main method
+        WriteLine();
+        WriteLine("public static int Main(string[] args)");
         WriteLine("{");
         IncreaseIndent();
-        
-        WriteLine("var env = new LuaEnvironment();");
-        WriteLine("try");
-        WriteLine("{");
-        IncreaseIndent();
-        
-        GenerateBlock(block);
-        
-        DecreaseIndent();
-        WriteLine("}");
-        WriteLine("catch (Exception ex)");
-        WriteLine("{");
-        IncreaseIndent();
-        WriteLine("Console.WriteLine($\"Error: {ex.Message}\");");
-        WriteLine("Environment.Exit(1);");
-        DecreaseIndent();
-        WriteLine("}");
-        
+        WriteLine("return LuaConsoleRunner.Run(Execute, args);");
         DecreaseIndent();
         WriteLine("}");
     }
