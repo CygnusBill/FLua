@@ -582,6 +582,32 @@ namespace FLua.Runtime
             return table;
         }
 
+        /// <summary>
+        /// Gets a method from a value (handles both tables and values with metatables)
+        /// </summary>
+        public static LuaValue GetMethod(LuaEnvironment env, LuaValue obj, LuaValue methodName)
+        {
+            // For tables, use Get directly
+            if (obj is LuaTable table)
+            {
+                return table.Get(methodName);
+            }
+            
+            // For strings, get from string metatable
+            if (obj is LuaString)
+            {
+                // Get the string library method
+                var stringLib = env.GetVariable("string") as LuaTable;
+                if (stringLib != null)
+                {
+                    return stringLib.Get(methodName);
+                }
+            }
+            
+            // TODO: Handle other types with metatables
+            return LuaNil.Instance;
+        }
+
         #endregion
     }
 }

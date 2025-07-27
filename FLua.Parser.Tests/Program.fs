@@ -469,6 +469,45 @@ let tests = testList "Parser Tests" [
                     (Statement.GenericFor([("k", Attribute.Const); ("v", Attribute.Close)], [Expr.FunctionCall(Expr.Var "pairs", [Expr.Var "t"])], []))
             ]
         ]
+        
+        testList "Known Parser Issues" [
+            // These tests document known parser limitations that need to be fixed
+            // They are commented out to avoid failing the test suite
+            
+            testList "Table Assignment at Statement Level (TODO: Fix Parser)" [
+                // The parser doesn't support table indexing on the left side of assignments
+                // See PARSER_KNOWN_ISSUES.md for details
+                
+                // testStmt "table index assignment" "t[1] = 100" 
+                //     (Statement.Assignment([Expr.TableAccess(Expr.Var "t", Expr.Literal (Literal.Integer 1I))], [Expr.Literal (Literal.Integer 100I)]))
+                
+                // testStmt "table dot assignment" "t.field = \"value\"" 
+                //     (Statement.Assignment([Expr.TableAccess(Expr.Var "t", Expr.Literal (Literal.String "field"))], [Expr.Literal (Literal.String "value")]))
+                
+                // testStmt "table string key assignment" "t[\"key\"] = true" 
+                //     (Statement.Assignment([Expr.TableAccess(Expr.Var "t", Expr.Literal (Literal.String "key"))], [Expr.Literal (Literal.Boolean true)]))
+                
+                // testStmt "nested table assignment" "t.a.b[1] = 42"
+                //     (Statement.Assignment([Expr.TableAccess(Expr.TableAccess(Expr.TableAccess(Expr.Var "t", Expr.Literal (Literal.String "a")), Expr.Literal (Literal.String "b")), Expr.Literal (Literal.Integer 1I))], [Expr.Literal (Literal.Integer 42I)]))
+            ]
+            
+            testList "Table Access in Binary Expressions (TODO: Fix Parser)" [
+                // The parser has issues with table access directly followed by binary operators
+                // See PARSER_KNOWN_ISSUES.md for details
+                
+                // testExpr "table access addition" "t[1] + t[2]"
+                //     (Expr.Binary(
+                //         Expr.TableAccess(Expr.Var "t", Expr.Literal (Literal.Integer 1I)),
+                //         BinaryOp.Add,
+                //         Expr.TableAccess(Expr.Var "t", Expr.Literal (Literal.Integer 2I))))
+                
+                // testExpr "table dot access addition" "t.x + t.y"
+                //     (Expr.Binary(
+                //         Expr.TableAccess(Expr.Var "t", Expr.Literal (Literal.String "x")),
+                //         BinaryOp.Add,
+                //         Expr.TableAccess(Expr.Var "t", Expr.Literal (Literal.String "y"))))
+            ]
+        ]
     ]
 ]
 

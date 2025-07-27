@@ -95,6 +95,58 @@ end
 
 **Status**: FIXED - Shebang lines are now properly ignored when they appear as the first line of a file.
 
+## Table Assignment at Statement Level
+
+**Issue**: The parser fails to recognize table assignment statements like `t[1] = 100` at the statement level.
+
+**Examples that fail**:
+```lua
+t[1] = 100           -- Fails: table indexing assignment
+t.field = "value"    -- Fails: dot notation assignment
+t["key"] = true      -- Fails: string key assignment
+```
+
+**Examples that work**:
+```lua
+local t = {}
+t = {[1] = 100}      -- Works: table constructor with explicit keys
+local x = t[1]       -- Works: table access in expressions
+-- Workaround: use a function
+local function set(t, k, v) t[k] = v end
+set(t, 1, 100)       -- Works: assignment inside function
+```
+
+**Root Cause**: The statement parser doesn't include table access expressions in the list of valid assignment targets. It only accepts simple variables and lists of variables.
+
+**Test Status**: One compiler test is failing due to this limitation (CompileAndExecute_TableAssignment_WorksCorrectly)
+
+**Priority**: High - This is a fundamental Lua feature that should be supported
+
+## Table Access in Binary Expressions
+
+**Issue**: The parser has trouble with table access expressions when used directly in binary operations.
+
+**Examples that fail**:
+```lua
+local sum = t[1] + t[2]    -- Fails: parser error after t[1]
+local x = t.a + t.b        -- May fail in some contexts
+```
+
+**Examples that work**:
+```lua
+local a = t[1]
+local b = t[2]
+local sum = a + b          -- Works: separate variable assignments
+```
+
+**Root Cause**: Possible operator precedence or expression parsing issue when table access is followed by binary operators.
+
+**Workaround**: Extract table values to local variables before using in expressions
+
+**Test Status**: Affects some compiler tests that had to be rewritten to work around this
+
+**Priority**: Medium - Has an easy workaround but affects code readability
+
 ## Other Notes
 
 - All escape sequences are now working correctly (decimal, hex, unicode, line continuation)

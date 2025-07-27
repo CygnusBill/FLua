@@ -619,23 +619,21 @@ namespace FLua.Compiler
         private ExpressionSyntax GenerateMethodCall(Expr obj, string methodName, IList<Expr> args)
         {
             // Method call obj:method(args) is equivalent to obj.method(obj, args)
-            // First get the method from the object
+            // We need to use LuaOperations.GetMethod to handle both tables and strings
+            var objExpr = GenerateExpression(obj);
             var methodKey = ObjectCreationExpression(IdentifierName("LuaString"))
                 .AddArgumentListArguments(
                     Argument(LiteralExpression(SyntaxKind.StringLiteralExpression, Literal(methodName))));
             
-            // Cast object to LuaTable
-            var tableExpr = ParenthesizedExpression(
-                CastExpression(
-                    IdentifierName("LuaTable"),
-                    GenerateExpression(obj)));
-            
+            // Call LuaOperations.GetMethod(env, obj, methodName)
             var methodAccess = InvocationExpression(
                 MemberAccessExpression(
                     SyntaxKind.SimpleMemberAccessExpression,
-                    tableExpr,
-                    IdentifierName("Get")))
+                    IdentifierName("LuaOperations"),
+                    IdentifierName("GetMethod")))
                 .AddArgumentListArguments(
+                    Argument(IdentifierName("env")),
+                    Argument(objExpr),
                     Argument(methodKey));
             
             // Cast to LuaFunction
@@ -655,13 +653,18 @@ namespace FLua.Compiler
                     SyntaxKind.ArrayInitializerExpression,
                     SeparatedList(allArgs)));
             
-            return InvocationExpression(
+            var callExpr = InvocationExpression(
                 MemberAccessExpression(
                     SyntaxKind.SimpleMemberAccessExpression,
                     funcExpr,
                     IdentifierName("Call")))
                 .AddArgumentListArguments(
                     Argument(arrayCreation));
+            
+            // For expressions, we need to index [0]
+            return ElementAccessExpression(callExpr)
+                .AddArgumentListArguments(
+                    Argument(LiteralExpression(SyntaxKind.NumericLiteralExpression, Literal(0))));
         }
         
         private ExpressionSyntax GenerateFunctionCall(Expr func, IList<Expr> args)
