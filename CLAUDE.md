@@ -224,12 +224,14 @@ During parser development, attempts to add custom error messages for table const
 ## Compiler Development
 
 ### FLua.Compiler Project Overview
-The compiler project provides Lua-to-C# compilation using Roslyn for code generation.
+The compiler project provides Lua-to-C# compilation with multiple backend options.
 
 #### Architecture
 - **ILuaCompiler Interface**: Defines contract for compiler backends
-- **RoslynLuaCompiler**: Main compiler implementation using Roslyn
-- **RoslynCodeGenerator**: Uses Roslyn syntax factory for structured code generation (preferred)
+- **RoslynLuaCompiler**: Roslyn-based implementation (generates C# code, 70MB executables)
+- **CecilLuaCompiler**: Mono.Cecil-based implementation (generates IL directly, 16MB executables)
+- **RoslynCodeGenerator**: Uses Roslyn syntax factory for structured code generation
+- **CecilCodeGenerator**: Direct IL emission using Mono.Cecil (preferred for size)
 - **CSharpCodeGenerator**: String-based code generation (legacy, kept for reference)
 
 #### Key Features Implemented
@@ -265,16 +267,23 @@ Following Lee Copeland testing methodologies:
 - Decision table testing
 - State transition testing
 
+### Compiler Backend Comparison
+- **Roslyn Backend**: Generates readable C# code, ~70MB executables, easier debugging
+- **Cecil Backend**: Direct IL generation, ~16MB executables (77% size reduction), faster compilation
+
 ### Pending Compiler Features
 High Priority:
-- Control structures (if/while/for)
+- Fix while/repeat loop infinite loop bug with local variables
 - Table support (literals, indexing, methods)
+- Function definitions
+- Generic for loops
 - Multiple assignment from function calls
 
 Medium Priority:
-- AOT/standalone executable support (PublishSingleFile)
+- Method calls (`:` syntax)
+- Unary operators
+- Varargs support
 - Improved error messages with source location
-- IL.Emit backend for size optimization
 
 ### Build and Test Commands
 ```bash
@@ -284,20 +293,31 @@ dotnet build FLua.Compiler/FLua.Compiler.csproj
 # Run compiler tests (minimal suite that works)
 dotnet test FLua.Compiler.Tests.Minimal/FLua.Compiler.Tests.Minimal.csproj
 
-# Compile a Lua script
+# Compile a Lua script (uses Cecil backend by default)
 dotnet run --project FLua.Cli -- compile script.lua [--target Library|ConsoleApp]
 
 # Run compiled script (requires FLua.Runtime.dll in same directory)
 dotnet script.dll
 ```
 
-### Current Status (as of last session)
-- **Completed**: Roslyn-based code generator with syntax factory
+### Current Status
+#### Cecil Backend (Default)
+- **Completed**: Direct IL generation using Mono.Cecil
+- **Completed**: 77% executable size reduction (70MB → 16MB)
 - **Completed**: Console application support with LuaConsoleRunner
+- **Completed**: Control structures (if/while/repeat/for/break/do)
+- **Completed**: Local and global variables with proper scoping
+- **Completed**: Binary operations (arithmetic, comparison, logical)
+- **Completed**: Function calls
+- **7 of 24 compiler tests passing** (up from 1)
+- **Known Issue**: While/repeat loops with local variables cause infinite loops
+- **Next Priority**: Fix loop bug, implement tables and function definitions
+
+#### Roslyn Backend
+- **Completed**: Full code generator with syntax factory
 - **Completed**: Local functions with proper closure support
 - **Completed**: Variable shadowing with name mangling
-- **All 6 compiler tests passing** in FLua.Compiler.Tests.Minimal
-- **Next Priority**: Control structures (if/while/for) and table support
+- **All 6 minimal tests passing**
 
 ## Important Files
 - `FLua-Gap-Analysis.md`: Detailed compatibility analysis

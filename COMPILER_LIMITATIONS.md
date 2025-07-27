@@ -2,6 +2,21 @@
 
 This document outlines the known limitations of compiled Lua code versus interpreted code.
 
+## Compiler Backend Support
+
+### Supported Backends
+1. **Mono.Cecil Backend** (Default)
+   - Direct IL generation
+   - 16MB executables (77% smaller than Roslyn)
+   - Faster compilation
+   - Currently implements ~30% of Lua features
+
+2. **Roslyn Backend**
+   - Generates C# source code
+   - 70MB executables
+   - Better debugging experience
+   - More complete feature support
+
 ## Dynamic Code Loading
 
 ### load() Function
@@ -59,6 +74,39 @@ This document outlines the known limitations of compiled Lua code versus interpr
 - **Example**: `load("return " .. expr)()` won't work
 - **Workaround**: Use proper expressions instead of string building
 
+## Current Implementation Status (Cecil Backend)
+
+### Implemented Features
+- ✅ Print statements
+- ✅ Variable assignments (local and global)
+- ✅ Binary operations (arithmetic, comparison, logical)
+- ✅ If/elseif/else statements
+- ✅ While loops (bug: infinite loop with local variables)
+- ✅ Repeat/until loops
+- ✅ Numeric for loops
+- ✅ Break statements
+- ✅ Do blocks
+- ✅ Function calls
+- ✅ Console application support
+
+### Not Yet Implemented
+- ❌ Table support (constructors, access, methods)
+- ❌ Function definitions
+- ❌ Generic for loops
+- ❌ Method calls (`:` syntax)
+- ❌ Unary operators
+- ❌ Varargs
+- ❌ Closures
+- ❌ Metatables
+- ❌ Coroutines
+- ❌ Error handling (pcall/xpcall)
+
+### Known Bugs
+- While/repeat loops with local variable conditions cause infinite loops
+- Some edge cases in numeric for loops
+
 ## Future Considerations
 
 These limitations are by design to keep compiled binaries small and fast. For use cases requiring these features, use the interpreter or consider hybrid approaches where critical paths are compiled and dynamic features use the interpreter.
+
+The Cecil backend prioritizes executable size and compilation speed over feature completeness. For applications requiring full Lua compatibility, use the interpreter or Roslyn backend.

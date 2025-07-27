@@ -19,13 +19,13 @@ namespace FLua.Compiler.Tests.Minimal;
 [TestClass]
 public class CompilerIntegrationTests
 {
-    private RoslynLuaCompiler _compiler;
+    private CecilLuaCompiler _compiler;
     private string _tempDir;
 
     [TestInitialize]
     public void Setup()
     {
-        _compiler = new RoslynLuaCompiler();
+        _compiler = new CecilLuaCompiler();
         _tempDir = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
         Directory.CreateDirectory(_tempDir);
     }
@@ -58,7 +58,7 @@ public class CompilerIntegrationTests
         
         // Execute and verify
         var assembly = Assembly.LoadFile(outputPath);
-        var type = assembly.GetType("CompiledLuaScript.LuaScript");
+        var type = assembly.GetType("CompiledLuaScript+LuaScript");
         var method = type.GetMethod("Execute");
         var env = LuaEnvironment.CreateStandardEnvironment();
         
@@ -68,7 +68,8 @@ public class CompilerIntegrationTests
         }
         catch (Exception ex)
         {
-            Assert.Fail($"Compiled script should execute without exceptions: {ex.Message}");
+            var inner = ex.InnerException ?? ex;
+            Assert.Fail($"Compiled script should execute without exceptions: {inner.GetType().Name}: {inner.Message}\nStack: {inner.StackTrace}");
         }
     }
 
@@ -78,8 +79,8 @@ public class CompilerIntegrationTests
         // Testing Approach: Equivalence Partitioning - Variable assignment and arithmetic
         // Arrange
         string luaCode = @"
-            local x = 42
-            local y = x + 8
+            x = 42
+            y = x + 8
             print('Result:', y)
         ";
         var ast = FLua.Parser.ParserHelper.ParseString(luaCode);
@@ -94,7 +95,7 @@ public class CompilerIntegrationTests
         
         // Execute and verify variable values
         var assembly = Assembly.LoadFile(outputPath);
-        var type = assembly.GetType("CompiledLuaScript.LuaScript");
+        var type = assembly.GetType("CompiledLuaScript+LuaScript");
         var method = type.GetMethod("Execute");
         var env = LuaEnvironment.CreateStandardEnvironment();
         
@@ -123,7 +124,7 @@ public class CompilerIntegrationTests
         
         // Execute empty program
         var assembly = Assembly.LoadFile(outputPath);
-        var type = assembly.GetType("CompiledLuaScript.LuaScript");
+        var type = assembly.GetType("CompiledLuaScript+LuaScript");
         var method = type.GetMethod("Execute");
         var env = LuaEnvironment.CreateStandardEnvironment();
         
@@ -171,7 +172,7 @@ public class CompilerIntegrationTests
         Assert.IsNull(assembly.EntryPoint, "Library should not have entry point");
         
         // Verify library has Execute method
-        var type = assembly.GetType("CompiledLuaScript.LuaScript");
+        var type = assembly.GetType("CompiledLuaScript+LuaScript");
         var executeMethod = type.GetMethod("Execute");
         Assert.IsNotNull(executeMethod, "Library should have Execute method");
         Assert.IsTrue(executeMethod.IsStatic, "Execute method should be static");
@@ -205,7 +206,7 @@ public class CompilerIntegrationTests
         // Arrange
         string luaCode = @"
             local x = 10
-            local result = 0
+            result = 0
             
             if x > 5 then
                 result = 1
@@ -227,7 +228,7 @@ public class CompilerIntegrationTests
         
         // Execute and verify
         var assembly = Assembly.LoadFile(outputPath);
-        var type = assembly.GetType("CompiledLuaScript.LuaScript");
+        var type = assembly.GetType("CompiledLuaScript+LuaScript");
         var method = type.GetMethod("Execute");
         var env = LuaEnvironment.CreateStandardEnvironment();
         
@@ -244,8 +245,8 @@ public class CompilerIntegrationTests
         // Testing Approach: Control Flow Testing - While loops
         // Arrange
         string luaCode = @"
-            local i = 0
-            local sum = 0
+            i = 0
+            sum = 0
             
             while i < 5 do
                 sum = sum + i
@@ -264,7 +265,7 @@ public class CompilerIntegrationTests
         
         // Execute and verify
         var assembly = Assembly.LoadFile(outputPath);
-        var type = assembly.GetType("CompiledLuaScript.LuaScript");
+        var type = assembly.GetType("CompiledLuaScript+LuaScript");
         var method = type.GetMethod("Execute");
         var env = LuaEnvironment.CreateStandardEnvironment();
         
@@ -281,8 +282,8 @@ public class CompilerIntegrationTests
         // Testing Approach: Control Flow Testing - Repeat/until loops
         // Arrange
         string luaCode = @"
-            local i = 0
-            local count = 0
+            i = 0
+            count = 0
             
             repeat
                 count = count + 1
@@ -301,7 +302,7 @@ public class CompilerIntegrationTests
         
         // Execute and verify
         var assembly = Assembly.LoadFile(outputPath);
-        var type = assembly.GetType("CompiledLuaScript.LuaScript");
+        var type = assembly.GetType("CompiledLuaScript+LuaScript");
         var method = type.GetMethod("Execute");
         var env = LuaEnvironment.CreateStandardEnvironment();
         
@@ -318,7 +319,7 @@ public class CompilerIntegrationTests
         // Testing Approach: Control Flow Testing - Numeric for loops
         // Arrange
         string luaCode = @"
-            local sum = 0
+            sum = 0
             
             for i = 1, 5 do
                 sum = sum + i
@@ -336,7 +337,7 @@ public class CompilerIntegrationTests
         
         // Execute and verify
         var assembly = Assembly.LoadFile(outputPath);
-        var type = assembly.GetType("CompiledLuaScript.LuaScript");
+        var type = assembly.GetType("CompiledLuaScript+LuaScript");
         var method = type.GetMethod("Execute");
         var env = LuaEnvironment.CreateStandardEnvironment();
         
@@ -353,7 +354,7 @@ public class CompilerIntegrationTests
         // Testing Approach: Boundary Value Analysis - For loop with custom step
         // Arrange
         string luaCode = @"
-            local count = 0
+            count = 0
             
             for i = 10, 1, -2 do
                 count = count + 1
@@ -371,7 +372,7 @@ public class CompilerIntegrationTests
         
         // Execute and verify
         var assembly = Assembly.LoadFile(outputPath);
-        var type = assembly.GetType("CompiledLuaScript.LuaScript");
+        var type = assembly.GetType("CompiledLuaScript+LuaScript");
         var method = type.GetMethod("Execute");
         var env = LuaEnvironment.CreateStandardEnvironment();
         
@@ -388,7 +389,7 @@ public class CompilerIntegrationTests
         // Testing Approach: Control Flow Testing - Break statements
         // Arrange
         string luaCode = @"
-            local count = 0
+            count = 0
             
             while true do
                 count = count + 1
@@ -409,7 +410,7 @@ public class CompilerIntegrationTests
         
         // Execute and verify
         var assembly = Assembly.LoadFile(outputPath);
-        var type = assembly.GetType("CompiledLuaScript.LuaScript");
+        var type = assembly.GetType("CompiledLuaScript+LuaScript");
         var method = type.GetMethod("Execute");
         var env = LuaEnvironment.CreateStandardEnvironment();
         
@@ -440,7 +441,7 @@ public class CompilerIntegrationTests
         
         // Execute and verify
         var assembly = Assembly.LoadFile(outputPath);
-        var type = assembly.GetType("CompiledLuaScript.LuaScript");
+        var type = assembly.GetType("CompiledLuaScript+LuaScript");
         var method = type.GetMethod("Execute");
         var env = LuaEnvironment.CreateStandardEnvironment();
         
@@ -477,7 +478,7 @@ local sum = a + b + c
         
         // Execute and verify
         var assembly = Assembly.LoadFile(outputPath);
-        var type = assembly.GetType("CompiledLuaScript.LuaScript");
+        var type = assembly.GetType("CompiledLuaScript+LuaScript");
         var method = type.GetMethod("Execute");
         var env = LuaEnvironment.CreateStandardEnvironment();
         
@@ -511,7 +512,7 @@ local sum = a + b
         
         // Execute and verify
         var assembly = Assembly.LoadFile(outputPath);
-        var type = assembly.GetType("CompiledLuaScript.LuaScript");
+        var type = assembly.GetType("CompiledLuaScript+LuaScript");
         var method = type.GetMethod("Execute");
         var env = LuaEnvironment.CreateStandardEnvironment();
         
@@ -548,7 +549,7 @@ local sum = a + b + c
         
         // Execute and verify
         var assembly = Assembly.LoadFile(outputPath);
-        var type = assembly.GetType("CompiledLuaScript.LuaScript");
+        var type = assembly.GetType("CompiledLuaScript+LuaScript");
         var method = type.GetMethod("Execute");
         var env = LuaEnvironment.CreateStandardEnvironment();
         
@@ -580,7 +581,7 @@ local len = str:len()
         
         // Execute and verify
         var assembly = Assembly.LoadFile(outputPath);
-        var type = assembly.GetType("CompiledLuaScript.LuaScript");
+        var type = assembly.GetType("CompiledLuaScript+LuaScript");
         var method = type.GetMethod("Execute");
         var env = LuaEnvironment.CreateStandardEnvironment();
         
@@ -616,7 +617,7 @@ local sum = a + b + c + d
         
         // Execute and verify
         var assembly = Assembly.LoadFile(outputPath);
-        var type = assembly.GetType("CompiledLuaScript.LuaScript");
+        var type = assembly.GetType("CompiledLuaScript+LuaScript");
         var method = type.GetMethod("Execute");
         var env = LuaEnvironment.CreateStandardEnvironment();
         
@@ -662,7 +663,7 @@ local p, q, r = dual()
         
         // Execute and verify
         var assembly = Assembly.LoadFile(outputPath);
-        var type = assembly.GetType("CompiledLuaScript.LuaScript");
+        var type = assembly.GetType("CompiledLuaScript+LuaScript");
         var method = type.GetMethod("Execute");
         var env = LuaEnvironment.CreateStandardEnvironment();
         
@@ -715,7 +716,7 @@ local d = nested.inner.data
         
         // Execute and verify
         var assembly = Assembly.LoadFile(outputPath);
-        var type = assembly.GetType("CompiledLuaScript.LuaScript");
+        var type = assembly.GetType("CompiledLuaScript+LuaScript");
         var method = type.GetMethod("Execute");
         var env = LuaEnvironment.CreateStandardEnvironment();
         

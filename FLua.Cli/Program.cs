@@ -47,6 +47,7 @@ public class CompileOptions
 
     [Option('r', "reference", HelpText = "Additional assembly references")]
     public IEnumerable<string>? References { get; set; }
+
 }
 
 class Program
@@ -184,8 +185,8 @@ class Program
                 return 1;
             }
 
-            // Compile using Roslyn backend
-            var compiler = new RoslynLuaCompiler();
+            // Use Cecil backend for smaller executable size
+            var compiler = new CecilLuaCompiler();
             var compilerOptions = new CompilerOptions(
                 OutputPath: options.OutputFile!,
                 Target: options.Target,
