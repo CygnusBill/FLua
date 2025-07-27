@@ -59,12 +59,17 @@
 ## High Priority
 
 ## Medium Priority
-- [ ] Implement load() function for dynamic code loading
+- [x] Implement load() function for dynamic code loading (interpreter only)
+  - Fully working in the interpreter with proper error handling
+  - Parses code dynamically and returns a callable chunk
+  - Reports syntax errors with line/column information
+  - Not supported in compiled code (returns "dynamic loading not supported")
 - [ ] Design and implement structured error/warning system
 - [ ] Improved error messages with line numbers
 - [ ] Add IL.Emit backend for size optimization
 
 ## Low Priority
+- [ ] Add load() support for compiled code (requires runtime compilation)
 - [ ] Review parser ordering and overlapping conditions
 - [ ] Add Lua bytecode backend
 - [ ] Implement sandboxing configuration

@@ -9,6 +9,10 @@ namespace FLua.Runtime
     /// </summary>
     public class LuaEnvironment : IDisposable
     {
+        /// <summary>
+        /// Optional load function implementation that can be set by the host
+        /// </summary>
+        public static Func<LuaValue[], LuaValue[]>? LoadImplementation { get; set; }
         private readonly LuaEnvironment? _parent;
         private readonly Dictionary<string, LuaVariable> _variables = new Dictionary<string, LuaVariable>();
         private readonly List<LuaVariable> _toBeClosedVariables = new List<LuaVariable>();
@@ -878,8 +882,13 @@ namespace FLua.Runtime
             if (args.Length == 0)
                 return new LuaValue[] { LuaNil.Instance, new LuaString("no chunk to load") };
             
-            // For now, we'll just return an error since we don't support dynamic compilation
-            // In a full implementation, this would parse and compile Lua code
+            // Use the host-provided implementation if available
+            if (LoadImplementation != null)
+            {
+                return LoadImplementation(args);
+            }
+            
+            // Otherwise, return an error since we don't support dynamic compilation in the runtime
             if (args[0] is LuaString code)
             {
                 // Return nil and an error message

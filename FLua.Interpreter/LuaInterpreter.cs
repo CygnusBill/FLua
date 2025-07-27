@@ -22,6 +22,9 @@ namespace FLua.Interpreter
             
             // Configure the package library to use this interpreter for loading files
             LuaPackageLib.LuaFileLoader = LoadLuaModule;
+            
+            // Register the load function implementation
+            InterpreterLoadFunction.Register();
         }
 
         /// <summary>
@@ -97,7 +100,7 @@ namespace FLua.Interpreter
         /// <summary>
         /// Executes a list of Lua statements
         /// </summary>
-        private LuaValue[] ExecuteStatements(FSharpList<Statement> statements)
+        public LuaValue[] ExecuteStatements(FSharpList<Statement> statements)
         {
             LuaValue[]? returnValues = null;
             bool breakFlag = false;
