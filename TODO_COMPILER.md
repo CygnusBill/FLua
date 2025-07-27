@@ -50,7 +50,7 @@
 ## High Priority
 
 ## Medium Priority
-- [ ] Fix multiple assignment from function calls
+- [x] Fix multiple assignment from function calls
 - [ ] Add AOT/standalone executable support (PublishSingleFile, self-contained)
 - [ ] Implement load() function for dynamic code loading
 - [ ] Design and implement structured error/warning system

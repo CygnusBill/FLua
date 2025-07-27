@@ -29,6 +29,7 @@ namespace FLua.Compiler
         private Scope _currentScope = new Scope();
         private int _variableCounter = 0;
         private int _tempVarCount = 0;
+        private int tempVarCounter = 0;
         
         public RoslynCodeGenerator()
         {
@@ -239,35 +240,100 @@ namespace FLua.Compiler
         {
             var statements = new List<StatementSyntax>();
             
-            for (int i = 0; i < vars.Count; i++)
+            // Special case: Single function call with multiple assignment targets
+            if (exprs.Count == 1 && vars.Count > 1 && exprs[0].IsFunctionCall)
             {
-                var (varName, attr) = vars[i];
-                var value = i < exprs.Count ? exprs[i] : Expr.CreateLiteral(FLua.Ast.Literal.CreateNil());
+                // Generate temporary variable to hold all return values
+                var resultsVarName = "_results_" + tempVarCounter++;
                 
-                // Get mangled name for the variable
-                var mangledName = GetOrCreateMangledName(varName);
-                
-                // Create local variable declaration: LuaValue mangledName = expression;
-                var varDecl = LocalDeclarationStatement(
-                    VariableDeclaration(IdentifierName("LuaValue"))
+                // LuaValue[] _results = functionCall();
+                var resultsDecl = LocalDeclarationStatement(
+                    VariableDeclaration(
+                        ArrayType(IdentifierName("LuaValue"))
+                            .WithRankSpecifiers(SingletonList(ArrayRankSpecifier(SingletonSeparatedList<ExpressionSyntax>(OmittedArraySizeExpression())))))
                         .AddVariables(
-                            VariableDeclarator(Identifier(SanitizeIdentifier(mangledName)))
-                                .WithInitializer(EqualsValueClause(GenerateExpression(value)))));
+                            VariableDeclarator(Identifier(resultsVarName))
+                                .WithInitializer(EqualsValueClause(GenerateFunctionCall(exprs[0])))));
                 
-                statements.Add(varDecl);
+                statements.Add(resultsDecl);
                 
-                // Also store in environment: env.SetVariable("varName", mangledName);
-                var setVarCall = ExpressionStatement(
-                    InvocationExpression(
+                // Assign each variable from the results array
+                for (int i = 0; i < vars.Count; i++)
+                {
+                    var (varName, attr) = vars[i];
+                    var mangledName = GetOrCreateMangledName(varName);
+                    
+                    // LuaValue mangledName = (_results.Length > i) ? _results[i] : LuaNil.Instance;
+                    var valueExpr = ConditionalExpression(
+                        BinaryExpression(
+                            SyntaxKind.GreaterThanExpression,
+                            MemberAccessExpression(
+                                SyntaxKind.SimpleMemberAccessExpression,
+                                IdentifierName(resultsVarName),
+                                IdentifierName("Length")),
+                            LiteralExpression(SyntaxKind.NumericLiteralExpression, Literal(i))),
+                        ElementAccessExpression(IdentifierName(resultsVarName))
+                            .AddArgumentListArguments(Argument(LiteralExpression(SyntaxKind.NumericLiteralExpression, Literal(i)))),
                         MemberAccessExpression(
                             SyntaxKind.SimpleMemberAccessExpression,
-                            IdentifierName("env"),
-                            IdentifierName("SetVariable")))
-                    .AddArgumentListArguments(
-                        Argument(LiteralExpression(SyntaxKind.StringLiteralExpression, Literal(varName))),
-                        Argument(IdentifierName(SanitizeIdentifier(mangledName)))));
-                
-                statements.Add(setVarCall);
+                            IdentifierName("LuaNil"),
+                            IdentifierName("Instance")));
+                    
+                    var varDecl = LocalDeclarationStatement(
+                        VariableDeclaration(IdentifierName("LuaValue"))
+                            .AddVariables(
+                                VariableDeclarator(Identifier(SanitizeIdentifier(mangledName)))
+                                    .WithInitializer(EqualsValueClause(valueExpr))));
+                    
+                    statements.Add(varDecl);
+                    
+                    // Also store in environment
+                    var setVarCall = ExpressionStatement(
+                        InvocationExpression(
+                            MemberAccessExpression(
+                                SyntaxKind.SimpleMemberAccessExpression,
+                                IdentifierName("env"),
+                                IdentifierName("SetVariable")))
+                        .AddArgumentListArguments(
+                            Argument(LiteralExpression(SyntaxKind.StringLiteralExpression, Literal(varName))),
+                            Argument(IdentifierName(SanitizeIdentifier(mangledName)))));
+                    
+                    statements.Add(setVarCall);
+                }
+            }
+            else
+            {
+                // Normal case: process each variable individually
+                for (int i = 0; i < vars.Count; i++)
+                {
+                    var (varName, attr) = vars[i];
+                    var value = i < exprs.Count ? exprs[i] : Expr.CreateLiteral(FLua.Ast.Literal.CreateNil());
+                    
+                    // Get mangled name for the variable
+                    var mangledName = GetOrCreateMangledName(varName);
+                    
+                    // Create local variable declaration: LuaValue mangledName = expression;
+                    var varDecl = LocalDeclarationStatement(
+                        VariableDeclaration(IdentifierName("LuaValue"))
+                            .AddVariables(
+                                VariableDeclarator(Identifier(SanitizeIdentifier(mangledName)))
+                                    .WithInitializer(EqualsValueClause(GenerateExpression(value)))));
+                    
+                    statements.Add(varDecl);
+                    
+                    // Also store in environment: env.SetVariable("varName", mangledName);
+                    var setVarCall = ExpressionStatement(
+                        InvocationExpression(
+                            MemberAccessExpression(
+                                SyntaxKind.SimpleMemberAccessExpression,
+                                IdentifierName("env"),
+                                IdentifierName("SetVariable")))
+                        .AddArgumentListArguments(
+                            Argument(LiteralExpression(SyntaxKind.StringLiteralExpression, Literal(varName))),
+                            Argument(IdentifierName(SanitizeIdentifier(mangledName)))));
+                    
+                    statements.Add(setVarCall);
+                }
             }
             
             return statements;
@@ -277,15 +343,74 @@ namespace FLua.Compiler
         {
             var statements = new List<StatementSyntax>();
             
-            for (int i = 0; i < vars.Count; i++)
+            // Special case: Single function call with multiple assignment targets
+            if (exprs.Count == 1 && vars.Count > 1 && exprs[0].IsFunctionCall)
             {
-                var varExpr = vars[i];
-                var valueExpr = i < exprs.Count ? exprs[i] : Expr.CreateLiteral(FLua.Ast.Literal.CreateNil());
+                // Generate temporary variable to hold all return values
+                var resultsVarName = "_results_" + tempVarCounter++;
                 
-                if (varExpr.IsVar)
+                // LuaValue[] _results = functionCall();
+                var resultsDecl = LocalDeclarationStatement(
+                    VariableDeclaration(
+                        ArrayType(IdentifierName("LuaValue"))
+                            .WithRankSpecifiers(SingletonList(ArrayRankSpecifier(SingletonSeparatedList<ExpressionSyntax>(OmittedArraySizeExpression())))))
+                        .AddVariables(
+                            VariableDeclarator(Identifier(resultsVarName))
+                                .WithInitializer(EqualsValueClause(GenerateFunctionCall(exprs[0])))));
+                
+                statements.Add(resultsDecl);
+                
+                // Assign each variable from the results array
+                for (int i = 0; i < vars.Count; i++)
                 {
-                    // Simple variable assignment
-                    var varName = ((Expr.Var)varExpr).Item;
+                    var varExpr = vars[i];
+                    
+                    // LuaValue value = (_results.Length > i) ? _results[i] : LuaNil.Instance;
+                    var valueExpr = ConditionalExpression(
+                        BinaryExpression(
+                            SyntaxKind.GreaterThanExpression,
+                            MemberAccessExpression(
+                                SyntaxKind.SimpleMemberAccessExpression,
+                                IdentifierName(resultsVarName),
+                                IdentifierName("Length")),
+                            LiteralExpression(SyntaxKind.NumericLiteralExpression, Literal(i))),
+                        ElementAccessExpression(IdentifierName(resultsVarName))
+                            .AddArgumentListArguments(Argument(LiteralExpression(SyntaxKind.NumericLiteralExpression, Literal(i)))),
+                        MemberAccessExpression(
+                            SyntaxKind.SimpleMemberAccessExpression,
+                            IdentifierName("LuaNil"),
+                            IdentifierName("Instance")));
+                    
+                    statements.AddRange(GenerateSingleAssignment(varExpr, valueExpr));
+                }
+            }
+            else
+            {
+                // Normal case: process each variable individually
+                for (int i = 0; i < vars.Count; i++)
+                {
+                    var varExpr = vars[i];
+                    var valueExpr = i < exprs.Count ? GenerateExpression(exprs[i]) : 
+                        MemberAccessExpression(
+                            SyntaxKind.SimpleMemberAccessExpression,
+                            IdentifierName("LuaNil"),
+                            IdentifierName("Instance"));
+                    
+                    statements.AddRange(GenerateSingleAssignment(varExpr, valueExpr));
+                }
+            }
+            
+            return statements;
+        }
+        
+        private IEnumerable<StatementSyntax> GenerateSingleAssignment(Expr varExpr, ExpressionSyntax valueExpr)
+        {
+            var statements = new List<StatementSyntax>();
+            
+            if (varExpr.IsVar)
+            {
+                // Simple variable assignment
+                var varName = ((Expr.Var)varExpr).Item;
                     
                     // Check if it's a local variable
                     if (IsLocalVariable(varName))
@@ -297,7 +422,7 @@ namespace FLua.Compiler
                             AssignmentExpression(
                                 SyntaxKind.SimpleAssignmentExpression,
                                 IdentifierName(SanitizeIdentifier(mangledName)),
-                                GenerateExpression(valueExpr)));
+                                valueExpr));
                         
                         statements.Add(assignment);
                         
@@ -325,7 +450,7 @@ namespace FLua.Compiler
                                     IdentifierName("SetVariable")))
                             .AddArgumentListArguments(
                                 Argument(LiteralExpression(SyntaxKind.StringLiteralExpression, Literal(varName))),
-                                Argument(GenerateExpression(valueExpr))));
+                                Argument(valueExpr)));
                         
                         statements.Add(setVarCall);
                     }
@@ -349,7 +474,7 @@ namespace FLua.Compiler
                                 IdentifierName("Set")))
                         .AddArgumentListArguments(
                             Argument(GenerateExpression(tableAccess.Item2)),
-                            Argument(GenerateExpression(valueExpr))));
+                            Argument(valueExpr)));
                     
                     statements.Add(setCall);
                 }
@@ -359,7 +484,6 @@ namespace FLua.Compiler
                     statements.Add(EmptyStatement().WithLeadingTrivia(
                         Comment($"// TODO: Implement complex assignment for {varExpr.GetType().Name}")));
                 }
-            }
             
             return statements;
         }
@@ -404,7 +528,16 @@ namespace FLua.Compiler
             else if (expr.IsMethodCall)
             {
                 var methodCall = (Expr.MethodCall)expr;
-                return GenerateMethodCall(methodCall.Item1, methodCall.Item2, FSharpListToList(methodCall.Item3));
+                var allValues = GenerateMethodCall(methodCall.Item1, methodCall.Item2, FSharpListToList(methodCall.Item3));
+                // For expressions, we need just the first value
+                return ElementAccessExpression(allValues)
+                    .AddArgumentListArguments(
+                        Argument(LiteralExpression(SyntaxKind.NumericLiteralExpression, Literal(0))));
+            }
+            else if (expr.IsFunctionDef)
+            {
+                var funcDef = (Expr.FunctionDef)expr;
+                return GenerateFunctionExpression(funcDef.Item);
             }
             else
             {
@@ -616,6 +749,19 @@ namespace FLua.Compiler
                     Argument(GenerateExpression(key)));
         }
         
+        private ExpressionSyntax GenerateFunctionExpression(FunctionDef funcDef)
+        {
+            // For anonymous functions in expressions, we'll generate them as local functions
+            // and return a LuaUserFunction reference
+            
+            // For now, return a placeholder that indicates a function should be here
+            // This is a limitation that needs proper handling with lambda expressions
+            return MemberAccessExpression(
+                SyntaxKind.SimpleMemberAccessExpression,
+                IdentifierName("LuaNil"),
+                IdentifierName("Instance"));
+        }
+        
         private ExpressionSyntax GenerateMethodCall(Expr obj, string methodName, IList<Expr> args)
         {
             // Method call obj:method(args) is equivalent to obj.method(obj, args)
@@ -653,27 +799,59 @@ namespace FLua.Compiler
                     SyntaxKind.ArrayInitializerExpression,
                     SeparatedList(allArgs)));
             
-            var callExpr = InvocationExpression(
+            return InvocationExpression(
                 MemberAccessExpression(
                     SyntaxKind.SimpleMemberAccessExpression,
                     funcExpr,
                     IdentifierName("Call")))
                 .AddArgumentListArguments(
                     Argument(arrayCreation));
-            
-            // For expressions, we need to index [0]
-            return ElementAccessExpression(callExpr)
-                .AddArgumentListArguments(
-                    Argument(LiteralExpression(SyntaxKind.NumericLiteralExpression, Literal(0))));
         }
         
-        private ExpressionSyntax GenerateFunctionCall(Expr func, IList<Expr> args)
+        private ExpressionSyntax GenerateFunctionCall(Expr expr)
+        {
+            // Generate function call that returns all values (used for multiple assignment)
+            if (expr.IsFunctionCall)
+            {
+                var funcCall = (Expr.FunctionCall)expr;
+                var func = funcCall.Item1;
+                var args = FSharpListToList(funcCall.Item2);
+                return GenerateFunctionCallRaw(func, args);
+            }
+            else if (expr.IsMethodCall)
+            {
+                var methodCall = (Expr.MethodCall)expr;
+                var obj = methodCall.Item1;
+                var method = methodCall.Item2;
+                var args = FSharpListToList(methodCall.Item3);
+                
+                // Return the full method call (array of values)
+                return GenerateMethodCall(obj, method, args);
+            }
+            else
+            {
+                throw new InvalidOperationException("Expression is not a function call");
+            }
+        }
+        
+        private ExpressionSyntax GenerateFunctionCallRaw(Expr func, IList<Expr> args, ExpressionSyntax funcOverride = null)
         {
             // Generate: ((LuaFunction)func).Call(new LuaValue[] { args })
-            var funcExpr = ParenthesizedExpression(
-                CastExpression(
-                    IdentifierName("LuaFunction"),
-                    GenerateExpression(func)));
+            ExpressionSyntax funcExpr;
+            if (funcOverride != null)
+            {
+                funcExpr = ParenthesizedExpression(
+                    CastExpression(
+                        IdentifierName("LuaFunction"),
+                        funcOverride));
+            }
+            else
+            {
+                funcExpr = ParenthesizedExpression(
+                    CastExpression(
+                        IdentifierName("LuaFunction"),
+                        GenerateExpression(func)));
+            }
             
             var argExpressions = args.Select(arg => GenerateExpression(arg)).ToArray();
             
@@ -684,15 +862,18 @@ namespace FLua.Compiler
                     SyntaxKind.ArrayInitializerExpression,
                     SeparatedList(argExpressions)));
             
-            var callExpr = InvocationExpression(
+            return InvocationExpression(
                 MemberAccessExpression(
                     SyntaxKind.SimpleMemberAccessExpression,
                     funcExpr,
                     IdentifierName("Call")))
                 .AddArgumentListArguments(Argument(arrayCreation));
-            
+        }
+        
+        private ExpressionSyntax GenerateFunctionCall(Expr func, IList<Expr> args)
+        {
             // For expressions, we need to index [0]
-            return ElementAccessExpression(callExpr)
+            return ElementAccessExpression(GenerateFunctionCallRaw(func, args))
                 .AddArgumentListArguments(
                     Argument(LiteralExpression(SyntaxKind.NumericLiteralExpression, Literal(0))));
         }

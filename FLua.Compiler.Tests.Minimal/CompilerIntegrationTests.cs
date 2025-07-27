@@ -629,4 +629,104 @@ local sum = a + b + c + d
         Assert.IsTrue(sum is LuaInteger, "sum should be LuaInteger");
         Assert.AreEqual(100L, ((LuaInteger)sum).Value, "sum should equal 100 (10+20+30+40)");
     }
+
+    [TestMethod]
+    public void CompileAndExecute_MultipleAssignmentFromFunction_WorksCorrectly()
+    {
+        // Testing Approach: Decision Table Testing - Multiple return value scenarios
+        // Arrange
+        string luaCode = @"
+local function multi()
+    return 10, 20, 30
+end
+
+local function dual()
+    return 1, 2
+end
+
+-- Test 1: Equal variables and returns
+local a, b, c = multi()
+
+-- Test 2: Fewer variables than returns
+local x, y = multi()
+
+-- Test 3: More variables than returns
+local p, q, r = dual()
+        ";
+        var ast = FLua.Parser.ParserHelper.ParseString(luaCode);
+        var outputPath = Path.Combine(_tempDir, "multi_assign.dll");
+        var options = new CompilerOptions(outputPath);
+
+        // Act
+        var compileResult = _compiler.Compile(Microsoft.FSharp.Collections.ListModule.ToArray(ast), options);
+
+        // Assert
+        Assert.IsTrue(compileResult.Success, "Multiple assignment from function should compile successfully");
+        
+        // Execute and verify
+        var assembly = Assembly.LoadFile(outputPath);
+        var type = assembly.GetType("CompiledLuaScript.LuaScript");
+        var method = type.GetMethod("Execute");
+        var env = LuaEnvironment.CreateStandardEnvironment();
+        
+        method.Invoke(null, new object[] { env });
+        
+        // Test 1: Equal variables and returns
+        Assert.AreEqual(10L, ((LuaInteger)env.GetVariable("a")).Value, "a should be 10");
+        Assert.AreEqual(20L, ((LuaInteger)env.GetVariable("b")).Value, "b should be 20");
+        Assert.AreEqual(30L, ((LuaInteger)env.GetVariable("c")).Value, "c should be 30");
+        
+        // Test 2: Fewer variables than returns
+        Assert.AreEqual(10L, ((LuaInteger)env.GetVariable("x")).Value, "x should be 10");
+        Assert.AreEqual(20L, ((LuaInteger)env.GetVariable("y")).Value, "y should be 20");
+        
+        // Test 3: More variables than returns
+        Assert.AreEqual(1L, ((LuaInteger)env.GetVariable("p")).Value, "p should be 1");
+        Assert.AreEqual(2L, ((LuaInteger)env.GetVariable("q")).Value, "q should be 2");
+        Assert.IsTrue(env.GetVariable("r") is LuaNil, "r should be nil");
+    }
+
+    [TestMethod]
+    public void CompileAndExecute_TableAccessAndStringMethods_WorksCorrectly()
+    {
+        // Testing Approach: State Transition Testing - Table access and string methods
+        // Arrange
+        string luaCode = @"
+-- Test table access
+local t = {value = 42, name = ""test""}
+local v = t.value
+local n = t.name
+
+-- Test string method with multiple assignment
+local s = ""hello world""
+local parts = {s:find("" "")}
+local idx = parts[1]
+
+-- Test chained access
+local nested = {inner = {data = 100}}
+local d = nested.inner.data
+        ";
+        var ast = FLua.Parser.ParserHelper.ParseString(luaCode);
+        var outputPath = Path.Combine(_tempDir, "table_custom_method.dll");
+        var options = new CompilerOptions(outputPath);
+
+        // Act
+        var compileResult = _compiler.Compile(Microsoft.FSharp.Collections.ListModule.ToArray(ast), options);
+
+        // Assert
+        Assert.IsTrue(compileResult.Success, "Table custom method should compile successfully");
+        
+        // Execute and verify
+        var assembly = Assembly.LoadFile(outputPath);
+        var type = assembly.GetType("CompiledLuaScript.LuaScript");
+        var method = type.GetMethod("Execute");
+        var env = LuaEnvironment.CreateStandardEnvironment();
+        
+        method.Invoke(null, new object[] { env });
+        
+        Assert.AreEqual(42L, ((LuaInteger)env.GetVariable("v")).Value, "v should be 42");
+        Assert.AreEqual("test", ((LuaString)env.GetVariable("n")).Value, "n should be 'test'");
+        Assert.AreEqual(6L, ((LuaInteger)env.GetVariable("idx")).Value, "idx should be 6 (position of space)");
+        Assert.AreEqual(100L, ((LuaInteger)env.GetVariable("d")).Value, "d should be 100");
+    }
 }
