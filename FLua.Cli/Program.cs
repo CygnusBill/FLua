@@ -33,7 +33,7 @@ public class CompileOptions
     [Option('o', "output", HelpText = "Output file path", Required = true)]
     public string? OutputFile { get; set; }
 
-    [Option('t', "target", HelpText = "Compilation target (library, console)", Default = CompilationTarget.Library)]
+    [Option('t', "target", HelpText = "Compilation target (library, console, nativeaot)", Default = CompilationTarget.Library)]
     public CompilationTarget Target { get; set; }
 
     [Option("optimization", HelpText = "Optimization level (debug, release)", Default = OptimizationLevel.Release)]

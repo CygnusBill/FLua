@@ -20,15 +20,23 @@ public class RoslynLuaCompiler : ILuaCompiler
     public IEnumerable<CompilationTarget> SupportedTargets => new[]
     {
         CompilationTarget.Library,
-        CompilationTarget.ConsoleApp
+        CompilationTarget.ConsoleApp,
+        CompilationTarget.NativeAot
     };
 
     public CompilationResult Compile(IList<Statement> ast, CompilerOptions options)
     {
         try
         {
+            // For AOT, we need to generate console app code
+            var effectiveOptions = options;
+            if (options.Target == CompilationTarget.NativeAot)
+            {
+                effectiveOptions = options with { Target = CompilationTarget.ConsoleApp };
+            }
+            
             // Generate C# code from Lua AST
-            var csharpCode = GenerateCSharpCode(ast, options);
+            var csharpCode = GenerateCSharpCode(ast, effectiveOptions);
             
             // Debug: Write generated C# code to file for inspection
             if (options.IncludeDebugInfo)
@@ -37,7 +45,13 @@ public class RoslynLuaCompiler : ILuaCompiler
                 File.WriteAllText(debugFile, csharpCode);
             }
             
-            // Compile using Roslyn
+            // Handle AOT compilation differently
+            if (options.Target == CompilationTarget.NativeAot)
+            {
+                return CompileAot(csharpCode, options);
+            }
+            
+            // Compile using Roslyn for regular targets
             return CompileWithRoslyn(csharpCode, options);
         }
         catch (Exception ex)
@@ -136,5 +150,150 @@ public class RoslynLuaCompiler : ILuaCompiler
         }
 
         return references;
+    }
+    
+    private CompilationResult CompileAot(string csharpCode, CompilerOptions options)
+    {
+        // Create a temporary directory for the AOT project
+        var tempDir = Path.Combine(Path.GetTempPath(), $"flua_aot_{Guid.NewGuid():N}");
+        Directory.CreateDirectory(tempDir);
+        
+        try
+        {
+            // Write the C# code to the temp directory
+            var csFile = Path.Combine(tempDir, "Program.cs");
+            File.WriteAllText(csFile, csharpCode);
+            
+            // Generate the project file
+            var projectFile = Path.Combine(tempDir, "Program.csproj");
+            // For AOT, we always want a console app (even for library scripts)
+            var isConsoleApp = true;
+            AotProjectGenerator.GenerateProjectFile(projectFile, 
+                options.AssemblyName ?? "LuaScript", 
+                isConsoleApp);
+            
+            // Generate runtime config template
+            var runtimeConfigFile = Path.Combine(tempDir, "runtimeconfig.template.json");
+            AotProjectGenerator.GenerateRuntimeConfigTemplate(runtimeConfigFile);
+            
+            // Copy FLua.Runtime.dll to the temp directory for reference
+            var runtimePath = typeof(FLua.Runtime.LuaValue).Assembly.Location;
+            var runtimeDestPath = Path.Combine(tempDir, "FLua.Runtime.dll");
+            File.Copy(runtimePath, runtimeDestPath);
+            
+            // Run dotnet publish to create AOT executable
+            // Ensure output directory exists
+            var outputDir = Path.GetDirectoryName(options.OutputPath);
+            if (string.IsNullOrEmpty(outputDir))
+            {
+                outputDir = Directory.GetCurrentDirectory();
+            }
+            else if (!Directory.Exists(outputDir))
+            {
+                Directory.CreateDirectory(outputDir);
+            }
+            
+            var publishProcess = new System.Diagnostics.Process
+            {
+                StartInfo = new System.Diagnostics.ProcessStartInfo
+                {
+                    FileName = "dotnet",
+                    Arguments = $"publish -c Release -o \"{outputDir}\"",
+                    WorkingDirectory = tempDir,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                    UseShellExecute = false,
+                    CreateNoWindow = true
+                }
+            };
+            
+            var output = new StringBuilder();
+            var errors = new StringBuilder();
+            
+            publishProcess.OutputDataReceived += (_, e) => { if (e.Data != null) output.AppendLine(e.Data); };
+            publishProcess.ErrorDataReceived += (_, e) => { if (e.Data != null) errors.AppendLine(e.Data); };
+            
+            publishProcess.Start();
+            publishProcess.BeginOutputReadLine();
+            publishProcess.BeginErrorReadLine();
+            publishProcess.WaitForExit();
+            
+            if (publishProcess.ExitCode != 0)
+            {
+                return new CompilationResult(
+                    Success: false,
+                    Errors: new[] { $"AOT compilation failed:\n{errors}\n{output}" }
+                );
+            }
+            
+            // The executable should be in the output directory
+            var exeName = Path.GetFileNameWithoutExtension(options.OutputPath);
+            if (OperatingSystem.IsWindows())
+                exeName += ".exe";
+            
+            var exePath = Path.Combine(outputDir, exeName);
+            
+            if (!File.Exists(exePath))
+            {
+                // Try with assembly name instead
+                var assemblyName = options.AssemblyName ?? "LuaScript";
+                var altExePath = Path.Combine(outputDir, assemblyName);
+                if (OperatingSystem.IsWindows())
+                    altExePath += ".exe";
+                
+                if (File.Exists(altExePath))
+                {
+                    exePath = altExePath;
+                }
+                else
+                {
+                    return new CompilationResult(
+                        Success: false,
+                        Errors: new[] { $"AOT compilation succeeded but executable not found at: {exePath} or {altExePath}\nOutput:\n{output}" }
+                    );
+                }
+            }
+            
+            // Move the executable to the desired output path
+            var finalPath = options.OutputPath;
+            if (File.Exists(finalPath))
+                File.Delete(finalPath);
+            File.Move(exePath, finalPath);
+            
+            // Make it executable on Unix systems
+            if (!OperatingSystem.IsWindows())
+            {
+                var chmodProcess = new System.Diagnostics.Process
+                {
+                    StartInfo = new System.Diagnostics.ProcessStartInfo
+                    {
+                        FileName = "chmod",
+                        Arguments = $"+x \"{finalPath}\"",
+                        UseShellExecute = false,
+                        CreateNoWindow = true
+                    }
+                };
+                chmodProcess.Start();
+                chmodProcess.WaitForExit();
+            }
+            
+            return new CompilationResult(
+                Success: true,
+                AssemblyPath: finalPath,
+                Warnings: output.Length > 0 ? new[] { output.ToString() } : null
+            );
+        }
+        finally
+        {
+            // Clean up temporary directory
+            try
+            {
+                Directory.Delete(tempDir, recursive: true);
+            }
+            catch
+            {
+                // Ignore cleanup errors
+            }
+        }
     }
 }
