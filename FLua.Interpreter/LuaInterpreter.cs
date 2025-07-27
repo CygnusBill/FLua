@@ -842,6 +842,19 @@ namespace FLua.Interpreter
                 var variable = (Expr.Var)expr;
                 return new[] { _environment.GetVariable(variable.Item) };
             }
+            else if (expr.IsVarPos)
+            {
+                var variable = (Expr.VarPos)expr;
+                try
+                {
+                    return new[] { _environment.GetVariable(variable.Item1) };
+                }
+                catch (LuaRuntimeException ex) when (ex.Diagnostic == null)
+                {
+                    // Add position information to the error
+                    throw LuaRuntimeException.UnknownVariable(variable.Item1, variable.Item2);
+                }
+            }
             else if (expr.IsBinary)
             {
                 var binary = (Expr.Binary)expr;
@@ -897,6 +910,41 @@ namespace FLua.Interpreter
                 }
                 
                 throw new LuaRuntimeException("Attempt to call non-function");
+            }
+            else if (expr.IsFunctionCallPos)
+            {
+                var funcCall = (Expr.FunctionCallPos)expr;
+                var func = EvaluateExpr(funcCall.Item1);
+                var args = funcCall.Item2.ToArray().Select(EvaluateExpr).ToArray();
+                
+                try
+                {
+                    if (func is LuaFunction function)
+                    {
+                        return function.Call(args);
+                    }
+                    else if (func is LuaTable table && table.Metatable != null)
+                    {
+                        // Check for __call metamethod
+                        var callMethod = table.Metatable.RawGet(new LuaString("__call"));
+                        if (callMethod is LuaFunction callFunction)
+                        {
+                            // Add the table itself as the first argument
+                            var callArgs = new LuaValue[args.Length + 1];
+                            callArgs[0] = table;
+                            Array.Copy(args, 0, callArgs, 1, args.Length);
+                            
+                            return callFunction.Call(callArgs);
+                        }
+                    }
+                    
+                    throw new LuaRuntimeException("Attempt to call non-function");
+                }
+                catch (LuaRuntimeException ex) when (ex.Diagnostic == null)
+                {
+                    // Add position information to runtime errors
+                    throw new LuaRuntimeException(ex.Message) { LuaStackTrace = $"at {funcCall.Item3}" };
+                }
             }
             else if (expr.IsMethodCall)
             {

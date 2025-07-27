@@ -25,6 +25,7 @@ module FLua.Parser.Parser
 open FParsec
 open FLua.Ast
 open FLua.Parser
+open FLua.Common.Diagnostics
 // We'll define our own parsers instead of using the Lexer
 
 // ============================================================================
@@ -62,6 +63,18 @@ let ws =
 
 let keyword kw = pstring kw >>? notFollowedBy (satisfy isIdentifierChar) .>> ws
 let symbol s = pstring s .>> ws
+
+// Helper function to capture position information
+let withPosition (parser: Parser<'a, unit>) : Parser<'a * SourceLocation, unit> =
+    getPosition .>>. parser .>>. getPosition
+    |>> fun ((startPos, value), endPos) ->
+        let sourceLocation = SourceLocation(
+            FileName = startPos.StreamName,
+            Line = int startPos.Line,
+            Column = int startPos.Column,
+            Length = int (endPos.Column - startPos.Column)
+        )
+        (value, sourceLocation)
 
 // Reserved words that cannot be used as identifiers
 let reservedWords = 
@@ -384,6 +397,10 @@ let pLiteral : Parser<Expr, unit> =
 let pVariable : Parser<Expr, unit> =
     identifier |>> (fun s -> Expr.Var s)
 
+// Position-aware variable parser
+let pVariablePos : Parser<Expr, unit> =
+    withPosition identifier |>> (fun (name, pos) -> Expr.VarPos(name, pos))
+
 let pVararg : Parser<Expr, unit> =
     pstring "..." >>% Expr.Vararg
 
@@ -416,13 +433,20 @@ let pFunctionCall : Parser<Expr, unit> =
         let args = argsOpt |> Option.defaultValue []
         Expr.FunctionCall(func, args)
 
+// Position-aware function call parser
+let pFunctionCallPos : Parser<Expr, unit> =
+    withPosition (pVariable .>>. between (pstring "(" >>. ws) (ws >>. pstring ")") (opt (sepBy1 expr (symbol ","))))
+    |>> fun ((func, argsOpt), pos) ->
+        let args = argsOpt |> Option.defaultValue []
+        Expr.FunctionCallPos(func, args, pos)
+
 // Primary expressions without postfix operations
 let pPrimaryBase : Parser<Expr, unit> =
     ws >>. choice [
         attempt pLiteral
         attempt pTableConstructor
         attempt functionExpr
-        attempt pVariable
+        attempt pVariable  // Keep original for backward compatibility
         attempt pVararg
         attempt pParenExpr
     ] .>> ws

@@ -509,6 +509,21 @@ namespace FLua.Compiler
                 var name = ((Expr.Var)expr).Item;
                 return GenerateVariable(name);
             }
+            else if (expr.IsVarPos)
+            {
+                var varExpr = (Expr.VarPos)expr;
+                var name = varExpr.Item1;
+                var location = varExpr.Item2;
+                
+                // Check for dynamic loading functions and report error with position
+                if (name == "load" || name == "loadfile" || name == "dofile")
+                {
+                    var diagnostic = DiagnosticBuilder.DynamicFeatureError(name, location);
+                    _diagnostics.Report(diagnostic);
+                }
+                
+                return GenerateVariable(name);
+            }
             else if (expr.IsBinary)
             {
                 var binary = (Expr.Binary)expr;
@@ -518,6 +533,27 @@ namespace FLua.Compiler
             {
                 var funcCall = (Expr.FunctionCall)expr;
                 return GenerateFunctionCall(funcCall.Item1, FSharpListToList(funcCall.Item2));
+            }
+            else if (expr.IsFunctionCallPos)
+            {
+                var funcCall = (Expr.FunctionCallPos)expr;
+                var func = funcCall.Item1;
+                var args = FSharpListToList(funcCall.Item2);
+                var location = funcCall.Item3;
+                
+                // Check for dynamic loading function calls with position
+                if (func.IsVar)
+                {
+                    var varExpr = (Expr.Var)func;
+                    var varName = varExpr.Item;
+                    if (varName == "load" || varName == "loadfile" || varName == "dofile")
+                    {
+                        var diagnostic = DiagnosticBuilder.DynamicFeatureError(varName, location);
+                        _diagnostics.Report(diagnostic);
+                    }
+                }
+                
+                return GenerateFunctionCall(func, args);
             }
             else if (expr.IsUnary)
             {

@@ -3,6 +3,7 @@ namespace FLua.Ast
 open System
 open System.Numerics
 open System.Runtime.CompilerServices
+open FLua.Common.Diagnostics
 
 /// Represents attributes that can be applied to variables and parameters in Lua 5.4
 [<RequireQualifiedAccess>]
@@ -13,6 +14,19 @@ type Attribute =
 
 /// Represents a Lua identifier (variable/function name)
 type Identifier = string
+
+/// Wrapper for AST nodes with optional source position information
+type Positioned<'T> = {
+    Value: 'T
+    Position: SourceLocation option
+}
+
+/// Extension methods for creating positioned values
+[<RequireQualifiedAccess>]
+module Positioned =
+    let create value position = { Value = value; Position = position }
+    let withoutPosition value = { Value = value; Position = None }
+    let withPosition value position = { Value = value; Position = Some position }
 
 /// Represents a literal value in Lua
 [<RequireQualifiedAccess>]
@@ -76,6 +90,9 @@ type Expr =
     | Binary of Expr * BinaryOp * Expr
     | Vararg
     | Paren of Expr
+    // Positioned variants for error reporting
+    | VarPos of Identifier * SourceLocation
+    | FunctionCallPos of Expr * Expr list * SourceLocation
     
     // Factory methods for C# interoperability
     static member CreateLiteral(literal: Literal) = Expr.Literal literal
@@ -89,6 +106,9 @@ type Expr =
     static member CreateBinary(left: Expr, op: BinaryOp, right: Expr) = Expr.Binary(left, op, right)
     static member CreateVararg() = Expr.Vararg
     static member CreateParen(expr: Expr) = Expr.Paren expr
+    // Positioned variants
+    static member CreateVarPos(name: string, location: SourceLocation) = Expr.VarPos(name, location)
+    static member CreateFunctionCallPos(func: Expr, args: Expr list, location: SourceLocation) = Expr.FunctionCallPos(func, args, location)
 
 /// Represents a field in a table constructor
 and TableField =
@@ -161,6 +181,21 @@ and Statement =
     static member CreateLocalFunctionDef(name: string, funcDef: FunctionDef) = 
         Statement.LocalFunctionDef(name, funcDef)
     static member CreateReturn(exprs: Expr list option) = Statement.Return exprs
+
+/// Helper functions for extracting position information from AST nodes
+[<RequireQualifiedAccess>]
+module AstPosition =
+    /// Extract position information from an expression
+    let getPosition = function
+        | Expr.VarPos(_, pos) -> Some pos
+        | Expr.FunctionCallPos(_, _, pos) -> Some pos
+        | _ -> None
+    
+    /// Extract the underlying expression without position information
+    let stripPosition = function
+        | Expr.VarPos(name, _) -> Expr.Var name
+        | Expr.FunctionCallPos(func, args, _) -> Expr.FunctionCall(func, args)
+        | expr -> expr
 
 /// Extension methods to make working with the AST more convenient from C#
 [<Extension>]

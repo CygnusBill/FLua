@@ -175,7 +175,7 @@ class Program
             
             try
             {
-                var fsharpList = FLua.Parser.ParserHelper.ParseString(code);
+                var fsharpList = FLua.Parser.ParserHelper.ParseStringWithFileName(code, options.InputFile!);
                 ast = Microsoft.FSharp.Collections.ListModule.ToArray(fsharpList);
             }
             catch (Exception ex)

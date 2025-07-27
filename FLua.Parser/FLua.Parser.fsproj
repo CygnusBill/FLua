@@ -15,6 +15,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\FLua.Ast\FLua.Ast.fsproj" />
+    <ProjectReference Include="..\FLua.Common\FLua.Common.csproj" />
   </ItemGroup>
 
   <ItemGroup>
