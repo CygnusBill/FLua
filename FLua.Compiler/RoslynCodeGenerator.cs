@@ -33,7 +33,7 @@ namespace FLua.Compiler
         private int _variableCounter = 0;
         private int tempVarCounter = 0;
         private int _anonymousFunctionCounter = 0;
-        private List<MethodDeclarationSyntax> _pendingMethods = new List<MethodDeclarationSyntax>();
+        private List<MethodDeclarationSyntax> _pendingMethods = [];
         
         public RoslynCodeGenerator(IDiagnosticCollector? diagnostics = null)
         {
@@ -172,26 +172,26 @@ namespace FLua.Compiler
             {
                 var funcCall = (Statement.FunctionCall)statement;
                 var expr = GenerateFunctionCallStatement(funcCall.Item);
-                return new[] { ExpressionStatement(expr) };
+                return [ExpressionStatement(expr)];
             }
             else if (statement.IsReturn)
             {
                 var ret = (Statement.Return)statement;
                 var exprs = OptionModule.IsSome(ret.Item) ? FSharpListToList(ret.Item.Value) : new List<Expr>();
-                return new[] { GenerateReturn(exprs) };
+                return [GenerateReturn(exprs)];
             }
             else if (statement.IsIf)
             {
                 var ifStmt = (Statement.If)statement;
                 var clauses = FSharpListToList(ifStmt.Item1);
                 var elseBlock = OptionModule.IsSome(ifStmt.Item2) ? FSharpListToList(ifStmt.Item2.Value) : null;
-                return new[] { GenerateIf(clauses, elseBlock) };
+                return [GenerateIf(clauses, elseBlock)];
             }
             else if (statement.IsDoBlock)
             {
                 var doBlock = (Statement.DoBlock)statement;
                 var body = FSharpListToList(doBlock.Item);
-                return new[] { GenerateDoBlock(body) };
+                return [GenerateDoBlock(body)];
             }
             else if (statement.IsLocalFunctionDef)
             {
@@ -203,14 +203,14 @@ namespace FLua.Compiler
                 var whileStmt = (Statement.While)statement;
                 var condition = whileStmt.Item1;
                 var body = FSharpListToList(whileStmt.Item2);
-                return new[] { GenerateWhile(condition, body) };
+                return [GenerateWhile(condition, body)];
             }
             else if (statement.IsRepeat)
             {
                 var repeatStmt = (Statement.Repeat)statement;
                 var body = FSharpListToList(repeatStmt.Item1);
                 var condition = repeatStmt.Item2;
-                return new[] { GenerateRepeat(body, condition) };
+                return [GenerateRepeat(body, condition)];
             }
             else if (statement.IsNumericFor)
             {
@@ -220,7 +220,7 @@ namespace FLua.Compiler
                 var stop = forStmt.Item3;
                 var step = forStmt.Item4;
                 var body = FSharpListToList(forStmt.Item5);
-                return new[] { GenerateNumericFor(varName, start, stop, step, body) };
+                return [GenerateNumericFor(varName, start, stop, step, body)];
             }
             else if (statement.IsGenericFor)
             {
@@ -228,19 +228,20 @@ namespace FLua.Compiler
                 var vars = FSharpListToList(forStmt.Item1);
                 var exprs = FSharpListToList(forStmt.Item2);
                 var body = FSharpListToList(forStmt.Item3);
-                return new[] { GenerateGenericFor(vars, exprs, body) };
+                return [GenerateGenericFor(vars, exprs, body)];
             }
             else if (statement.IsBreak)
             {
-                return new[] { BreakStatement() };
+                return [BreakStatement()];
             }
             else
             {
                 // Return a comment for unimplemented statement types
-                return new[] { 
+                return
+                [
                     EmptyStatement().WithLeadingTrivia(
-                        Comment($"// TODO: Implement {statement.GetType().Name}")) 
-                };
+                        Comment($"// TODO: Implement {statement.GetType().Name}"))
+                ];
             }
         }
         

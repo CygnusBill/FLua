@@ -15,7 +15,7 @@ namespace FLua.Runtime
         public static Func<LuaValue[], LuaValue[]>? LoadImplementation { get; set; }
         private readonly LuaEnvironment? _parent;
         private readonly Dictionary<string, LuaVariable> _variables = new Dictionary<string, LuaVariable>();
-        private readonly List<LuaVariable> _toBeClosedVariables = new List<LuaVariable>();
+        private readonly List<LuaVariable> _toBeClosedVariables = [];
 
         public LuaTable Globals { get; }
         private bool _disposed = false;
@@ -55,7 +55,7 @@ namespace FLua.Runtime
             }
 
             // Finally, check global table
-            return Globals.Get(new LuaString(name));
+            return Globals.Get(name);
         }
 
         /// <summary>
@@ -81,7 +81,7 @@ namespace FLua.Runtime
 
 
             // Set in global table
-            Globals.Set(new LuaString(name), value);
+            Globals.Set(name, value);
         }
 
         /// <summary>
@@ -131,7 +131,7 @@ namespace FLua.Runtime
             }
 
             // Check global table
-            return Globals.Get(new LuaString(name)) != LuaNil.Instance;
+            return Globals.Get(name) != LuaValue.Nil;
         }
 
         /// <summary>
@@ -209,7 +209,7 @@ namespace FLua.Runtime
             env.SetVariable("load", new BuiltinFunction(Load));
             
             // Add standard libraries
-            LuaCoroutineLib.AddCoroutineLibrary(env);
+            // TODO: LuaCoroutineLib.AddCoroutineLibrary(env);
             LuaMathLib.AddMathLibrary(env);
             LuaStringLib.AddStringLibrary(env);
             LuaTableLib.AddTableLibrary(env);
@@ -230,7 +230,7 @@ namespace FLua.Runtime
         private static LuaValue[] Print(LuaValue[] args)
         {
             Console.WriteLine(string.Join("\t", args.Select(a => a.ToString())));
-            return Array.Empty<LuaValue>();
+            return [];
         }
         
         /// <summary>
@@ -239,22 +239,23 @@ namespace FLua.Runtime
         private static LuaValue[] Type(LuaValue[] args)
         {
             if (args.Length == 0)
-                return new[] { new LuaString("no value") };
+                return ["no value"];
             
             var value = args[0];
-            string type = value switch
+            string type = value.Type switch
             {
-                LuaNil => "nil",
-                LuaBoolean => "boolean",
-                LuaNumber => "number",
-                LuaInteger => "number",
-                LuaString => "string",
-                LuaTable => "table",
-                LuaFunction => "function",
+                LuaType.Nil => "nil",
+                LuaType.Boolean => "boolean",
+                LuaType.Float => "number",
+                LuaType.Integer => "number",
+                LuaType.String => "string",
+                LuaType.Table => "table",
+                LuaType.Function => "function",
+                LuaType.Thread => "thread",
                 _ => "userdata"
             };
             
-            return new[] { new LuaString(type) };
+            return [(LuaValue)type];
         }
         
         /// <summary>
@@ -263,19 +264,24 @@ namespace FLua.Runtime
         private static LuaValue[] ToString(LuaValue[] args)
         {
             if (args.Length == 0)
-                return new[] { new LuaString("nil") };
+                return [LuaValue.Nil];
             
             // Check for __tostring metamethod
-            if (args[0] is LuaTable table && table.Metatable != null)
+            if (args[0].IsTable)
             {
-                var toStringMethod = table.Metatable.RawGet(new LuaString("__tostring"));
-                if (toStringMethod is LuaFunction func)
+                var table = args[0].AsTable<LuaTable>();
+                if (table.Metatable != null)
                 {
-                    return func.Call(new[] { args[0] });
+                    var toStringMethod = table.Metatable.RawGet("__tostring");
+                    if (toStringMethod.IsFunction)
+                {
+                        var func = toStringMethod.AsFunction<LuaFunction>();
+                        return func.Call(new[] { args[0] });
+                    }
                 }
             }
             
-            return new[] { new LuaString(args[0].ToString() ?? string.Empty) };
+            return [args[0]];
         }
         
         /// <summary>
@@ -284,20 +290,21 @@ namespace FLua.Runtime
         private static LuaValue[] ToNumber(LuaValue[] args)
         {
             if (args.Length == 0)
-                return new[] { LuaNil.Instance };
+                return [LuaValue.Nil];
             
             var value = args[0];
             
-            if (value.AsNumber.HasValue)
-                return new[] { new LuaNumber(value.AsNumber.Value) };
+            if (value.IsNumber)
+                return [(LuaValue)value.AsNumber()];
             
-            if (value is LuaString str)
+            if (value.IsString)
             {
-                if (double.TryParse(str.Value, out var result))
-                    return new[] { new LuaNumber(result) };
+                var str = value.AsString();
+                if (double.TryParse(str, out var result))
+                    return [(LuaValue)result];
             }
             
-            return new[] { LuaNil.Instance };
+            return [LuaValue.Nil];
         }
         
         /// <summary>
@@ -306,9 +313,9 @@ namespace FLua.Runtime
         private static LuaValue[] ProtectedCall(LuaValue[] args)
         {
             if (args.Length == 0)
-                return new LuaValue[] { new LuaBoolean(false), new LuaString("no function to call") };
+                return [false, "no function to call"];
             
-            if (args[0] is LuaFunction func)
+            if (args[0].IsFunction)
             {
                 try
                 {
@@ -316,26 +323,27 @@ namespace FLua.Runtime
                     var funcArgs = new LuaValue[args.Length - 1];
                     Array.Copy(args, 1, funcArgs, 0, args.Length - 1);
                     
+                    var func = args[0].AsFunction<LuaFunction>();
                     var results = func.Call(funcArgs);
                     
                     // Prepend success value
                     var pcallResults = new LuaValue[results.Length + 1];
-                    pcallResults[0] = new LuaBoolean(true);
+                    pcallResults[0] = true;
                     Array.Copy(results, 0, pcallResults, 1, results.Length);
                     
                     return pcallResults;
                 }
                 catch (LuaRuntimeException ex)
                 {
-                    return new LuaValue[] { new LuaBoolean(false), new LuaString(ex.Message) };
+                    return [false, ex.Message];
                 }
                 catch (Exception ex)
                 {
-                    return new LuaValue[] { new LuaBoolean(false), new LuaString($"Internal error: {ex.Message}") };
+                    return [false, $"Internal error: {ex.Message}"];
                 }
             }
             
-            return new LuaValue[] { new LuaBoolean(false), new LuaString("attempt to call a non-function") };
+            return [false, "attempt to call a non-function"];
         }
         
         /// <summary>
@@ -352,10 +360,10 @@ namespace FLua.Runtime
             var firstArg = args[0];
             
             // Check if the first argument is falsy (nil or false)
-            if (!LuaValue.IsValueTruthy(firstArg))
+            if (!firstArg.IsTruthy())
             {
                 // Get error message from second argument or use default
-                string message = args.Length > 1 && args[1] != null
+                string message = args.Length > 1 && !args[1].IsNil
                     ? (args[1].ToString() ?? "assertion failed!")
                     : "assertion failed!";
                 
@@ -380,37 +388,40 @@ namespace FLua.Runtime
         /// </summary>
         private static LuaValue[] Pairs(LuaValue[] args)
         {
-            if (args.Length == 0 || !(args[0] is LuaTable table))
+            if (args.Length == 0 || !args[0].IsTable)
                 throw new LuaRuntimeException("bad argument #1 to 'pairs' (table expected)");
+            
+            var table = args[0].AsTable<LuaTable>();
             
             // Check for __pairs metamethod
             if (table.Metatable != null)
             {
-                var pairsMethod = table.Metatable.RawGet(new LuaString("__pairs"));
-                if (pairsMethod is LuaFunction func)
+                var pairsMethod = table.Metatable.RawGet("__pairs");
+                if (pairsMethod.IsFunction)
                 {
-                    return func.Call(new[] { table });
+                    var func = pairsMethod.AsFunction<LuaFunction>();
+                    return func.Call(new[] { args[0] });
                 }
             }
             
             // Create the iterator function
-            var nextFunc = new LuaUserFunction(nextArgs =>
+            var nextFunc = new BuiltinFunction(nextArgs =>
             {
                 if (nextArgs.Length < 2)
                     throw new LuaRuntimeException("bad argument #1 to 'next' (table expected)");
                 
-                var t = nextArgs[0] as LuaTable;
-                var key = nextArgs.Length > 1 ? nextArgs[1] : LuaNil.Instance;
-                
-                if (t == null)
+                if (!nextArgs[0].IsTable)
                     throw new LuaRuntimeException("bad argument #1 to 'next' (table expected)");
+                    
+                var t = nextArgs[0].AsTable<LuaTable>();
+                var key = nextArgs.Length > 1 ? nextArgs[1] : LuaValue.Nil;
                 
                 // First check the dictionary
                 var dict = t.Dictionary;
                 var found = false;
                 LuaValue? nextKey = null;
                 
-                if (key == LuaNil.Instance)
+                if (key.IsNil)
                 {
                     // Start with the first key
                     var enumerator = dict.GetEnumerator();
@@ -440,15 +451,15 @@ namespace FLua.Runtime
                     }
                 }
                 
-                if (found && nextKey != null)
+                if (found && nextKey.HasValue)
                 {
-                    return new LuaValue[] { nextKey, t.Get(nextKey) };
+                    return [nextKey.Value, t.Get(nextKey.Value)];
                 }
                 
-                return new LuaValue[] { LuaNil.Instance };
+                return [LuaValue.Nil];
             });
             
-            return new LuaValue[] { nextFunc, table, LuaNil.Instance };
+            return [LuaValue.Function(nextFunc), args[0], LuaValue.Nil];
         }
         
         /// <summary>
@@ -456,44 +467,47 @@ namespace FLua.Runtime
         /// </summary>
         private static LuaValue[] IPairs(LuaValue[] args)
         {
-            if (args.Length == 0 || !(args[0] is LuaTable table))
+            if (args.Length == 0 || !args[0].IsTable)
                 throw new LuaRuntimeException("bad argument #1 to 'ipairs' (table expected)");
+            
+            var table = args[0].AsTable<LuaTable>();
             
             // Check for __ipairs metamethod
             if (table.Metatable != null)
             {
-                var ipairsMethod = table.Metatable.RawGet(new LuaString("__ipairs"));
-                if (ipairsMethod is LuaFunction func)
+                var ipairsMethod = table.Metatable.RawGet(LuaValue.String("__ipairs"));
+                if (ipairsMethod.IsFunction)
                 {
-                    return func.Call(new[] { table });
+                    var func = ipairsMethod.AsFunction<LuaFunction>();
+                    return func.Call(new[] { args[0] });
                 }
             }
             
             // Create the iterator function
-            var iterFunc = new LuaUserFunction(iterArgs =>
+            var iterFunc = new BuiltinFunction(iterArgs =>
             {
                 if (iterArgs.Length < 2)
                     throw new LuaRuntimeException("bad argument #1 to 'ipairs iterator' (table expected)");
                 
-                var t = iterArgs[0] as LuaTable;
-                var index = iterArgs[1] as LuaInteger;
-                
-                if (t == null)
+                if (!iterArgs[0].IsTable)
                     throw new LuaRuntimeException("bad argument #1 to 'ipairs iterator' (table expected)");
                 
-                if (index == null)
+                if (!iterArgs[1].IsInteger)
                     throw new LuaRuntimeException("bad argument #2 to 'ipairs iterator' (number expected)");
                 
-                var nextIndex = index.Value + 1;
-                var nextValue = t.Get(new LuaInteger(nextIndex));
+                var t = iterArgs[0].AsTable<LuaTable>();
+                var index = iterArgs[1].AsInteger();
                 
-                if (nextValue == LuaNil.Instance)
-                    return new LuaValue[] { LuaNil.Instance };
+                var nextIndex = index + 1;
+                var nextValue = t.Get((LuaValue)nextIndex);
                 
-                return new LuaValue[] { new LuaInteger(nextIndex), nextValue };
+                if (nextValue.IsNil)
+                    return [LuaValue.Nil];
+                
+                return [(LuaValue)nextIndex, nextValue];
             });
             
-            return new LuaValue[] { iterFunc, table, new LuaInteger(0) };
+            return [iterFunc, args[0], 0];
         }
         
         /// <summary>
@@ -504,24 +518,26 @@ namespace FLua.Runtime
             if (args.Length < 2)
                 throw new LuaRuntimeException("bad argument #1 to 'setmetatable' (table expected)");
             
-            if (!(args[0] is LuaTable table))
+            if (!args[0].IsTable)
                 throw new LuaRuntimeException("bad argument #1 to 'setmetatable' (table expected)");
             
-            if (args[1] != LuaNil.Instance && !(args[1] is LuaTable metatable))
+            var table = args[0].AsTable<LuaTable>();
+            
+            if (!args[1].IsNil && !args[1].IsTable)
                 throw new LuaRuntimeException("bad argument #2 to 'setmetatable' (nil or table expected)");
             
             // Check for __metatable field in the current metatable
             if (table.Metatable != null)
             {
-                var protectedMeta = table.Metatable.RawGet(new LuaString("__metatable"));
-                if (protectedMeta != LuaNil.Instance)
+                var protectedMeta = table.Metatable.RawGet(LuaValue.String("__metatable"));
+                if (!protectedMeta.IsNil)
                     throw new LuaRuntimeException("cannot change a protected metatable");
             }
             
             // Set the metatable
-            table.Metatable = args[1] as LuaTable;
+            table.Metatable = args[1].IsTable ? args[1].AsTable<LuaTable>() : null;
             
-            return new[] { table };
+            return [args[0]];
         }
         
         /// <summary>
@@ -530,20 +546,22 @@ namespace FLua.Runtime
         private static LuaValue[] GetMetatable(LuaValue[] args)
         {
             if (args.Length == 0)
-                return new[] { LuaNil.Instance };
+                return [LuaValue.Nil];
             
-            if (!(args[0] is LuaTable table))
-                return new[] { LuaNil.Instance };
+            if (!args[0].IsTable)
+                return [LuaValue.Nil];
+            
+            var table = args[0].AsTable<LuaTable>();
             
             if (table.Metatable == null)
-                return new[] { LuaNil.Instance };
+                return [LuaValue.Nil];
             
             // Check for __metatable field
-            var protectedMeta = table.Metatable.RawGet(new LuaString("__metatable"));
-            if (protectedMeta != LuaNil.Instance)
-                return new[] { protectedMeta };
+            var protectedMeta = table.Metatable.RawGet(LuaValue.String("__metatable"));
+            if (!protectedMeta.IsNil)
+                return [protectedMeta];
             
-            return new[] { table.Metatable };
+            return [LuaValue.Table(table.Metatable)];
         }
         
         /// <summary>
@@ -551,24 +569,25 @@ namespace FLua.Runtime
         /// </summary>
         private static LuaValue[] Next(LuaValue[] args)
         {
-            if (args.Length == 0 || !(args[0] is LuaTable table))
+            if (args.Length == 0 || !args[0].IsTable)
                 throw new LuaRuntimeException("bad argument #1 to 'next' (table expected)");
             
-            var key = args.Length > 1 ? args[1] : LuaNil.Instance;
+            var table = args[0].AsTable<LuaTable>();
+            var key = args.Length > 1 ? args[1] : LuaValue.Nil;
             
             // Get all keys from the table
             var dict = table.Dictionary;
             var keys = dict.Keys.ToList();
             
-            if (key == LuaNil.Instance)
+            if (key.IsNil)
             {
                 // Return first key-value pair
                 if (keys.Count > 0)
                 {
                     var firstKey = keys[0];
-                    return new LuaValue[] { firstKey, table.Get(firstKey) };
+                    return [firstKey, table.Get(firstKey)];
                 }
-                return new LuaValue[] { LuaNil.Instance };
+                return [LuaValue.Nil];
             }
             
             // Find the next key after the given key
@@ -577,7 +596,7 @@ namespace FLua.Runtime
             {
                 if (keyFound)
                 {
-                    return new LuaValue[] { k, table.Get(k) };
+                    return [k, table.Get(k)];
                 }
                 
                 if (k.ToString() == key.ToString())
@@ -587,7 +606,7 @@ namespace FLua.Runtime
             }
             
             // No next key found
-            return new LuaValue[] { LuaNil.Instance };
+            return [LuaValue.Nil];
         }
         
         /// <summary>
@@ -596,13 +615,13 @@ namespace FLua.Runtime
         private static LuaValue[] ExtendedProtectedCall(LuaValue[] args)
         {
             if (args.Length < 2)
-                return new LuaValue[] { new LuaBoolean(false), new LuaString("bad arguments to 'xpcall'") };
+                return [LuaValue.Boolean(false), LuaValue.String("bad arguments to 'xpcall'")];
             
-            if (!(args[0] is LuaFunction func))
-                return new LuaValue[] { new LuaBoolean(false), new LuaString("attempt to call a non-function") };
+            if (!args[0].IsFunction)
+                return [false, "attempt to call a non-function"];
             
-            if (!(args[1] is LuaFunction errorHandler))
-                return new LuaValue[] { new LuaBoolean(false), new LuaString("bad argument #2 to 'xpcall' (function expected)") };
+            if (!args[1].IsFunction)
+                return [LuaValue.Boolean(false), LuaValue.String("bad argument #2 to 'xpcall' (function expected)")];
             
             try
             {
@@ -610,11 +629,12 @@ namespace FLua.Runtime
                 var funcArgs = new LuaValue[args.Length - 2];
                 Array.Copy(args, 2, funcArgs, 0, args.Length - 2);
                 
+                var func = args[0].AsFunction<LuaFunction>();
                 var results = func.Call(funcArgs);
                 
                 // Prepend success value
                 var xpcallResults = new LuaValue[results.Length + 1];
-                xpcallResults[0] = new LuaBoolean(true);
+                xpcallResults[0] = LuaValue.Boolean(true);
                 Array.Copy(results, 0, xpcallResults, 1, results.Length);
                 
                 return xpcallResults;
@@ -624,14 +644,15 @@ namespace FLua.Runtime
                 try
                 {
                     // Call error handler
-                    var errorResults = errorHandler.Call(new[] { new LuaString(ex.Message) });
-                    var errorMessage = errorResults.Length > 0 ? errorResults[0] : new LuaString(ex.Message);
-                    return new LuaValue[] { new LuaBoolean(false), errorMessage };
+                    var errorHandler = args[1].AsFunction<LuaFunction>();
+                    var errorResults = errorHandler.Call(new[] { LuaValue.String(ex.Message) });
+                    var errorMessage = errorResults.Length > 0 ? errorResults[0] : LuaValue.String(ex.Message);
+                    return [LuaValue.Boolean(false), errorMessage];
                 }
                 catch
                 {
                     // Error in error handler
-                    return new LuaValue[] { new LuaBoolean(false), new LuaString("error in error handling") };
+                    return [LuaValue.Boolean(false), LuaValue.String("error in error handling")];
                 }
             }
             catch (Exception ex)
@@ -639,14 +660,15 @@ namespace FLua.Runtime
                 try
                 {
                     // Call error handler
-                    var errorResults = errorHandler.Call(new[] { new LuaString($"Internal error: {ex.Message}") });
-                    var errorMessage = errorResults.Length > 0 ? errorResults[0] : new LuaString(ex.Message);
-                    return new LuaValue[] { new LuaBoolean(false), errorMessage };
+                    var errorHandler = args[1].AsFunction<LuaFunction>();
+                    var errorResults = errorHandler.Call(new[] { LuaValue.String($"Internal error: {ex.Message}") });
+                    var errorMessage = errorResults.Length > 0 ? errorResults[0] : LuaValue.String(ex.Message);
+                    return [LuaValue.Boolean(false), errorMessage];
                 }
                 catch
                 {
                     // Error in error handler
-                    return new LuaValue[] { new LuaBoolean(false), new LuaString("error in error handling") };
+                    return [LuaValue.Boolean(false), LuaValue.String("error in error handling")];
                 }
             }
         }
@@ -659,10 +681,11 @@ namespace FLua.Runtime
             if (args.Length < 2)
                 throw new LuaRuntimeException("bad arguments to 'rawget'");
             
-            if (!(args[0] is LuaTable table))
+            if (!args[0].IsTable)
                 throw new LuaRuntimeException("bad argument #1 to 'rawget' (table expected)");
             
-            return new[] { table.RawGet(args[1]) };
+            var table = args[0].AsTable<LuaTable>();
+            return [table.RawGet(args[1])];
         }
         
         /// <summary>
@@ -673,11 +696,12 @@ namespace FLua.Runtime
             if (args.Length < 3)
                 throw new LuaRuntimeException("bad arguments to 'rawset'");
             
-            if (!(args[0] is LuaTable table))
+            if (!args[0].IsTable)
                 throw new LuaRuntimeException("bad argument #1 to 'rawset' (table expected)");
             
-            table.RawSet(args[1], args[2]);
-            return new[] { table };
+            var table = args[0].AsTable<LuaTable>();
+            table.Set(args[1], args[2]);
+            return [args[0]];
         }
         
         /// <summary>
@@ -686,13 +710,13 @@ namespace FLua.Runtime
         private static LuaValue[] RawEqual(LuaValue[] args)
         {
             if (args.Length < 2)
-                return new[] { new LuaBoolean(false) };
+                return [LuaValue.Boolean(false)];
             
             // Raw equality means no metamethods
             bool equal = args[0].GetType() == args[1].GetType() && 
                         args[0].ToString() == args[1].ToString();
             
-            return new[] { new LuaBoolean(equal) };
+            return [LuaValue.Boolean(equal)];
         }
         
         /// <summary>
@@ -705,23 +729,25 @@ namespace FLua.Runtime
             
             var value = args[0];
             
-            if (value is LuaString str)
+            if (value.IsString)
             {
-                return new[] { new LuaInteger(str.Value.Length) };
+                var str = value.AsString();
+                return [LuaValue.Integer(str.Length)];
             }
             
-            if (value is LuaTable table)
+            if (value.IsTable)
             {
+                var table = value.AsTable<LuaTable>();
                 // Count consecutive integer keys starting from 1
                 int length = 0;
-                while (table.RawGet(new LuaInteger(length + 1)) != LuaNil.Instance)
+                while (!table.RawGet(LuaValue.Integer(length + 1)).IsNil)
                 {
                     length++;
                 }
-                return new[] { new LuaInteger(length) };
+                return [LuaValue.Integer(length)];
             }
             
-            throw new LuaRuntimeException($"attempt to get length of a {Type(new[] { value })[0]} value");
+            throw new LuaRuntimeException($"attempt to get length of a {Type([value])[0]} value");
         }
         
         /// <summary>
@@ -735,15 +761,15 @@ namespace FLua.Runtime
             var selector = args[0];
             
             // Handle '#' selector - return count of remaining arguments
-            if (selector is LuaString str && str.Value == "#")
+            if (selector.IsString && selector.AsString() == "#")
             {
-                return new[] { new LuaInteger(args.Length - 1) };
+                return [LuaValue.Integer(args.Length - 1)];
             }
             
             // Handle numeric selector
-            if (selector.AsNumber.HasValue)
+            if (selector.IsNumber)
             {
-                int index = (int)selector.AsNumber.Value;
+                int index = (int)selector.AsNumber();
                 
                 // Handle negative indices (from end)
                 if (index < 0)
@@ -758,7 +784,7 @@ namespace FLua.Runtime
                 // Validate index
                 if (index < 0 || index >= args.Length - 1)
                 {
-                    return Array.Empty<LuaValue>();
+                    return [];
                 }
                 
                 // Return arguments starting from the specified index
@@ -775,26 +801,28 @@ namespace FLua.Runtime
         /// </summary>
         private static LuaValue[] Unpack(LuaValue[] args)
         {
-            if (args.Length == 0 || !(args[0] is LuaTable table))
+            if (args.Length == 0 || !args[0].IsTable)
                 throw new LuaRuntimeException("bad argument #1 to 'unpack' (table expected)");
+            
+            var table = args[0].AsTable<LuaTable>();
             
             // Get start index (default 1)
             int start = 1;
-            if (args.Length > 1 && args[1].AsNumber.HasValue)
+            if (args.Length > 1 && args[1].IsNumber)
             {
-                start = (int)args[1].AsNumber!.Value;
+                start = (int)args[1].AsNumber();
             }
             
             // Get end index (default table length)
             int end = start;
-            if (args.Length > 2 && args[2].AsNumber.HasValue)
+            if (args.Length > 2 && args[2].IsNumber)
             {
-                end = (int)args[2].AsNumber!.Value;
+                end = (int)args[2].AsNumber();
             }
             else
             {
                 // Calculate table length
-                while (table.RawGet(new LuaInteger(end)) != LuaNil.Instance)
+                while (!table.RawGet(LuaValue.Integer(end)).IsNil)
                 {
                     end++;
                 }
@@ -805,7 +833,7 @@ namespace FLua.Runtime
             var results = new List<LuaValue>();
             for (int i = start; i <= end; i++)
             {
-                results.Add(table.RawGet(new LuaInteger(i)));
+                results.Add(table.RawGet(LuaValue.Integer(i)));
             }
             
             return results.ToArray();
@@ -817,10 +845,10 @@ namespace FLua.Runtime
         private static LuaValue[] Warn(LuaValue[] args)
         {
             if (args.Length == 0)
-                return Array.Empty<LuaValue>();
+                return [];
             
-            var message = args[0].AsString;
-            var tocont = args.Length > 1 ? args[1].AsString : "@off";
+            var message = args[0].IsString ? args[0].AsString() : args[0].ToString();
+            var tocont = args.Length > 1 && args[1].IsString ? args[1].AsString() : "@off";
             
             // Simple warning implementation - write to stderr
             // In a full implementation, this would respect warning control modes
@@ -829,7 +857,7 @@ namespace FLua.Runtime
                 Console.Error.WriteLine($"Lua warning: {message}"); 
             }
             
-            return Array.Empty<LuaValue>();
+            return [];
         }
         
         /// <summary>
@@ -841,9 +869,9 @@ namespace FLua.Runtime
             // For now, we'll just run .NET's garbage collector for some options
             
             string option = "collect";
-            if (args.Length > 0 && args[0] is LuaString str)
+            if (args.Length > 0 && args[0].IsString)
             {
-                option = str.Value;
+                option = args[0].AsString()!;
             }
             
             switch (option)
@@ -851,26 +879,26 @@ namespace FLua.Runtime
                 case "collect":
                     // Force a garbage collection
                     GC.Collect();
-                    return new LuaValue[] { new LuaInteger(0) }; // Return 0 for compatibility
+                    return [LuaValue.Integer(0)]; // Return 0 for compatibility
                     
                 case "stop":
                 case "restart":
                 case "step":
                     // These don't map well to .NET GC, just return success
-                    return new LuaValue[] { new LuaInteger(0) };
+                    return [LuaValue.Integer(0)];
                     
                 case "count":
                     // Return memory usage in KB
                     long memoryUsed = GC.GetTotalMemory(false) / 1024;
-                    return new LuaValue[] { new LuaNumber(memoryUsed) };
+                    return [LuaValue.Number(memoryUsed)];
                     
                 case "isrunning":
                     // .NET GC is always running
-                    return new LuaValue[] { new LuaBoolean(true) };
+                    return [LuaValue.Boolean(true)];
                     
                 default:
                     // Unknown option, return nil
-                    return new LuaValue[] { LuaNil.Instance };
+                    return [LuaValue.Nil];
             }
         }
         
@@ -880,7 +908,7 @@ namespace FLua.Runtime
         private static LuaValue[] Load(LuaValue[] args)
         {
             if (args.Length == 0)
-                return new LuaValue[] { LuaNil.Instance, new LuaString("no chunk to load") };
+                return [LuaValue.Nil, LuaValue.String("no chunk to load")];
             
             // Use the host-provided implementation if available
             if (LoadImplementation != null)
@@ -889,16 +917,18 @@ namespace FLua.Runtime
             }
             
             // Otherwise, return an error since we don't support dynamic compilation in the runtime
-            if (args[0] is LuaString code)
+            if (args[0].IsString)
             {
                 // Return nil and an error message
-                return new LuaValue[] { LuaNil.Instance, new LuaString("dynamic loading not supported") };
+                return [LuaValue.Nil, LuaValue.String("dynamic loading not supported")];
             }
             
-            return new LuaValue[] { LuaNil.Instance, new LuaString("bad argument #1 to 'load' (string expected)") };
+            return [LuaValue.Nil, LuaValue.String("bad argument #1 to 'load' (string expected)")];
         }
     }
 
+    // Moved to LuaTypes.cs
+    /*
     /// <summary>
     /// Represents a built-in function implemented in C#
     /// </summary>
@@ -916,4 +946,5 @@ namespace FLua.Runtime
             return _function(arguments);
         }
     }
+    */
 } 

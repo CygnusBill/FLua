@@ -17,6 +17,8 @@ namespace FLua.Runtime
         }
     }
     
+    // Moved to LuaTypes.cs - this file now only contains CoroutineYieldException and helper code
+    /*
     /// <summary>
     /// Represents a Lua coroutine with proper state management
     /// </summary>
@@ -56,12 +58,12 @@ namespace FLua.Runtime
         {
             if (_status == CoroutineStatus.Dead)
             {
-                return new LuaValue[] { new LuaBoolean(false), new LuaString("cannot resume dead coroutine") };
+                return new LuaValue[] { LuaValue.Boolean(false), LuaValue.String("cannot resume dead coroutine") };
             }
             
             if (_status == CoroutineStatus.Running)
             {
-                return new LuaValue[] { new LuaBoolean(false), new LuaString("cannot resume running coroutine") };
+                return new LuaValue[] { LuaValue.Boolean(false), LuaValue.String("cannot resume running coroutine") };
             }
             
             var previousCoroutine = CurrentCoroutine;
@@ -106,7 +108,7 @@ namespace FLua.Runtime
                     else
                     {
                         _status = CoroutineStatus.Dead;
-                        return new LuaValue[] { new LuaBoolean(true) };
+                        return new LuaValue[] { LuaValue.Boolean(true) };
                     }
                 }
             }
@@ -121,12 +123,12 @@ namespace FLua.Runtime
             catch (LuaRuntimeException ex)
             {
                 _status = CoroutineStatus.Dead;
-                return new LuaValue[] { new LuaBoolean(false), new LuaString(ex.Message) };
+                return new LuaValue[] { LuaValue.Boolean(false), LuaValue.String(ex.Message) };
             }
             catch (Exception ex)
             {
                 _status = CoroutineStatus.Dead;
-                return new LuaValue[] { new LuaBoolean(false), new LuaString($"Internal error: {ex.Message}") };
+                return new LuaValue[] { LuaValue.Boolean(false), LuaValue.String($"Internal error: {ex.Message}") };
             }
             finally
             {
@@ -171,7 +173,7 @@ namespace FLua.Runtime
         private static LuaValue[] PrependSuccess(LuaValue[] results)
         {
             var newResults = new LuaValue[results.Length + 1];
-            newResults[0] = new LuaBoolean(true);
+            newResults[0] = LuaValue.Boolean(true);
             Array.Copy(results, 0, newResults, 1, results.Length);
             return newResults;
         }
@@ -206,14 +208,14 @@ namespace FLua.Runtime
         {
             var coroutineTable = new LuaTable();
             
-            coroutineTable.Set(new LuaString("create"), new BuiltinFunction(Create));
-            coroutineTable.Set(new LuaString("resume"), new BuiltinFunction(Resume));
-            coroutineTable.Set(new LuaString("yield"), new BuiltinFunction(Yield));
-            coroutineTable.Set(new LuaString("status"), new BuiltinFunction(Status));
-            coroutineTable.Set(new LuaString("running"), new BuiltinFunction(Running));
-            coroutineTable.Set(new LuaString("isyieldable"), new BuiltinFunction(IsYieldable));
-            coroutineTable.Set(new LuaString("wrap"), new BuiltinFunction(Wrap));
-            coroutineTable.Set(new LuaString("close"), new BuiltinFunction(Close));
+            coroutineTable.Set(LuaValue.String("create"), new BuiltinFunction(Create));
+            coroutineTable.Set(LuaValue.String("resume"), new BuiltinFunction(Resume));
+            coroutineTable.Set(LuaValue.String("yield"), new BuiltinFunction(Yield));
+            coroutineTable.Set(LuaValue.String("status"), new BuiltinFunction(Status));
+            coroutineTable.Set(LuaValue.String("running"), new BuiltinFunction(Running));
+            coroutineTable.Set(LuaValue.String("isyieldable"), new BuiltinFunction(IsYieldable));
+            coroutineTable.Set(LuaValue.String("wrap"), new BuiltinFunction(Wrap));
+            coroutineTable.Set(LuaValue.String("close"), new BuiltinFunction(Close));
             
             env.SetVariable("coroutine", coroutineTable);
         }
@@ -268,7 +270,7 @@ namespace FLua.Runtime
                 throw new LuaRuntimeException("bad argument #1 to 'status' (coroutine expected)");
             }
             
-            return new LuaValue[] { new LuaString(co.Status) };
+            return new LuaValue[] { LuaValue.String(co.Status) };
         }
         
         /// <summary>
@@ -279,10 +281,10 @@ namespace FLua.Runtime
             var current = LuaCoroutine.CurrentCoroutine;
             if (current != null)
             {
-                return new LuaValue[] { current, new LuaBoolean(false) };
+                return new LuaValue[] { current, LuaValue.Boolean(false) };
             }
             
-            return new LuaValue[] { LuaNil.Instance, new LuaBoolean(true) };
+            return new LuaValue[] { LuaValue.Nil, LuaValue.Boolean(true) };
         }
         
         /// <summary>
@@ -291,7 +293,7 @@ namespace FLua.Runtime
         private static LuaValue[] IsYieldable(LuaValue[] args)
         {
             // Can yield if we're in a coroutine
-            return new LuaValue[] { new LuaBoolean(LuaCoroutine.CurrentCoroutine != null) };
+            return new LuaValue[] { LuaValue.Boolean(LuaCoroutine.CurrentCoroutine != null) };
         }
         
         /// <summary>
@@ -315,7 +317,7 @@ namespace FLua.Runtime
                 if (results.Length > 0 && results[0] is LuaBoolean success && !success.Value)
                 {
                     // Resume failed - throw the error
-                    var errorMessage = results.Length > 1 ? results[1].AsString : "coroutine error";
+                    var errorMessage = results.Length > 1 ? results[1].AsString() : "coroutine error";
                     throw new LuaRuntimeException(errorMessage);
                 }
                 
@@ -347,16 +349,16 @@ namespace FLua.Runtime
             // For this implementation, we'll just check if it's already closed
             if (co.Status == "dead")
             {
-                return new LuaValue[] { new LuaBoolean(true) };
+                return new LuaValue[] { LuaValue.Boolean(true) };
             }
             else if (co.Status == "suspended")
             {
                 // Force close - in a full implementation, this would call to-be-closed variables
-                return new LuaValue[] { new LuaBoolean(true) };
+                return new LuaValue[] { LuaValue.Boolean(true) };
             }
             else
             {
-                return new LuaValue[] { new LuaBoolean(false), new LuaString("cannot close running coroutine") };
+                return new LuaValue[] { LuaValue.Boolean(false), LuaValue.String("cannot close running coroutine") };
             }
         }
     }
@@ -437,7 +439,7 @@ namespace FLua.Runtime
             {
                 for (int i = start; step > 0 ? i <= end : i >= end; i += step)
                 {
-                    LuaCoroutine.Yield(new[] { new LuaInteger(i) });
+                    LuaCoroutine.Yield(new[] { LuaValue.Integer(i) });
                 }
                 return Array.Empty<LuaValue>();
             });
@@ -457,7 +459,7 @@ namespace FLua.Runtime
                 
                 while (generated < count)
                 {
-                    LuaCoroutine.Yield(new[] { new LuaInteger(a) });
+                    LuaCoroutine.Yield(new[] { LuaValue.Integer(a) });
                     (a, b) = (b, a + b);
                     generated++;
                 }
@@ -468,4 +470,5 @@ namespace FLua.Runtime
             return new LuaCoroutine(fibFunc);
         }
     }
+    */
 }

@@ -19,7 +19,7 @@ namespace FLua.Runtime
             
             // Set up package.loaded table
             var loadedTable = new LuaTable();
-            packageTable.Set(new LuaString("loaded"), loadedTable);
+            packageTable.Set(LuaValue.String("loaded"), loadedTable);
             
             // Set up package.path with default Lua search paths
             var defaultPaths = new[]
@@ -29,26 +29,26 @@ namespace FLua.Runtime
                 "./lib/?.lua",
                 "./lib/?/init.lua"
             };
-            packageTable.Set(new LuaString("path"), new LuaString(string.Join(";", defaultPaths)));
+            packageTable.Set(LuaValue.String("path"), LuaValue.String(string.Join(";", defaultPaths)));
             
             // Set up package.cpath (C library paths - mostly unused in FLua)
-            packageTable.Set(new LuaString("cpath"), new LuaString(""));
+            packageTable.Set(LuaValue.String("cpath"), LuaValue.String(""));
             
             // Set up package.searchers (Lua 5.4) / package.loaders (Lua 5.1)
             var searchersTable = new LuaTable();
-            searchersTable.Set(new LuaInteger(1), new BuiltinFunction(args => LuaSearcher(args, env)));
-            searchersTable.Set(new LuaInteger(2), new BuiltinFunction(args => FileSearcher(args, packageTable)));
-            packageTable.Set(new LuaString("searchers"), searchersTable);
-            packageTable.Set(new LuaString("loaders"), searchersTable); // Lua 5.1 compatibility
+            searchersTable.Set(LuaValue.Integer(1), new BuiltinFunction(args => LuaSearcher(args, env)));
+            searchersTable.Set(LuaValue.Integer(2), new BuiltinFunction(args => FileSearcher(args, packageTable)));
+            packageTable.Set(LuaValue.String("searchers"), searchersTable);
+            packageTable.Set(LuaValue.String("loaders"), searchersTable); // Lua 5.1 compatibility
             
             // Set up package.config (path configuration)
-            packageTable.Set(new LuaString("config"), new LuaString("\\n;\n?\n!\n-\n"));
+            packageTable.Set(LuaValue.String("config"), LuaValue.String("\\n;\n?\n!\n-\n"));
             
             // Package library functions
-            packageTable.Set(new LuaString("searchpath"), new BuiltinFunction(args => SearchPath(args)));
+            packageTable.Set(LuaValue.String("searchpath"), new BuiltinFunction(args => SearchPath(args)));
             
             // Add the package table to globals
-            env.Globals.Set(new LuaString("package"), packageTable);
+            env.Globals.Set(LuaValue.String("package"), packageTable);
             
             // Add the require function to globals
             env.SetVariable("require", new BuiltinFunction(args => Require(args, env, packageTable)));
@@ -59,54 +59,61 @@ namespace FLua.Runtime
         /// </summary>
         private static LuaValue[] Require(LuaValue[] args, LuaEnvironment env, LuaTable packageTable)
         {
-            if (args.Length == 0 || !(args[0] is LuaString moduleName))
+            if (args.Length == 0 || !args[0].IsString)
                 throw new LuaRuntimeException("bad argument #1 to 'require' (string expected)");
             
-            var name = moduleName.Value;
-            var loadedTable = packageTable.Get(new LuaString("loaded")) as LuaTable;
+            var moduleName = args[0];
+            var name = moduleName.AsString();
             
-            if (loadedTable == null)
+            var loadedValue = packageTable.Get(LuaValue.String("loaded"));
+            if (!loadedValue.IsTable)
                 throw new LuaRuntimeException("package.loaded is not a table");
+                
+            var loadedTable = loadedValue.AsTable<LuaTable>();
             
             // Check if module is already loaded
             var existingModule = loadedTable.Get(moduleName);
-            if (existingModule != LuaNil.Instance)
+            if (!existingModule.IsNil)
             {
-                return new LuaValue[] { existingModule };
+                return [existingModule];
             }
             
             // Search for the module using package.searchers
-            var searchersTable = packageTable.Get(new LuaString("searchers")) as LuaTable ??
-                               packageTable.Get(new LuaString("loaders")) as LuaTable;
-            
-            if (searchersTable == null)
+            var searchersValue = packageTable.Get(LuaValue.String("searchers"));
+            if (searchersValue.IsNil)
+                searchersValue = packageTable.Get(LuaValue.String("loaders"));
+                
+            if (!searchersValue.IsTable)
                 throw new LuaRuntimeException("package.searchers is not a table");
+                
+            var searchersTable = searchersValue.AsTable<LuaTable>();
             
             LuaFunction? loader = null;
-            LuaValue extra = LuaNil.Instance;
+            LuaValue extra = LuaValue.Nil;
             var errors = new List<string>();
             
             // Try each searcher
             for (int i = 1; ; i++)
             {
-                var searcher = searchersTable.Get(new LuaInteger(i));
-                if (searcher == LuaNil.Instance)
+                var searcher = searchersTable.Get(LuaValue.Integer(i));
+                if (searcher.IsNil)
                     break;
                 
-                if (searcher is LuaFunction searcherFunc)
+                if (searcher.IsFunction)
                 {
                     try
                     {
+                        var searcherFunc = searcher.AsFunction<LuaFunction>();
                         var result = searcherFunc.Call(new LuaValue[] { moduleName });
-                        if (result.Length > 0 && result[0] is LuaFunction foundLoader)
+                        if (result.Length > 0 && result[0].IsFunction)
                         {
-                            loader = foundLoader;
-                            extra = result.Length > 1 ? result[1] : LuaNil.Instance;
+                            loader = result[0].AsFunction<LuaFunction>();
+                            extra = result.Length > 1 ? result[1] : LuaValue.Nil;
                             break;
                         }
-                        else if (result.Length > 0 && result[0] is LuaString errorMsg)
+                        else if (result.Length > 0 && result[0].IsString)
                         {
-                            errors.Add(errorMsg.Value);
+                            errors.Add(result[0].AsString());
                         }
                     }
                     catch (Exception ex)
@@ -127,17 +134,17 @@ namespace FLua.Runtime
             }
             
             // Call the loader
-            LuaValue[] loaderArgs = extra == LuaNil.Instance 
-                ? new LuaValue[] { moduleName } 
-                : new LuaValue[] { moduleName, extra };
+            LuaValue[] loaderArgs = extra == LuaValue.Nil 
+                ? [moduleName]
+                : [moduleName, extra];
             
             var moduleResult = loader.Call(loaderArgs);
-            var moduleValue = moduleResult.Length > 0 ? moduleResult[0] : new LuaBoolean(true);
+            var moduleValue = moduleResult.Length > 0 ? moduleResult[0] : LuaValue.Boolean(true);
             
             // Cache the module
             loadedTable.Set(moduleName, moduleValue);
             
-            return new LuaValue[] { moduleValue };
+            return [moduleValue];
         }
         
         /// <summary>
@@ -145,34 +152,34 @@ namespace FLua.Runtime
         /// </summary>
         private static LuaValue[] LuaSearcher(LuaValue[] args, LuaEnvironment env)
         {
-            if (args.Length == 0 || !(args[0] is LuaString moduleName))
-                return new LuaValue[] { new LuaString("module name not string") };
+            if (args.Length == 0 || !args[0].IsString)
+                return [LuaValue.String("module name not string")];
             
-            var name = moduleName.Value;
+            var name = args[0].AsString();
             
             // Check for built-in libraries
             switch (name)
             {
                 case "coroutine":
-                    return new LuaValue[] { new BuiltinFunction(CreateCoroutineLoader(env)) };
+                    return [new BuiltinFunction(CreateCoroutineLoader(env))];
                 case "string":
-                    return new LuaValue[] { new BuiltinFunction(CreateStringLoader(env)) };
+                    return [new BuiltinFunction(CreateStringLoader(env))];
                 case "table":
-                    return new LuaValue[] { new BuiltinFunction(CreateTableLoader(env)) };
+                    return [new BuiltinFunction(CreateTableLoader(env))];
                 case "math":
-                    return new LuaValue[] { new BuiltinFunction(CreateMathLoader(env)) };
+                    return [new BuiltinFunction(CreateMathLoader(env))];
                 case "io":
-                    return new LuaValue[] { new BuiltinFunction(CreateIOLoader(env)) };
+                    return [new BuiltinFunction(CreateIOLoader(env))];
                 case "os":
-                    return new LuaValue[] { new BuiltinFunction(CreateOSLoader(env)) };
+                    return [new BuiltinFunction(CreateOSLoader(env))];
                 case "utf8":
-                    return new LuaValue[] { new BuiltinFunction(CreateUTF8Loader(env)) };
+                    return [new BuiltinFunction(CreateUTF8Loader(env))];
                 case "debug":
-                    return new LuaValue[] { new BuiltinFunction(CreateDebugLoader(env)) };
+                    return [new BuiltinFunction(CreateDebugLoader(env))];
                 case "package":
-                    return new LuaValue[] { new BuiltinFunction(CreatePackageLoader(env)) };
+                    return [new BuiltinFunction(CreatePackageLoader(env))];
                 default:
-                    return new LuaValue[] { new LuaString($"no field package.preload['{name}']") };
+                    return [LuaValue.String($"no field package.preload['{name}']")];
             }
         }
         
@@ -181,24 +188,28 @@ namespace FLua.Runtime
         /// </summary>
         private static LuaValue[] FileSearcher(LuaValue[] args, LuaTable packageTable)
         {
-            if (args.Length == 0 || !(args[0] is LuaString moduleName))
-                return new LuaValue[] { new LuaString("module name not string") };
+            if (args.Length == 0 || !args[0].IsString)
+                return [LuaValue.String("module name not string")];
             
-            var name = moduleName.Value;
-            var packagePath = packageTable.Get(new LuaString("path")) as LuaString;
+            var moduleName = args[0];
+            var name = moduleName.AsString();
+            var packagePathValue = packageTable.Get(LuaValue.String("path"));
             
-            if (packagePath == null)
-                return new LuaValue[] { new LuaString("package.path is not a string") };
+            if (!packagePathValue.IsString)
+                return [LuaValue.String("package.path is not a string")];
+                
+            var packagePath = packagePathValue.AsString();
             
-            var searchResult = SearchPath(new LuaValue[] { moduleName, packagePath });
-            if (searchResult.Length > 0 && searchResult[0] is LuaString filePath)
+            var searchResult = SearchPath([moduleName, LuaValue.String(packagePath)]);
+            if (searchResult.Length > 0 && searchResult[0].IsString)
             {
                 // Create a loader function for this file
-                var loader = new BuiltinFunction(loaderArgs => LoadLuaFile(filePath.Value, name));
-                return new LuaValue[] { loader, filePath };
+                var filePath = searchResult[0].AsString();
+                var loader = new BuiltinFunction(loaderArgs => LoadLuaFile(filePath, name));
+                return [LuaValue.Function(loader), searchResult[0]];
             }
             
-            return new LuaValue[] { new LuaString($"no file '{name}' in package.path") };
+            return [LuaValue.String($"no file '{name}' in package.path")];
         }
         
         /// <summary>
@@ -206,13 +217,13 @@ namespace FLua.Runtime
         /// </summary>
         private static LuaValue[] SearchPath(LuaValue[] args)
         {
-            if (args.Length < 2 || !(args[0] is LuaString name) || !(args[1] is LuaString path))
+            if (args.Length < 2 || !args[0].IsString || !args[1].IsString)
                 throw new LuaRuntimeException("bad arguments to 'searchpath'");
             
-            var moduleName = name.Value;
-            var searchPath = path.Value;
-            var sep = args.Length > 2 && args[2] is LuaString sepStr ? sepStr.Value : ".";
-            var rep = args.Length > 3 && args[3] is LuaString repStr ? repStr.Value : "/";
+            var moduleName = args[0].AsString();
+            var searchPath = args[1].AsString();
+            var sep = args.Length > 2 && args[2].IsString ? args[2].AsString() : ".";
+            var rep = args.Length > 3 && args[3].IsString ? args[3].AsString() : "/";
             
             // Replace module separators with directory separators
             var fileName = moduleName.Replace(sep, rep);
@@ -232,7 +243,7 @@ namespace FLua.Runtime
                 {
                     if (File.Exists(fullPath))
                     {
-                        return new LuaValue[] { new LuaString(Path.GetFullPath(fullPath)) };
+                        return [LuaValue.String(Path.GetFullPath(fullPath))];
                     }
                     else
                     {
@@ -246,7 +257,7 @@ namespace FLua.Runtime
             }
             
             // Return nil and error message
-            return new LuaValue[] { LuaNil.Instance, new LuaString(string.Join("\n\t", errors)) };
+            return [LuaValue.Nil, LuaValue.String(string.Join("\n\t", errors))];
         }
         
         /// <summary>
@@ -286,8 +297,8 @@ namespace FLua.Runtime
             return args =>
             {
                 var tempEnv = new LuaEnvironment();
-                LuaCoroutineLib.AddCoroutineLibrary(tempEnv);
-                return new LuaValue[] { tempEnv.Globals.Get(new LuaString("coroutine")) };
+                // TODO: LuaCoroutineLib.AddCoroutineLibrary(tempEnv);
+                return [tempEnv.Globals.Get(LuaValue.String("coroutine"))];
             };
         }
         
@@ -300,7 +311,7 @@ namespace FLua.Runtime
             {
                 var tempEnv = new LuaEnvironment();
                 LuaStringLib.AddStringLibrary(tempEnv);
-                return new LuaValue[] { tempEnv.Globals.Get(new LuaString("string")) };
+                return [tempEnv.Globals.Get(LuaValue.String("string"))];
             };
         }
         
@@ -313,7 +324,7 @@ namespace FLua.Runtime
             {
                 var tempEnv = new LuaEnvironment();
                 LuaTableLib.AddTableLibrary(tempEnv);
-                return new LuaValue[] { tempEnv.Globals.Get(new LuaString("table")) };
+                return [tempEnv.Globals.Get(LuaValue.String("table"))];
             };
         }
         
@@ -326,7 +337,7 @@ namespace FLua.Runtime
             {
                 var tempEnv = new LuaEnvironment();
                 LuaMathLib.AddMathLibrary(tempEnv);
-                return new LuaValue[] { tempEnv.Globals.Get(new LuaString("math")) };
+                return [tempEnv.Globals.Get(LuaValue.String("math"))];
             };
         }
         
@@ -339,7 +350,7 @@ namespace FLua.Runtime
             {
                 var tempEnv = new LuaEnvironment();
                 LuaIOLib.AddIOLibrary(tempEnv);
-                return new LuaValue[] { tempEnv.Globals.Get(new LuaString("io")) };
+                return [tempEnv.Globals.Get(LuaValue.String("io"))];
             };
         }
         
@@ -352,7 +363,7 @@ namespace FLua.Runtime
             {
                 var tempEnv = new LuaEnvironment();
                 LuaOSLib.AddOSLibrary(tempEnv);
-                return new LuaValue[] { tempEnv.Globals.Get(new LuaString("os")) };
+                return [tempEnv.Globals.Get(LuaValue.String("os"))];
             };
         }
         
@@ -365,7 +376,7 @@ namespace FLua.Runtime
             {
                 var tempEnv = new LuaEnvironment();
                 LuaUTF8Lib.AddUTF8Library(tempEnv);
-                return new LuaValue[] { tempEnv.Globals.Get(new LuaString("utf8")) };
+                return [tempEnv.Globals.Get(LuaValue.String("utf8"))];
             };
         }
         
@@ -378,7 +389,7 @@ namespace FLua.Runtime
             {
                 var tempEnv = new LuaEnvironment();
                 LuaDebugLib.AddDebugLibrary(tempEnv);
-                return new LuaValue[] { tempEnv.Globals.Get(new LuaString("debug")) };
+                return [tempEnv.Globals.Get(LuaValue.String("debug"))];
             };
         }
         
@@ -389,7 +400,7 @@ namespace FLua.Runtime
         {
             return args =>
             {
-                return new LuaValue[] { env.Globals.Get(new LuaString("package")) };
+                return [env.Globals.Get(LuaValue.String("package"))];
             };
         }
     }

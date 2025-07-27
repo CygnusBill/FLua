@@ -13,6 +13,7 @@
 
   <ItemGroup>
     <PackageReference Include="Mono.Cecil" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" />
   </ItemGroup>
 
 </Project>

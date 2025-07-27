@@ -23,14 +23,14 @@ namespace FLua.Runtime
             var utf8Table = new LuaTable();
             
             // Core functions
-            utf8Table.Set(new LuaString("len"), new BuiltinFunction(Len));
-            utf8Table.Set(new LuaString("char"), new BuiltinFunction(Char));
-            utf8Table.Set(new LuaString("codepoint"), new BuiltinFunction(CodePoint));
-            utf8Table.Set(new LuaString("offset"), new BuiltinFunction(Offset));
-            utf8Table.Set(new LuaString("codes"), new BuiltinFunction(Codes));
+            utf8Table.Set(LuaValue.String("len"), new BuiltinFunction(Len));
+            utf8Table.Set(LuaValue.String("char"), new BuiltinFunction(Char));
+            utf8Table.Set(LuaValue.String("codepoint"), new BuiltinFunction(CodePoint));
+            utf8Table.Set(LuaValue.String("offset"), new BuiltinFunction(Offset));
+            utf8Table.Set(LuaValue.String("codes"), new BuiltinFunction(Codes));
             
             // Pattern for character matching
-            utf8Table.Set(new LuaString("charpattern"), new LuaString(CharPattern));
+            utf8Table.Set("charpattern", CharPattern);
             
             env.SetVariable("utf8", utf8Table);
         }
@@ -42,17 +42,17 @@ namespace FLua.Runtime
             if (args.Length == 0)
                 throw new LuaRuntimeException("bad argument #1 to 'len' (string expected)");
             
-            var str = args[0].AsString;
-            var start = args.Length > 1 ? (int)(args[1].AsInteger ?? 1) : 1;
-            var end = args.Length > 2 ? (int)(args[2].AsInteger ?? str.Length) : str.Length;
-            var lax = args.Length > 3 ? LuaValue.IsValueTruthy(args[3]) : false;
+            var str = args[0].AsString();
+            var start = args.Length > 1 && args[1].IsInteger ? (int)args[1].AsInteger() : 1;
+            var end = args.Length > 2 && args[2].IsInteger ? (int)args[2].AsInteger() : str.Length;
+            var lax = args.Length > 3 ? args[3].IsTruthy() : false;
             
             // Convert to 0-based indexing
             start = Math.Max(0, start - 1);
             end = Math.Min(str.Length, end);
             
             if (start >= end)
-                return new LuaValue[] { new LuaInteger(0) };
+                return [LuaValue.Integer(0)];
             
             try
             {
@@ -69,17 +69,17 @@ namespace FLua.Runtime
                     {
                         if (!IsValidUTF8ByteSequence(bytes, i))
                         {
-                            return new LuaValue[] { LuaNil.Instance, new LuaInteger(start + i + 1) };
+                            return [LuaValue.Nil, LuaValue.Integer(start + i + 1)];
                         }
                     }
                 }
                 
-                return new LuaValue[] { new LuaInteger(length) };
+                return [LuaValue.Integer(length)];
             }
             catch (ArgumentException)
             {
                 // Invalid UTF-8 sequence
-                return new LuaValue[] { LuaNil.Instance, new LuaInteger(start + 1) };
+                return [LuaValue.Nil, LuaValue.Integer(start + 1)];
             }
         }
         
@@ -89,10 +89,10 @@ namespace FLua.Runtime
             
             for (int i = 0; i < args.Length; i++)
             {
-                if (!args[i].AsInteger.HasValue)
+                if (!args[i].IsInteger)
                     throw new LuaRuntimeException($"bad argument #{i + 1} to 'char' (number expected)");
                 
-                var codepoint = (int)args[i].AsInteger!.Value;
+                var codepoint = (int)args[i].AsInteger();
                 if (codepoint < 0 || codepoint > 0x10FFFF)
                     throw new LuaRuntimeException($"bad argument #{i + 1} to 'char' (value out of range)");
                 
@@ -107,7 +107,7 @@ namespace FLua.Runtime
                     result.Append(char.ConvertFromUtf32(codepoint));
                 }
                 
-                return new LuaValue[] { new LuaString(result.ToString()) };
+                return [LuaValue.String(result.ToString())];
             }
             catch (ArgumentException ex)
             {
@@ -120,17 +120,17 @@ namespace FLua.Runtime
             if (args.Length == 0)
                 throw new LuaRuntimeException("bad argument #1 to 'codepoint' (string expected)");
             
-            var str = args[0].AsString;
-            var start = args.Length > 1 ? (int)(args[1].AsInteger ?? 1) : 1;
-            var end = args.Length > 2 ? (int)(args[2].AsInteger ?? start) : start;
-            var lax = args.Length > 3 ? LuaValue.IsValueTruthy(args[3]) : false;
+            var str = args[0].AsString();
+            var start = args.Length > 1 && args[1].IsInteger ? (int)args[1].AsInteger() : 1;
+            var end = args.Length > 2 && args[2].IsInteger ? (int)args[2].AsInteger() : start;
+            var lax = args.Length > 3 ? args[3].IsTruthy() : false;
             
             // Convert to 0-based indexing
             start = Math.Max(0, start - 1);
             end = Math.Min(str.Length, end);
             
             if (start >= str.Length)
-                return Array.Empty<LuaValue>();
+                return [];
             
             try
             {
@@ -147,7 +147,7 @@ namespace FLua.Runtime
                     {
                         var element = textElements.GetTextElement();
                         var codepoint = char.ConvertToUtf32(element, 0);
-                        results.Add(new LuaInteger(codepoint));
+                        results.Add(LuaValue.Integer(codepoint));
                         
                         if (position >= end - 1)
                             break;
@@ -167,7 +167,7 @@ namespace FLua.Runtime
                     var results = new List<LuaValue>();
                     for (int i = start; i < end && i < str.Length; i++)
                     {
-                        results.Add(new LuaInteger((byte)str[i]));
+                        results.Add(LuaValue.Integer((byte)str[i]));
                     }
                     return results.ToArray();
                 }
@@ -183,20 +183,20 @@ namespace FLua.Runtime
             if (args.Length < 2)
                 throw new LuaRuntimeException("bad argument #2 to 'offset' (number expected)");
             
-            var str = args[0].AsString;
+            var str = args[0].AsString();
             var n = args[1];
-            var i = args.Length > 2 ? (int)(args[2].AsInteger ?? 1) : 1;
+            var i = args.Length > 2 && args[2].IsInteger ? (int)args[2].AsInteger() : 1;
             
-            if (!n.AsInteger.HasValue)
+            if (!n.IsInteger)
                 throw new LuaRuntimeException("bad argument #2 to 'offset' (number expected)");
             
-            var offset = (int)n.AsInteger.Value;
+            var offset = (int)n.AsInteger();
             
             // Convert to 0-based indexing
             i = Math.Max(0, i - 1);
             
             if (i >= str.Length)
-                return Array.Empty<LuaValue>();
+                return [];
             
             try
             {
@@ -205,7 +205,7 @@ namespace FLua.Runtime
                     // Find the start of the character at position i
                     var charStart = FindCharacterStart(str, i);
                     var charEnd = FindCharacterEnd(str, charStart);
-                    return new LuaValue[] { new LuaInteger(charStart + 1), new LuaInteger(charEnd) };
+                    return [LuaValue.Integer(charStart + 1), LuaValue.Integer(charEnd)];
                 }
                 else
                 {
@@ -241,9 +241,9 @@ namespace FLua.Runtime
                     }
                     
                     if (currentPos < 0 || currentPos > str.Length)
-                        return Array.Empty<LuaValue>();
+                        return [];
                     
-                    return new LuaValue[] { new LuaInteger(currentPos + 1) };
+                    return [LuaValue.Integer(currentPos + 1)];
                 }
             }
             catch (ArgumentException)
@@ -257,8 +257,8 @@ namespace FLua.Runtime
             if (args.Length == 0)
                 throw new LuaRuntimeException("bad argument #1 to 'codes' (string expected)");
             
-            var str = args[0].AsString;
-            var lax = args.Length > 1 ? LuaValue.IsValueTruthy(args[1]) : false;
+            var str = args[0].AsString();
+            var lax = args.Length > 1 ? args[1].IsTruthy() : false;
             
             try
             {
@@ -277,17 +277,17 @@ namespace FLua.Runtime
                 
                 // Return an iterator function
                 var index = 0;
-                var iterator = new LuaUserFunction(iterArgs =>
+                var iterator = new BuiltinFunction(iterArgs =>
                 {
                     if (index < codepoints.Count)
                     {
                         var (pos, cp) = codepoints[index++];
-                        return new[] { new LuaInteger(pos), new LuaInteger(cp) };
+                        return [LuaValue.Integer(pos), LuaValue.Integer(cp)];
                     }
-                    return Array.Empty<LuaValue>();
+                    return [];
                 });
                 
-                return new[] { iterator };
+                return [LuaValue.Function(iterator)];
             }
             catch (ArgumentException)
             {
@@ -296,16 +296,16 @@ namespace FLua.Runtime
                     // In lax mode, iterate over bytes
                     var bytes = Encoding.UTF8.GetBytes(str);
                     var index = 0;
-                    var iterator = new LuaUserFunction(iterArgs =>
+                    var iterator = new BuiltinFunction(iterArgs =>
                     {
                         if (index < bytes.Length)
                         {
-                            return new[] { new LuaInteger(index + 1), new LuaInteger(bytes[index++]) };
+                            return [LuaValue.Integer(index + 1), LuaValue.Integer(bytes[index++])];
                         }
-                        return Array.Empty<LuaValue>();
+                        return [];
                     });
                     
-                    return new[] { iterator };
+                    return [LuaValue.Function(iterator)];
                 }
                 else
                 {

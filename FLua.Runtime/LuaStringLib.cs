@@ -19,32 +19,32 @@ namespace FLua.Runtime
             var stringTable = new LuaTable();
             
             // Basic string functions
-            stringTable.Set(new LuaString("len"), new BuiltinFunction(Len));
-            stringTable.Set(new LuaString("sub"), new BuiltinFunction(Sub));
-            stringTable.Set(new LuaString("upper"), new BuiltinFunction(Upper));
-            stringTable.Set(new LuaString("lower"), new BuiltinFunction(Lower));
-            stringTable.Set(new LuaString("reverse"), new BuiltinFunction(Reverse));
+            stringTable.Set(LuaValue.String("len"), new BuiltinFunction(Len));
+            stringTable.Set(LuaValue.String("sub"), new BuiltinFunction(Sub));
+            stringTable.Set(LuaValue.String("upper"), new BuiltinFunction(Upper));
+            stringTable.Set(LuaValue.String("lower"), new BuiltinFunction(Lower));
+            stringTable.Set(LuaValue.String("reverse"), new BuiltinFunction(Reverse));
             
             // Character functions
-            stringTable.Set(new LuaString("char"), new BuiltinFunction(Char));
-            stringTable.Set(new LuaString("byte"), new BuiltinFunction(Byte));
+            stringTable.Set(LuaValue.String("char"), new BuiltinFunction(Char));
+            stringTable.Set(LuaValue.String("byte"), new BuiltinFunction(Byte));
             
             // Repetition
-            stringTable.Set(new LuaString("rep"), new BuiltinFunction(Rep));
+            stringTable.Set(LuaValue.String("rep"), new BuiltinFunction(Rep));
             
             // Pattern matching (simplified - full Lua patterns are complex)
-            stringTable.Set(new LuaString("find"), new BuiltinFunction(Find));
-            stringTable.Set(new LuaString("match"), new BuiltinFunction(Match));
-            stringTable.Set(new LuaString("gsub"), new BuiltinFunction(GSub));
-            stringTable.Set(new LuaString("gmatch"), new BuiltinFunction(GMatch));
+            stringTable.Set(LuaValue.String("find"), new BuiltinFunction(Find));
+            stringTable.Set(LuaValue.String("match"), new BuiltinFunction(Match));
+            stringTable.Set(LuaValue.String("gsub"), new BuiltinFunction(GSub));
+            stringTable.Set(LuaValue.String("gmatch"), new BuiltinFunction(GMatch));
             
             // Formatting
-            stringTable.Set(new LuaString("format"), new BuiltinFunction(Format));
+            stringTable.Set(LuaValue.String("format"), new BuiltinFunction(Format));
             
             // Binary packing/unpacking (Lua 5.3+)
-            stringTable.Set(new LuaString("pack"), new BuiltinFunction(Pack));
-            stringTable.Set(new LuaString("unpack"), new BuiltinFunction(Unpack));
-            stringTable.Set(new LuaString("packsize"), new BuiltinFunction(PackSize));
+            stringTable.Set(LuaValue.String("pack"), new BuiltinFunction(Pack));
+            stringTable.Set(LuaValue.String("unpack"), new BuiltinFunction(Unpack));
+            stringTable.Set(LuaValue.String("packsize"), new BuiltinFunction(PackSize));
             
             env.SetVariable("string", stringTable);
         }
@@ -57,11 +57,11 @@ namespace FLua.Runtime
                 throw new LuaRuntimeException("bad argument #1 to 'len' (string expected)");
             
             var str = args[0];
-            if (str is LuaString luaStr)
-                return new[] { new LuaInteger(luaStr.Value.Length) };
+            if (str.IsString)
+                return [LuaValue.Integer(str.AsString().Length)];
             
-            if (str is LuaNumber || str is LuaInteger)
-                return new[] { new LuaInteger(str.ToString()?.Length ?? 0) };
+            if (str.IsNumber)
+                return [LuaValue.Integer(str.ToString().Length)];
             
             throw new LuaRuntimeException("bad argument #1 to 'len' (string expected)");
         }
@@ -73,14 +73,18 @@ namespace FLua.Runtime
             
             var str = args[0];
             var start = args[1];
-            var end = args.Length > 2 ? args[2] : null;
+            LuaValue end = LuaValue.Nil;
+            if(args.Length > 2)
+            {
+                end = args[2];
+            }
             
-            var stringValue = str.AsString;
-            if (!start.AsInteger.HasValue)
+            var stringValue = str.AsString();
+            if (!start.IsInteger)
                 throw new LuaRuntimeException("bad argument #2 to 'sub' (number expected)");
             
-            var startIndex = (int)start.AsInteger.Value;
-            var endIndex = end?.AsInteger ?? stringValue.Length;
+            var startIndex = (int)start.AsInteger();
+            var endIndex = end != LuaValue.Nil && end.IsInteger ? (int)end.AsInteger() : stringValue.Length;
             
             // Convert Lua 1-based indexing to C# 0-based
             if (startIndex < 0)
@@ -92,20 +96,20 @@ namespace FLua.Runtime
             endIndex = Math.Max(0, Math.Min(endIndex, stringValue.Length));
             
             if (startIndex > endIndex || startIndex > stringValue.Length)
-                return new[] { new LuaString("") };
+                return [LuaValue.String("")];
             
             var length = (int)(endIndex - startIndex + 1);
             if (length <= 0)
-                return new[] { new LuaString("") };
+                return [LuaValue.String("")];
             
             try
             {
                 var result = stringValue.Substring(startIndex - 1, Math.Min(length, stringValue.Length - startIndex + 1));
-                return new[] { new LuaString(result) };
+                return [LuaValue.String(result)];
             }
             catch
             {
-                return new[] { new LuaString("") };
+                return [LuaValue.String("")];
             }
         }
         
@@ -115,7 +119,7 @@ namespace FLua.Runtime
                 throw new LuaRuntimeException("bad argument #1 to 'upper' (string expected)");
             
             var str = args[0];
-            return new[] { new LuaString(str.AsString.ToUpperInvariant()) };
+            return [LuaValue.String(str.AsString().ToUpperInvariant())];
         }
         
         private static LuaValue[] Lower(LuaValue[] args)
@@ -124,7 +128,7 @@ namespace FLua.Runtime
                 throw new LuaRuntimeException("bad argument #1 to 'lower' (string expected)");
             
             var str = args[0];
-            return new[] { new LuaString(str.AsString.ToLowerInvariant()) };
+            return [LuaValue.String(str.AsString().ToLowerInvariant())];
         }
         
         private static LuaValue[] Reverse(LuaValue[] args)
@@ -133,9 +137,9 @@ namespace FLua.Runtime
                 throw new LuaRuntimeException("bad argument #1 to 'reverse' (string expected)");
             
             var str = args[0];
-            var chars = str.AsString.ToCharArray();
+            var chars = str.AsString().ToCharArray();
             Array.Reverse(chars);
-            return new[] { new LuaString(new string(chars)) };
+            return [LuaValue.String(new string(chars))];
         }
         
         #endregion
@@ -148,17 +152,17 @@ namespace FLua.Runtime
             
             for (int i = 0; i < args.Length; i++)
             {
-                if (!args[i].AsInteger.HasValue)
+                if (!args[i].IsInteger)
                     throw new LuaRuntimeException($"bad argument #{i + 1} to 'char' (number expected)");
                 
-                var value = args[i].AsInteger!.Value;
+                var value = args[i].AsInteger();
                 if (value < 0 || value > 255)
                     throw new LuaRuntimeException($"bad argument #{i + 1} to 'char' (out of range)");
                 
                 chars[i] = (char)value;
             }
             
-            return new[] { new LuaString(new string(chars)) };
+            return [LuaValue.String(new string(chars))];
         }
         
         private static LuaValue[] Byte(LuaValue[] args)
@@ -166,9 +170,9 @@ namespace FLua.Runtime
             if (args.Length == 0)
                 throw new LuaRuntimeException("bad argument #1 to 'byte' (string expected)");
             
-            var str = args[0].AsString;
-            var start = args.Length > 1 ? args[1].AsInteger ?? 1 : 1;
-            var end = args.Length > 2 ? args[2].AsInteger ?? start : start;
+            var str = args[0].AsString();
+            var start = args.Length > 1 && args[1].IsInteger ? args[1].AsInteger() : 1;
+            var end = args.Length > 2 && args[2].IsInteger ? args[2].AsInteger() : start;
             
             if (start < 0)
                 start = str.Length + start + 1;
@@ -179,12 +183,12 @@ namespace FLua.Runtime
             end = Math.Max(start, Math.Min(end, str.Length));
             
             if (start > str.Length)
-                return new LuaValue[0]; // Return no values
+                return []; // Return no values
             
             var results = new List<LuaValue>();
             for (long i = start; i <= end && i <= str.Length; i++)
             {
-                results.Add(new LuaInteger((byte)str[(int)i - 1]));
+                results.Add(LuaValue.Integer((byte)str[(int)i - 1]));
             }
             
             return results.ToArray();
@@ -199,19 +203,19 @@ namespace FLua.Runtime
             if (args.Length < 2)
                 throw new LuaRuntimeException("bad argument #2 to 'rep' (number expected)");
             
-            var str = args[0].AsString;
+            var str = args[0].AsString();
             var count = args[1];
-            var separator = args.Length > 2 ? args[2].AsString : "";
+            var separator = args.Length > 2 ? args[2].AsString() : "";
             
-            if (!count.AsInteger.HasValue)
+            if (!count.IsInteger)
                 throw new LuaRuntimeException("bad argument #2 to 'rep' (number expected)");
             
-            var n = (int)count.AsInteger.Value;
+            var n = (int)count.AsInteger();
             if (n <= 0)
-                return new[] { new LuaString("") };
+                return [LuaValue.String("")];
             
             if (n == 1)
-                return new[] { new LuaString(str) };
+                return [LuaValue.String(str)];
             
             try
             {
@@ -222,7 +226,7 @@ namespace FLua.Runtime
                     {
                         sb.Append(str);
                     }
-                    return new[] { new LuaString(sb.ToString()) };
+                    return [LuaValue.String(sb.ToString())];
                 }
                 else
                 {
@@ -233,7 +237,7 @@ namespace FLua.Runtime
                             sb.Append(separator);
                         sb.Append(str);
                     }
-                    return new[] { new LuaString(sb.ToString()) };
+                    return [LuaValue.String(sb.ToString())];
                 }
             }
             catch (OutOfMemoryException)
@@ -251,17 +255,17 @@ namespace FLua.Runtime
             if (args.Length < 2)
                 throw new LuaRuntimeException("bad argument #2 to 'find' (string expected)");
             
-            var str = args[0].AsString;
-            var pattern = args[1].AsString;
-            var start = args.Length > 2 ? (int)(args[2].AsInteger ?? 1) : 1;
-            var plain = args.Length > 3 ? LuaValue.IsValueTruthy(args[3]) : false;
+            var str = args[0].AsString();
+            var pattern = args[1].AsString();
+            var start = args.Length > 2 && args[2].IsInteger ? (int)args[2].AsInteger() : 1;
+            var plain = args.Length > 3 ? args[3].IsTruthy() : false;
             
             if (start < 0)
                 start = str.Length + start + 1;
             start = Math.Max(1, Math.Min(start, str.Length + 1));
             
             if (start > str.Length)
-                return new[] { LuaNil.Instance };
+                return [LuaValue.Nil];
             
             try
             {
@@ -271,14 +275,14 @@ namespace FLua.Runtime
                 {
                     var results = new List<LuaValue>
                     {
-                        new LuaInteger(match.Start), // Already 1-based
-                        new LuaInteger(match.End)    // Already 1-based
+                        LuaValue.Integer(match.Start), // Already 1-based
+                        LuaValue.Integer(match.End)    // Already 1-based
                     };
                     
                     // Add captured groups
                     foreach (var capture in match.Captures)
                     {
-                        results.Add(new LuaString(capture));
+                        results.Add(LuaValue.String(capture));
                     }
                     
                     return results.ToArray();
@@ -289,7 +293,7 @@ namespace FLua.Runtime
                 throw new LuaRuntimeException("invalid pattern");
             }
             
-            return new[] { LuaNil.Instance };
+            return [LuaValue.Nil];
         }
         
         private static LuaValue[] Match(LuaValue[] args)
@@ -297,9 +301,9 @@ namespace FLua.Runtime
             if (args.Length < 2)
                 throw new LuaRuntimeException("bad argument #2 to 'match' (string expected)");
             
-            var str = args[0].AsString;
-            var pattern = args[1].AsString;
-            var start = args.Length > 2 ? (int)(args[2].AsInteger ?? 1) : 1;
+            var str = args[0].AsString();
+            var pattern = args[1].AsString();
+            var start = args.Length > 2 && args[2].IsInteger ? (int)args[2].AsInteger() : 1;
             
             if (start < 0)
                 start = str.Length + start + 1;
@@ -319,14 +323,14 @@ namespace FLua.Runtime
                         var results = new List<LuaValue>();
                         for (int i = 1; i < match.Groups.Count; i++)
                         {
-                            results.Add(new LuaString(match.Groups[i].Value));
+                            results.Add(LuaValue.String(match.Groups[i].Value));
                         }
                         return results.ToArray();
                     }
                     else
                     {
                         // Return the entire match
-                        return new[] { new LuaString(match.Value) };
+                        return [LuaValue.String(match.Value)];
                     }
                 }
             }
@@ -335,7 +339,7 @@ namespace FLua.Runtime
                 throw new LuaRuntimeException("invalid pattern");
             }
             
-            return new LuaValue[0];
+            return [];
         }
         
         private static LuaValue[] GSub(LuaValue[] args)
@@ -343,10 +347,10 @@ namespace FLua.Runtime
             if (args.Length < 3)
                 throw new LuaRuntimeException("bad argument #3 to 'gsub' (string/function/table expected)");
             
-            var str = args[0].AsString;
-            var pattern = args[1].AsString;
+            var str = args[0].AsString();
+            var pattern = args[1].AsString();
             var replacement = args[2];
-            var limit = args.Length > 3 ? (int)(args[3].AsInteger ?? int.MaxValue) : int.MaxValue;
+            var limit = args.Length > 3 && args[3].IsInteger ? (int)args[3].AsInteger() : int.MaxValue;
             
             try
             {
@@ -355,25 +359,26 @@ namespace FLua.Runtime
                 var matches = regex.Matches(str);
                 
                 if (matches.Count == 0)
-                    return new LuaValue[] { new LuaString(str), new LuaInteger(0) };
+                    return [LuaValue.String(str), LuaValue.Integer(0)];
                 
                 var result = str;
                 var count = 0;
                 
                 // Simple string replacement (more complex function/table replacements would need additional logic)
-                if (replacement is LuaString replStr)
+                if (replacement.IsString)
                 {
-                    result = regex.Replace(str, replStr.Value, Math.Min(limit, matches.Count));
+                    var replStr = replacement.AsString();
+                    result = regex.Replace(str, replStr, Math.Min(limit, matches.Count));
                     count = Math.Min(limit, matches.Count);
                 }
-                else if (replacement is LuaFunction || replacement is LuaTable)
+                else if (replacement.IsFunction || replacement.IsTable)
                 {
                     // For now, just do basic replacement - full implementation would call functions/lookup tables
                     result = regex.Replace(str, "", Math.Min(limit, matches.Count));
                     count = Math.Min(limit, matches.Count);
                 }
                 
-                return new LuaValue[] { new LuaString(result), new LuaInteger(count) };
+                return [LuaValue.String(result), LuaValue.Integer(count)];
             }
             catch (ArgumentException)
             {
@@ -386,8 +391,8 @@ namespace FLua.Runtime
             if (args.Length < 2)
                 throw new LuaRuntimeException("bad argument #2 to 'gmatch' (string expected)");
             
-            var str = args[0].AsString;
-            var pattern = args[1].AsString;
+            var str = args[0].AsString();
+            var pattern = args[1].AsString();
             
             // Return an iterator function
             var matches = new List<string>();
@@ -408,16 +413,16 @@ namespace FLua.Runtime
             }
             
             var index = 0;
-            var iterator = new LuaUserFunction(iterArgs =>
+            var iterator = new BuiltinFunction(iterArgs =>
             {
                 if (index < matches.Count)
                 {
-                    return new[] { new LuaString(matches[index++]) };
+                    return [LuaValue.String(matches[index++])];
                 }
-                return new LuaValue[0];
+                return [];
             });
             
-                            return new LuaValue[] { iterator };
+            return [LuaValue.Function(iterator)];
         }
         
         /// <summary>
@@ -450,7 +455,7 @@ namespace FLua.Runtime
             if (args.Length == 0)
                 throw new LuaRuntimeException("bad argument #1 to 'format' (string expected)");
             
-            var format = args[0].AsString;
+            var format = args[0].AsString();
             var values = args.Skip(1).ToArray();
             
             try
@@ -495,7 +500,7 @@ namespace FLua.Runtime
                 // Append remaining text
                 result.Append(format.Substring(pos));
                 
-                return new[] { new LuaString(result.ToString()) };
+                return [LuaValue.String(result.ToString())];
             }
             catch (Exception ex) when (!(ex is LuaRuntimeException))
             {
@@ -513,16 +518,16 @@ namespace FLua.Runtime
             
             string result = specifier switch
             {
-                "d" or "i" => FormatInteger(value.AsInteger ?? 0, showSign, spaceSign),
-                "o" => FormatOctal(value.AsInteger ?? 0, altForm),
-                "u" => FormatUnsigned(value.AsInteger ?? 0),
-                "x" => FormatHex(value.AsInteger ?? 0, false, altForm),
-                "X" => FormatHex(value.AsInteger ?? 0, true, altForm),
-                "f" or "F" => FormatFloat(value.AsNumber ?? 0, precision >= 0 ? precision : 6, specifier == "F"),
-                "e" => FormatExponential(value.AsNumber ?? 0, precision >= 0 ? precision : 6, false),
-                "E" => FormatExponential(value.AsNumber ?? 0, precision >= 0 ? precision : 6, true),
-                "g" => FormatGeneral(value.AsNumber ?? 0, precision >= 0 ? precision : 6, false, altForm),
-                "G" => FormatGeneral(value.AsNumber ?? 0, precision >= 0 ? precision : 6, true, altForm),
+                "d" or "i" => FormatInteger(value.IsInteger ? value.AsInteger() : 0, showSign, spaceSign),
+                "o" => FormatOctal(value.IsInteger ? value.AsInteger() : 0, altForm),
+                "u" => FormatUnsigned(value.IsInteger ? value.AsInteger() : 0),
+                "x" => FormatHex(value.IsInteger ? value.AsInteger() : 0, false, altForm),
+                "X" => FormatHex(value.IsInteger ? value.AsInteger() : 0, true, altForm),
+                "f" or "F" => FormatFloat(value.IsNumber ? value.AsNumber() : 0, precision >= 0 ? precision : 6, specifier == "F"),
+                "e" => FormatExponential(value.IsNumber ? value.AsNumber() : 0, precision >= 0 ? precision : 6, false),
+                "E" => FormatExponential(value.IsNumber ? value.AsNumber() : 0, precision >= 0 ? precision : 6, true),
+                "g" => FormatGeneral(value.IsNumber ? value.AsNumber() : 0, precision >= 0 ? precision : 6, false, altForm),
+                "G" => FormatGeneral(value.IsNumber ? value.AsNumber() : 0, precision >= 0 ? precision : 6, true, altForm),
                 "c" => FormatCharacter(value),
                 "s" => FormatString(value, precision),
                 "q" => FormatQuotedString(value),
@@ -625,7 +630,7 @@ namespace FLua.Runtime
         
         private static string FormatCharacter(LuaValue value)
         {
-            var code = value.AsInteger ?? 0;
+            var code = value.IsInteger ? value.AsInteger() : 0;
             if (code < 0 || code > 255)
                 throw new LuaRuntimeException($"bad argument to format (char out of range)");
             return new string((char)code, 1);
@@ -633,7 +638,7 @@ namespace FLua.Runtime
         
         private static string FormatString(LuaValue value, int precision)
         {
-            var str = value.AsString ?? "";
+            var str = value.AsString() ?? "";
             if (precision >= 0 && precision < str.Length)
                 str = str.Substring(0, precision);
             return str;
@@ -641,7 +646,7 @@ namespace FLua.Runtime
         
         private static string FormatQuotedString(LuaValue value)
         {
-            var str = value.AsString ?? "";
+            var str = value.AsString() ?? "";
             var result = new StringBuilder();
             result.Append('"');
             
@@ -683,7 +688,7 @@ namespace FLua.Runtime
             if (args.Length == 0)
                 throw new LuaRuntimeException("bad argument #1 to 'pack' (string expected)");
                 
-            var format = args[0].AsString;
+            var format = args[0].AsString();
             var values = args.Skip(1).ToList();
             var result = new List<byte>();
             var valueIndex = 0;
@@ -703,7 +708,7 @@ namespace FLua.Runtime
                 }
                 
                 // Convert byte array to string (Lua strings can contain binary data)
-                return new[] { new LuaString(Encoding.GetEncoding("ISO-8859-1").GetString(result.ToArray())) };
+                return [LuaValue.String(Encoding.GetEncoding("ISO-8859-1").GetString(result.ToArray()))];
             }
             catch (Exception ex) when (!(ex is LuaRuntimeException))
             {
@@ -716,9 +721,9 @@ namespace FLua.Runtime
             if (args.Length < 2)
                 throw new LuaRuntimeException("bad argument #2 to 'unpack' (string expected)");
                 
-            var format = args[0].AsString;
-            var data = Encoding.GetEncoding("ISO-8859-1").GetBytes(args[1].AsString);
-            var startPos = args.Length > 2 ? (int)(args[2].AsInteger ?? 1) - 1 : 0; // Lua uses 1-based indexing
+            var format = args[0].AsString();
+            var data = Encoding.GetEncoding("ISO-8859-1").GetBytes(args[1].AsString());
+            var startPos = args.Length > 2 && args[2].IsInteger ? (int)args[2].AsInteger() - 1 : 0; // Lua uses 1-based indexing
             
             var results = new List<LuaValue>();
             var dataPos = startPos;
@@ -729,12 +734,12 @@ namespace FLua.Runtime
                 while (formatPos < format.Length)
                 {
                     var value = ProcessUnpackFormat(format, ref formatPos, data, ref dataPos);
-                    if (value != null)
-                        results.Add(value);
+                    if (value.HasValue)
+                        results.Add(value.Value);
                 }
                 
                 // Return unpacked values plus the position after last read byte (1-based)
-                results.Add(new LuaInteger(dataPos + 1));
+                results.Add(LuaValue.Integer(dataPos + 1));
                 return results.ToArray();
             }
             catch (Exception ex) when (!(ex is LuaRuntimeException))
@@ -748,7 +753,7 @@ namespace FLua.Runtime
             if (args.Length == 0)
                 throw new LuaRuntimeException("bad argument #1 to 'packsize' (string expected)");
                 
-            var format = args[0].AsString;
+            var format = args[0].AsString();
             
             try
             {
@@ -763,7 +768,7 @@ namespace FLua.Runtime
                     totalSize += size;
                 }
                 
-                return new[] { new LuaInteger(totalSize) };
+                return [LuaValue.Integer(totalSize)];
             }
             catch (Exception ex) when (!(ex is LuaRuntimeException))
             {
@@ -858,7 +863,7 @@ namespace FLua.Runtime
                 case 'b': // signed byte
                     {
                         var value = getValue();
-                        var num = value.AsInteger ?? 0;
+                        var num = value.IsInteger ? value.AsInteger() : 0;
                         output.Add((byte)(sbyte)num);
                         return (1, true);
                     }
@@ -866,7 +871,7 @@ namespace FLua.Runtime
                 case 'B': // unsigned byte
                     {
                         var value = getValue();
-                        var num = value.AsInteger ?? 0;
+                        var num = value.IsInteger ? value.AsInteger() : 0;
                         output.Add((byte)num);
                         return (1, true);
                     }
@@ -874,7 +879,7 @@ namespace FLua.Runtime
                 case 'h': // signed short
                     {
                         var value = getValue();
-                        var num = value.AsInteger ?? 0;
+                        var num = value.IsInteger ? value.AsInteger() : 0;
                         var bytes = BitConverter.GetBytes((short)num);
                         output.AddRange(bytes);
                         return (2, true);
@@ -883,7 +888,7 @@ namespace FLua.Runtime
                 case 'H': // unsigned short
                     {
                         var value = getValue();
-                        var num = value.AsInteger ?? 0;
+                        var num = value.IsInteger ? value.AsInteger() : 0;
                         var bytes = BitConverter.GetBytes((ushort)num);
                         output.AddRange(bytes);
                         return (2, true);
@@ -893,7 +898,7 @@ namespace FLua.Runtime
                 case 'j': // lua_Integer
                     {
                         var value = getValue();
-                        var num = value.AsInteger ?? 0;
+                        var num = value.IsInteger ? value.AsInteger() : 0;
                         var bytes = BitConverter.GetBytes(num);
                         output.AddRange(bytes);
                         return (8, true);
@@ -904,7 +909,7 @@ namespace FLua.Runtime
                 case 'T': // size_t
                     {
                         var value = getValue();
-                        var num = value.AsInteger ?? 0;
+                        var num = value.IsInteger ? value.AsInteger() : 0;
                         var bytes = BitConverter.GetBytes((ulong)num);
                         output.AddRange(bytes);
                         return (8, true);
@@ -914,7 +919,7 @@ namespace FLua.Runtime
                 case 'I': // unsigned int with size
                     {
                         var value = getValue();
-                        var num = value.AsInteger ?? 0;
+                        var num = value.IsInteger ? value.AsInteger() : 0;
                         var intSize = size > 0 ? size : 4;
                         
                         if (intSize > 8)
@@ -932,7 +937,7 @@ namespace FLua.Runtime
                 case 'f': // float
                     {
                         var value = getValue();
-                        var num = value.AsNumber ?? 0;
+                        var num = value.IsNumber ? value.AsNumber() : 0;
                         var bytes = BitConverter.GetBytes((float)num);
                         output.AddRange(bytes);
                         return (4, true);
@@ -942,7 +947,7 @@ namespace FLua.Runtime
                 case 'n': // Lua number
                     {
                         var value = getValue();
-                        var num = value.AsNumber ?? 0;
+                        var num = value.IsNumber ? value.AsNumber() : 0;
                         var bytes = BitConverter.GetBytes(num);
                         output.AddRange(bytes);
                         return (8, true);
@@ -951,7 +956,7 @@ namespace FLua.Runtime
                 case 'c': // fixed-length string
                     {
                         var value = getValue();
-                        var str = value.AsString ?? "";
+                        var str = value.AsString() ?? "";
                         var strSize = size > 0 ? size : 1;
                         var bytes = Encoding.GetEncoding("ISO-8859-1").GetBytes(str);
                         
@@ -969,7 +974,7 @@ namespace FLua.Runtime
                 case 'z': // zero-terminated string
                     {
                         var value = getValue();
-                        var str = value.AsString ?? "";
+                        var str = value.AsString() ?? "";
                         var bytes = Encoding.GetEncoding("ISO-8859-1").GetBytes(str);
                         output.AddRange(bytes);
                         output.Add(0); // null terminator
@@ -979,7 +984,7 @@ namespace FLua.Runtime
                 case 's': // string with length prefix
                     {
                         var value = getValue();
-                        var str = value.AsString ?? "";
+                        var str = value.AsString() ?? "";
                         var bytes = Encoding.GetEncoding("ISO-8859-1").GetBytes(str);
                         var lenSize = size > 0 ? size : 8; // default to 8-byte length
                         
@@ -1046,26 +1051,26 @@ namespace FLua.Runtime
                 case 'b': // signed byte
                     if (dataPos >= data.Length)
                         throw new LuaRuntimeException("data string too short");
-                    return new LuaInteger((sbyte)data[dataPos++]);
+                    return LuaValue.Integer((sbyte)data[dataPos++]);
                     
                 case 'B': // unsigned byte
                     if (dataPos >= data.Length)
                         throw new LuaRuntimeException("data string too short");
-                    return new LuaInteger(data[dataPos++]);
+                    return LuaValue.Integer(data[dataPos++]);
                     
                 case 'h': // signed short
                     if (dataPos + 2 > data.Length)
                         throw new LuaRuntimeException("data string too short");
                     var shortVal = BitConverter.ToInt16(data, dataPos);
                     dataPos += 2;
-                    return new LuaInteger(shortVal);
+                    return LuaValue.Integer(shortVal);
                     
                 case 'H': // unsigned short
                     if (dataPos + 2 > data.Length)
                         throw new LuaRuntimeException("data string too short");
                     var ushortVal = BitConverter.ToUInt16(data, dataPos);
                     dataPos += 2;
-                    return new LuaInteger(ushortVal);
+                    return LuaValue.Integer(ushortVal);
                     
                 case 'l': // signed long
                 case 'j': // lua_Integer
@@ -1073,7 +1078,7 @@ namespace FLua.Runtime
                         throw new LuaRuntimeException("data string too short");
                     var longVal = BitConverter.ToInt64(data, dataPos);
                     dataPos += 8;
-                    return new LuaInteger(longVal);
+                    return LuaValue.Integer(longVal);
                     
                 case 'L': // unsigned long
                 case 'J': // lua_Unsigned
@@ -1082,7 +1087,7 @@ namespace FLua.Runtime
                         throw new LuaRuntimeException("data string too short");
                     var ulongVal = BitConverter.ToUInt64(data, dataPos);
                     dataPos += 8;
-                    return new LuaInteger((long)ulongVal);
+                    return LuaValue.Integer((long)ulongVal);
                     
                 case 'i': // signed int with size
                 case 'I': // unsigned int with size
@@ -1110,7 +1115,7 @@ namespace FLua.Runtime
                         }
                         
                         dataPos += intSize;
-                        return new LuaInteger(value);
+                        return LuaValue.Integer(value);
                     }
                     
                 case 'f': // float
@@ -1118,7 +1123,7 @@ namespace FLua.Runtime
                         throw new LuaRuntimeException("data string too short");
                     var floatVal = BitConverter.ToSingle(data, dataPos);
                     dataPos += 4;
-                    return new LuaNumber(floatVal);
+                    return LuaValue.Number(floatVal);
                     
                 case 'd': // double
                 case 'n': // Lua number
@@ -1126,7 +1131,7 @@ namespace FLua.Runtime
                         throw new LuaRuntimeException("data string too short");
                     var doubleVal = BitConverter.ToDouble(data, dataPos);
                     dataPos += 8;
-                    return new LuaNumber(doubleVal);
+                    return LuaValue.Number(doubleVal);
                     
                 case 'c': // fixed-length string
                     {
@@ -1135,7 +1140,7 @@ namespace FLua.Runtime
                             throw new LuaRuntimeException("data string too short");
                         var str = Encoding.GetEncoding("ISO-8859-1").GetString(data, dataPos, strSize);
                         dataPos += strSize;
-                        return new LuaString(str);
+                        return LuaValue.String(str);
                     }
                     
                 case 'z': // zero-terminated string
@@ -1147,7 +1152,7 @@ namespace FLua.Runtime
                             throw new LuaRuntimeException("unfinished string");
                         var str = Encoding.GetEncoding("ISO-8859-1").GetString(data, start, dataPos - start);
                         dataPos++; // skip null terminator
-                        return new LuaString(str);
+                        return LuaValue.String(str);
                     }
                     
                 case 's': // string with length prefix
@@ -1171,7 +1176,7 @@ namespace FLua.Runtime
                             throw new LuaRuntimeException("data string too short");
                         var str = Encoding.GetEncoding("ISO-8859-1").GetString(data, dataPos, (int)len);
                         dataPos += (int)len;
-                        return new LuaString(str);
+                        return LuaValue.String(str);
                     }
                     
                 case 'x': // padding byte

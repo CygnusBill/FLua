@@ -19,23 +19,23 @@ namespace FLua.Runtime
             var osTable = new LuaTable();
             
             // Time functions
-            osTable.Set(new LuaString("clock"), new BuiltinFunction(Clock));
-            osTable.Set(new LuaString("time"), new BuiltinFunction(Time));
-            osTable.Set(new LuaString("date"), new BuiltinFunction(Date));
-            osTable.Set(new LuaString("difftime"), new BuiltinFunction(DiffTime));
+            osTable.Set(LuaValue.String("clock"), new BuiltinFunction(Clock));
+            osTable.Set(LuaValue.String("time"), new BuiltinFunction(Time));
+            osTable.Set(LuaValue.String("date"), new BuiltinFunction(Date));
+            osTable.Set(LuaValue.String("difftime"), new BuiltinFunction(DiffTime));
             
             // Environment functions
-            osTable.Set(new LuaString("getenv"), new BuiltinFunction(GetEnv));
-            osTable.Set(new LuaString("setlocale"), new BuiltinFunction(SetLocale));
+            osTable.Set(LuaValue.String("getenv"), new BuiltinFunction(GetEnv));
+            osTable.Set(LuaValue.String("setlocale"), new BuiltinFunction(SetLocale));
             
             // Process functions
-            osTable.Set(new LuaString("exit"), new BuiltinFunction(Exit));
+            osTable.Set(LuaValue.String("exit"), new BuiltinFunction(Exit));
             
             // File system functions
-            osTable.Set(new LuaString("remove"), new BuiltinFunction(Remove));
+            osTable.Set(LuaValue.String("remove"), new BuiltinFunction(Remove));
             
             // System information
-            osTable.Set(new LuaString("tmpname"), new BuiltinFunction(TmpName));
+            osTable.Set(LuaValue.String("tmpname"), new BuiltinFunction(TmpName));
             
             env.SetVariable("os", osTable);
         }
@@ -47,7 +47,7 @@ namespace FLua.Runtime
             // Return CPU time used by the program in seconds
             var ticks = Environment.TickCount;
             var seconds = ticks / 1000.0;
-            return new[] { new LuaNumber(seconds) };
+            return [LuaValue.Number(seconds)];
         }
         
         private static LuaValue[] Time(LuaValue[] args)
@@ -59,17 +59,29 @@ namespace FLua.Runtime
                 // Return current time as seconds since Unix epoch
                 dateTime = DateTime.UtcNow;
             }
-            else if (args.Length == 1 && args[0] is LuaTable table)
+            else if (args.Length == 1 && args[0].IsTable)
             {
                 // Parse time table
+                var table = args[0].AsTable<LuaTable>();
                 try
                 {
-                    var year = (int)(table.Get(new LuaString("year")).AsInteger ?? DateTime.Now.Year);
-                    var month = (int)(table.Get(new LuaString("month")).AsInteger ?? 1);
-                    var day = (int)(table.Get(new LuaString("day")).AsInteger ?? 1);
-                    var hour = (int)(table.Get(new LuaString("hour")).AsInteger ?? 0);
-                    var min = (int)(table.Get(new LuaString("min")).AsInteger ?? 0);
-                    var sec = (int)(table.Get(new LuaString("sec")).AsInteger ?? 0);
+                    var yearVal = table.Get(LuaValue.String("year"));
+                    var year = yearVal.IsInteger ? (int)yearVal.AsInteger() : DateTime.Now.Year;
+                    
+                    var monthVal = table.Get(LuaValue.String("month"));
+                    var month = monthVal.IsInteger ? (int)monthVal.AsInteger() : 1;
+                    
+                    var dayVal = table.Get(LuaValue.String("day"));
+                    var day = dayVal.IsInteger ? (int)dayVal.AsInteger() : 1;
+                    
+                    var hourVal = table.Get(LuaValue.String("hour"));
+                    var hour = hourVal.IsInteger ? (int)hourVal.AsInteger() : 0;
+                    
+                    var minVal = table.Get(LuaValue.String("min"));
+                    var min = minVal.IsInteger ? (int)minVal.AsInteger() : 0;
+                    
+                    var secVal = table.Get(LuaValue.String("sec"));
+                    var sec = secVal.IsInteger ? (int)secVal.AsInteger() : 0;
                     
                     dateTime = new DateTime(year, month, day, hour, min, sec, DateTimeKind.Utc);
                 }
@@ -84,13 +96,15 @@ namespace FLua.Runtime
             }
             
             var unixTime = (long)(dateTime - UnixEpoch).TotalSeconds;
-            return new[] { new LuaInteger(unixTime) };
+            return [LuaValue.Integer(unixTime)];
         }
         
         private static LuaValue[] Date(LuaValue[] args)
         {
-            var format = args.Length > 0 ? args[0].AsString : "%c";
-            var time = args.Length > 1 ? args[1].AsInteger : null;
+            var format = args.Length > 0 ? args[0].AsString() : "%c";
+            long? time = null;
+            if (args.Length > 1 && args[1].IsInteger)
+                time = args[1].AsInteger();
             
             DateTime dateTime;
             if (time.HasValue)
@@ -113,23 +127,23 @@ namespace FLua.Runtime
             {
                 // Return a table with date/time components
                 var result = new LuaTable();
-                result.Set(new LuaString("year"), new LuaInteger(dateTime.Year));
-                result.Set(new LuaString("month"), new LuaInteger(dateTime.Month));
-                result.Set(new LuaString("day"), new LuaInteger(dateTime.Day));
-                result.Set(new LuaString("hour"), new LuaInteger(dateTime.Hour));
-                result.Set(new LuaString("min"), new LuaInteger(dateTime.Minute));
-                result.Set(new LuaString("sec"), new LuaInteger(dateTime.Second));
-                result.Set(new LuaString("wday"), new LuaInteger(((int)dateTime.DayOfWeek) + 1)); // Lua uses 1-7
-                result.Set(new LuaString("yday"), new LuaInteger(dateTime.DayOfYear));
-                result.Set(new LuaString("isdst"), new LuaBoolean(dateTime.IsDaylightSavingTime()));
+                result.Set(LuaValue.String("year"), LuaValue.Integer(dateTime.Year));
+                result.Set(LuaValue.String("month"), LuaValue.Integer(dateTime.Month));
+                result.Set(LuaValue.String("day"), LuaValue.Integer(dateTime.Day));
+                result.Set(LuaValue.String("hour"), LuaValue.Integer(dateTime.Hour));
+                result.Set(LuaValue.String("min"), LuaValue.Integer(dateTime.Minute));
+                result.Set(LuaValue.String("sec"), LuaValue.Integer(dateTime.Second));
+                result.Set(LuaValue.String("wday"), LuaValue.Integer(((int)dateTime.DayOfWeek) + 1)); // Lua uses 1-7
+                result.Set(LuaValue.String("yday"), LuaValue.Integer(dateTime.DayOfYear));
+                result.Set(LuaValue.String("isdst"), LuaValue.Boolean(dateTime.IsDaylightSavingTime()));
                 
-                return new[] { result };
+                return [LuaValue.Table(result)];
             }
             else
             {
                 // Format the date string (simplified implementation)
                 var formatted = FormatDate(format, dateTime);
-                return new[] { new LuaString(formatted) };
+                return [LuaValue.String(formatted)];
             }
         }
         
@@ -141,11 +155,11 @@ namespace FLua.Runtime
             var t2 = args[0];
             var t1 = args[1];
             
-            if (!t2.AsNumber.HasValue || !t1.AsNumber.HasValue)
+            if (!t2.IsNumber || !t1.IsNumber)
                 throw new LuaRuntimeException("bad argument to 'difftime' (number expected)");
             
-            var diff = t2.AsNumber.Value - t1.AsNumber.Value;
-            return new[] { new LuaNumber(diff) };
+            var diff = t2.AsNumber() - t1.AsNumber();
+            return [LuaValue.Number(diff)];
         }
         
         #endregion
@@ -157,16 +171,16 @@ namespace FLua.Runtime
             if (args.Length == 0)
                 throw new LuaRuntimeException("bad argument #1 to 'getenv' (string expected)");
             
-            var varName = args[0].AsString;
+            var varName = args[0].AsString();
             var value = Environment.GetEnvironmentVariable(varName);
             
-            return value != null ? new[] { new LuaString(value) } : new[] { LuaNil.Instance };
+            return value != null ? [LuaValue.String(value)] : [LuaValue.Nil];
         }
         
         private static LuaValue[] SetLocale(LuaValue[] args)
         {
-            var locale = args.Length > 0 ? args[0].AsString : null;
-            var category = args.Length > 1 ? args[1].AsString : "all";
+            var locale = args.Length > 0 ? args[0].AsString() : null;
+            var category = args.Length > 1 ? args[1].AsString() : "all";
             
             try
             {
@@ -174,7 +188,7 @@ namespace FLua.Runtime
                 {
                     // Return current locale
                     var current = CultureInfo.CurrentCulture.Name;
-                    return new[] { new LuaString(current.Length == 0 ? "C" : current) };
+                    return [LuaValue.String(current.Length == 0 ? "C" : current)];
                 }
                 
                 CultureInfo culture;
@@ -206,15 +220,15 @@ namespace FLua.Runtime
                         throw new LuaRuntimeException($"bad argument #2 to 'setlocale' (invalid category '{category}')");
                 }
                 
-                return new[] { new LuaString(culture.Name.Length == 0 ? "C" : culture.Name) };
+                return [LuaValue.String(culture.Name.Length == 0 ? "C" : culture.Name)];
             }
             catch (CultureNotFoundException)
             {
-                return new[] { LuaNil.Instance };
+                return [LuaValue.Nil];
             }
             catch (ArgumentException)
             {
-                return new[] { LuaNil.Instance };
+                return [LuaValue.Nil];
             }
         }
         
@@ -227,20 +241,20 @@ namespace FLua.Runtime
             var exitCode = 0;
             if (args.Length > 0)
             {
-                if (args[0] is LuaBoolean boolVal)
+                if (args[0].IsBoolean)
                 {
-                    exitCode = boolVal.Value ? 0 : 1;
+                    exitCode = args[0].AsBoolean() ? 0 : 1;
                 }
-                else if (args[0].AsInteger.HasValue)
+                else if (args[0].IsInteger)
                 {
-                    exitCode = (int)args[0].AsInteger!.Value;
+                    exitCode = (int)args[0].AsInteger();
                 }
             }
             
             Environment.Exit(exitCode);
             
             // This line will never be reached, but needed for compiler
-            return Array.Empty<LuaValue>();
+            return [];
         }
         
         #endregion
@@ -252,28 +266,28 @@ namespace FLua.Runtime
             if (args.Length == 0)
                 throw new LuaRuntimeException("bad argument #1 to 'remove' (string expected)");
             
-            var filename = args[0].AsString;
+            var filename = args[0].AsString();
             
             try
             {
                 if (File.Exists(filename))
                 {
                     File.Delete(filename);
-                    return new[] { new LuaBoolean(true) };
+                    return [LuaValue.Boolean(true)];
                 }
                 else if (Directory.Exists(filename))
                 {
                     Directory.Delete(filename);
-                    return new[] { new LuaBoolean(true) };
+                    return [LuaValue.Boolean(true)];
                 }
                 else
                 {
-                    return new LuaValue[] { LuaNil.Instance, new LuaString($"No such file or directory: {filename}") };
+                    return [LuaValue.Nil, LuaValue.String($"No such file or directory: {filename}")];
                 }
             }
             catch (Exception ex)
             {
-                return new LuaValue[] { LuaNil.Instance, new LuaString(ex.Message) };
+                return [LuaValue.Nil, LuaValue.String(ex.Message)];
             }
         }
         
@@ -286,7 +300,7 @@ namespace FLua.Runtime
             try
             {
                 var tempFileName = System.IO.Path.GetTempFileName();
-                return new[] { new LuaString(tempFileName) };
+                return [LuaValue.String(tempFileName)];
             }
             catch (Exception ex)
             {

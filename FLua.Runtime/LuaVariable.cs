@@ -18,7 +18,10 @@ namespace FLua.Runtime
 
         public LuaVariable(LuaValue value, LuaAttribute attribute, string? name = null)
         {
-            Value = value ?? throw new ArgumentNullException(nameof(value));
+            if (value.Type == LuaType.Nil)
+                Value = LuaValue.Nil;
+            else
+                Value = value;
             Attribute = attribute;
             IsClosed = false;
             Name = name;
@@ -39,7 +42,10 @@ namespace FLua.Runtime
                 throw LuaRuntimeException.ClosedVariableAccess(Name ?? "variable");
             }
 
-            Value = newValue ?? throw new ArgumentNullException(nameof(newValue));
+            if (newValue.Type == LuaType.Nil)
+                Value = LuaValue.Nil;
+            else
+                Value = newValue;
         }
 
         /// <summary>
@@ -65,29 +71,35 @@ namespace FLua.Runtime
                 IsClosed = true;
 
                 // Call __close metamethod if the value has one
-                if (Value is LuaTable table && table.Metatable != null)
+                if (Value.IsTable)
                 {
-                    var closeMethod = table.Metatable.RawGet(new LuaString("__close"));
-                    if (closeMethod is LuaFunction closeFunc)
+                    var table = Value.AsTable<LuaTable>();
+                    if (table.Metatable != null)
                     {
-                        try
+                        var closeMethod = table.Metatable.RawGet(LuaValue.String("__close"));
+                        if (closeMethod.IsFunction)
                         {
-                            // Call __close(value, nil) - nil indicates normal close, not error
-                            closeFunc.Call(new[] { Value, LuaNil.Instance });
-                        }
-                        catch (Exception ex)
-                        {
-                            // In Lua, errors in __close are typically ignored or logged
-                            // For now, we'll just ignore them to prevent double-faults
-                            Console.WriteLine($"Error in __close metamethod: {ex.Message}");
+                            try
+                            {
+                                // Call __close(value, nil) - nil indicates normal close, not error
+                                var closeFunc = closeMethod.AsFunction<LuaFunction>();
+                                closeFunc.Call(new[] { Value, LuaValue.Nil });
+                            }
+                            catch (Exception ex)
+                            {
+                                // In Lua, errors in __close are typically ignored or logged
+                                // For now, we'll just ignore them to prevent double-faults
+                                Console.WriteLine($"Error in __close metamethod: {ex.Message}");
+                            }
                         }
                     }
                 }
-                else if (Value is LuaFunction func)
+                else if (Value.IsFunction)
                 {
                     // For functions, we can call them as close handlers
                     try
                     {
+                        var func = Value.AsFunction<LuaFunction>();
                         func.Call(Array.Empty<LuaValue>());
                     }
                     catch (Exception ex)

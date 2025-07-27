@@ -31,7 +31,7 @@ namespace FLua.Runtime
                     var argTable = new LuaTable();
                     for (int i = 0; i < args.Length; i++)
                     {
-                        argTable.Set(new LuaInteger(i), new LuaString(args[i]));
+                        argTable.Set(i, args[i]);
                     }
                     env.SetVariable("arg", argTable);
                 }
@@ -40,9 +40,9 @@ namespace FLua.Runtime
                 var results = scriptDelegate(env);
                 
                 // If the script returns a number as the first value, use it as exit code
-                if (results != null && results.Length > 0 && results[0] is LuaInteger exitCode)
+                if (results != null && results.Length > 0 && results[0].IsInteger)
                 {
-                    return (int)exitCode.Value;
+                    return (int)results[0].AsInteger();
                 }
                 
                 return 0; // Success

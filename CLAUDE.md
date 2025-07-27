@@ -234,6 +234,17 @@ The compiler project provides Lua-to-C# compilation with multiple backend option
 - **CecilCodeGenerator**: Direct IL emission using Mono.Cecil (preferred for size)
 - **CSharpCodeGenerator**: String-based code generation (legacy, kept for reference)
 
+#### NewLuaValue Migration Notes
+The codebase contains a new value type implementation (`NewLuaValue`) that will eventually replace the current class hierarchy:
+- **NewLuaValue**: 20-byte struct matching Lua's internal representation
+- Stack-allocated for better performance
+- Uses type tags instead of inheritance
+- Complex types (file handles, userdata) stored as object references using GCHandle
+- When migrating: 
+  - Virtual `IsTruthy` property becomes non-virtual `IsTruthy()` method
+  - `OpCodes.Callvirt` changes to `OpCodes.Call` for struct methods
+  - Need to extend type enum and add accessors for types like LuaFileHandle
+
 #### Key Features Implemented
 1. **Local Variables**: With proper scoping and name mangling for shadowing
 2. **Binary Operations**: All arithmetic, comparison, logical, and string operations

@@ -4,151 +4,116 @@ using System.Globalization;
 namespace FLua.Runtime
 {
     /// <summary>
-    /// Provides centralized type conversion functionality for Lua values.
-    /// This ensures consistent conversion behavior between interpreter and future compiler.
+    /// Provides type conversion utilities for Lua values.
+    /// Most conversions are now handled by the LuaValue struct itself.
     /// </summary>
     public static class LuaTypeConversion
     {
         /// <summary>
         /// Converts a Lua value to a number (double).
-        /// Returns null if the conversion is not possible.
+        /// This includes parsing hex strings which LuaValue doesn't handle.
         /// </summary>
         public static double? ToNumber(LuaValue value)
         {
-            switch (value)
+            if (value.IsNumber)
+                return value.AsNumber();
+                
+            if (value.IsString)
             {
-                case LuaNumber num:
-                    return num.Value;
-                    
-                case LuaInteger integer:
-                    return (double)integer.Value;
-                    
-                case LuaString str:
-                    // Try to parse the string as a number
-                    if (double.TryParse(str.Value.Trim(), NumberStyles.Float | NumberStyles.AllowLeadingSign, CultureInfo.InvariantCulture, out double result))
+                var str = value.AsString().Trim();
+                
+                // Try to parse the string as a number
+                if (double.TryParse(str, NumberStyles.Float | NumberStyles.AllowLeadingSign, CultureInfo.InvariantCulture, out double result))
+                {
+                    return result;
+                }
+                
+                // Try hexadecimal format
+                if (str.StartsWith("0x", StringComparison.OrdinalIgnoreCase) || 
+                    str.StartsWith("0X", StringComparison.OrdinalIgnoreCase))
+                {
+                    try
                     {
-                        return result;
-                    }
-                    // Try hexadecimal format
-                    if (str.Value.Trim().StartsWith("0x", StringComparison.OrdinalIgnoreCase) || 
-                        str.Value.Trim().StartsWith("0X", StringComparison.OrdinalIgnoreCase))
-                    {
-                        try
+                        var hexStr = str.Substring(2);
+                        if (long.TryParse(hexStr, NumberStyles.HexNumber, CultureInfo.InvariantCulture, out long hexValue))
                         {
-                            var hexStr = str.Value.Trim().Substring(2);
-                            if (long.TryParse(hexStr, NumberStyles.HexNumber, CultureInfo.InvariantCulture, out long hexValue))
-                            {
-                                return (double)hexValue;
-                            }
+                            return (double)hexValue;
                         }
-                        catch { }
                     }
-                    return null;
-                    
-                default:
-                    return null;
+                    catch { }
+                }
             }
+            
+            return null;
         }
 
         /// <summary>
         /// Converts a Lua value to an integer (long).
-        /// Returns null if the conversion is not possible.
+        /// This includes parsing hex strings which LuaValue doesn't handle.
         /// </summary>
         public static long? ToInteger(LuaValue value)
         {
-            switch (value)
+            if (value.IsInteger)
+                return value.AsInteger();
+                
+            if (value.IsFloat)
             {
-                case LuaInteger integer:
-                    return integer.Value;
-                    
-                case LuaNumber num:
-                    // Only convert if the number is an exact integer
-                    double d = num.Value;
-                    if (Math.Floor(d) == d && d >= long.MinValue && d <= long.MaxValue)
-                    {
-                        return (long)d;
-                    }
-                    return null;
-                    
-                case LuaString str:
-                    // Try to parse the string as an integer
-                    if (long.TryParse(str.Value.Trim(), NumberStyles.Integer | NumberStyles.AllowLeadingSign, CultureInfo.InvariantCulture, out long result))
-                    {
-                        return result;
-                    }
-                    // Try hexadecimal format
-                    if (str.Value.Trim().StartsWith("0x", StringComparison.OrdinalIgnoreCase) || 
-                        str.Value.Trim().StartsWith("0X", StringComparison.OrdinalIgnoreCase))
-                    {
-                        try
-                        {
-                            var hexStr = str.Value.Trim().Substring(2);
-                            if (long.TryParse(hexStr, NumberStyles.HexNumber, CultureInfo.InvariantCulture, out long hexValue))
-                            {
-                                return hexValue;
-                            }
-                        }
-                        catch { }
-                    }
-                    // Try parsing as double first and check if it's an integer
-                    var numValue = ToNumber(value);
-                    if (numValue.HasValue)
-                    {
-                        double dValue = numValue.Value;
-                        if (Math.Floor(dValue) == dValue && dValue >= long.MinValue && dValue <= long.MaxValue)
-                        {
-                            return (long)dValue;
-                        }
-                    }
-                    return null;
-                    
-                default:
-                    return null;
+                // Only convert if the number is an exact integer
+                double d = value.AsFloat();
+                if (Math.Floor(d) == d && d >= long.MinValue && d <= long.MaxValue)
+                {
+                    return (long)d;
+                }
+                return null;
             }
+            
+            if (value.IsString)
+            {
+                var str = value.AsString().Trim();
+                
+                // Try to parse the string as an integer
+                if (long.TryParse(str, NumberStyles.Integer | NumberStyles.AllowLeadingSign, CultureInfo.InvariantCulture, out long result))
+                {
+                    return result;
+                }
+                
+                // Try hexadecimal format
+                if (str.StartsWith("0x", StringComparison.OrdinalIgnoreCase) || 
+                    str.StartsWith("0X", StringComparison.OrdinalIgnoreCase))
+                {
+                    try
+                    {
+                        var hexStr = str.Substring(2);
+                        if (long.TryParse(hexStr, NumberStyles.HexNumber, CultureInfo.InvariantCulture, out long hexValue))
+                        {
+                            return hexValue;
+                        }
+                    }
+                    catch { }
+                }
+                
+                // Try parsing as double first and check if it's an integer
+                var numValue = ToNumber(value);
+                if (numValue.HasValue)
+                {
+                    double dValue = numValue.Value;
+                    if (Math.Floor(dValue) == dValue && dValue >= long.MinValue && dValue <= long.MaxValue)
+                    {
+                        return (long)dValue;
+                    }
+                }
+            }
+            
+            return null;
         }
 
         /// <summary>
         /// Converts a Lua value to a string.
-        /// This follows Lua's string conversion rules.
+        /// Just delegates to the built-in ToString() method.
         /// </summary>
         public static string ToString(LuaValue value)
         {
-            switch (value)
-            {
-                case LuaString str:
-                    return str.Value;
-                    
-                case LuaNumber num:
-                    // Format numbers according to Lua rules
-                    double d = num.Value;
-                    if (Math.Floor(d) == d && d >= long.MinValue && d <= long.MaxValue)
-                    {
-                        // Integer-valued numbers are formatted without decimal point
-                        return ((long)d).ToString();
-                    }
-                    return d.ToString(CultureInfo.InvariantCulture);
-                    
-                case LuaInteger integer:
-                    return integer.Value.ToString();
-                    
-                case LuaBoolean boolean:
-                    return boolean.Value ? "true" : "false";
-                    
-                case LuaNil _:
-                    return "nil";
-                    
-                case LuaTable _:
-                    return "table";
-                    
-                case LuaFunction _:
-                    return "function";
-                    
-                case LuaCoroutine _:
-                    return "thread";
-                    
-                default:
-                    return value.ToString() ?? "unknown";
-            }
+            return value.ToString();
         }
 
         /// <summary>
@@ -157,91 +122,97 @@ namespace FLua.Runtime
         /// </summary>
         public static bool ToBoolean(LuaValue value)
         {
-            return LuaValue.IsValueTruthy(value);
+            return value.IsTruthy();
         }
 
         /// <summary>
-        /// Gets the Lua type name of a value.
-        /// This is what the type() function returns.
+        /// Gets the type name of a Lua value as a string.
         /// </summary>
         public static string GetTypeName(LuaValue value)
         {
-            switch (value)
+            return value.Type switch
             {
-                case LuaNil _:
-                    return "nil";
-                case LuaBoolean _:
-                    return "boolean";
-                case LuaNumber _:
-                case LuaInteger _:
-                    return "number";
-                case LuaString _:
-                    return "string";
-                case LuaTable _:
-                    return "table";
-                case LuaFunction _:
-                    return "function";
-                case LuaCoroutine _:
-                    return "thread";
-                default:
-                    return "userdata"; // Default for unknown types
-            }
+                LuaType.Nil => "nil",
+                LuaType.Boolean => "boolean",
+                LuaType.Integer => "number",
+                LuaType.Float => "number",
+                LuaType.String => "string",
+                LuaType.Table => "table",
+                LuaType.Function => "function",
+                LuaType.Thread => "thread",
+                _ => "userdata"
+            };
         }
 
         /// <summary>
-        /// Attempts to coerce a value to a number for arithmetic operations.
-        /// This is more permissive than ToNumber and matches Lua's behavior.
+        /// Converts a value to a string for concatenation.
+        /// Returns null if the value cannot be concatenated.
         /// </summary>
-        public static double? CoerceToNumber(LuaValue value)
+        public static string? ToConcatString(LuaValue value)
         {
-            // For now, this is the same as ToNumber, but we might want to
-            // add metamethod support here in the future
-            return ToNumber(value);
-        }
-
-        /// <summary>
-        /// Attempts to coerce a value to an integer for bitwise operations.
-        /// This is more permissive than ToInteger and matches Lua's behavior.
-        /// </summary>
-        public static long? CoerceToInteger(LuaValue value)
-        {
-            // First try direct conversion
-            var intResult = ToInteger(value);
-            if (intResult.HasValue)
-                return intResult;
-
-            // Try converting through number first
-            var numResult = ToNumber(value);
-            if (numResult.HasValue)
+            if (value.IsString)
+                return value.AsString();
+                
+            if (value.IsNumber)
+                return value.ToString();
+                
+            // Check for __concat metamethod
+            if (value.IsTable)
             {
-                double d = numResult.Value;
-                // Lua truncates towards zero for bitwise operations
-                if (d >= 0)
-                    return (long)Math.Floor(d);
-                else
-                    return (long)Math.Ceiling(d);
+                var table = value.AsTable<LuaTable>();
+                if (table.Metatable != null)
+                {
+                    var concat = table.Metatable.RawGet(LuaValue.String("__concat"));
+                    if (!concat.IsNil)
+                        return null; // Has metamethod, should use it instead
+                }
             }
-
+            
             return null;
         }
 
         /// <summary>
-        /// Formats a value for concatenation.
-        /// Numbers are converted to strings, other types may error.
+        /// Parses a string to a number according to Lua rules.
         /// </summary>
-        public static string? ToConcatString(LuaValue value)
+        public static LuaValue? StringToNumber(string str, int? base_ = null)
         {
-            switch (value)
+            str = str.Trim();
+            
+            if (base_ == null)
             {
-                case LuaString str:
-                    return str.Value;
-                case LuaNumber _:
-                case LuaInteger _:
-                    return ToString(value);
-                default:
-                    // Other types require metamethods for concatenation
-                    return null;
+                // Auto-detect base
+                if (str.StartsWith("0x", StringComparison.OrdinalIgnoreCase) || 
+                    str.StartsWith("0X", StringComparison.OrdinalIgnoreCase))
+                {
+                    base_ = 16;
+                    str = str.Substring(2);
+                }
+                else
+                {
+                    base_ = 10;
+                }
             }
+            
+            if (base_ == 10)
+            {
+                if (long.TryParse(str, NumberStyles.Integer | NumberStyles.AllowLeadingSign, CultureInfo.InvariantCulture, out long intResult))
+                {
+                    return LuaValue.Integer(intResult);
+                }
+                if (double.TryParse(str, NumberStyles.Float | NumberStyles.AllowLeadingSign, CultureInfo.InvariantCulture, out double floatResult))
+                {
+                    return LuaValue.Number(floatResult);
+                }
+            }
+            else if (base_ == 16)
+            {
+                if (long.TryParse(str, NumberStyles.HexNumber, CultureInfo.InvariantCulture, out long hexResult))
+                {
+                    return LuaValue.Integer(hexResult);
+                }
+            }
+            
+            return null;
         }
     }
 }

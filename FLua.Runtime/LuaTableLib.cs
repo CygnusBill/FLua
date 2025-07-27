@@ -18,19 +18,19 @@ namespace FLua.Runtime
             var tableTable = new LuaTable();
             
             // Table manipulation functions
-            tableTable.Set(new LuaString("insert"), new BuiltinFunction(Insert));
-            tableTable.Set(new LuaString("remove"), new BuiltinFunction(Remove));
-            tableTable.Set(new LuaString("move"), new BuiltinFunction(Move));
+            tableTable.Set(LuaValue.String("insert"), LuaValue.Function(new BuiltinFunction(Insert)));
+            tableTable.Set(LuaValue.String("remove"), LuaValue.Function(new BuiltinFunction(Remove)));
+            tableTable.Set(LuaValue.String("move"), LuaValue.Function(new BuiltinFunction(Move)));
             
             // Utility functions
-            tableTable.Set(new LuaString("concat"), new BuiltinFunction(Concat));
-            tableTable.Set(new LuaString("sort"), new BuiltinFunction(Sort));
+            tableTable.Set(LuaValue.String("concat"), LuaValue.Function(new BuiltinFunction(Concat)));
+            tableTable.Set(LuaValue.String("sort"), LuaValue.Function(new BuiltinFunction(Sort)));
             
             // Packing functions
-            tableTable.Set(new LuaString("pack"), new BuiltinFunction(Pack));
-            tableTable.Set(new LuaString("unpack"), new BuiltinFunction(Unpack));
+            tableTable.Set(LuaValue.String("pack"), LuaValue.Function(new BuiltinFunction(Pack)));
+            tableTable.Set(LuaValue.String("unpack"), LuaValue.Function(new BuiltinFunction(Unpack)));
             
-            env.SetVariable("table", tableTable);
+            env.SetVariable("table", LuaValue.Table(tableTable));
         }
         
         #region Table Manipulation Functions
@@ -40,16 +40,17 @@ namespace FLua.Runtime
             if (args.Length == 0)
                 throw new LuaRuntimeException("bad argument #1 to 'insert' (table expected)");
             
-            var table = args[0];
-            if (!(table is LuaTable luaTable))
+            if (!args[0].IsTable)
                 throw new LuaRuntimeException("bad argument #1 to 'insert' (table expected)");
+                
+            var luaTable = args[0].AsTable<LuaTable>();
             
             if (args.Length == 2)
             {
                 // table.insert(t, value) - insert at end
                 var value = args[1];
                 var newIndex = luaTable.Array.Count + 1;
-                luaTable.Set(new LuaInteger(newIndex), value);
+                luaTable.Set(LuaValue.Integer(newIndex), value);
             }
             else if (args.Length >= 3)
             {
@@ -57,10 +58,10 @@ namespace FLua.Runtime
                 var pos = args[1];
                 var value = args[2];
                 
-                if (!pos.AsInteger.HasValue)
+                if (!pos.IsInteger)
                     throw new LuaRuntimeException("bad argument #2 to 'insert' (number expected)");
                 
-                var position = (int)pos.AsInteger.Value;
+                var position = (int)pos.AsInteger();
                 if (position < 1)
                     throw new LuaRuntimeException("bad argument #2 to 'insert' (position out of bounds)");
                 
@@ -74,16 +75,16 @@ namespace FLua.Runtime
                     arrayList.Insert(position, value);
                     
                     // Rebuild the array part of the table
-                    luaTable.Set(new LuaInteger(1), LuaNil.Instance); // Clear array
+                    luaTable.Set(LuaValue.Integer(1), LuaValue.Nil); // Clear array
                     for (int i = 0; i < arrayList.Count; i++)
                     {
-                        luaTable.Set(new LuaInteger(i + 1), arrayList[i]);
+                        luaTable.Set(LuaValue.Integer(i + 1), arrayList[i]);
                     }
                 }
                 else
                 {
                     // Insert beyond current array bounds
-                    luaTable.Set(new LuaInteger(position + 1), value);
+                    luaTable.Set(LuaValue.Integer(position + 1), value);
                 }
             }
             else
@@ -91,7 +92,7 @@ namespace FLua.Runtime
                 throw new LuaRuntimeException("wrong number of arguments to 'insert'");
             }
             
-            return Array.Empty<LuaValue>();
+            return [];
         }
         
         private static LuaValue[] Remove(LuaValue[] args)
@@ -100,8 +101,10 @@ namespace FLua.Runtime
                 throw new LuaRuntimeException("bad argument #1 to 'remove' (table expected)");
             
             var table = args[0];
-            if (!(table is LuaTable luaTable))
+            if (!table.IsTable)
                 throw new LuaRuntimeException("bad argument #1 to 'remove' (table expected)");
+                
+            var luaTable = table.AsTable<LuaTable>();
             
             int position;
             if (args.Length == 1)
@@ -113,16 +116,16 @@ namespace FLua.Runtime
             {
                 // table.remove(t, pos) - remove at position
                 var pos = args[1];
-                if (!pos.AsInteger.HasValue)
+                if (!pos.IsInteger)
                     throw new LuaRuntimeException("bad argument #2 to 'remove' (number expected)");
                 
-                position = (int)pos.AsInteger.Value;
+                position = (int)pos.AsInteger();
             }
             
             if (position < 1 || position > luaTable.Array.Count)
-                return new[] { LuaNil.Instance };
+                return [LuaValue.Nil];
             
-            var removedValue = luaTable.Get(new LuaInteger(position));
+            var removedValue = luaTable.Get(LuaValue.Integer(position));
             
             // Shift elements to the left
             var arrayList = luaTable.Array.ToList();
@@ -132,15 +135,15 @@ namespace FLua.Runtime
                 
                 // Rebuild the array part of the table
                 var lastIndex = luaTable.Array.Count;
-                luaTable.Set(new LuaInteger(lastIndex), LuaNil.Instance); // Remove last element
+                luaTable.Set(LuaValue.Integer(lastIndex), LuaValue.Nil); // Remove last element
                 
                 for (int i = 0; i < arrayList.Count; i++)
                 {
-                    luaTable.Set(new LuaInteger(i + 1), arrayList[i]);
+                    luaTable.Set(LuaValue.Integer(i + 1), arrayList[i]);
                 }
             }
             
-            return new[] { removedValue };
+            return [removedValue];
         }
         
         private static LuaValue[] Move(LuaValue[] args)
@@ -154,34 +157,37 @@ namespace FLua.Runtime
             var destIndex = args[3];
             var destTable = args.Length > 4 ? args[4] : sourceTable;
             
-            if (!(sourceTable is LuaTable srcTable))
+            if (!sourceTable.IsTable)
                 throw new LuaRuntimeException("bad argument #1 to 'move' (table expected)");
-            if (!(destTable is LuaTable dstTable))
+            if (!destTable.IsTable)
                 throw new LuaRuntimeException("bad argument #5 to 'move' (table expected)");
+                
+            var srcTable = sourceTable.AsTable<LuaTable>();
+            var dstTable = destTable.AsTable<LuaTable>();
             
-            if (!start.AsInteger.HasValue)
+            if (!start.IsInteger)
                 throw new LuaRuntimeException("bad argument #2 to 'move' (number expected)");
-            if (!end.AsInteger.HasValue)
+            if (!end.IsInteger)
                 throw new LuaRuntimeException("bad argument #3 to 'move' (number expected)");
-            if (!destIndex.AsInteger.HasValue)
+            if (!destIndex.IsInteger)
                 throw new LuaRuntimeException("bad argument #4 to 'move' (number expected)");
             
-            var startIdx = start.AsInteger.Value;
-            var endIdx = end.AsInteger.Value;
-            var destIdx = destIndex.AsInteger.Value;
+            var startIdx = start.AsInteger();
+            var endIdx = end.AsInteger();
+            var destIdx = destIndex.AsInteger();
             
             if (startIdx > endIdx)
-                return new[] { destTable };
+                return [destTable];
             
             // Copy elements
             for (long i = startIdx; i <= endIdx; i++)
             {
-                var value = srcTable.Get(new LuaInteger(i));
+                var value = srcTable.Get(LuaValue.Integer(i));
                 var targetIdx = destIdx + (i - startIdx);
-                dstTable.Set(new LuaInteger(targetIdx), value);
+                dstTable.Set(LuaValue.Integer(targetIdx), value);
             }
             
-            return new[] { destTable };
+            return [destTable];
         }
         
         #endregion
@@ -194,33 +200,35 @@ namespace FLua.Runtime
                 throw new LuaRuntimeException("bad argument #1 to 'concat' (table expected)");
             
             var table = args[0];
-            if (!(table is LuaTable luaTable))
+            if (!table.IsTable)
                 throw new LuaRuntimeException("bad argument #1 to 'concat' (table expected)");
+                
+            var luaTable = table.AsTable<LuaTable>();
             
-            var separator = args.Length > 1 ? args[1].AsString : "";
-            var start = args.Length > 2 ? (int)(args[2].AsInteger ?? 1) : 1;
-            var end = args.Length > 3 ? (int)(args[3].AsInteger ?? luaTable.Array.Count) : luaTable.Array.Count;
+            var separator = args.Length > 1 && args[1].IsString ? args[1].AsString() : "";
+            var start = args.Length > 2 && args[2].IsInteger ? (int)args[2].AsInteger() : 1;
+            var end = args.Length > 3 && args[3].IsInteger ? (int)args[3].AsInteger() : luaTable.Array.Count;
             
             if (start > end)
-                return new[] { new LuaString("") };
+                return [LuaValue.String("")];
             
             var sb = new StringBuilder();
             bool first = true;
             
             for (int i = start; i <= end && i <= luaTable.Array.Count; i++)
             {
-                var value = luaTable.Get(new LuaInteger(i));
-                if (value is LuaNil)
+                var value = luaTable.Get(LuaValue.Integer(i));
+                if (value.IsNil)
                     break;
                 
                 if (!first && !string.IsNullOrEmpty(separator))
                     sb.Append(separator);
                 
-                sb.Append(value.AsString);
+                sb.Append(value.ToString());
                 first = false;
             }
             
-            return new[] { new LuaString(sb.ToString()) };
+            return [LuaValue.String(sb.ToString())];
         }
         
         private static LuaValue[] Sort(LuaValue[] args)
@@ -228,18 +236,23 @@ namespace FLua.Runtime
             if (args.Length == 0)
                 throw new LuaRuntimeException("bad argument #1 to 'sort' (table expected)");
             
-            var table = args[0];
-            if (!(table is LuaTable luaTable))
+            if (!args[0].IsTable)
                 throw new LuaRuntimeException("bad argument #1 to 'sort' (table expected)");
             
-            var compareFunc = args.Length > 1 ? args[1] as LuaFunction : null;
+            var luaTable = args[0].AsTable<LuaTable>();
+            
+            LuaFunction? compareFunc = null;
+            if (args.Length > 1 && args[1].IsFunction)
+            {
+                compareFunc = args[1].AsFunction<LuaFunction>();
+            }
             
             // Get array elements
             var elements = new List<LuaValue>();
             for (int i = 1; i <= luaTable.Array.Count; i++)
             {
-                var value = luaTable.Get(new LuaInteger(i));
-                if (value is LuaNil)
+                var value = luaTable.Get(LuaValue.Integer(i));
+                if (value.IsNil)
                     break;
                 elements.Add(value);
             }
@@ -253,7 +266,7 @@ namespace FLua.Runtime
                     try
                     {
                         var result = compareFunc.Call(new[] { a, b });
-                        if (result.Length > 0 && LuaValue.IsValueTruthy(result[0]))
+                        if (result.Length > 0 && result[0].IsTruthy())
                             return -1;
                         return 1;
                     }
@@ -269,31 +282,31 @@ namespace FLua.Runtime
                 elements.Sort((a, b) =>
                 {
                     // Compare numbers numerically
-                    if (a.AsNumber.HasValue && b.AsNumber.HasValue)
-                        return a.AsNumber.Value.CompareTo(b.AsNumber.Value);
+                    if (a.IsNumber && b.IsNumber)
+                        return a.AsNumber().CompareTo(b.AsNumber());
                     
                     // Compare strings lexicographically
-                    return string.Compare(a.AsString, b.AsString, StringComparison.Ordinal);
+                    return string.Compare(a.ToString(), b.ToString(), StringComparison.Ordinal);
                 });
             }
             
             // Put sorted elements back into table
             for (int i = 0; i < elements.Count; i++)
             {
-                luaTable.Set(new LuaInteger(i + 1), elements[i]);
+                luaTable.Set(LuaValue.Integer(i + 1), elements[i]);
             }
             
             // Clear any remaining elements
             for (int i = elements.Count + 1; i <= luaTable.Array.Count; i++)
             {
-                var value = luaTable.Get(new LuaInteger(i));
-                if (value is not LuaNil)
-                    luaTable.Set(new LuaInteger(i), LuaNil.Instance);
+                var value = luaTable.Get(LuaValue.Integer(i));
+                if (!value.IsNil)
+                    luaTable.Set(LuaValue.Integer(i), LuaValue.Nil);
                 else
                     break;
             }
             
-            return Array.Empty<LuaValue>();
+            return [];
         }
         
         #endregion
@@ -307,13 +320,13 @@ namespace FLua.Runtime
             // Pack all arguments into array part
             for (int i = 0; i < args.Length; i++)
             {
-                result.Set(new LuaInteger(i + 1), args[i]);
+                result.Set(LuaValue.Integer(i + 1), args[i]);
             }
             
             // Set 'n' field with count
-            result.Set(new LuaString("n"), new LuaInteger(args.Length));
+            result.Set(LuaValue.String("n"), LuaValue.Integer(args.Length));
             
-            return new[] { result };
+            return [LuaValue.Table(result)];
         }
         
         private static LuaValue[] Unpack(LuaValue[] args)
@@ -321,26 +334,27 @@ namespace FLua.Runtime
             if (args.Length == 0)
                 throw new LuaRuntimeException("bad argument #1 to 'unpack' (table expected)");
             
-            var table = args[0];
-            if (!(table is LuaTable luaTable))
+            if (!args[0].IsTable)
                 throw new LuaRuntimeException("bad argument #1 to 'unpack' (table expected)");
             
-            var start = args.Length > 1 ? (int)(args[1].AsInteger ?? 1) : 1;
+            var luaTable = args[0].AsTable<LuaTable>();
+            
+            var start = args.Length > 1 && args[1].IsInteger ? (int)args[1].AsInteger() : 1;
             
             int end;
             if (args.Length > 2)
             {
-                if (!args[2].AsInteger.HasValue)
+                if (!args[2].IsInteger)
                     throw new LuaRuntimeException("bad argument #3 to 'unpack' (number expected)");
-                end = (int)args[2].AsInteger!.Value;
+                end = (int)args[2].AsInteger();
             }
             else
             {
                 // Try to get 'n' field first
-                var nValue = luaTable.Get(new LuaString("n"));
-                if (nValue.AsInteger.HasValue)
+                var nValue = luaTable.Get(LuaValue.String("n"));
+                if (nValue.IsInteger)
                 {
-                    end = (int)nValue.AsInteger.Value;
+                    end = (int)nValue.AsInteger();
                 }
                 else
                 {
@@ -350,12 +364,12 @@ namespace FLua.Runtime
             }
             
             if (start > end)
-                return Array.Empty<LuaValue>();
+                return [];
             
             var results = new List<LuaValue>();
             for (int i = start; i <= end; i++)
             {
-                var value = luaTable.Get(new LuaInteger(i));
+                var value = luaTable.Get(LuaValue.Integer(i));
                 results.Add(value);
             }
             

@@ -17,29 +17,18 @@ namespace FLua.Runtime
         {
             // Check for metamethods first
             var metamethodResult = TryInvokeMetamethod(left, right, "__add");
-            if (metamethodResult != null)
-                return metamethodResult;
+            if (metamethodResult.HasValue)
+                return metamethodResult.Value;
 
-            // Preserve integer type when both operands are integers
-            if (left.AsInteger.HasValue && right.AsInteger.HasValue)
+            // Use the built-in Add method from LuaValue struct
+            try
             {
-                try
-                {
-                    long result = checked(left.AsInteger.Value + right.AsInteger.Value);
-                    return new LuaInteger(result);
-                }
-                catch (OverflowException)
-                {
-                    // Fall back to floating point
-                    return new LuaNumber((double)left.AsInteger.Value + (double)right.AsInteger.Value);
-                }
+                return LuaValue.Add(left, right);
             }
-            else if (left.AsNumber.HasValue && right.AsNumber.HasValue)
+            catch (InvalidOperationException)
             {
-                return new LuaNumber(left.AsNumber.Value + right.AsNumber.Value);
+                throw new LuaRuntimeException("Attempt to add non-numbers");
             }
-
-            throw new LuaRuntimeException("Attempt to add non-numbers");
         }
 
         /// <summary>
@@ -49,29 +38,18 @@ namespace FLua.Runtime
         {
             // Check for metamethods first
             var metamethodResult = TryInvokeMetamethod(left, right, "__sub");
-            if (metamethodResult != null)
-                return metamethodResult;
+            if (metamethodResult.HasValue)
+                return metamethodResult.Value;
 
-            // Preserve integer type when both operands are integers
-            if (left.AsInteger.HasValue && right.AsInteger.HasValue)
+            // Use the built-in Subtract method from LuaValue struct
+            try
             {
-                try
-                {
-                    long result = checked(left.AsInteger.Value - right.AsInteger.Value);
-                    return new LuaInteger(result);
-                }
-                catch (OverflowException)
-                {
-                    // Fall back to floating point
-                    return new LuaNumber((double)left.AsInteger.Value - (double)right.AsInteger.Value);
-                }
+                return LuaValue.Subtract(left, right);
             }
-            else if (left.AsNumber.HasValue && right.AsNumber.HasValue)
+            catch (InvalidOperationException)
             {
-                return new LuaNumber(left.AsNumber.Value - right.AsNumber.Value);
+                throw new LuaRuntimeException("Attempt to subtract non-numbers");
             }
-
-            throw new LuaRuntimeException("Attempt to subtract non-numbers");
         }
 
         /// <summary>
@@ -81,29 +59,18 @@ namespace FLua.Runtime
         {
             // Check for metamethods first
             var metamethodResult = TryInvokeMetamethod(left, right, "__mul");
-            if (metamethodResult != null)
-                return metamethodResult;
+            if (metamethodResult.HasValue)
+                return metamethodResult.Value;
 
-            // Preserve integer type when both operands are integers
-            if (left.AsInteger.HasValue && right.AsInteger.HasValue)
+            // Use the built-in Multiply method from LuaValue struct
+            try
             {
-                try
-                {
-                    long result = checked(left.AsInteger.Value * right.AsInteger.Value);
-                    return new LuaInteger(result);
-                }
-                catch (OverflowException)
-                {
-                    // Fall back to floating point
-                    return new LuaNumber((double)left.AsInteger.Value * (double)right.AsInteger.Value);
-                }
+                return LuaValue.Multiply(left, right);
             }
-            else if (left.AsNumber.HasValue && right.AsNumber.HasValue)
+            catch (InvalidOperationException)
             {
-                return new LuaNumber(left.AsNumber.Value * right.AsNumber.Value);
+                throw new LuaRuntimeException("Attempt to multiply non-numbers");
             }
-
-            throw new LuaRuntimeException("Attempt to multiply non-numbers");
         }
 
         /// <summary>
@@ -113,17 +80,17 @@ namespace FLua.Runtime
         {
             // Check for metamethods first
             var metamethodResult = TryInvokeMetamethod(left, right, "__div");
-            if (metamethodResult != null)
-                return metamethodResult;
+            if (metamethodResult.HasValue)
+                return metamethodResult.Value;
 
-            if (left.AsNumber.HasValue && right.AsNumber.HasValue)
+            if (left.IsNumber && right.IsNumber)
             {
-                if (right.AsNumber.Value == 0)
+                if (right.AsNumber() == 0)
                 {
                     throw new LuaRuntimeException("Division by zero");
                 }
 
-                return new LuaNumber(left.AsNumber.Value / right.AsNumber.Value);
+                return LuaValue.Float(left.AsNumber() / right.AsNumber());
             }
 
             throw new LuaRuntimeException("Attempt to divide non-numbers");
@@ -136,17 +103,17 @@ namespace FLua.Runtime
         {
             // Check for metamethods first
             var metamethodResult = TryInvokeMetamethod(left, right, "__idiv");
-            if (metamethodResult != null)
-                return metamethodResult;
+            if (metamethodResult.HasValue)
+                return metamethodResult.Value;
 
-            if (left.AsNumber.HasValue && right.AsNumber.HasValue)
+            if (left.IsNumber && right.IsNumber)
             {
-                if (right.AsNumber.Value == 0)
+                if (right.AsNumber() == 0)
                 {
                     throw new LuaRuntimeException("Division by zero");
                 }
 
-                return new LuaNumber(Math.Floor(left.AsNumber.Value / right.AsNumber.Value));
+                return LuaValue.Number(Math.Floor(left.AsNumber() / right.AsNumber()));
             }
 
             throw new LuaRuntimeException("Attempt to perform floor division on non-numbers");
@@ -159,17 +126,17 @@ namespace FLua.Runtime
         {
             // Check for metamethods first
             var metamethodResult = TryInvokeMetamethod(left, right, "__mod");
-            if (metamethodResult != null)
-                return metamethodResult;
+            if (metamethodResult.HasValue)
+                return metamethodResult.Value;
 
-            if (left.AsNumber.HasValue && right.AsNumber.HasValue)
+            if (left.IsNumber && right.IsNumber)
             {
-                if (right.AsNumber.Value == 0)
+                if (right.AsNumber() == 0)
                 {
                     throw new LuaRuntimeException("Modulo by zero");
                 }
 
-                return new LuaNumber(left.AsNumber.Value % right.AsNumber.Value);
+                return LuaValue.Number(left.AsNumber() % right.AsNumber());
             }
 
             throw new LuaRuntimeException("Attempt to perform modulo on non-numbers");
@@ -182,12 +149,12 @@ namespace FLua.Runtime
         {
             // Check for metamethods first
             var metamethodResult = TryInvokeMetamethod(left, right, "__pow");
-            if (metamethodResult != null)
-                return metamethodResult;
+            if (metamethodResult.HasValue)
+                return metamethodResult.Value;
 
-            if (left.AsNumber.HasValue && right.AsNumber.HasValue)
+            if (left.IsNumber && right.IsNumber)
             {
-                return new LuaNumber(Math.Pow(left.AsNumber.Value, right.AsNumber.Value));
+                return LuaValue.Float(Math.Pow(left.AsNumber(), right.AsNumber()));
             }
 
             throw new LuaRuntimeException("Attempt to perform power operation on non-numbers");
@@ -200,8 +167,8 @@ namespace FLua.Runtime
         {
             // Check for metamethods first
             var metamethodResult = TryInvokeMetamethod(left, right, "__concat");
-            if (metamethodResult != null)
-                return metamethodResult;
+            if (metamethodResult.HasValue)
+                return metamethodResult.Value;
 
             var leftStr = LuaTypeConversion.ToConcatString(left);
             var rightStr = LuaTypeConversion.ToConcatString(right);
@@ -211,7 +178,7 @@ namespace FLua.Runtime
                 throw new LuaRuntimeException($"attempt to concatenate a {LuaTypeConversion.GetTypeName(leftStr == null ? left : right)} value");
             }
 
-            return new LuaString(leftStr + rightStr);
+            return LuaValue.String(leftStr + rightStr);
         }
 
         #region Comparison Operations
@@ -223,11 +190,11 @@ namespace FLua.Runtime
         {
             // Check for metamethods first
             var metamethodResult = TryInvokeMetamethod(left, right, "__eq");
-            if (metamethodResult != null)
-                return metamethodResult;
+            if (metamethodResult.HasValue)
+                return metamethodResult.Value;
 
             // Simple equality check for now
-            return new LuaBoolean(left.ToString() == right.ToString());
+            return LuaValue.Boolean(left.ToString() == right.ToString());
         }
 
         /// <summary>
@@ -237,11 +204,11 @@ namespace FLua.Runtime
         {
             // Lua doesn't have a __ne metamethod, so we just negate __eq
             var equalResult = Equal(left, right);
-            if (equalResult is LuaBoolean boolResult)
+            if (equalResult.IsBoolean)
             {
-                return new LuaBoolean(!boolResult.Value);
+                return LuaValue.Boolean(!equalResult.AsBoolean());
             }
-            return new LuaBoolean(false);
+            return LuaValue.Boolean(false);
         }
 
         /// <summary>
@@ -251,16 +218,16 @@ namespace FLua.Runtime
         {
             // Check for metamethods first
             var metamethodResult = TryInvokeMetamethod(left, right, "__lt");
-            if (metamethodResult != null)
-                return metamethodResult;
+            if (metamethodResult.HasValue)
+                return metamethodResult.Value;
 
-            if (left.AsNumber.HasValue && right.AsNumber.HasValue)
+            if (left.IsNumber && right.IsNumber)
             {
-                return new LuaBoolean(left.AsNumber.Value < right.AsNumber.Value);
+                return LuaValue.Boolean(left.AsNumber() < right.AsNumber());
             }
-            else if (left is LuaString leftStr && right is LuaString rightStr)
+            else if (left.IsString && right.IsString)
             {
-                return new LuaBoolean(leftStr.Value.CompareTo(rightStr.Value) < 0);
+                return LuaValue.Boolean(left.AsString().CompareTo(right.AsString()) < 0);
             }
 
             throw new LuaRuntimeException("Attempt to compare incompatible types");
@@ -273,16 +240,16 @@ namespace FLua.Runtime
         {
             // Check for metamethods first
             var metamethodResult = TryInvokeMetamethod(left, right, "__le");
-            if (metamethodResult != null)
-                return metamethodResult;
+            if (metamethodResult.HasValue)
+                return metamethodResult.Value;
 
-            if (left.AsNumber.HasValue && right.AsNumber.HasValue)
+            if (left.IsNumber && right.IsNumber)
             {
-                return new LuaBoolean(left.AsNumber.Value <= right.AsNumber.Value);
+                return LuaValue.Boolean(left.AsNumber() <= right.AsNumber());
             }
-            else if (left is LuaString leftStr && right is LuaString rightStr)
+            else if (left.IsString && right.IsString)
             {
-                return new LuaBoolean(leftStr.Value.CompareTo(rightStr.Value) <= 0);
+                return LuaValue.Boolean(left.AsString().CompareTo(right.AsString()) <= 0);
             }
 
             throw new LuaRuntimeException("Attempt to compare incompatible types");
@@ -316,7 +283,7 @@ namespace FLua.Runtime
         public static LuaValue And(LuaValue left, LuaValue right)
         {
             // In Lua, 'and' returns the first value if it's falsy, otherwise the second value
-            return LuaValue.IsValueTruthy(left) ? right : left;
+            return left.IsTruthy() ? right : left;
         }
 
         /// <summary>
@@ -325,7 +292,7 @@ namespace FLua.Runtime
         public static LuaValue Or(LuaValue left, LuaValue right)
         {
             // In Lua, 'or' returns the first value if it's truthy, otherwise the second value
-            return LuaValue.IsValueTruthy(left) ? left : right;
+            return left.IsTruthy() ? left : right;
         }
 
         #endregion
@@ -339,12 +306,12 @@ namespace FLua.Runtime
         {
             // Check for metamethods first
             var metamethodResult = TryInvokeMetamethod(left, right, "__band");
-            if (metamethodResult != null)
-                return metamethodResult;
+            if (metamethodResult.HasValue)
+                return metamethodResult.Value;
 
-            if (left.AsInteger.HasValue && right.AsInteger.HasValue)
+            if (left.IsInteger && right.IsInteger)
             {
-                return new LuaInteger(left.AsInteger.Value & right.AsInteger.Value);
+                return LuaValue.Integer(left.AsInteger() & right.AsInteger());
             }
 
             throw new LuaRuntimeException("Attempt to perform bitwise AND on non-integers");
@@ -357,12 +324,12 @@ namespace FLua.Runtime
         {
             // Check for metamethods first
             var metamethodResult = TryInvokeMetamethod(left, right, "__bor");
-            if (metamethodResult != null)
-                return metamethodResult;
+            if (metamethodResult.HasValue)
+                return metamethodResult.Value;
 
-            if (left.AsInteger.HasValue && right.AsInteger.HasValue)
+            if (left.IsInteger && right.IsInteger)
             {
-                return new LuaInteger(left.AsInteger.Value | right.AsInteger.Value);
+                return LuaValue.Integer(left.AsInteger() | right.AsInteger());
             }
 
             throw new LuaRuntimeException("Attempt to perform bitwise OR on non-integers");
@@ -375,12 +342,12 @@ namespace FLua.Runtime
         {
             // Check for metamethods first
             var metamethodResult = TryInvokeMetamethod(left, right, "__bxor");
-            if (metamethodResult != null)
-                return metamethodResult;
+            if (metamethodResult.HasValue)
+                return metamethodResult.Value;
 
-            if (left.AsInteger.HasValue && right.AsInteger.HasValue)
+            if (left.IsInteger && right.IsInteger)
             {
-                return new LuaInteger(left.AsInteger.Value ^ right.AsInteger.Value);
+                return LuaValue.Integer(left.AsInteger() ^ right.AsInteger());
             }
 
             throw new LuaRuntimeException("Attempt to perform bitwise XOR on non-integers");
@@ -393,12 +360,12 @@ namespace FLua.Runtime
         {
             // Check for metamethods first
             var metamethodResult = TryInvokeMetamethod(left, right, "__shl");
-            if (metamethodResult != null)
-                return metamethodResult;
+            if (metamethodResult.HasValue)
+                return metamethodResult.Value;
 
-            if (left.AsInteger.HasValue && right.AsInteger.HasValue)
+            if (left.IsInteger && right.IsInteger)
             {
-                var shift = right.AsInteger.Value;
+                var shift = right.AsInteger();
                 if (shift < 0)
                 {
                     throw new LuaRuntimeException("Negative shift count");
@@ -407,10 +374,10 @@ namespace FLua.Runtime
                 // Lua behavior: shifts >= 64 bits result in 0
                 if (shift >= 64)
                 {
-                    return new LuaInteger(0);
+                    return LuaValue.Integer(0);
                 }
 
-                return new LuaInteger(left.AsInteger.Value << (int)shift);
+                return LuaValue.Integer(left.AsInteger() << (int)shift);
             }
 
             throw new LuaRuntimeException("Attempt to perform left shift on non-integers");
@@ -423,12 +390,12 @@ namespace FLua.Runtime
         {
             // Check for metamethods first
             var metamethodResult = TryInvokeMetamethod(left, right, "__shr");
-            if (metamethodResult != null)
-                return metamethodResult;
+            if (metamethodResult.HasValue)
+                return metamethodResult.Value;
 
-            if (left.AsInteger.HasValue && right.AsInteger.HasValue)
+            if (left.IsInteger && right.IsInteger)
             {
-                var shift = right.AsInteger.Value;
+                var shift = right.AsInteger();
                 if (shift < 0)
                 {
                     throw new LuaRuntimeException("Negative shift count");
@@ -437,10 +404,10 @@ namespace FLua.Runtime
                 // Lua behavior: shifts >= 64 bits result in 0
                 if (shift >= 64)
                 {
-                    return new LuaInteger(0);
+                    return LuaValue.Integer(0);
                 }
 
-                return new LuaInteger(left.AsInteger.Value >> (int)shift);
+                return LuaValue.Integer(left.AsInteger() >> (int)shift);
             }
 
             throw new LuaRuntimeException("Attempt to perform right shift on non-integers");
@@ -458,7 +425,7 @@ namespace FLua.Runtime
         public static LuaValue Not(LuaValue value)
         {
             // 'not' has no metamethod in Lua
-            return new LuaBoolean(!LuaValue.IsValueTruthy(value));
+            return LuaValue.Boolean(!value.IsTruthy());
         }
 
         /// <summary>
@@ -468,12 +435,12 @@ namespace FLua.Runtime
         {
             // Check for metamethods first
             var metamethodResult = TryInvokeUnaryMetamethod(value, "__unm");
-            if (metamethodResult != null)
-                return metamethodResult;
+            if (metamethodResult.HasValue)
+                return metamethodResult.Value;
 
-            if (value.AsNumber.HasValue)
+            if (value.IsNumber)
             {
-                return new LuaNumber(-value.AsNumber.Value);
+                return LuaValue.Number(-value.AsNumber());
             }
 
             throw new LuaRuntimeException("Attempt to negate non-number");
@@ -486,16 +453,17 @@ namespace FLua.Runtime
         {
             // Check for metamethods first
             var metamethodResult = TryInvokeUnaryMetamethod(value, "__len");
-            if (metamethodResult != null)
-                return metamethodResult;
+            if (metamethodResult.HasValue)
+                return metamethodResult.Value;
 
-            if (value is LuaString str)
+            if (value.IsString)
             {
-                return new LuaInteger(str.Value.Length);
+                return LuaValue.Integer(value.AsString().Length);
             }
-            else if (value is LuaTable table)
+            else if (value.IsTable)
             {
-                return new LuaInteger(table.Array.Count);
+                var table = value.AsTable<LuaTable>();
+                return LuaValue.Integer(table.Array.Count);
             }
 
             throw new LuaRuntimeException("Attempt to get length of non-string/table");
@@ -508,12 +476,12 @@ namespace FLua.Runtime
         {
             // Check for metamethods first
             var metamethodResult = TryInvokeUnaryMetamethod(value, "__bnot");
-            if (metamethodResult != null)
-                return metamethodResult;
+            if (metamethodResult.HasValue)
+                return metamethodResult.Value;
 
-            if (value.AsInteger.HasValue)
+            if (value.IsInteger)
             {
-                return new LuaInteger(~value.AsInteger.Value);
+                return LuaValue.Integer(~value.AsInteger());
             }
 
             throw new LuaRuntimeException("Attempt to perform bitwise NOT on non-integer");
@@ -570,24 +538,26 @@ namespace FLua.Runtime
         public static LuaValue GetMethod(LuaEnvironment env, LuaValue obj, LuaValue methodName)
         {
             // For tables, use Get directly
-            if (obj is LuaTable table)
+            if (obj.IsTable)
             {
+                var table = obj.AsTable<LuaTable>();
                 return table.Get(methodName);
             }
             
             // For strings, get from string metatable
-            if (obj is LuaString)
+            if (obj.IsString)
             {
                 // Get the string library method
-                var stringLib = env.GetVariable("string") as LuaTable;
-                if (stringLib != null)
+                var stringLibValue = env.GetVariable("string");
+                if (stringLibValue.IsTable)
                 {
+                    var stringLib = stringLibValue.AsTable<LuaTable>();
                     return stringLib.Get(methodName);
                 }
             }
             
             // TODO: Handle other types with metatables
-            return LuaNil.Instance;
+            return LuaValue.Nil;
         }
 
         #endregion

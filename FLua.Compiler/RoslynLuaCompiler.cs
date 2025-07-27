@@ -18,12 +18,12 @@ public class RoslynLuaCompiler : ILuaCompiler
 {
     public string BackendName => "Roslyn";
     
-    public IEnumerable<CompilationTarget> SupportedTargets => new[]
-    {
+    public IEnumerable<CompilationTarget> SupportedTargets =>
+    [
         CompilationTarget.Library,
         CompilationTarget.ConsoleApp,
         CompilationTarget.NativeAot
-    };
+    ];
 
     public CompilationResult Compile(IList<Statement> ast, CompilerOptions options)
     {
@@ -83,7 +83,7 @@ public class RoslynLuaCompiler : ILuaCompiler
         {
             return new CompilationResult(
                 Success: false,
-                Errors: new[] { $"Compilation failed: {ex.Message}" },
+                Errors: [$"Compilation failed: {ex.Message}"],
                 Warnings: diagnostics.GetDiagnostics()
                     .Where(d => d.Severity == ErrorSeverity.Warning)
                     .Select(d => d.Message)
@@ -112,7 +112,7 @@ public class RoslynLuaCompiler : ILuaCompiler
         
         var compilation = CSharpCompilation.Create(
             assemblyName: options.AssemblyName ?? "LuaScript",
-            syntaxTrees: new[] { syntaxTree },
+            syntaxTrees: [syntaxTree],
             references: references,
             options: new CSharpCompilationOptions(
                 outputKind: options.Target == CompilationTarget.ConsoleApp 
@@ -259,7 +259,7 @@ public class RoslynLuaCompiler : ILuaCompiler
             {
                 return new CompilationResult(
                     Success: false,
-                    Errors: new[] { $"AOT compilation failed:\n{errors}\n{output}" },
+                    Errors: [$"AOT compilation failed:\n{errors}\n{output}"],
                     Warnings: diagnostics.GetDiagnostics()
                         .Where(d => d.Severity == ErrorSeverity.Warning)
                         .Select(d => d.Message)
@@ -289,7 +289,8 @@ public class RoslynLuaCompiler : ILuaCompiler
                 {
                     return new CompilationResult(
                         Success: false,
-                        Errors: new[] { $"AOT compilation succeeded but executable not found at: {exePath} or {altExePath}\nOutput:\n{output}" },
+                        Errors: [$"AOT compilation succeeded but executable not found at: {exePath} or {altExePath}\nOutput:\n{output}"
+                        ],
                         Warnings: diagnostics.GetDiagnostics()
                             .Where(d => d.Severity == ErrorSeverity.Warning)
                             .Select(d => d.Message)

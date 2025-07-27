@@ -19,7 +19,7 @@ namespace FLua.Compiler;
 public class CecilCodeGenerator
 {
     private readonly IDiagnosticCollector? _diagnostics;
-    private readonly Dictionary<string, VariableDefinition> _locals = new();
+    // Locals are now tracked in Scope.Locals
     private readonly Stack<Instruction> _breakTargets = new();
     
     // Cecil generation context
@@ -29,11 +29,12 @@ public class CecilCodeGenerator
     private MethodDefinition? _currentMethod;
     private ILProcessor? _il;
     
-    // Scope tracking for variable name mangling
+    // Scope tracking for variable name mangling and IL locals
     private class Scope
     {
         public Dictionary<string, string> Variables { get; } = new Dictionary<string, string>();
         public Dictionary<string, SourceLocation> VariableLocations { get; } = new Dictionary<string, SourceLocation>();
+        public Dictionary<string, VariableDefinition> Locals { get; } = new Dictionary<string, VariableDefinition>();
         public Scope? Parent { get; set; }
     }
     
@@ -53,6 +54,45 @@ public class CecilCodeGenerator
     public CecilCodeGenerator(IDiagnosticCollector? diagnostics = null)
     {
         _diagnostics = diagnostics;
+    }
+    
+    /// <summary>
+    /// Push a new scope for variable tracking
+    /// </summary>
+    private void PushScope()
+    {
+        var newScope = new Scope { Parent = _currentScope };
+        _currentScope = newScope;
+    }
+    
+    /// <summary>
+    /// Pop the current scope
+    /// </summary>
+    private void PopScope()
+    {
+        if (_currentScope.Parent != null)
+        {
+            _currentScope = _currentScope.Parent;
+        }
+    }
+    
+    /// <summary>
+    /// Find a local variable in the scope chain
+    /// </summary>
+    private VariableDefinition? FindLocal(string name)
+    {
+        var scope = _currentScope;
+        while (scope != null)
+        {
+            if (scope.Locals.TryGetValue(name, out var local))
+            {
+                // Found the local variable
+                return local;
+            }
+            scope = scope.Parent;
+        }
+        // Local not found - this might indicate a bug
+        return null;
     }
     
     /// <summary>
@@ -320,7 +360,7 @@ public class CecilCodeGenerator
             var boolLit = (Literal.Boolean)literal;
             _il!.Emit(boolLit.Item ? OpCodes.Ldc_I4_1 : OpCodes.Ldc_I4_0);
             var boolCtor = _module!.ImportReference(
-                typeof(LuaBoolean).GetConstructor(new[] { typeof(bool) }));
+                typeof(LuaBoolean).GetConstructor([typeof(bool)]));
             _il.Emit(OpCodes.Newobj, boolCtor);
         }
         else if (literal.IsInteger)
@@ -328,7 +368,7 @@ public class CecilCodeGenerator
             var intLit = (Literal.Integer)literal;
             _il!.Emit(OpCodes.Ldc_I8, (long)intLit.Item);
             var intCtor = _module!.ImportReference(
-                typeof(LuaInteger).GetConstructor(new[] { typeof(long) }));
+                typeof(LuaInteger).GetConstructor([typeof(long)]));
             _il.Emit(OpCodes.Newobj, intCtor);
         }
         else if (literal.IsFloat)
@@ -336,7 +376,7 @@ public class CecilCodeGenerator
             var floatLit = (Literal.Float)literal;
             _il!.Emit(OpCodes.Ldc_R8, floatLit.Item);
             var numberCtor = _module!.ImportReference(
-                typeof(LuaNumber).GetConstructor(new[] { typeof(double) }));
+                typeof(LuaNumber).GetConstructor([typeof(double)]));
             _il.Emit(OpCodes.Newobj, numberCtor);
         }
         else if (literal.IsString)
@@ -344,7 +384,7 @@ public class CecilCodeGenerator
             var stringLit = (Literal.String)literal;
             _il!.Emit(OpCodes.Ldstr, stringLit.Item);
             var stringCtor = _module!.ImportReference(
-                typeof(LuaString).GetConstructor(new[] { typeof(string) }));
+                typeof(LuaString).GetConstructor([typeof(string)]));
             _il.Emit(OpCodes.Newobj, stringCtor);
         }
     }
@@ -354,7 +394,8 @@ public class CecilCodeGenerator
     /// </summary>
     private void GenerateVariable(string name, VariableDefinition environment)
     {
-        if (_locals.TryGetValue(name, out var local))
+        var local = FindLocal(name);
+        if (local != null)
         {
             _il!.Emit(OpCodes.Ldloc, local);
         }
@@ -416,7 +457,7 @@ public class CecilCodeGenerator
         _il.Emit(OpCodes.Pop);
         _il.Emit(OpCodes.Ldstr, "Attempt to call a non-function value");
         var exceptionCtor = _module.ImportReference(
-            typeof(LuaRuntimeException).GetConstructor(new[] { typeof(string) }));
+            typeof(LuaRuntimeException).GetConstructor([typeof(string)]));
         _il.Emit(OpCodes.Newobj, exceptionCtor);
         _il.Emit(OpCodes.Throw);
         
@@ -500,8 +541,7 @@ public class CecilCodeGenerator
     {
         var variables = FSharpListHelpers.ToList(localAssign.Item1);
         var expressions = localAssign.Item2.HasValue() ? 
-            FSharpListHelpers.ToList(localAssign.Item2.Value) : 
-            new List<Expr>();
+            FSharpListHelpers.ToList(localAssign.Item2.Value) : [];
         
         for (int i = 0; i < variables.Count; i++)
         {
@@ -521,7 +561,13 @@ public class CecilCodeGenerator
             var local = new VariableDefinition(_luaValueType);
             _currentMethod!.Body.Variables.Add(local);
             _il!.Emit(OpCodes.Stloc, local);
-            _locals[varName] = local;
+            _currentScope.Locals[varName] = local;
+            
+            // DEBUG: Verify the local was stored
+            if (!_currentScope.Locals.ContainsKey(varName))
+            {
+                throw new InvalidOperationException($"Failed to store local variable '{varName}'");
+            }
         }
     }
     
@@ -550,12 +596,21 @@ public class CecilCodeGenerator
             if (variables[i] is Expr.Var variable)
             {
                 var varName = variable.Item;
-                if (_locals.TryGetValue(varName, out var local))
+                var local = FindLocal(varName);
+                if (local != null)
                 {
+                    // Debug: Add a comment to the IL
+                    _il!.Emit(OpCodes.Nop); // Debug marker for found local
                     _il!.Emit(OpCodes.Stloc, local);
                 }
                 else
                 {
+                    // DEBUG: This path should not be taken for local variables
+                    if (_currentScope.Locals.Count > 0)
+                    {
+                        var localVars = string.Join(", ", _currentScope.Locals.Keys);
+                        ReportError($"Variable '{varName}' not found in locals. Available locals: {localVars}", null);
+                    }
                     // Store value in temp
                     var tempLocal = new VariableDefinition(_luaValueType);
                     _currentMethod!.Body.Variables.Add(tempLocal);
@@ -610,7 +665,7 @@ public class CecilCodeGenerator
             GenerateExpression(condition, environment);
             var isTruthy = _module!.ImportReference(
                 typeof(LuaValue).GetProperty("IsTruthy")!.GetGetMethod());
-            _il.Emit(OpCodes.Call, isTruthy);
+            _il.Emit(OpCodes.Callvirt, isTruthy);
             _il.Emit(OpCodes.Brfalse, nextLabel);
             
             var blockStatements = FSharpListHelpers.ToList(block);
@@ -651,7 +706,7 @@ public class CecilCodeGenerator
         GenerateExpression(condition, environment);
         var isTruthy = _module!.ImportReference(
             typeof(LuaValue).GetProperty("IsTruthy")!.GetGetMethod());
-        _il.Emit(OpCodes.Call, isTruthy);
+        _il.Emit(OpCodes.Callvirt, isTruthy);
         _il.Emit(OpCodes.Brfalse, loopEnd);
         
         var blockStatements = FSharpListHelpers.ToList(block);
@@ -691,7 +746,7 @@ public class CecilCodeGenerator
         GenerateExpression(condition, environment);
         var isTruthy = _module!.ImportReference(
             typeof(LuaValue).GetProperty("IsTruthy")!.GetGetMethod());
-        _il.Emit(OpCodes.Call, isTruthy);
+        _il.Emit(OpCodes.Callvirt, isTruthy);
         
         // Loop if condition is false (until means loop while false)
         _il.Emit(OpCodes.Brfalse, loopStart);
@@ -734,7 +789,7 @@ public class CecilCodeGenerator
         // Initialize loop variable
         GenerateExpression(start, environment);
         _il!.Emit(OpCodes.Stloc, loopVar);
-        _locals[varName] = loopVar;
+        _currentScope.Locals[varName] = loopVar;
         
         // Initialize limit
         GenerateExpression(end, environment);
@@ -749,7 +804,7 @@ public class CecilCodeGenerator
         {
             _il.Emit(OpCodes.Ldc_I8, 1L);
             var intCtor = _module!.ImportReference(
-                typeof(LuaInteger).GetConstructor(new[] { typeof(long) }));
+                typeof(LuaInteger).GetConstructor([typeof(long)]));
             _il.Emit(OpCodes.Newobj, intCtor);
         }
         _il.Emit(OpCodes.Stloc, stepVar);
@@ -767,14 +822,14 @@ public class CecilCodeGenerator
         _il.Emit(OpCodes.Ldloc, stepVar);
         _il.Emit(OpCodes.Ldc_I8, 0L);
         var zeroInt = _module!.ImportReference(
-            typeof(LuaInteger).GetConstructor(new[] { typeof(long) }));
+            typeof(LuaInteger).GetConstructor([typeof(long)]));
         _il.Emit(OpCodes.Newobj, zeroInt);
         var greater = _module.ImportReference(
             typeof(LuaOperations).GetMethod("Greater"));
         _il.Emit(OpCodes.Call, greater);
         var isTruthy = _module.ImportReference(
             typeof(LuaValue).GetProperty("IsTruthy")!.GetGetMethod());
-        _il.Emit(OpCodes.Call, isTruthy);
+        _il.Emit(OpCodes.Callvirt, isTruthy);
         
         var checkNegativeStep = _il.Create(OpCodes.Nop);
         var executeBlock = _il.Create(OpCodes.Nop);
@@ -787,7 +842,7 @@ public class CecilCodeGenerator
         var lessEqual = _module.ImportReference(
             typeof(LuaOperations).GetMethod("LessEqual"));
         _il.Emit(OpCodes.Call, lessEqual);
-        _il.Emit(OpCodes.Call, isTruthy);
+        _il.Emit(OpCodes.Callvirt, isTruthy);
         _il.Emit(OpCodes.Brtrue, executeBlock);
         _il.Emit(OpCodes.Br, loopEnd);
         
@@ -798,7 +853,7 @@ public class CecilCodeGenerator
         var greaterEqual = _module.ImportReference(
             typeof(LuaOperations).GetMethod("GreaterEqual"));
         _il.Emit(OpCodes.Call, greaterEqual);
-        _il.Emit(OpCodes.Call, isTruthy);
+        _il.Emit(OpCodes.Callvirt, isTruthy);
         _il.Emit(OpCodes.Brfalse, loopEnd);
         
         // Execute block
@@ -821,7 +876,7 @@ public class CecilCodeGenerator
         _il.Append(loopEnd);
         
         _breakTargets.Pop();
-        _locals.Remove(varName); // Remove loop variable from scope
+        _currentScope.Locals.Remove(varName); // Remove loop variable from scope
     }
     
     /// <summary>
@@ -854,7 +909,7 @@ public class CecilCodeGenerator
                 // Push index
                 _il.Emit(OpCodes.Ldc_I8, (long)arrayIndex);
                 var intCtor = _module.ImportReference(
-                    typeof(LuaInteger).GetConstructor(new[] { typeof(long) }));
+                    typeof(LuaInteger).GetConstructor([typeof(long)]));
                 _il.Emit(OpCodes.Newobj, intCtor);
                 
                 // Push value
@@ -870,7 +925,7 @@ public class CecilCodeGenerator
                 // Push key (string)
                 _il.Emit(OpCodes.Ldstr, namedField.Item1);
                 var stringCtor = _module.ImportReference(
-                    typeof(LuaString).GetConstructor(new[] { typeof(string) }));
+                    typeof(LuaString).GetConstructor([typeof(string)]));
                 _il.Emit(OpCodes.Newobj, stringCtor);
                 
                 // Push value
@@ -917,7 +972,7 @@ public class CecilCodeGenerator
         _il.Emit(OpCodes.Pop);
         _il.Emit(OpCodes.Ldstr, "Attempt to index a non-table value");
         var exceptionCtor = _module.ImportReference(
-            typeof(LuaRuntimeException).GetConstructor(new[] { typeof(string) }));
+            typeof(LuaRuntimeException).GetConstructor([typeof(string)]));
         _il.Emit(OpCodes.Newobj, exceptionCtor);
         _il.Emit(OpCodes.Throw);
         

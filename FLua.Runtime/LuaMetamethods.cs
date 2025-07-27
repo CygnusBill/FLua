@@ -19,19 +19,22 @@ namespace FLua.Runtime
             if (metamethod == "__eq")
             {
                 // For equality, both values must have the same metatable with __eq defined
-                if (left is LuaTable leftTable && right is LuaTable rightTable)
+                if (left.Type == LuaType.Table && right.Type == LuaType.Table)
                 {
+                    var leftTable = left.AsTable<LuaTable>();
+                    var rightTable = right.AsTable<LuaTable>();
                     if (leftTable.Metatable == rightTable.Metatable && leftTable.Metatable != null)
                     {
-                        var eqFunc = leftTable.Metatable.RawGet(new LuaString(metamethod));
-                        if (eqFunc is LuaFunction eqFunction)
+                        var eqFunc = leftTable.Metatable.Get(LuaValue.String(metamethod));
+                        if (eqFunc.Type == LuaType.Function)
                         {
+                            var eqFunction = eqFunc.AsFunction<LuaFunction>();
                             var result = eqFunction.Call(new[] { left, right });
-                            return result.Length > 0 ? result[0] : LuaNil.Instance;
+                            return result.Length > 0 ? result[0] : LuaValue.Nil;
                         }
                     }
                 }
-                return null;
+                return LuaValue.Nil;
             }
 
             // Try left operand first
@@ -39,7 +42,7 @@ namespace FLua.Runtime
             if (leftMeta != null)
             {
                 var result = leftMeta.Call(new[] { left, right });
-                return result.Length > 0 ? result[0] : LuaNil.Instance;
+                return result.Length > 0 ? result[0] : LuaValue.Nil;
             }
 
             // Try right operand if left didn't have the metamethod
@@ -47,7 +50,7 @@ namespace FLua.Runtime
             if (rightMeta != null)
             {
                 var result = rightMeta.Call(new[] { left, right });
-                return result.Length > 0 ? result[0] : LuaNil.Instance;
+                return result.Length > 0 ? result[0] : LuaValue.Nil;
             }
 
             return null;
@@ -62,7 +65,7 @@ namespace FLua.Runtime
             if (meta != null)
             {
                 var result = meta.Call(new[] { value });
-                return result.Length > 0 ? result[0] : LuaNil.Instance;
+                return result.Length > 0 ? result[0] : LuaValue.Nil;
             }
 
             return null;
@@ -73,10 +76,17 @@ namespace FLua.Runtime
         /// </summary>
         public static LuaFunction? GetMetamethod(LuaValue value, string metamethod)
         {
-            if (value is LuaTable table && table.Metatable != null)
+            if (value.IsTable)
             {
-                var meta = table.Metatable.RawGet(new LuaString(metamethod));
-                return meta as LuaFunction;
+                var table = value.AsTable<LuaTable>();
+                if (table.Metatable != null)
+                {
+                    var meta = table.Metatable.RawGet(LuaValue.String(metamethod));
+                    if (meta.IsFunction)
+                    {
+                        return meta.AsFunction<LuaFunction>();
+                    }
+                }
             }
 
             // In the future, we might support metatables for other types
@@ -88,8 +98,9 @@ namespace FLua.Runtime
         /// </summary>
         public static LuaTable? GetMetatable(LuaValue value)
         {
-            if (value is LuaTable table)
+            if (value.IsTable)
             {
+                var table = value.AsTable<LuaTable>();
                 return table.Metatable;
             }
 
@@ -102,13 +113,14 @@ namespace FLua.Runtime
         /// </summary>
         public static bool SetMetatable(LuaValue value, LuaTable? metatable)
         {
-            if (value is LuaTable table)
+            if (value.IsTable)
             {
+                var table = value.AsTable<LuaTable>();
                 // Check for __metatable field which protects the metatable
                 if (table.Metatable != null)
                 {
-                    var protection = table.Metatable.RawGet(new LuaString("__metatable"));
-                    if (!(protection is LuaNil))
+                    var protection = table.Metatable.RawGet(LuaValue.String("__metatable"));
+                    if (!protection.IsNil)
                     {
                         throw new LuaRuntimeException("cannot change a protected metatable");
                     }
@@ -129,16 +141,18 @@ namespace FLua.Runtime
         {
             if (table.Metatable != null)
             {
-                var indexMeta = table.Metatable.RawGet(new LuaString("__index"));
+                var indexMeta = table.Metatable.RawGet(LuaValue.String("__index"));
                 
                 // __index can be a function or a table
-                if (indexMeta is LuaFunction indexFunc)
+                if (indexMeta.IsFunction)
                 {
-                    var result = indexFunc.Call(new[] { table, key });
-                    return result.Length > 0 ? result[0] : LuaNil.Instance;
+                    var indexFunc = indexMeta.AsFunction<LuaFunction>();
+                    var result = indexFunc.Call(new[] { LuaValue.Table(table), key });
+                    return result.Length > 0 ? result[0] : LuaValue.Nil;
                 }
-                else if (indexMeta is LuaTable indexTable)
+                else if (indexMeta.IsTable)
                 {
+                    var indexTable = indexMeta.AsTable<LuaTable>();
                     return indexTable.Get(key);
                 }
             }
@@ -153,16 +167,18 @@ namespace FLua.Runtime
         {
             if (table.Metatable != null)
             {
-                var newIndexMeta = table.Metatable.RawGet(new LuaString("__newindex"));
+                var newIndexMeta = table.Metatable.RawGet(LuaValue.String("__newindex"));
                 
                 // __newindex can be a function or a table
-                if (newIndexMeta is LuaFunction newIndexFunc)
+                if (newIndexMeta.IsFunction)
                 {
-                    newIndexFunc.Call(new[] { table, key, value });
+                    var newIndexFunc = newIndexMeta.AsFunction<LuaFunction>();
+                    newIndexFunc.Call(new[] { LuaValue.Table(table), key, value });
                     return true;
                 }
-                else if (newIndexMeta is LuaTable newIndexTable)
+                else if (newIndexMeta.IsTable)
                 {
+                    var newIndexTable = newIndexMeta.AsTable<LuaTable>();
                     newIndexTable.Set(key, value);
                     return true;
                 }
@@ -251,10 +267,10 @@ namespace FLua.Runtime
         {
             if (table.Metatable != null)
             {
-                var mode = table.Metatable.RawGet(new LuaString("__mode"));
-                if (mode is LuaString modeStr)
+                var mode = table.Metatable.RawGet(LuaValue.String("__mode"));
+                if (mode.IsString)
                 {
-                    return modeStr.Value;
+                    return mode.AsString();
                 }
             }
 
@@ -278,7 +294,10 @@ namespace FLua.Runtime
             var closeMeta = GetMetamethod(value, "__close");
             if (closeMeta != null)
             {
-                closeMeta.Call(error != null ? new[] { value, error } : new[] { value });
+                if (error.HasValue)
+                    closeMeta.Call(new[] { value, error.Value });
+                else
+                    closeMeta.Call(new[] { value });
             }
         }
     }

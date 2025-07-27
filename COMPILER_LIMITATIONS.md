@@ -103,7 +103,32 @@ This document outlines the known limitations of compiled Lua code versus interpr
 
 ### Known Bugs
 - While/repeat loops with local variable conditions cause infinite loops
+- Local variable assignments inside loops don't update the outer variable
 - Some edge cases in numeric for loops
+
+## Numeric Type Representation
+
+### Current Status
+- All numeric values use `LuaValue` objects (specifically `LuaInteger` and `LuaNumber`)
+- This ensures compatibility with Lua's numeric semantics but has performance overhead
+
+### Future Optimization Considerations
+1. **Loop Counters**: When we can prove bounds, use native int32/int64
+2. **Overflow Concerns**: Lua numbers can exceed int32/int64 range
+   - Lua uses double-precision floating point (53-bit integer precision)
+   - Loop counters could theoretically overflow int32 (±2.1 billion)
+   - Need type inference or runtime checks for safety
+3. **Type Choices**:
+   - **Safe but slow**: Always use `LuaValue` objects (current approach)
+   - **Fast but limited**: Use int32 with overflow checks
+   - **Balanced**: Use int64 for integers, double for floats
+   - **Complex**: Type inference to choose optimal representation
+4. **BigInteger Option**: Would handle all cases but very wasteful for typical usage
+
+### Recommendations
+- Phase 1: Fix correctness issues with current `LuaValue` approach
+- Phase 2: Add optimization passes for provable integer loops
+- Phase 3: Implement type inference for broader optimizations
 
 ## Future Considerations
 

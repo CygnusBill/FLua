@@ -42,7 +42,7 @@ namespace FLua.Runtime
                     {
                         Start = start,
                         End = start - 1, // Empty match: end before start
-                        Captures = new List<string>()
+                        Captures = []
                     };
                 }
                 
@@ -53,7 +53,7 @@ namespace FLua.Runtime
                     {
                         Start = index + 1, // Convert to 1-based
                         End = index + pattern.Length, // End position is inclusive (last character position)
-                        Captures = new List<string>()
+                        Captures = []
                     };
                 }
                 return null;
@@ -188,7 +188,7 @@ namespace FLua.Runtime
     {
         public int Start { get; set; } // 1-based
         public int End { get; set; }   // 1-based, exclusive
-        public List<string> Captures { get; set; } = new List<string>();
+        public List<string> Captures { get; set; } = [];
     }
 
     /// <summary>
@@ -222,7 +222,7 @@ namespace FLua.Runtime
                     {
                         Start = pos + 1, // Convert to 1-based
                         End = match.Value, // TryMatch returns 1-based end position
-                        Captures = new List<string>(captures)
+                        Captures = [..captures]
                     };
                 }
                 

@@ -17,44 +17,44 @@ namespace FLua.Runtime
             var mathTable = new LuaTable();
             
             // Constants
-            mathTable.Set(new LuaString("pi"), new LuaNumber(Math.PI));
-            mathTable.Set(new LuaString("huge"), new LuaNumber(double.PositiveInfinity));
-            mathTable.Set(new LuaString("mininteger"), new LuaInteger(long.MinValue));
-            mathTable.Set(new LuaString("maxinteger"), new LuaInteger(long.MaxValue));
+            mathTable.Set(LuaValue.String("pi"), LuaValue.Number(Math.PI));
+            mathTable.Set(LuaValue.String("huge"), LuaValue.Number(double.PositiveInfinity));
+            mathTable.Set(LuaValue.String("mininteger"), LuaValue.Integer(long.MinValue));
+            mathTable.Set(LuaValue.String("maxinteger"), LuaValue.Integer(long.MaxValue));
             
             // Basic arithmetic functions
-            mathTable.Set(new LuaString("abs"), new BuiltinFunction(Abs));
-            mathTable.Set(new LuaString("max"), new BuiltinFunction(Max));
-            mathTable.Set(new LuaString("min"), new BuiltinFunction(Min));
-            mathTable.Set(new LuaString("floor"), new BuiltinFunction(Floor));
-            mathTable.Set(new LuaString("ceil"), new BuiltinFunction(Ceil));
-            mathTable.Set(new LuaString("fmod"), new BuiltinFunction(FMod));
-            mathTable.Set(new LuaString("modf"), new BuiltinFunction(Modf));
+            mathTable.Set(LuaValue.String("abs"), new BuiltinFunction(Abs));
+            mathTable.Set(LuaValue.String("max"), new BuiltinFunction(Max));
+            mathTable.Set(LuaValue.String("min"), new BuiltinFunction(Min));
+            mathTable.Set(LuaValue.String("floor"), new BuiltinFunction(Floor));
+            mathTable.Set(LuaValue.String("ceil"), new BuiltinFunction(Ceil));
+            mathTable.Set(LuaValue.String("fmod"), new BuiltinFunction(FMod));
+            mathTable.Set(LuaValue.String("modf"), new BuiltinFunction(Modf));
             
             // Trigonometric functions
-            mathTable.Set(new LuaString("sin"), new BuiltinFunction(Sin));
-            mathTable.Set(new LuaString("cos"), new BuiltinFunction(Cos));
-            mathTable.Set(new LuaString("tan"), new BuiltinFunction(Tan));
-            mathTable.Set(new LuaString("asin"), new BuiltinFunction(ASin));
-            mathTable.Set(new LuaString("acos"), new BuiltinFunction(ACos));
-            mathTable.Set(new LuaString("atan"), new BuiltinFunction(ATan));
-            mathTable.Set(new LuaString("deg"), new BuiltinFunction(Deg));
-            mathTable.Set(new LuaString("rad"), new BuiltinFunction(Rad));
+            mathTable.Set(LuaValue.String("sin"), new BuiltinFunction(Sin));
+            mathTable.Set(LuaValue.String("cos"), new BuiltinFunction(Cos));
+            mathTable.Set(LuaValue.String("tan"), new BuiltinFunction(Tan));
+            mathTable.Set(LuaValue.String("asin"), new BuiltinFunction(ASin));
+            mathTable.Set(LuaValue.String("acos"), new BuiltinFunction(ACos));
+            mathTable.Set(LuaValue.String("atan"), new BuiltinFunction(ATan));
+            mathTable.Set(LuaValue.String("deg"), new BuiltinFunction(Deg));
+            mathTable.Set(LuaValue.String("rad"), new BuiltinFunction(Rad));
             
             // Exponential and logarithmic functions
-            mathTable.Set(new LuaString("exp"), new BuiltinFunction(Exp));
-            mathTable.Set(new LuaString("log"), new BuiltinFunction(Log));
-            mathTable.Set(new LuaString("sqrt"), new BuiltinFunction(Sqrt));
-            mathTable.Set(new LuaString("pow"), new BuiltinFunction(Pow));
+            mathTable.Set(LuaValue.String("exp"), new BuiltinFunction(Exp));
+            mathTable.Set(LuaValue.String("log"), new BuiltinFunction(Log));
+            mathTable.Set(LuaValue.String("sqrt"), new BuiltinFunction(Sqrt));
+            mathTable.Set(LuaValue.String("pow"), new BuiltinFunction(Pow));
             
             // Random functions
-            mathTable.Set(new LuaString("random"), new BuiltinFunction(Random));
-            mathTable.Set(new LuaString("randomseed"), new BuiltinFunction(RandomSeed));
+            mathTable.Set(LuaValue.String("random"), new BuiltinFunction(Random));
+            mathTable.Set(LuaValue.String("randomseed"), new BuiltinFunction(RandomSeed));
             
             // Type and conversion functions
-            mathTable.Set(new LuaString("type"), new BuiltinFunction(Type));
-            mathTable.Set(new LuaString("tointeger"), new BuiltinFunction(ToInteger));
-            mathTable.Set(new LuaString("ult"), new BuiltinFunction(Ult));
+            mathTable.Set(LuaValue.String("type"), new BuiltinFunction(Type));
+            mathTable.Set(LuaValue.String("tointeger"), new BuiltinFunction(ToInteger));
+            mathTable.Set(LuaValue.String("ult"), new BuiltinFunction(Ult));
             
             env.SetVariable("math", mathTable);
         }
@@ -67,16 +67,17 @@ namespace FLua.Runtime
                 throw new LuaRuntimeException("bad argument #1 to 'abs' (number expected)");
             
             var value = args[0];
-            if (value is LuaInteger intVal)
+            if (value.IsInteger)
             {
-                if (intVal.Value == long.MinValue)
-                    return new[] { new LuaInteger(long.MinValue) }; // MinValue abs is itself in Lua
-                return new[] { new LuaInteger(Math.Abs(intVal.Value)) };
+                var intVal = value.AsInteger();
+                if (intVal == long.MinValue)
+                    return [LuaValue.Integer(long.MinValue)]; // MinValue abs is itself in Lua
+                return [LuaValue.Integer(Math.Abs(intVal))];
             }
             
-            if (value.AsNumber.HasValue)
+            if (value.IsNumber)
             {
-                return new[] { new LuaNumber(Math.Abs(value.AsNumber.Value)) };
+                return [LuaValue.Number(Math.Abs(value.AsNumber()))];
             }
             
             throw new LuaRuntimeException("bad argument #1 to 'abs' (number expected)");
@@ -88,20 +89,20 @@ namespace FLua.Runtime
                 throw new LuaRuntimeException("bad argument #1 to 'max' (value expected)");
             
             var max = args[0];
-            if (!max.AsNumber.HasValue)
+            if (!max.IsNumber)
                 throw new LuaRuntimeException("bad argument #1 to 'max' (number expected)");
             
             for (int i = 1; i < args.Length; i++)
             {
                 var current = args[i];
-                if (!current.AsNumber.HasValue)
+                if (!current.IsNumber)
                     throw new LuaRuntimeException($"bad argument #{i + 1} to 'max' (number expected)");
                 
-                if (current.AsNumber.Value > max.AsNumber.Value)
+                if (current.AsNumber() > max.AsNumber())
                     max = current;
             }
             
-            return new[] { max };
+            return [max];
         }
         
         private static LuaValue[] Min(LuaValue[] args)
@@ -110,20 +111,20 @@ namespace FLua.Runtime
                 throw new LuaRuntimeException("bad argument #1 to 'min' (value expected)");
             
             var min = args[0];
-            if (!min.AsNumber.HasValue)
+            if (!min.IsNumber)
                 throw new LuaRuntimeException("bad argument #1 to 'min' (number expected)");
             
             for (int i = 1; i < args.Length; i++)
             {
                 var current = args[i];
-                if (!current.AsNumber.HasValue)
+                if (!current.IsNumber)
                     throw new LuaRuntimeException($"bad argument #{i + 1} to 'min' (number expected)");
                 
-                if (current.AsNumber.Value < min.AsNumber.Value)
+                if (current.AsNumber() < min.AsNumber())
                     min = current;
             }
             
-            return new[] { min };
+            return [min];
         }
         
         private static LuaValue[] Floor(LuaValue[] args)
@@ -132,16 +133,16 @@ namespace FLua.Runtime
                 throw new LuaRuntimeException("bad argument #1 to 'floor' (number expected)");
             
             var value = args[0];
-            if (value is LuaInteger)
-                return new[] { value }; // Integer is already floored
+            if (value.IsInteger)
+                return [value]; // Integer is already floored
             
-            if (value.AsNumber.HasValue)
+            if (value.IsNumber)
             {
-                var result = Math.Floor(value.AsNumber.Value);
+                var result = Math.Floor(value.AsNumber());
                 // Return integer if it fits in long range
                 if (result >= long.MinValue && result <= long.MaxValue && result == Math.Truncate(result))
-                    return new[] { new LuaInteger((long)result) };
-                return new[] { new LuaNumber(result) };
+                    return [LuaValue.Integer((long)result)];
+                return [LuaValue.Number(result)];
             }
             
             throw new LuaRuntimeException("bad argument #1 to 'floor' (number expected)");
@@ -153,16 +154,16 @@ namespace FLua.Runtime
                 throw new LuaRuntimeException("bad argument #1 to 'ceil' (number expected)");
             
             var value = args[0];
-            if (value is LuaInteger)
-                return new[] { value }; // Integer is already ceiled
+            if (value.IsInteger)
+                return [value]; // Integer is already ceiled
             
-            if (value.AsNumber.HasValue)
+            if (value.IsNumber)
             {
-                var result = Math.Ceiling(value.AsNumber.Value);
+                var result = Math.Ceiling(value.AsNumber());
                 // Return integer if it fits in long range
                 if (result >= long.MinValue && result <= long.MaxValue && result == Math.Truncate(result))
-                    return new[] { new LuaInteger((long)result) };
-                return new[] { new LuaNumber(result) };
+                    return [LuaValue.Integer((long)result)];
+                return [LuaValue.Number(result)];
             }
             
             throw new LuaRuntimeException("bad argument #1 to 'ceil' (number expected)");
@@ -176,21 +177,21 @@ namespace FLua.Runtime
             var x = args[0];
             var y = args[1];
             
-            if (!x.AsNumber.HasValue)
+            if (!x.IsNumber)
                 throw new LuaRuntimeException("bad argument #1 to 'fmod' (number expected)");
-            if (!y.AsNumber.HasValue)
+            if (!y.IsNumber)
                 throw new LuaRuntimeException("bad argument #2 to 'fmod' (number expected)");
             
-            if (y.AsNumber.Value == 0)
+            if (y.AsNumber() == 0)
                 throw new LuaRuntimeException("bad argument #2 to 'fmod' (zero)");
             
-            var result = x.AsNumber.Value % y.AsNumber.Value;
+            var result = x.AsNumber() % y.AsNumber();
             
             // Preserve integer type if both inputs are integers
             if (x is LuaInteger && y is LuaInteger)
-                return new[] { new LuaInteger((long)result) };
+                return [LuaValue.Integer((long)result)];
             
-            return new[] { new LuaNumber(result) };
+            return [LuaValue.Number(result)];
         }
         
         private static LuaValue[] Modf(LuaValue[] args)
@@ -199,20 +200,20 @@ namespace FLua.Runtime
                 throw new LuaRuntimeException("bad argument #1 to 'modf' (number expected)");
             
             var value = args[0];
-            if (!value.AsNumber.HasValue)
+            if (!value.IsNumber)
                 throw new LuaRuntimeException("bad argument #1 to 'modf' (number expected)");
             
-            var num = value.AsNumber.Value;
+            var num = value.AsNumber();
             var intPart = Math.Truncate(num);
             var fracPart = num - intPart;
             
             LuaValue intResult;
             if (intPart >= long.MinValue && intPart <= long.MaxValue && intPart == Math.Truncate(intPart))
-                intResult = new LuaInteger((long)intPart);
+                intResult = LuaValue.Integer((long)intPart);
             else
-                intResult = new LuaNumber(intPart);
+                intResult = LuaValue.Number(intPart);
             
-            return new[] { intResult, new LuaNumber(fracPart) };
+            return [intResult, LuaValue.Number(fracPart)];
         }
         
         #endregion
@@ -225,10 +226,10 @@ namespace FLua.Runtime
                 throw new LuaRuntimeException("bad argument #1 to 'sin' (number expected)");
             
             var value = args[0];
-            if (!value.AsNumber.HasValue)
+            if (!value.IsNumber)
                 throw new LuaRuntimeException("bad argument #1 to 'sin' (number expected)");
             
-            return new[] { new LuaNumber(Math.Sin(value.AsNumber.Value)) };
+            return [LuaValue.Number(Math.Sin(value.AsNumber()))];
         }
         
         private static LuaValue[] Cos(LuaValue[] args)
@@ -237,10 +238,10 @@ namespace FLua.Runtime
                 throw new LuaRuntimeException("bad argument #1 to 'cos' (number expected)");
             
             var value = args[0];
-            if (!value.AsNumber.HasValue)
+            if (!value.IsNumber)
                 throw new LuaRuntimeException("bad argument #1 to 'cos' (number expected)");
             
-            return new[] { new LuaNumber(Math.Cos(value.AsNumber.Value)) };
+            return [LuaValue.Number(Math.Cos(value.AsNumber()))];
         }
         
         private static LuaValue[] Tan(LuaValue[] args)
@@ -249,10 +250,10 @@ namespace FLua.Runtime
                 throw new LuaRuntimeException("bad argument #1 to 'tan' (number expected)");
             
             var value = args[0];
-            if (!value.AsNumber.HasValue)
+            if (!value.IsNumber)
                 throw new LuaRuntimeException("bad argument #1 to 'tan' (number expected)");
             
-            return new[] { new LuaNumber(Math.Tan(value.AsNumber.Value)) };
+            return [LuaValue.Number(Math.Tan(value.AsNumber()))];
         }
         
         private static LuaValue[] ASin(LuaValue[] args)
@@ -261,10 +262,10 @@ namespace FLua.Runtime
                 throw new LuaRuntimeException("bad argument #1 to 'asin' (number expected)");
             
             var value = args[0];
-            if (!value.AsNumber.HasValue)
+            if (!value.IsNumber)
                 throw new LuaRuntimeException("bad argument #1 to 'asin' (number expected)");
             
-            return new[] { new LuaNumber(Math.Asin(value.AsNumber.Value)) };
+            return [LuaValue.Number(Math.Asin(value.AsNumber()))];
         }
         
         private static LuaValue[] ACos(LuaValue[] args)
@@ -273,10 +274,10 @@ namespace FLua.Runtime
                 throw new LuaRuntimeException("bad argument #1 to 'acos' (number expected)");
             
             var value = args[0];
-            if (!value.AsNumber.HasValue)
+            if (!value.IsNumber)
                 throw new LuaRuntimeException("bad argument #1 to 'acos' (number expected)");
             
-            return new[] { new LuaNumber(Math.Acos(value.AsNumber.Value)) };
+            return [LuaValue.Number(Math.Acos(value.AsNumber()))];
         }
         
         private static LuaValue[] ATan(LuaValue[] args)
@@ -285,19 +286,19 @@ namespace FLua.Runtime
                 throw new LuaRuntimeException("bad argument #1 to 'atan' (number expected)");
             
             var value = args[0];
-            if (!value.AsNumber.HasValue)
+            if (!value.IsNumber)
                 throw new LuaRuntimeException("bad argument #1 to 'atan' (number expected)");
             
             if (args.Length >= 2)
             {
                 var x = args[1];
-                if (!x.AsNumber.HasValue)
+                if (!x.IsNumber)
                     throw new LuaRuntimeException("bad argument #2 to 'atan' (number expected)");
                 
-                return new[] { new LuaNumber(Math.Atan2(value.AsNumber.Value, x.AsNumber.Value)) };
+                return [LuaValue.Number(Math.Atan2(value.AsNumber(), x.AsNumber()))];
             }
             
-            return new[] { new LuaNumber(Math.Atan(value.AsNumber.Value)) };
+            return [LuaValue.Number(Math.Atan(value.AsNumber()))];
         }
         
         private static LuaValue[] Deg(LuaValue[] args)
@@ -306,10 +307,10 @@ namespace FLua.Runtime
                 throw new LuaRuntimeException("bad argument #1 to 'deg' (number expected)");
             
             var value = args[0];
-            if (!value.AsNumber.HasValue)
+            if (!value.IsNumber)
                 throw new LuaRuntimeException("bad argument #1 to 'deg' (number expected)");
             
-            return new[] { new LuaNumber(value.AsNumber.Value * 180.0 / Math.PI) };
+            return [LuaValue.Number(value.AsNumber() * 180.0 / Math.PI)];
         }
         
         private static LuaValue[] Rad(LuaValue[] args)
@@ -318,10 +319,10 @@ namespace FLua.Runtime
                 throw new LuaRuntimeException("bad argument #1 to 'rad' (number expected)");
             
             var value = args[0];
-            if (!value.AsNumber.HasValue)
+            if (!value.IsNumber)
                 throw new LuaRuntimeException("bad argument #1 to 'rad' (number expected)");
             
-            return new[] { new LuaNumber(value.AsNumber.Value * Math.PI / 180.0) };
+            return [LuaValue.Number(value.AsNumber() * Math.PI / 180.0)];
         }
         
         #endregion
@@ -334,10 +335,10 @@ namespace FLua.Runtime
                 throw new LuaRuntimeException("bad argument #1 to 'exp' (number expected)");
             
             var value = args[0];
-            if (!value.AsNumber.HasValue)
+            if (!value.IsNumber)
                 throw new LuaRuntimeException("bad argument #1 to 'exp' (number expected)");
             
-            return new[] { new LuaNumber(Math.Exp(value.AsNumber.Value)) };
+            return [LuaValue.Number(Math.Exp(value.AsNumber()))];
         }
         
         private static LuaValue[] Log(LuaValue[] args)
@@ -346,19 +347,19 @@ namespace FLua.Runtime
                 throw new LuaRuntimeException("bad argument #1 to 'log' (number expected)");
             
             var value = args[0];
-            if (!value.AsNumber.HasValue)
+            if (!value.IsNumber)
                 throw new LuaRuntimeException("bad argument #1 to 'log' (number expected)");
             
             if (args.Length >= 2)
             {
                 var baseValue = args[1];
-                if (!baseValue.AsNumber.HasValue)
+                if (!baseValue.IsNumber)
                     throw new LuaRuntimeException("bad argument #2 to 'log' (number expected)");
                 
-                return new[] { new LuaNumber(Math.Log(value.AsNumber.Value, baseValue.AsNumber.Value)) };
+                return [LuaValue.Number(Math.Log(value.AsNumber(), baseValue.AsNumber()))];
             }
             
-            return new[] { new LuaNumber(Math.Log(value.AsNumber.Value)) };
+            return [LuaValue.Number(Math.Log(value.AsNumber()))];
         }
         
         private static LuaValue[] Sqrt(LuaValue[] args)
@@ -367,10 +368,10 @@ namespace FLua.Runtime
                 throw new LuaRuntimeException("bad argument #1 to 'sqrt' (number expected)");
             
             var value = args[0];
-            if (!value.AsNumber.HasValue)
+            if (!value.IsNumber)
                 throw new LuaRuntimeException("bad argument #1 to 'sqrt' (number expected)");
             
-            return new[] { new LuaNumber(Math.Sqrt(value.AsNumber.Value)) };
+            return [LuaValue.Number(Math.Sqrt(value.AsNumber()))];
         }
         
         private static LuaValue[] Pow(LuaValue[] args)
@@ -381,12 +382,12 @@ namespace FLua.Runtime
             var x = args[0];
             var y = args[1];
             
-            if (!x.AsNumber.HasValue)
+            if (!x.IsNumber)
                 throw new LuaRuntimeException("bad argument #1 to 'pow' (number expected)");
-            if (!y.AsNumber.HasValue)
+            if (!y.IsNumber)
                 throw new LuaRuntimeException("bad argument #2 to 'pow' (number expected)");
             
-            return new[] { new LuaNumber(Math.Pow(x.AsNumber.Value, y.AsNumber.Value)) };
+            return [LuaValue.Number(Math.Pow(x.AsNumber(), y.AsNumber()))];
         }
         
         #endregion
@@ -398,16 +399,16 @@ namespace FLua.Runtime
             if (args.Length == 0)
             {
                 // Return random float between 0 and 1
-                return new[] { new LuaNumber(_random.NextDouble()) };
+                return [LuaValue.Number(_random.NextDouble())];
             }
             else if (args.Length == 1)
             {
                 // Return random integer between 1 and n
                 var n = args[0];
-                if (!n.AsInteger.HasValue || n.AsInteger.Value <= 0)
+                if (!n.IsInteger || n.AsInteger() <= 0)
                     throw new LuaRuntimeException("bad argument #1 to 'random' (interval is empty)");
                 
-                return new[] { new LuaInteger(_random.Next(1, (int)n.AsInteger.Value + 1)) };
+                return [LuaValue.Integer(_random.Next(1, (int)n.AsInteger() + 1))];
             }
             else if (args.Length >= 2)
             {
@@ -415,15 +416,15 @@ namespace FLua.Runtime
                 var m = args[0];
                 var n = args[1];
                 
-                if (!m.AsInteger.HasValue)
+                if (!m.IsInteger)
                     throw new LuaRuntimeException("bad argument #1 to 'random' (number expected)");
-                if (!n.AsInteger.HasValue)
+                if (!n.IsInteger)
                     throw new LuaRuntimeException("bad argument #2 to 'random' (number expected)");
                 
-                if (m.AsInteger.Value > n.AsInteger.Value)
+                if (m.AsInteger() > n.AsInteger())
                     throw new LuaRuntimeException("bad argument #2 to 'random' (interval is empty)");
                 
-                return new[] { new LuaInteger(_random.Next((int)m.AsInteger.Value, (int)n.AsInteger.Value + 1)) };
+                return [LuaValue.Integer(_random.Next((int)m.AsInteger(), (int)n.AsInteger() + 1))];
             }
             
             throw new LuaRuntimeException("bad arguments to 'random'");
@@ -437,18 +438,18 @@ namespace FLua.Runtime
                 var seed = Environment.TickCount;
                 var newRandom = new Random(seed);
                 // In a full implementation, we'd replace the global random instance
-                return new[] { new LuaInteger(seed), new LuaInteger(seed) };
+                return [LuaValue.Integer(seed), LuaValue.Integer(seed)];
             }
             else
             {
                 var seed = args[0];
-                if (!seed.AsInteger.HasValue)
+                if (!seed.IsInteger)
                     throw new LuaRuntimeException("bad argument #1 to 'randomseed' (number expected)");
                 
-                var seedValue = (int)seed.AsInteger.Value;
+                var seedValue = (int)seed.AsInteger();
                 var newRandom = new Random(seedValue);
                 // In a full implementation, we'd replace the global random instance
-                return new[] { new LuaInteger(seedValue), new LuaInteger(seedValue) };
+                return [LuaValue.Integer(seedValue), LuaValue.Integer(seedValue)];
             }
         }
         
@@ -459,55 +460,57 @@ namespace FLua.Runtime
         private static LuaValue[] Type(LuaValue[] args)
         {
             if (args.Length == 0)
-                return new[] { LuaNil.Instance };
+                return [LuaValue.Nil];
             
             var value = args[0];
-            string type = value switch
+            var type = value.Type switch
             {
-                LuaInteger => "integer",
-                LuaNumber => "float",
-                _ => LuaNil.Instance.ToString()
+                LuaType.Integer => "integer",
+                LuaType.Float => "float",
+                _ => "nil"
             };
             
             if (type == "nil")
-                return new[] { LuaNil.Instance };
+                return [LuaValue.Nil];
             
-            return new[] { new LuaString(type) };
+            return [LuaValue.String(type)];
         }
         
         private static LuaValue[] ToInteger(LuaValue[] args)
         {
             if (args.Length == 0)
-                return new[] { LuaNil.Instance };
+                return [LuaValue.Nil];
             
             var value = args[0];
             
-            if (value is LuaInteger)
-                return new[] { value };
+            if (value.IsInteger)
+                return [value];
             
-            if (value is LuaNumber num)
+            if (value.IsFloat)
             {
-                if (num.Value == Math.Truncate(num.Value) && 
-                    num.Value >= long.MinValue && num.Value <= long.MaxValue)
+                var num = value.AsFloat();
+                if (num == Math.Truncate(num) && 
+                    num >= long.MinValue && num <= long.MaxValue)
                 {
-                    return new[] { new LuaInteger((long)num.Value) };
+                    return [LuaValue.Integer((long)num)];
                 }
             }
             
-            if (value is LuaString str)
+            if (value.IsString)
             {
-                if (long.TryParse(str.Value.Trim(), out var result))
-                    return new[] { new LuaInteger(result) };
+                var str = value.AsString().Trim();
+                if (long.TryParse(str, out var result))
+                    return [LuaValue.Integer(result)];
                 
-                if (double.TryParse(str.Value.Trim(), out var floatResult) &&
+                if (double.TryParse(str, out var floatResult) &&
                     floatResult == Math.Truncate(floatResult) &&
                     floatResult >= long.MinValue && floatResult <= long.MaxValue)
                 {
-                    return new[] { new LuaInteger((long)floatResult) };
+                    return [LuaValue.Integer((long)floatResult)];
                 }
             }
             
-            return new[] { LuaNil.Instance };
+            return [LuaValue.Nil];
         }
         
         private static LuaValue[] Ult(LuaValue[] args)
@@ -518,16 +521,16 @@ namespace FLua.Runtime
             var x = args[0];
             var y = args[1];
             
-            if (!x.AsInteger.HasValue)
+            if (!x.IsInteger)
                 throw new LuaRuntimeException("bad argument #1 to 'ult' (number expected)");
-            if (!y.AsInteger.HasValue)
+            if (!y.IsInteger)
                 throw new LuaRuntimeException("bad argument #2 to 'ult' (number expected)");
             
             // Unsigned comparison
-            var ux = (ulong)x.AsInteger.Value;
-            var uy = (ulong)y.AsInteger.Value;
+            var ux = (ulong)x.AsInteger();
+            var uy = (ulong)y.AsInteger();
             
-            return new[] { new LuaBoolean(ux < uy) };
+            return [LuaValue.Boolean(ux < uy)];
         }
         
         #endregion

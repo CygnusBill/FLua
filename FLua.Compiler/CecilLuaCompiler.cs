@@ -18,8 +18,8 @@ public class CecilLuaCompiler : ILuaCompiler
 {
     private readonly IDiagnosticCollector _diagnostics = new DiagnosticCollector();
     
-    public IEnumerable<CompilationTarget> SupportedTargets => 
-        new[] { CompilationTarget.Library, CompilationTarget.ConsoleApp };
+    public IEnumerable<CompilationTarget> SupportedTargets =>
+        [CompilationTarget.Library, CompilationTarget.ConsoleApp];
     
     public string BackendName => "Mono.Cecil";
     
@@ -70,7 +70,7 @@ public class CecilLuaCompiler : ILuaCompiler
                 Success: false,
                 Assembly: null,
                 AssemblyPath: null,
-                Errors: new[] { errorMessage },
+                Errors: [errorMessage],
                 Warnings: GetWarnings()
             );
         }

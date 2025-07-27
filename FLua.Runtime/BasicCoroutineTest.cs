@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using FLua.Runtime;
 
 namespace FLua.Runtime.Tests
@@ -15,57 +16,66 @@ namespace FLua.Runtime.Tests
                 var env = LuaEnvironment.CreateStandardEnvironment();
                 
                 // Get coroutine functions
-                var coroutineTable = env.GetVariable("coroutine").AsTable!;
-                var createFunc = (LuaFunction)coroutineTable.Get(new LuaString("create"));
-                var resumeFunc = (LuaFunction)coroutineTable.Get(new LuaString("resume"));
-                var statusFunc = (LuaFunction)coroutineTable.Get(new LuaString("status"));
-                var yieldFunc = (LuaFunction)coroutineTable.Get(new LuaString("yield"));
+                var coroutineTableValue = env.GetVariable("coroutine");
+                if (!coroutineTableValue.IsTable)
+                    throw new Exception("coroutine library not found");
+                    
+                var coroutineTable = coroutineTableValue.AsTable<LuaTable>();
+                var createFunc = coroutineTable.Get(LuaValue.String("create")).AsFunction<LuaFunction>();
+                var resumeFunc = coroutineTable.Get(LuaValue.String("resume")).AsFunction<LuaFunction>();
+                var statusFunc = coroutineTable.Get(LuaValue.String("status")).AsFunction<LuaFunction>();
+                var yieldFuncValue = coroutineTable.Get(LuaValue.String("yield"));
+                var yieldFunc = yieldFuncValue.AsFunction<LuaFunction>();
                 
                 Console.WriteLine("✓ Coroutine library loaded successfully");
                 
                 // Test 1: Basic coroutine creation
-                var testFunc = new LuaUserFunction(args =>
+                var testFunc = new BuiltinFunction(args =>
                 {
-                    Console.WriteLine("  -> Coroutine started with args: " + string.Join(", ", (object[])args));
-                    return new[] { new LuaString("Hello from coroutine!") };
+                    Console.WriteLine("  -> Coroutine started with args: " + string.Join(", ", args.Select(a => a.ToString())));
+                    return [LuaValue.String("Hello from coroutine!")];
                 });
                 
-                var createResult = createFunc.Call(new[] { testFunc });
-                var coroutine = createResult[0] as LuaCoroutine;
+                var createResult = createFunc.Call(new[] { LuaValue.Function(testFunc) });
+                if (!createResult[0].IsUserData)
+                    throw new Exception("Failed to create coroutine");
+                var coroutine = createResult[0].AsUserData<LuaCoroutine>();
                 
                 Console.WriteLine("✓ Coroutine created: " + coroutine);
                 
                 // Test 2: Check initial status
-                var statusResult = statusFunc.Call(new LuaValue[] { coroutine! });
+                var statusResult = statusFunc.Call(new[] { createResult[0] });
                 Console.WriteLine($"✓ Initial status: {statusResult[0]}");
                 
                 // Test 3: Resume coroutine
-                var resumeResult = resumeFunc.Call(new LuaValue[] { coroutine!, new LuaString("test arg") });
+                var resumeResult = resumeFunc.Call(new[] { createResult[0], LuaValue.String("test arg") });
                 Console.WriteLine($"✓ Resume result: success={resumeResult[0]}, value={resumeResult[1]}");
                 
                 // Test 4: Check final status
-                statusResult = statusFunc.Call(new LuaValue[] { coroutine! });
+                statusResult = statusFunc.Call(new[] { createResult[0] });
                 Console.WriteLine($"✓ Final status: {statusResult[0]}");
                 
                 // Test 5: Producer pattern with yield
                 Console.WriteLine("\n--- Testing Producer Pattern ---");
                 
-                var producer = new LuaUserFunction(args =>
+                var producer = new BuiltinFunction(args =>
                 {
-                    yieldFunc.Call(new[] { new LuaString("first") });
-                    yieldFunc.Call(new[] { new LuaString("second") });
-                    return new[] { new LuaString("final") };
+                    yieldFunc.Call(new[] { LuaValue.String("first") });
+                    yieldFunc.Call(new[] { LuaValue.String("second") });
+                    return [LuaValue.String("final")];
                 });
                 
-                var producerCoroutine = (LuaCoroutine)createFunc.Call(new[] { producer })[0];
+                var producerCoroutineResult = createFunc.Call(new[] { LuaValue.Function(producer) });
+                var producerCoroutine = producerCoroutineResult[0];
                 
                 // Resume multiple times
                 for (int i = 0; i < 4; i++)
                 {
-                    var result = resumeFunc.Call(new LuaValue[] { producerCoroutine });
-                    var success = ((LuaBoolean)result[0]).Value;
+                    var result = resumeFunc.Call(new[] { producerCoroutine });
+                    var success = result[0].AsBoolean();
                     var value = result.Length > 1 ? result[1].ToString() : "none";
-                    var status = ((LuaString)statusFunc.Call(new LuaValue[] { producerCoroutine })[0]).Value;
+                    var statusValue = statusFunc.Call(new[] { producerCoroutine })[0];
+                    var status = statusValue.AsString();
                     
                     Console.WriteLine($"  Resume {i + 1}: success={success}, value={value}, status={status}");
                     

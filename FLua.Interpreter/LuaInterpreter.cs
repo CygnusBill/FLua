@@ -52,7 +52,7 @@ namespace FLua.Interpreter
                     var result = ExecuteStatements(ast);
                     
                     // Return the module's result or true if no explicit return
-                    return result.Length > 0 ? result : new[] { new LuaBoolean(true) };
+                    return result.Length > 0 ? result : [LuaValue.Boolean(true)];
                 }
                 finally
                 {
@@ -121,7 +121,7 @@ namespace FLua.Interpreter
                 gotoLabel = result.GotoLabel;
             }
 
-            return returnValues ?? Array.Empty<LuaValue>();
+            return returnValues ?? [];
         }
 
         /// <summary>
@@ -190,7 +190,7 @@ namespace FLua.Interpreter
                 var expressions = localAssign.Item2;
                 
                 // Evaluate expressions if present
-                LuaValue[] values = Array.Empty<LuaValue>();
+                LuaValue[] values = [];
                 if (FSharpOption<FSharpList<Expr>>.get_IsSome(expressions))
                 {
                     var exprList = expressions.Value.ToArray();
@@ -215,7 +215,7 @@ namespace FLua.Interpreter
                 for (int i = 0; i < variables.Length; i++)
                 {
                     var (name, attribute) = variables[i];
-                    var value = i < values.Length ? values[i] : LuaNil.Instance;
+                    var value = i < values.Length ? values[i] : LuaValue.Nil;
                     _environment.SetLocalVariable(name, value, InterpreterOperations.ConvertAttribute(attribute));
                 }
                 
@@ -237,7 +237,7 @@ namespace FLua.Interpreter
                 var expressions = returnStmt.Item;
                 
                 // Evaluate return expressions if present
-                LuaValue[] values = Array.Empty<LuaValue>();
+                LuaValue[] values = [];
                 if (FSharpOption<FSharpList<Expr>>.get_IsSome(expressions))
                 {
                     var exprList = expressions.Value;
@@ -245,7 +245,7 @@ namespace FLua.Interpreter
                 }
                 else
                 {
-                    values = new[] { LuaNil.Instance };
+                    values = [LuaValue.Nil];
                 }
                 
                 return new StatementResult { ReturnValues = values };
@@ -275,7 +275,7 @@ namespace FLua.Interpreter
                 for (int i = 0; i < varExprs.Length; i++)
                 {
                     var varExpr = varExprs[i];
-                    var value = i < values.Count ? values[i] : LuaNil.Instance;
+                    var value = i < values.Count ? values[i] : LuaValue.Nil;
                     
                     if (varExpr.IsVar)
                     {
@@ -295,9 +295,9 @@ namespace FLua.Interpreter
                         var tableValue = EvaluateExpr(tableAccess.Item1);
                         var keyValue = EvaluateExpr(tableAccess.Item2);
                         
-                        if (tableValue is LuaTable table)
+                        if (tableValue.IsTable)
                         {
-                            table.Set(keyValue, value);
+                            tableValue.AsTable<LuaTable>().Set(keyValue, value);
                         }
                         else
                         {
@@ -322,7 +322,7 @@ namespace FLua.Interpreter
                 foreach (var (condition, block) in conditionBlocks)
                 {
                     var conditionValue = EvaluateExpr(condition);
-                    if (LuaValue.IsValueTruthy(conditionValue))
+                    if (conditionValue.IsTruthy())
                     {
                         // Execute this block
                         return ExecuteBlock(block);
@@ -350,7 +350,7 @@ namespace FLua.Interpreter
                 {
                     // Check the condition
                     var conditionValue = EvaluateExpr(condition);
-                    if (!LuaValue.IsValueTruthy(conditionValue))
+                    if (!conditionValue.IsTruthy())
                     {
                         break;
                     }
@@ -401,7 +401,7 @@ namespace FLua.Interpreter
                     
                     // Check the condition (exit if true)
                     var conditionValue = EvaluateExpr(condition);
-                    if (LuaValue.IsValueTruthy(conditionValue))
+                    if (conditionValue.IsTruthy())
                     {
                         break;
                     }
@@ -428,7 +428,7 @@ namespace FLua.Interpreter
                 var funcDef = localFuncDef.Item2;
                 
                 // Create a closure for the local function
-                var closure = new LuaUserFunction(args =>
+                var closure = new BuiltinFunction(args =>
                 {
                     // Create a new environment for the function execution
                     var funcEnv = new LuaEnvironment(_environment);
@@ -452,7 +452,7 @@ namespace FLua.Interpreter
                                 var attribute = namedParam.Item2;
                                 
                                 // Set parameter value or nil if not enough arguments
-                                var value = paramIndex < args.Length ? args[paramIndex] : LuaNil.Instance;
+                                var value = paramIndex < args.Length ? args[paramIndex] : LuaValue.Nil;
                                 _environment.SetLocalVariable(paramName, value, InterpreterOperations.ConvertAttribute(attribute));
                                 paramIndex++;
                             }
@@ -470,10 +470,10 @@ namespace FLua.Interpreter
                             
                             for (int i = paramIndex; i < args.Length; i++)
                             {
-                                varargTable.Set(new LuaInteger(varargIndex++), args[i]);
+                                varargTable.Set(LuaValue.Integer(varargIndex++), args[i]);
                             }
                             
-                            _environment.SetLocalVariable("...", varargTable);
+                            _environment.SetLocalVariable("...", LuaValue.Table(varargTable));
                         }
                         
                         // Execute function body
@@ -489,7 +489,7 @@ namespace FLua.Interpreter
                 });
                 
                 // Bind the function as a local variable
-                _environment.SetLocalVariable(name, closure);
+                _environment.SetLocalVariable(name, LuaValue.Function(closure));
                 
                 return new StatementResult();
             }
@@ -500,7 +500,7 @@ namespace FLua.Interpreter
                 var functionDef = funcDef.Item2;
                 
                 // Create a closure for the function
-                var closure = new LuaUserFunction(args =>
+                var closure = new BuiltinFunction(args =>
                 {
                     // Create a new environment for the function execution
                     var funcEnv = new LuaEnvironment(_environment);
@@ -524,7 +524,7 @@ namespace FLua.Interpreter
                                 var attribute = namedParam.Item2;
                                 
                                 // Set parameter value or nil if not enough arguments
-                                var value = paramIndex < args.Length ? args[paramIndex] : LuaNil.Instance;
+                                var value = paramIndex < args.Length ? args[paramIndex] : LuaValue.Nil;
                                 _environment.SetLocalVariable(paramName, value, InterpreterOperations.ConvertAttribute(attribute));
                                 paramIndex++;
                             }
@@ -542,10 +542,10 @@ namespace FLua.Interpreter
                             
                             for (int i = paramIndex; i < args.Length; i++)
                             {
-                                varargTable.Set(new LuaInteger(varargIndex++), args[i]);
+                                varargTable.Set(LuaValue.Integer(varargIndex++), args[i]);
                             }
                             
-                            _environment.SetLocalVariable("...", varargTable);
+                            _environment.SetLocalVariable("...", LuaValue.Table(varargTable));
                         }
                         
                         // Execute function body
@@ -567,7 +567,7 @@ namespace FLua.Interpreter
                 else if (path.Length == 1)
                 {
                     // Simple global function: function name() end
-                    _environment.SetVariable(path[0], closure);
+                    _environment.SetVariable(path[0], LuaValue.Function(closure));
                 }
                 else
                 {
@@ -577,14 +577,14 @@ namespace FLua.Interpreter
                     
                     // Create table if it doesn't exist
                     LuaTable baseTable;
-                    if (baseValue is LuaTable table)
+                    if (baseValue.IsTable)
                     {
-                        baseTable = table;
+                        baseTable = baseValue.AsTable<LuaTable>();
                     }
-                    else if (baseValue == LuaNil.Instance)
+                    else if (baseValue.IsNil)
                     {
                         baseTable = new LuaTable();
-                        _environment.SetVariable(baseName, baseTable);
+                        _environment.SetVariable(baseName, LuaValue.Table(baseTable));
                     }
                     else
                     {
@@ -596,17 +596,17 @@ namespace FLua.Interpreter
                     for (int i = 1; i < path.Length - 1; i++)
                     {
                         string fieldName = path[i];
-                        var fieldValue = currentTable.Get(new LuaString(fieldName));
+                        var fieldValue = currentTable.Get(LuaValue.String(fieldName));
                         
-                        if (fieldValue is LuaTable nextTable)
+                        if (fieldValue.IsTable)
                         {
-                            currentTable = nextTable;
+                            currentTable = fieldValue.AsTable<LuaTable>();;
                         }
-                        else if (fieldValue == LuaNil.Instance)
+                        else if (fieldValue.IsNil)
                         {
                             // Create nested table
                             var newTable = new LuaTable();
-                            currentTable.Set(new LuaString(fieldName), newTable);
+                            currentTable.Set(LuaValue.String(fieldName), LuaValue.Table(newTable));
                             currentTable = newTable;
                         }
                         else
@@ -616,7 +616,7 @@ namespace FLua.Interpreter
                     }
                     
                     // Set the function at the final path element
-                    currentTable.Set(new LuaString(path[path.Length - 1]), closure);
+                    currentTable.Set(LuaValue.String(path[^1]), LuaValue.Function(closure));
                 }
                 
                 return new StatementResult();
@@ -647,17 +647,17 @@ namespace FLua.Interpreter
                 var endVal = EvaluateExpr(endExpr);
                 var stepVal = FSharpOption<Expr>.get_IsSome(stepExpr) 
                     ? EvaluateExpr(stepExpr.Value) 
-                    : new LuaNumber(1.0);
+                    : LuaValue.Number(1.0);
                 
                 // Ensure all values are numbers
-                if (!startVal.AsNumber.HasValue || !endVal.AsNumber.HasValue || !stepVal.AsNumber.HasValue)
+                if (!startVal.IsNumber || !endVal.IsNumber || !stepVal.IsNumber)
                 {
                     throw new LuaRuntimeException("For loop limits and step must be numbers");
                 }
                 
-                double start = startVal.AsNumber.Value;
-                double end = endVal.AsNumber.Value;
-                double step = stepVal.AsNumber.Value;
+                double start = startVal.AsNumber();
+                double end = endVal.AsNumber();
+                double step = stepVal.AsNumber();
                 
                 if (step == 0)
                 {
@@ -680,7 +680,7 @@ namespace FLua.Interpreter
                     while ((step > 0 && current <= end) || (step < 0 && current >= end))
                     {
                         // Set the loop variable
-                        _environment.SetLocalVariable(varName, new LuaNumber(current));
+                        _environment.SetLocalVariable(varName, LuaValue.Number(current));
                         
                         // Execute the body
                         result = ExecuteStatementsWithResult(body);
@@ -740,7 +740,7 @@ namespace FLua.Interpreter
                 // Pad with nil if needed
                 while (iterValues.Count < 3)
                 {
-                    iterValues.Add(LuaNil.Instance);
+                    iterValues.Add(LuaValue.Nil);
                 }
                 
                 // Get iterator function, state, and initial value
@@ -748,7 +748,7 @@ namespace FLua.Interpreter
                 var stateVal = iterValues[1];
                 var initialVal = iterValues[2];
                 
-                if (!(iteratorFunc is LuaFunction))
+                if (!iteratorFunc.IsFunction)
                 {
                     throw new LuaRuntimeException("Iterator must be a function");
                 }
@@ -769,10 +769,11 @@ namespace FLua.Interpreter
                     while (true)
                     {
                         // Call iterator function: iterator(state, key)
-                        var iterResults = ((LuaFunction)iteratorFunc).Call(new[] { stateVal, currentKey });
+                        var iterFunc = iteratorFunc.AsFunction<LuaFunction>();
+                        var iterResults = iterFunc.Call(new[] { stateVal, currentKey });
                         
                         // Check if iteration is complete
-                        if (iterResults.Length == 0 || iterResults[0] == LuaNil.Instance)
+                        if (iterResults.Length == 0 || iterResults[0] == LuaValue.Nil)
                         {
                             break;
                         }
@@ -784,7 +785,7 @@ namespace FLua.Interpreter
                         for (int i = 0; i < variables.Length; i++)
                         {
                             var (varName, _) = variables[i];
-                            var value = i < iterResults.Length ? iterResults[i] : LuaNil.Instance;
+                            var value = i < iterResults.Length ? iterResults[i] : LuaValue.Nil;
                             _environment.SetLocalVariable(varName, value);
                         }
                         
@@ -824,7 +825,8 @@ namespace FLua.Interpreter
         /// </summary>
         private LuaValue EvaluateExpr(Expr expr)
         {
-            return EvaluateExprWithMultipleReturns(expr).FirstOrDefault() ?? LuaNil.Instance;
+            var returnList = EvaluateExprWithMultipleReturns(expr);
+            return returnList.Length > 0 ? returnList[0] : LuaValue.Nil;
         }
         
         /// <summary>
@@ -835,19 +837,19 @@ namespace FLua.Interpreter
             if (expr.IsLiteral)
             {
                 var literal = (Expr.Literal)expr;
-                return new[] { EvaluateLiteral(literal.Item) };
+                return [EvaluateLiteral(literal.Item)];
             }
             else if (expr.IsVar)
             {
                 var variable = (Expr.Var)expr;
-                return new[] { _environment.GetVariable(variable.Item) };
+                return [_environment.GetVariable(variable.Item)];
             }
             else if (expr.IsVarPos)
             {
                 var variable = (Expr.VarPos)expr;
                 try
                 {
-                    return new[] { _environment.GetVariable(variable.Item1) };
+                    return [_environment.GetVariable(variable.Item1)];
                 }
                 catch (LuaRuntimeException ex) when (ex.Diagnostic == null)
                 {
@@ -862,14 +864,14 @@ namespace FLua.Interpreter
                 var op = binary.Item2;
                 var right = EvaluateExpr(binary.Item3);
                 
-                return new[] { EvaluateBinaryOp(left, op, right) };
+                return [EvaluateBinaryOp(left, op, right)];
             }
             else if (expr.IsUnary)
             {
                 var unary = (Expr.Unary)expr;
                 var value = EvaluateExpr(unary.Item2);
                 
-                return new[] { EvaluateUnaryOp(unary.Item1, value) };
+                return [EvaluateUnaryOp(unary.Item1, value)];
             }
             else if (expr.IsTableAccess)
             {
@@ -877,9 +879,9 @@ namespace FLua.Interpreter
                 var tableValue = EvaluateExpr(tableAccess.Item1);
                 var keyValue = EvaluateExpr(tableAccess.Item2);
                 
-                if (tableValue is LuaTable table)
+                if (tableValue.IsTable)
                 {
-                    return new[] { table.Get(keyValue) };
+                    return [tableValue.AsTable<LuaTable>().Get(keyValue)];
                 }
                 
                 throw new LuaRuntimeException("Attempt to index non-table");
@@ -890,22 +892,24 @@ namespace FLua.Interpreter
                 var func = EvaluateExpr(funcCall.Item1);
                 var args = funcCall.Item2.ToArray().Select(EvaluateExpr).ToArray();
                 
-                if (func is LuaFunction function)
+                if (func.IsFunction)
                 {
-                    return function.Call(args);
+                    return func.AsFunction<LuaFunction>().Call(args);
                 }
-                else if (func is LuaTable table && table.Metatable != null)
+                else if (func.IsTable && func.AsTable<LuaTable>().Metatable != null)
                 {
+                    var table = func.AsTable<LuaTable>();
+                    
                     // Check for __call metamethod
-                    var callMethod = table.Metatable.RawGet(new LuaString("__call"));
-                    if (callMethod is LuaFunction callFunction)
+                    var callMethod = table.Metatable!.RawGet(LuaValue.String("__call"));
+                    if (callMethod.IsFunction)
                     {
                         // Add the table itself as the first argument
                         var callArgs = new LuaValue[args.Length + 1];
                         callArgs[0] = table;
                         Array.Copy(args, 0, callArgs, 1, args.Length);
                         
-                        return callFunction.Call(callArgs);
+                        return callMethod.AsFunction<LuaFunction>().Call(callArgs);
                     }
                 }
                 
@@ -919,22 +923,24 @@ namespace FLua.Interpreter
                 
                 try
                 {
-                    if (func is LuaFunction function)
+                    if (func.IsFunction)
                     {
-                        return function.Call(args);
+                        return func.AsFunction<LuaFunction>().Call(args);
                     }
-                    else if (func is LuaTable table && table.Metatable != null)
+                    else if (func.IsTable && func.AsTable<LuaTable>().Metatable != null)
                     {
+                        var table = func.AsTable<LuaTable>();
+                        
                         // Check for __call metamethod
-                        var callMethod = table.Metatable.RawGet(new LuaString("__call"));
-                        if (callMethod is LuaFunction callFunction)
+                        var callMethod = table.Metatable!.RawGet(LuaValue.String("__call"));
+                        if (callMethod.IsFunction)
                         {
                             // Add the table itself as the first argument
                             var callArgs = new LuaValue[args.Length + 1];
                             callArgs[0] = table;
                             Array.Copy(args, 0, callArgs, 1, args.Length);
                             
-                            return callFunction.Call(callArgs);
+                            return callMethod.AsFunction<LuaFunction>().Call(callArgs);
                         }
                     }
                     
@@ -960,11 +966,11 @@ namespace FLua.Interpreter
                 var args = argExprs.ToArray().Select(EvaluateExpr).ToArray();
                 
                 // Get the method from the object (which should be a table)
-                if (objValue is LuaTable table)
+                if (objValue.IsTable)
                 {
-                    var methodValue = table.Get(new LuaString(methodName));
+                    var methodValue = objValue.AsTable<LuaTable>().Get(LuaValue.String(methodName));
                     
-                    if (methodValue is LuaFunction method)
+                    if (methodValue.IsFunction)
                     {
                         // Add the object as the first argument (self)
                         var callArgs = new LuaValue[args.Length + 1];
@@ -972,7 +978,7 @@ namespace FLua.Interpreter
                         Array.Copy(args, 0, callArgs, 1, args.Length);
                         
                         // Call the method
-                        return method.Call(callArgs);
+                        return methodValue.AsFunction<LuaFunction>().Call(callArgs);
                     }
                     
                     throw new LuaRuntimeException($"Attempt to call method '{methodName}' on table (not a function)");
@@ -992,14 +998,14 @@ namespace FLua.Interpreter
                     {
                         var exprField = (TableField.ExprField)field;
                         var value = EvaluateExpr(exprField.Item);
-                        table.Set(new LuaInteger(arrayIndex++), value);
+                        table.Set(LuaValue.Integer(arrayIndex++), value);
                     }
                     else if (field.IsNamedField)
                     {
                         var namedField = (TableField.NamedField)field;
                         var name = namedField.Item1;
                         var value = EvaluateExpr(namedField.Item2);
-                        table.Set(new LuaString(name), value);
+                        table.Set(LuaValue.String(name), value);
                     }
                     else if (field.IsKeyField)
                     {
@@ -1010,7 +1016,7 @@ namespace FLua.Interpreter
                     }
                 }
                 
-                return new[] { table };
+                return [LuaValue.Table(table)];
             }
             else if (expr.IsFunctionDef)
             {
@@ -1018,8 +1024,7 @@ namespace FLua.Interpreter
                 var functionDef = funcDef.Item;
                 
                 // Create a closure for the function
-                return new[] {
-                    new LuaUserFunction(args =>
+                var funcClosure = new BuiltinFunction(args =>
                     {
                         // Create a new environment for the function execution
                         var funcEnv = new LuaEnvironment(_environment);
@@ -1042,7 +1047,7 @@ namespace FLua.Interpreter
                                     var paramName = namedParam.Item1;
                                     
                                     // Set parameter value or nil if not enough arguments
-                                    var value = paramIndex < args.Length ? args[paramIndex] : LuaNil.Instance;
+                                    var value = paramIndex < args.Length ? args[paramIndex] : LuaValue.Nil;
                                     _environment.SetLocalVariable(paramName, value);
                                     paramIndex++;
                                 }
@@ -1060,10 +1065,10 @@ namespace FLua.Interpreter
                                 
                                 for (int i = paramIndex; i < args.Length; i++)
                                 {
-                                    varargTable.Set(new LuaInteger(varargIndex++), args[i]);
+                                    varargTable.Set(LuaValue.Integer(varargIndex++), args[i]);
                                 }
                                 
-                                _environment.SetLocalVariable("...", varargTable);
+                                _environment.SetLocalVariable("...", LuaValue.Table(varargTable));
                             }
                             
                             // Execute function body
@@ -1076,22 +1081,22 @@ namespace FLua.Interpreter
                             // Restore original environment
                             _environment = originalEnv;
                         }
-                    })
-                };
+                    });
+                return [LuaValue.Function(funcClosure)];
             }
             else if (expr.IsVararg)
             {
                 // Access varargs stored as "..." in the environment
                 var varargValue = _environment.GetVariable("...");
                 
-                if (varargValue is LuaTable varargTable)
+                if (varargValue.IsTable)
                 {
                     // Extract all values from the vararg table
                     var values = new List<LuaValue>();
                     for (long i = 1; ; i++)
                     {
-                        var value = varargTable.Get(new LuaInteger(i));
-                        if (value == LuaNil.Instance)
+                        var value = varargValue.AsTable<LuaTable>().Get(LuaValue.Integer(i));
+                        if (value.IsNil)
                             break;
                         values.Add(value);
                     }
@@ -1120,27 +1125,27 @@ namespace FLua.Interpreter
         {
             if (literal.IsNil)
             {
-                return LuaNil.Instance;
+                return LuaValue.Nil;
             }
             else if (literal.IsBoolean)
             {
                 var boolLiteral = (Literal.Boolean)literal;
-                return new LuaBoolean(boolLiteral.Item);
+                return LuaValue.Boolean(boolLiteral.Item);
             }
             else if (literal.IsInteger)
             {
                 var intLiteral = (Literal.Integer)literal;
-                return new LuaInteger((long)intLiteral.Item);
+                return LuaValue.Integer((long)intLiteral.Item);
             }
             else if (literal.IsFloat)
             {
                 var floatLiteral = (Literal.Float)literal;
-                return new LuaNumber(floatLiteral.Item);
+                return LuaValue.Number(floatLiteral.Item);
             }
             else if (literal.IsString)
             {
                 var stringLiteral = (Literal.String)literal;
-                return new LuaString(stringLiteral.Item);
+                return LuaValue.String(stringLiteral.Item);
             }
             else
             {
