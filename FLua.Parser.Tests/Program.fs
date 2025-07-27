@@ -547,21 +547,39 @@ let tests = testList "Parser Tests" [
                     (Statement.Assignment([Expr.TableAccess(Expr.Var "t", Expr.Literal (Literal.Integer 1I))], [Expr.Literal (Literal.Integer 2I)]))
             ]
             
-            testList "Table Access in Binary Expressions (TODO: Fix Parser)" [
-                // The parser has issues with table access directly followed by binary operators
-                // See PARSER_KNOWN_ISSUES.md for details
+            testList "Table Access in Binary Expressions (Fixed)" [
+                // Previously had issues with table access directly followed by binary operators
+                // Fixed by adding whitespace consumption after bracket access
                 
-                // testExpr "table access addition" "t[1] + t[2]"
-                //     (Expr.Binary(
-                //         Expr.TableAccess(Expr.Var "t", Expr.Literal (Literal.Integer 1I)),
-                //         BinaryOp.Add,
-                //         Expr.TableAccess(Expr.Var "t", Expr.Literal (Literal.Integer 2I))))
+                testExpr "table access addition" "t[1] + t[2]"
+                    (Expr.Binary(
+                        Expr.TableAccess(Expr.Var "t", Expr.Literal (Literal.Integer 1I)),
+                        BinaryOp.Add,
+                        Expr.TableAccess(Expr.Var "t", Expr.Literal (Literal.Integer 2I))))
                 
-                // testExpr "table dot access addition" "t.x + t.y"
-                //     (Expr.Binary(
-                //         Expr.TableAccess(Expr.Var "t", Expr.Literal (Literal.String "x")),
-                //         BinaryOp.Add,
-                //         Expr.TableAccess(Expr.Var "t", Expr.Literal (Literal.String "y"))))
+                testExpr "table dot access addition" "t.x + t.y"
+                    (Expr.Binary(
+                        Expr.TableAccess(Expr.Var "t", Expr.Literal (Literal.String "x")),
+                        BinaryOp.Add,
+                        Expr.TableAccess(Expr.Var "t", Expr.Literal (Literal.String "y"))))
+                        
+                testExpr "complex table expression" "t[1] * 2 + t[2] / 2"
+                    (Expr.Binary(
+                        Expr.Binary(
+                            Expr.TableAccess(Expr.Var "t", Expr.Literal (Literal.Integer 1I)),
+                            BinaryOp.Multiply,
+                            Expr.Literal (Literal.Integer 2I)),
+                        BinaryOp.Add,
+                        Expr.Binary(
+                            Expr.TableAccess(Expr.Var "t", Expr.Literal (Literal.Integer 2I)),
+                            BinaryOp.FloatDiv,
+                            Expr.Literal (Literal.Integer 2I))))
+                            
+                testExpr "whitespace variations" "t[1]  +  t[2]"
+                    (Expr.Binary(
+                        Expr.TableAccess(Expr.Var "t", Expr.Literal (Literal.Integer 1I)),
+                        BinaryOp.Add,
+                        Expr.TableAccess(Expr.Var "t", Expr.Literal (Literal.Integer 2I))))
             ]
         ]
     ]

@@ -473,7 +473,7 @@ let pPostfixOp =
             | _ -> fail "Expected string literal"
         
         // Bracket access: [expr] - but not [[
-        attempt (pstring "[" >>. notFollowedBy (pstring "[") >>. ws >>. expr .>> ws .>> pstring "]")
+        attempt (pstring "[" >>. notFollowedBy (pstring "[") >>. ws >>. expr .>> ws .>> pstring "]" .>> ws)
         |>> fun key -> fun expr -> Expr.TableAccess(expr, key)
         
         // Function call with table constructor (no parentheses): func {table}

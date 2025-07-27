@@ -116,30 +116,24 @@ t.a.b[1] = 42          -- Works: nested table assignment
 a[1], b[2] = 10, 20    -- Works: multiple table assignment
 ```
 
-## Table Access in Binary Expressions
+## Table Access in Binary Expressions (FIXED)
 
-**Issue**: The parser has trouble with table access expressions when used directly in binary operations.
+**Issue**: The parser had trouble with table access expressions when used directly in binary operations.
 
-**Examples that fail**:
+**Status**: FIXED - Table access now works correctly in binary expressions.
+
+**Fix Applied**: 
+- Added whitespace consumption after closing bracket in bracket access parser
+- This ensures consistency with other postfix operators (dot access, function calls)
+- The fix was a simple addition of `.>> ws` after `pstring "]"` in the bracket access parser
+
+**Examples that now work**:
 ```lua
-local sum = t[1] + t[2]    -- Fails: parser error after t[1]
-local x = t.a + t.b        -- May fail in some contexts
+local sum = t[1] + t[2]      -- Works: bracket access in binary expression
+local x = t.a + t.b          -- Works: dot notation (already worked)
+local calc = t[1] * 2 + t[2] -- Works: complex expressions
+t[1]  +  t[2]                -- Works: with various whitespace
 ```
-
-**Examples that work**:
-```lua
-local a = t[1]
-local b = t[2]
-local sum = a + b          -- Works: separate variable assignments
-```
-
-**Root Cause**: Possible operator precedence or expression parsing issue when table access is followed by binary operators.
-
-**Workaround**: Extract table values to local variables before using in expressions
-
-**Test Status**: Affects some compiler tests that had to be rewritten to work around this
-
-**Priority**: Medium - Has an easy workaround but affects code readability
 
 ## Other Notes
 
