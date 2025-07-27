@@ -46,11 +46,14 @@
   - [x] Table indexing (get)
   - [x] Table indexing (set) - with parser limitations
   - [x] Method calls on tables
+- [x] Fix multiple assignment from function calls
+- [x] Fix parser table assignment limitation (t[1] = 100 now works)
+- [x] Fix parser table access in expressions (t[1] + t[2] now works)
+- [x] Add inline function expression support (function() ... end)
 
 ## High Priority
 
 ## Medium Priority
-- [x] Fix multiple assignment from function calls
 - [ ] Add AOT/standalone executable support (PublishSingleFile, self-contained)
 - [ ] Implement load() function for dynamic code loading
 - [ ] Design and implement structured error/warning system
@@ -66,9 +69,12 @@
 
 ## Notes
 - Console app support helps with testing - we can now compile and run standalone programs
-- All 12 compiler tests are passing in FLua.Compiler.Tests.Minimal (including control structures)
+- All 24 compiler tests are passing in FLua.Compiler.Tests.Minimal (including inline functions)
 - RoslynCodeGenerator is the preferred implementation (syntax factory based)
 - CSharpCodeGenerator kept for reference but could be removed
 - Control structures implemented: if/elseif/else, while, repeat/until, numeric for, generic for, break
 - Assignment statements now support both local and non-local variables
 - Unary operators implemented for proper handling of negative numbers in for loops
+- Parser fixes enable full table support: assignment (t[1] = 100) and expressions (t[1] + t[2])
+- Inline function expressions supported (function() ... end) with proper code generation
+- Note: Closures not yet supported (accessing outer scope variables from inner functions)

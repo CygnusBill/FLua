@@ -30,6 +30,8 @@ namespace FLua.Compiler
         private int _variableCounter = 0;
         private int _tempVarCount = 0;
         private int tempVarCounter = 0;
+        private int _anonymousFunctionCounter = 0;
+        private List<MethodDeclarationSyntax> _pendingMethods = new List<MethodDeclarationSyntax>();
         
         public RoslynCodeGenerator()
         {
@@ -44,6 +46,9 @@ namespace FLua.Compiler
             
             // Create class members
             var classMembers = new List<MemberDeclarationSyntax> { executeMethod };
+            
+            // Add any pending methods (from anonymous functions)
+            classMembers.AddRange(_pendingMethods);
             
             // Add Main method for console applications
             if (options.Target == CompilationTarget.ConsoleApp)
@@ -751,15 +756,22 @@ namespace FLua.Compiler
         
         private ExpressionSyntax GenerateFunctionExpression(FunctionDef funcDef)
         {
-            // For anonymous functions in expressions, we'll generate them as local functions
-            // and return a LuaUserFunction reference
+            // Generate an anonymous function as a LuaUserFunction
+            var parameters = FSharpListToList(funcDef.Parameters);
+            var body = FSharpListToList(funcDef.Body);
+            var isVarArgs = funcDef.IsVararg;
             
-            // For now, return a placeholder that indicates a function should be here
-            // This is a limitation that needs proper handling with lambda expressions
-            return MemberAccessExpression(
-                SyntaxKind.SimpleMemberAccessExpression,
-                IdentifierName("LuaNil"),
-                IdentifierName("Instance"));
+            // Generate unique name for the anonymous function
+            var funcName = $"__anon_{_anonymousFunctionCounter++}";
+            
+            // Create the function method
+            var funcMethod = GenerateFunctionMethod(funcName, parameters, body, isVarArgs);
+            _pendingMethods.Add(funcMethod);
+            
+            // Create LuaUserFunction instance
+            return ObjectCreationExpression(IdentifierName("LuaUserFunction"))
+                .AddArgumentListArguments(
+                    Argument(IdentifierName(funcName)));
         }
         
         private ExpressionSyntax GenerateMethodCall(Expr obj, string methodName, IList<Expr> args)
@@ -981,6 +993,109 @@ namespace FLua.Compiler
             return Block(statements);
         }
         
+        private MethodDeclarationSyntax GenerateFunctionMethod(string name, IList<Parameter> parameters, IList<Statement> body, bool isVarArgs)
+        {
+            // Create method that matches LuaFunction delegate signature
+            var method = MethodDeclaration(
+                ArrayType(IdentifierName("LuaValue"))
+                    .WithRankSpecifiers(SingletonList(ArrayRankSpecifier())),
+                Identifier(name))
+                .AddModifiers(Token(SyntaxKind.PrivateKeyword), Token(SyntaxKind.StaticKeyword))
+                .AddParameterListParameters(
+                    Parameter(Identifier("args"))
+                        .WithType(ArrayType(IdentifierName("LuaValue"))
+                            .WithRankSpecifiers(SingletonList(ArrayRankSpecifier())))
+                        .AddModifiers(Token(SyntaxKind.ParamsKeyword)));
+            
+            // Generate method body
+            EnterScope();
+            var bodyStatements = new List<StatementSyntax>();
+            
+            // Handle parameters
+            int paramIndex = 0;
+            foreach (var param in parameters)
+            {
+                if (param.IsNamed)
+                {
+                    var namedParam = (Parameter.Named)param;
+                    var paramName = namedParam.Item1;
+                    var paramMangledName = GetOrCreateMangledName(paramName);
+                    
+                    // var paramMangledName = args.Length > paramIndex ? args[paramIndex] : LuaNil.Instance;
+                    var paramDecl = LocalDeclarationStatement(
+                        VariableDeclaration(IdentifierName("var"))
+                            .AddVariables(
+                                VariableDeclarator(Identifier(SanitizeIdentifier(paramMangledName)))
+                                    .WithInitializer(EqualsValueClause(
+                                        ConditionalExpression(
+                                            BinaryExpression(
+                                                SyntaxKind.GreaterThanExpression,
+                                                MemberAccessExpression(
+                                                    SyntaxKind.SimpleMemberAccessExpression,
+                                                    IdentifierName("args"),
+                                                    IdentifierName("Length")),
+                                                LiteralExpression(SyntaxKind.NumericLiteralExpression, Literal(paramIndex))),
+                                            ElementAccessExpression(IdentifierName("args"))
+                                                .AddArgumentListArguments(
+                                                    Argument(LiteralExpression(SyntaxKind.NumericLiteralExpression, Literal(paramIndex)))),
+                                            MemberAccessExpression(
+                                                SyntaxKind.SimpleMemberAccessExpression,
+                                                IdentifierName("LuaNil"),
+                                                IdentifierName("Instance")))))));
+                    
+                    bodyStatements.Add(paramDecl);
+                    paramIndex++;
+                }
+                else if (param.IsVararg)
+                {
+                    // Handle varargs - create local array using range syntax
+                    var varArgsDecl = LocalDeclarationStatement(
+                        VariableDeclaration(IdentifierName("var"))
+                            .AddVariables(
+                                VariableDeclarator(Identifier("varargs__"))
+                                    .WithInitializer(EqualsValueClause(
+                                        ConditionalExpression(
+                                            BinaryExpression(
+                                                SyntaxKind.GreaterThanExpression,
+                                                MemberAccessExpression(
+                                                    SyntaxKind.SimpleMemberAccessExpression,
+                                                    IdentifierName("args"),
+                                                    IdentifierName("Length")),
+                                                LiteralExpression(SyntaxKind.NumericLiteralExpression, Literal(paramIndex))),
+                                            ElementAccessExpression(IdentifierName("args"))
+                                                .AddArgumentListArguments(
+                                                    Argument(
+                                                        RangeExpression()
+                                                            .WithLeftOperand(LiteralExpression(SyntaxKind.NumericLiteralExpression, Literal(paramIndex))))),
+                                            ArrayCreationExpression(
+                                                ArrayType(IdentifierName("LuaValue"))
+                                                    .WithRankSpecifiers(SingletonList(ArrayRankSpecifier(SingletonSeparatedList<ExpressionSyntax>(OmittedArraySizeExpression()))))))))));
+                    
+                    bodyStatements.Add(varArgsDecl);
+                }
+            }
+            
+            // Generate the function body statements
+            foreach (var stmt in body)
+            {
+                bodyStatements.AddRange(GenerateStatement(stmt));
+            }
+            
+            // Add default return if needed
+            if (bodyStatements.Count == 0 || !IsReturnStatement(bodyStatements.Last()))
+            {
+                bodyStatements.Add(ReturnStatement(
+                    ArrayCreationExpression(
+                        ArrayType(IdentifierName("LuaValue"))
+                            .WithRankSpecifiers(SingletonList(ArrayRankSpecifier(SingletonSeparatedList<ExpressionSyntax>(OmittedArraySizeExpression())))))));
+            }
+            
+            ExitScope();
+            
+            method = method.WithBody(Block(bodyStatements));
+            return method;
+        }
+
         private IEnumerable<StatementSyntax> GenerateLocalFunctionDef(string name, FunctionDef funcDef)
         {
             var statements = new List<StatementSyntax>();
@@ -1563,6 +1678,11 @@ namespace FLua.Compiler
             {
                 _currentScope = _currentScope.Parent;
             }
+        }
+        
+        private bool IsReturnStatement(StatementSyntax statement)
+        {
+            return statement is ReturnStatementSyntax;
         }
         
         private string GetOrCreateMangledName(string varName)
