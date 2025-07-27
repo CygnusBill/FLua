@@ -41,9 +41,13 @@
 - [x] Add break statement support
 - [x] Fix variable types (LuaValue vs specific types)
 - [x] Handle nullable double conversions in for loops
+- [x] Implement table support in compiler (literals, indexing, methods)
+  - [x] Table constructor literals
+  - [x] Table indexing (get)
+  - [x] Table indexing (set) - with parser limitations
+  - [x] Method calls on tables
 
 ## High Priority
-- [ ] Implement table support in compiler (literals, indexing, methods)
 
 ## Medium Priority
 - [ ] Fix multiple assignment from function calls
