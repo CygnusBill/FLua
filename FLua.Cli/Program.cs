@@ -214,6 +214,17 @@ class Program
             Console.WriteLine($"Target: {options.Target}");
             Console.WriteLine($"Backend: {compiler.BackendName}");
             
+            // Display warnings if any
+            if (result.Warnings != null && result.Warnings.Any())
+            {
+                Console.WriteLine();
+                Console.WriteLine("Warnings:");
+                foreach (var warning in result.Warnings)
+                {
+                    Console.WriteLine($"  {warning}");
+                }
+            }
+            
             return 0;
         }
         catch (Exception ex)

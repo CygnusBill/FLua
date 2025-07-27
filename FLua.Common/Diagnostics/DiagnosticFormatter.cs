@@ -94,10 +94,10 @@ public class DiagnosticFormatter
             if (lineNum == location.Line)
             {
                 // Highlight the error line
-                sb.Append($"{lineNum,{lineNumWidth}} | {lines[i]}\n");
+                sb.Append($"{lineNum.ToString().PadLeft(lineNumWidth)} | {lines[i]}\n");
                 
                 // Add caret pointing to error position
-                sb.Append($"{"",{lineNumWidth}} | ");
+                sb.Append($"{new string(' ', lineNumWidth)} | ");
                 sb.Append(new string(' ', Math.Max(0, location.Column - 1)));
                 sb.Append('^');
                 
@@ -115,7 +115,7 @@ public class DiagnosticFormatter
             }
             else
             {
-                sb.AppendLine($"{lineNum,{lineNumWidth}} | {lines[i]}");
+                sb.AppendLine($"{lineNum.ToString().PadLeft(lineNumWidth)} | {lines[i]}");
             }
         }
     }

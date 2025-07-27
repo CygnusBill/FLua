@@ -10,6 +10,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\FLua.Ast\FLua.Ast.fsproj" />
+    <ProjectReference Include="..\FLua.Common\FLua.Common.csproj" />
     <ProjectReference Include="..\FLua.Parser\FLua.Parser.fsproj" />
     <ProjectReference Include="..\FLua.Runtime\FLua.Runtime.csproj" />
   </ItemGroup>

@@ -10,16 +10,18 @@ namespace FLua.Runtime
         public LuaValue Value { get; private set; }
         public LuaAttribute Attribute { get; }
         public bool IsClosed { get; private set; }
+        public string? Name { get; set; }
 
         public LuaVariable(LuaValue value) : this(value, LuaAttribute.NoAttribute)
         {
         }
 
-        public LuaVariable(LuaValue value, LuaAttribute attribute)
+        public LuaVariable(LuaValue value, LuaAttribute attribute, string? name = null)
         {
             Value = value ?? throw new ArgumentNullException(nameof(value));
             Attribute = attribute;
             IsClosed = false;
+            Name = name;
         }
 
         /// <summary>
@@ -29,12 +31,12 @@ namespace FLua.Runtime
         {
             if (Attribute == LuaAttribute.Const)
             {
-                throw new LuaRuntimeException("attempt to change const variable");
+                throw LuaRuntimeException.ConstAssignment(Name ?? "variable");
             }
 
             if (IsClosed)
             {
-                throw new LuaRuntimeException("attempt to use closed variable");
+                throw LuaRuntimeException.ClosedVariableAccess(Name ?? "variable");
             }
 
             Value = newValue ?? throw new ArgumentNullException(nameof(newValue));
@@ -47,7 +49,7 @@ namespace FLua.Runtime
         {
             if (IsClosed)
             {
-                throw new LuaRuntimeException("attempt to use closed variable");
+                throw LuaRuntimeException.ClosedVariableAccess(Name ?? "variable");
             }
 
             return Value;

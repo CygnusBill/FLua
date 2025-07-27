@@ -69,9 +69,9 @@ public static class DiagnosticMessages
     public static string CodeGenerationFailure(string construct, string reason)
         => $"Failed to compile {construct}: {reason}";
     
-    // Compiler warning messages
+    // Compiler error messages  
     public static string DynamicFeatureUsed(string feature)
-        => $"Using '{feature}' in compiled code will return an error at runtime. Consider restructuring to avoid dynamic features.";
+        => $"Function '{feature}' cannot be used in compiled code. Dynamic code loading is not supported in compiled executables.";
     
     public static string UnusedVariable(string name)
         => $"Variable '{name}' is defined but never used. Consider removing it or prefix with '_' to indicate it's intentionally unused.";

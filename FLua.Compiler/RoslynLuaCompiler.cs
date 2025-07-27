@@ -1,4 +1,5 @@
 using FLua.Ast;
+using FLua.Common.Diagnostics;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using System.Reflection;
@@ -26,6 +27,8 @@ public class RoslynLuaCompiler : ILuaCompiler
 
     public CompilationResult Compile(IList<Statement> ast, CompilerOptions options)
     {
+        var diagnostics = new DiagnosticCollector();
+        
         try
         {
             // For AOT, we need to generate console app code
@@ -36,7 +39,29 @@ public class RoslynLuaCompiler : ILuaCompiler
             }
             
             // Generate C# code from Lua AST
-            var csharpCode = GenerateCSharpCode(ast, effectiveOptions);
+            var (csharpCode, codeGenDiagnostics) = GenerateCSharpCode(ast, effectiveOptions);
+            
+            // Collect any diagnostics from code generation
+            foreach (var diag in codeGenDiagnostics.GetDiagnostics())
+            {
+                diagnostics.Report(diag);
+            }
+            
+            // Check for compilation errors
+            var errors = diagnostics.GetDiagnostics()
+                .Where(d => d.Severity == ErrorSeverity.Error)
+                .ToArray();
+            
+            if (errors.Length > 0)
+            {
+                return new CompilationResult(
+                    Success: false,
+                    Errors: errors.Select(e => e.Message),
+                    Warnings: diagnostics.GetDiagnostics()
+                        .Where(d => d.Severity == ErrorSeverity.Warning)
+                        .Select(d => d.Message)
+                );
+            }
             
             // Debug: Write generated C# code to file for inspection
             if (options.IncludeDebugInfo)
@@ -48,32 +73,38 @@ public class RoslynLuaCompiler : ILuaCompiler
             // Handle AOT compilation differently
             if (options.Target == CompilationTarget.NativeAot)
             {
-                return CompileAot(csharpCode, options);
+                return CompileAot(csharpCode, options, diagnostics);
             }
             
             // Compile using Roslyn for regular targets
-            return CompileWithRoslyn(csharpCode, options);
+            return CompileWithRoslyn(csharpCode, options, diagnostics);
         }
         catch (Exception ex)
         {
             return new CompilationResult(
                 Success: false,
-                Errors: new[] { $"Compilation failed: {ex.Message}" }
+                Errors: new[] { $"Compilation failed: {ex.Message}" },
+                Warnings: diagnostics.GetDiagnostics()
+                    .Where(d => d.Severity == ErrorSeverity.Warning)
+                    .Select(d => d.Message)
             );
         }
     }
 
-    private string GenerateCSharpCode(IList<Statement> ast, CompilerOptions options)
+    private (string code, IDiagnosticCollector diagnostics) GenerateCSharpCode(IList<Statement> ast, CompilerOptions options)
     {
+        // Create a diagnostic collector for code generation
+        var codeGenDiagnostics = new DiagnosticCollector();
+        
         // Use the new Roslyn-based code generator
-        var generator = new RoslynCodeGenerator();
+        var generator = new RoslynCodeGenerator(codeGenDiagnostics);
         var syntaxTree = generator.Generate(ast, options);
         
         // Convert syntax tree to string
-        return syntaxTree.ToFullString();
+        return (syntaxTree.ToFullString(), codeGenDiagnostics);
     }
 
-    private CompilationResult CompileWithRoslyn(string csharpCode, CompilerOptions options)
+    private CompilationResult CompileWithRoslyn(string csharpCode, CompilerOptions options, IDiagnosticCollector diagnostics)
     {
         var syntaxTree = CSharpSyntaxTree.ParseText(csharpCode);
         
@@ -104,7 +135,10 @@ public class RoslynLuaCompiler : ILuaCompiler
                 
             return new CompilationResult(
                 Success: false,
-                Errors: errors
+                Errors: errors,
+                Warnings: diagnostics.GetDiagnostics()
+                    .Where(d => d.Severity == ErrorSeverity.Warning)
+                    .Select(d => d.Message)
             );
         }
 
@@ -119,7 +153,10 @@ public class RoslynLuaCompiler : ILuaCompiler
         return new CompilationResult(
             Success: true,
             Assembly: assembly,
-            AssemblyPath: options.OutputPath
+            AssemblyPath: options.OutputPath,
+            Warnings: diagnostics.GetDiagnostics()
+                .Where(d => d.Severity == ErrorSeverity.Warning)
+                .Select(d => d.Message)
         );
     }
 
@@ -152,7 +189,7 @@ public class RoslynLuaCompiler : ILuaCompiler
         return references;
     }
     
-    private CompilationResult CompileAot(string csharpCode, CompilerOptions options)
+    private CompilationResult CompileAot(string csharpCode, CompilerOptions options, IDiagnosticCollector diagnostics)
     {
         // Create a temporary directory for the AOT project
         var tempDir = Path.Combine(Path.GetTempPath(), $"flua_aot_{Guid.NewGuid():N}");
@@ -222,7 +259,10 @@ public class RoslynLuaCompiler : ILuaCompiler
             {
                 return new CompilationResult(
                     Success: false,
-                    Errors: new[] { $"AOT compilation failed:\n{errors}\n{output}" }
+                    Errors: new[] { $"AOT compilation failed:\n{errors}\n{output}" },
+                    Warnings: diagnostics.GetDiagnostics()
+                        .Where(d => d.Severity == ErrorSeverity.Warning)
+                        .Select(d => d.Message)
                 );
             }
             
@@ -249,7 +289,10 @@ public class RoslynLuaCompiler : ILuaCompiler
                 {
                     return new CompilationResult(
                         Success: false,
-                        Errors: new[] { $"AOT compilation succeeded but executable not found at: {exePath} or {altExePath}\nOutput:\n{output}" }
+                        Errors: new[] { $"AOT compilation succeeded but executable not found at: {exePath} or {altExePath}\nOutput:\n{output}" },
+                        Warnings: diagnostics.GetDiagnostics()
+                            .Where(d => d.Severity == ErrorSeverity.Warning)
+                            .Select(d => d.Message)
                     );
                 }
             }
@@ -277,10 +320,19 @@ public class RoslynLuaCompiler : ILuaCompiler
                 chmodProcess.WaitForExit();
             }
             
+            var warnings = new List<string>();
+            if (output.Length > 0)
+            {
+                warnings.Add(output.ToString());
+            }
+            warnings.AddRange(diagnostics.GetDiagnostics()
+                .Where(d => d.Severity == ErrorSeverity.Warning)
+                .Select(d => d.Message));
+            
             return new CompilationResult(
                 Success: true,
                 AssemblyPath: finalPath,
-                Warnings: output.Length > 0 ? new[] { output.ToString() } : null
+                Warnings: warnings.Count > 0 ? warnings : null
             );
         }
         finally

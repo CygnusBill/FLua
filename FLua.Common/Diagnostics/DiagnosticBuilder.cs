@@ -92,17 +92,17 @@ public static class DiagnosticBuilder
         return diagnostic;
     }
     
-    // Compiler warnings
-    public static FLuaDiagnostic DynamicFeatureWarning(string feature, SourceLocation? location = null)
+    // Compiler errors
+    public static FLuaDiagnostic DynamicFeatureError(string feature, SourceLocation? location = null)
     {
         var diagnostic = new FLuaDiagnostic(
             ErrorCodes.DynamicFeatureUsed,
-            ErrorSeverity.Warning,
+            ErrorSeverity.Error,
             DiagnosticMessages.DynamicFeatureUsed(feature),
             location);
             
-        diagnostic.Help = "This code will fail at runtime in compiled executables.";
-        diagnostic.Notes.Add("Consider using the interpreter if dynamic features are required.");
+        diagnostic.Help = "Dynamic features cannot be used in compiled code.";
+        diagnostic.Notes.Add("Use the interpreter instead if dynamic features are required.");
         
         return diagnostic;
     }

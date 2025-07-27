@@ -40,6 +40,7 @@ public static class ErrorCodes
     public const string InvalidCompilationTarget = "FLU-1203";
     public const string MissingRuntimeDependency = "FLU-1204";
     public const string InvalidSyntaxForCompilation = "FLU-1205";
+    public const string DynamicFeatureUsed = "FLU-1206";
     
     // Type errors (1-3-xx)
     public const string InvalidTypeConversion = "FLU-1301";
@@ -72,7 +73,9 @@ public static class ErrorCodes
     public const string PossibleNilAccess = "FLU-2102";
     
     // Compiler warnings (2-2-xx)
-    public const string DynamicFeatureUsed = "FLU-2201";
+    // (No warnings defined yet)
+    
+    // Note: DynamicFeatureUsed moved to compiler errors section as FLU-1206
     public const string PerformanceWarning = "FLU-2202";
     public const string PotentialRuntimeIncompatibility = "FLU-2203";
     public const string UnusedVariable = "FLU-2204";

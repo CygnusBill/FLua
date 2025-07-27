@@ -105,7 +105,7 @@ namespace FLua.Runtime
         /// </summary>
         public void SetLocalVariable(string name, LuaValue value, LuaAttribute attribute)
         {
-            var variable = new LuaVariable(value, attribute);
+            var variable = new LuaVariable(value, attribute, name);
             _variables[name] = variable;
             
             // Track to-be-closed variables for proper cleanup

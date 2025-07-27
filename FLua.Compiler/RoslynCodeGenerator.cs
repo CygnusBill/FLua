@@ -5,6 +5,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using FLua.Ast;
+using FLua.Common.Diagnostics;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 using LuaAttribute = FLua.Ast.Attribute;
 using Microsoft.FSharp.Core;
@@ -18,11 +19,13 @@ namespace FLua.Compiler
     public class RoslynCodeGenerator
     {
         private CompilerOptions _options = null!;
+        private readonly IDiagnosticCollector _diagnostics;
         
         // Scope management for variable name resolution
         private class Scope
         {
             public Dictionary<string, string> Variables { get; } = new Dictionary<string, string>();
+            public Dictionary<string, SourceLocation> VariableLocations { get; } = new Dictionary<string, SourceLocation>();
             public Scope? Parent { get; set; }
         }
         
@@ -33,8 +36,9 @@ namespace FLua.Compiler
         private int _anonymousFunctionCounter = 0;
         private List<MethodDeclarationSyntax> _pendingMethods = new List<MethodDeclarationSyntax>();
         
-        public RoslynCodeGenerator()
+        public RoslynCodeGenerator(IDiagnosticCollector? diagnostics = null)
         {
+            _diagnostics = diagnostics ?? new DiagnosticCollector();
         }
         
         public CompilationUnitSyntax Generate(IList<Statement> block, CompilerOptions options)
@@ -605,6 +609,14 @@ namespace FLua.Compiler
         {
             var mangledName = ResolveVariableName(name);
             
+            // Check for dynamic loading functions
+            if (name == "load" || name == "loadfile" || name == "dofile")
+            {
+                // Report error about dynamic feature
+                var diagnostic = DiagnosticBuilder.DynamicFeatureError(name);
+                _diagnostics.Report(diagnostic);
+            }
+            
             // Check if it's a local variable
             if (IsLocalVariable(name))
             {
@@ -848,6 +860,19 @@ namespace FLua.Compiler
         
         private ExpressionSyntax GenerateFunctionCallRaw(Expr func, IList<Expr> args, ExpressionSyntax funcOverride = null)
         {
+            // Check if calling a dynamic loading function
+            if (func.IsVar)
+            {
+                var varExpr = (Expr.Var)func;
+                var varName = varExpr.Item;
+                if (varName == "load" || varName == "loadfile" || varName == "dofile")
+                {
+                    // Report error about dynamic feature
+                    var diagnostic = DiagnosticBuilder.DynamicFeatureError(varName);
+                    _diagnostics.Report(diagnostic);
+                }
+            }
+            
             // Generate: ((LuaFunction)func).Call(new LuaValue[] { args })
             ExpressionSyntax funcExpr;
             if (funcOverride != null)
