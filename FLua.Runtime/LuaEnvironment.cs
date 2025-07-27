@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using FLua.Ast;
 
 namespace FLua.Runtime
 {
@@ -94,19 +93,19 @@ namespace FLua.Runtime
         /// </summary>
         public void SetLocalVariable(string name, LuaValue value)
         {
-            SetLocalVariable(name, value, FLua.Ast.Attribute.NoAttribute);
+            SetLocalVariable(name, value, LuaAttribute.NoAttribute);
         }
 
         /// <summary>
         /// Sets a local variable in the current scope with attributes
         /// </summary>
-        public void SetLocalVariable(string name, LuaValue value, FLua.Ast.Attribute attribute)
+        public void SetLocalVariable(string name, LuaValue value, LuaAttribute attribute)
         {
             var variable = new LuaVariable(value, attribute);
             _variables[name] = variable;
             
             // Track to-be-closed variables for proper cleanup
-            if (attribute == FLua.Ast.Attribute.Close)
+            if (attribute == LuaAttribute.Close)
             {
                 _toBeClosedVariables.Add(variable);
             }

@@ -50,13 +50,13 @@
 - [x] Fix parser table assignment limitation (t[1] = 100 now works)
 - [x] Fix parser table access in expressions (t[1] + t[2] now works)
 - [x] Add inline function expression support (function() ... end)
-- [x] Add AOT/standalone executable support (basic implementation complete)
+- [x] Add AOT/standalone executable support (fully working)
   - Native executables can be generated with -t NativeAot
-  - Creates single file native executables (~2.4MB on macOS ARM64)
-  - Known issue: Runtime dependencies on FLua.Ast need to be resolved
+  - Creates single file native executables (~2.3MB on macOS ARM64)
+  - No runtime dependencies - truly standalone executables
+- [x] Fix AOT runtime dependencies (resolved by removing FLua.Ast from Runtime)
 
 ## High Priority
-- [ ] Fix AOT runtime dependencies (FLua.Ast loading at runtime)
 
 ## Medium Priority
 - [ ] Implement load() function for dynamic code loading
@@ -82,7 +82,10 @@
 - Parser fixes enable full table support: assignment (t[1] = 100) and expressions (t[1] + t[2])
 - Inline function expressions supported (function() ... end) with proper code generation
 - Note: Closures not yet supported (accessing outer scope variables from inner functions)
-- AOT compilation implemented: Generates native executables using .NET AOT
+- AOT compilation fully implemented: Generates native executables using .NET AOT
   - Uses temporary project file with PublishAot=true
   - Automatically handles platform-specific runtime identifiers
-  - Currently requires runtime resolution of FLua.Ast dependency
+  - Produces standalone executables with no runtime dependencies
+  - FLua.Runtime no longer depends on FLua.Ast (dependency removed)
+  - Moved interpreter-specific operations to FLua.Interpreter
+  - Created runtime-only enums (LuaAttribute, LuaBinaryOp, LuaUnaryOp)

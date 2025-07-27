@@ -1,5 +1,4 @@
 using System;
-using FLua.Ast;
 
 namespace FLua.Runtime
 {
@@ -544,23 +543,6 @@ namespace FLua.Runtime
 
         #region Operation Dispatch
 
-        /// <summary>
-        /// Evaluates a binary operation based on the operator type
-        /// </summary>
-        public static LuaValue EvaluateBinaryOp(LuaValue left, BinaryOp op, LuaValue right)
-        {
-            // Use extension method for deterministic evaluation
-            return op.Evaluate(left, right);
-        }
-
-        /// <summary>
-        /// Evaluates a unary operation based on the operator type
-        /// </summary>
-        public static LuaValue EvaluateUnaryOp(UnaryOp op, LuaValue value)
-        {
-            // Use extension method for deterministic evaluation
-            return op.Evaluate(value);
-        }
 
         #endregion
 

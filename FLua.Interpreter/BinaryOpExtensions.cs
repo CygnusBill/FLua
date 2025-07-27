@@ -1,7 +1,8 @@
 using System;
 using FLua.Ast;
+using FLua.Runtime;
 
-namespace FLua.Runtime
+namespace FLua.Interpreter
 {
     /// <summary>
     /// Extension methods for BinaryOp to provide deterministic operator identification

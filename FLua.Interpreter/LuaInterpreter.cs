@@ -213,7 +213,7 @@ namespace FLua.Interpreter
                 {
                     var (name, attribute) = variables[i];
                     var value = i < values.Length ? values[i] : LuaNil.Instance;
-                    _environment.SetLocalVariable(name, value, attribute);
+                    _environment.SetLocalVariable(name, value, InterpreterOperations.ConvertAttribute(attribute));
                 }
                 
                 return new StatementResult();
@@ -450,7 +450,7 @@ namespace FLua.Interpreter
                                 
                                 // Set parameter value or nil if not enough arguments
                                 var value = paramIndex < args.Length ? args[paramIndex] : LuaNil.Instance;
-                                _environment.SetLocalVariable(paramName, value, attribute);
+                                _environment.SetLocalVariable(paramName, value, InterpreterOperations.ConvertAttribute(attribute));
                                 paramIndex++;
                             }
                             else if (param.IsVararg)
@@ -522,7 +522,7 @@ namespace FLua.Interpreter
                                 
                                 // Set parameter value or nil if not enough arguments
                                 var value = paramIndex < args.Length ? args[paramIndex] : LuaNil.Instance;
-                                _environment.SetLocalVariable(paramName, value, attribute);
+                                _environment.SetLocalVariable(paramName, value, InterpreterOperations.ConvertAttribute(attribute));
                                 paramIndex++;
                             }
                             else if (param.IsVararg)
@@ -1103,7 +1103,7 @@ namespace FLua.Interpreter
         private LuaValue EvaluateBinaryOp(LuaValue left, BinaryOp op, LuaValue right)
         {
             // Use the centralized operations from FLua.Runtime
-            return LuaOperations.EvaluateBinaryOp(left, op, right);
+            return InterpreterOperations.EvaluateBinaryOp(left, op, right);
         }
 
         /// <summary>
@@ -1112,7 +1112,7 @@ namespace FLua.Interpreter
         private LuaValue EvaluateUnaryOp(UnaryOp op, LuaValue value)
         {
             // Use the centralized operations from FLua.Runtime
-            return LuaOperations.EvaluateUnaryOp(op, value);
+            return InterpreterOperations.EvaluateUnaryOp(op, value);
         }
     }
 

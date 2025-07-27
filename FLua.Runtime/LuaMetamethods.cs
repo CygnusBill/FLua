@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using FLua.Ast;
 
 namespace FLua.Runtime
 {
@@ -10,23 +9,6 @@ namespace FLua.Runtime
     /// </summary>
     public static class LuaMetamethods
     {
-        /// <summary>
-        /// Gets the metamethod name for a binary operator
-        /// </summary>
-        public static string? GetMetamethodName(BinaryOp op)
-        {
-            // Use extension method for deterministic lookup
-            return op.GetMetamethodName();
-        }
-
-        /// <summary>
-        /// Gets the metamethod name for a unary operator
-        /// </summary>
-        public static string? GetMetamethodName(UnaryOp op)
-        {
-            // Use extension method for deterministic lookup
-            return op.GetMetamethodName();
-        }
 
         /// <summary>
         /// Attempts to invoke a binary metamethod on two values

@@ -1,5 +1,4 @@
 using System;
-using FLua.Ast;
 
 namespace FLua.Runtime
 {
@@ -9,14 +8,14 @@ namespace FLua.Runtime
     public class LuaVariable
     {
         public LuaValue Value { get; private set; }
-        public FLua.Ast.Attribute Attribute { get; }
+        public LuaAttribute Attribute { get; }
         public bool IsClosed { get; private set; }
 
-        public LuaVariable(LuaValue value) : this(value, FLua.Ast.Attribute.NoAttribute)
+        public LuaVariable(LuaValue value) : this(value, LuaAttribute.NoAttribute)
         {
         }
 
-        public LuaVariable(LuaValue value, FLua.Ast.Attribute attribute)
+        public LuaVariable(LuaValue value, LuaAttribute attribute)
         {
             Value = value ?? throw new ArgumentNullException(nameof(value));
             Attribute = attribute;
@@ -28,7 +27,7 @@ namespace FLua.Runtime
         /// </summary>
         public void SetValue(LuaValue newValue)
         {
-            if (Attribute == FLua.Ast.Attribute.Const)
+            if (Attribute == LuaAttribute.Const)
             {
                 throw new LuaRuntimeException("attempt to change const variable");
             }
@@ -59,7 +58,7 @@ namespace FLua.Runtime
         /// </summary>
         public void Close()
         {
-            if (Attribute == FLua.Ast.Attribute.Close && !IsClosed)
+            if (Attribute == LuaAttribute.Close && !IsClosed)
             {
                 IsClosed = true;
 
@@ -100,9 +99,9 @@ namespace FLua.Runtime
         public override string ToString()
         {
             string attrStr;
-            if (Attribute == FLua.Ast.Attribute.Const)
+            if (Attribute == LuaAttribute.Const)
                 attrStr = " <const>";
-            else if (Attribute == FLua.Ast.Attribute.Close)
+            else if (Attribute == LuaAttribute.Close)
                 attrStr = " <close>";
             else
                 attrStr = "";
