@@ -302,6 +302,7 @@ dotnet script.dll
 ## Important Files
 - `FLua-Gap-Analysis.md`: Detailed compatibility analysis
 - `PARSER_KNOWN_ISSUES.md`: Known parser limitations
+- `COMPILER_LIMITATIONS.md`: Limitations of compiled vs interpreted code
 - `test_*.lua`: Various test scripts for specific features
 - `LuaTests/`: Official Lua test suite (for compatibility testing)
 - `ARCHITECTURE_COMPLIANCE_REPORT.md`: Architectural analysis and compliance status
