@@ -62,7 +62,7 @@
   - [x] Add compile-time errors for dynamic features (load/loadfile/dofile)
   - [x] Update CLI to display warnings and structured error messages
   - [x] Complete integration into compiler with error detection
-  - [ ] Convert FParsec errors to structured diagnostics (requires parser integration)
+  - [x] Convert FParsec errors to structured diagnostics (enhanced with line/column info)
 
 ## Medium Priority
 - [x] Implement load() function for dynamic code loading (interpreter only)
@@ -79,7 +79,11 @@
   - [x] Support for errors, warnings, info, and hints
   - [x] Full integration into compiler and runtime
   - [x] Dynamic loading functions now cause compilation errors (not warnings)
-- [ ] Improved error messages with line numbers
+- [x] Improved error messages with line numbers
+  - [x] Enhanced FParsec error handling with precise source location information
+  - [x] Added positioned AST variants (VarPos, FunctionCallPos) for semantic error support
+  - [x] User-friendly parse error messages: "Syntax error in filename.lua at line 2, column 1"
+  - [x] Infrastructure ready for enhanced semantic error reporting
 - [ ] Add IL.Emit backend for size optimization
 
 ## Low Priority
@@ -102,6 +106,8 @@
 - **Structured error/warning system** fully integrated
 - **Error codes**: FLU-XYZZ format (severity-area-sequence)
 - **User-friendly messages** with helpful suggestions
+- **Parse error enhancement**: Line and column numbers with filename context
+- **Positioned AST infrastructure**: Ready for semantic error reporting
 - **Compile-time error detection** for dynamic loading functions
 - **CLI integration** with proper warning/error display
 
