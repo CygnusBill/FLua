@@ -57,6 +57,11 @@
 - [x] Fix AOT runtime dependencies (resolved by removing FLua.Ast from Runtime)
 
 ## High Priority
+- [ ] Integrate error system into parser/interpreter/compiler
+  - Convert FParsec errors to structured diagnostics
+  - Wrap runtime exceptions with diagnostic information
+  - Add compile-time warnings for dynamic features
+  - Update CLI to use DiagnosticFormatter
 
 ## Medium Priority
 - [x] Implement load() function for dynamic code loading (interpreter only)
@@ -64,7 +69,13 @@
   - Parses code dynamically and returns a callable chunk
   - Reports syntax errors with line/column information
   - Not supported in compiled code (returns "dynamic loading not supported")
-- [ ] Design and implement structured error/warning system
+- [x] Design and implement structured error/warning system
+  - Created FLua.Common project with diagnostic infrastructure
+  - Error codes use logical scheme: FLU-XYZZ (severity-area-number)
+  - User-friendly error messages (no technical jargon)
+  - Rust-like error formatting with source context
+  - DiagnosticBuilder for consistent error creation
+  - Support for errors, warnings, info, and hints
 - [ ] Improved error messages with line numbers
 - [ ] Add IL.Emit backend for size optimization
 

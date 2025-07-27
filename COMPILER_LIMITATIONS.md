@@ -6,21 +6,27 @@ This document outlines the known limitations of compiled Lua code versus interpr
 
 ### load() Function
 - **Status**: Not supported in compiled code
-- **Error**: Returns `nil, "dynamic loading not supported"`
+- **Error Code**: `FLU-1201`
+- **Runtime Error**: Returns `nil, "dynamic loading not supported"`
+- **Compile Warning**: `FLU-2201` - Using 'load' in compiled code will return an error at runtime
 - **Reason**: Would require embedding the parser/interpreter or runtime compiler
 - **Impact**: Low - mostly used in REPLs and debugging tools
 - **Workaround**: Use the interpreter for dynamic code execution
 
 ### loadfile() Function
 - **Status**: Not supported in compiled code
-- **Error**: Returns `nil, "dynamic loading not supported"`
+- **Error Code**: `FLU-1201`
+- **Runtime Error**: Returns `nil, "dynamic loading not supported"`
+- **Compile Warning**: `FLU-2201` - Using 'loadfile' in compiled code will return an error at runtime
 - **Reason**: Same as load() - requires runtime compilation
 - **Impact**: Low - can pre-compile all needed files
 - **Workaround**: Compile all Lua files ahead of time
 
 ### dofile() Function
 - **Status**: Not supported in compiled code
-- **Error**: Throws "dynamic loading not supported"
+- **Error Code**: `FLU-1201`
+- **Runtime Error**: Throws "dynamic loading not supported"
+- **Compile Warning**: `FLU-2201` - Using 'dofile' in compiled code will return an error at runtime
 - **Reason**: Same as load() - requires runtime compilation
 - **Impact**: Low to Medium - some scripts use dofile for configuration
 - **Workaround**: Use require() with pre-compiled modules

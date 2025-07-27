@@ -16,15 +16,29 @@ This document outlines the design for a structured error and warning system for 
 
 ## Error Code Structure
 
-Error codes follow the pattern: `FLU-XXXX`
+Error codes follow the pattern: `FLU-XYZZ` where:
 
-- `FLU-0xxx`: Parser errors
-- `FLU-1xxx`: Runtime errors
-- `FLU-2xxx`: Compiler errors
-- `FLU-3xxx`: Type-related errors
-- `FLU-4xxx`: Module/require errors
-- `FLU-5xxx`: Built-in library errors
-- `FLU-9xxx`: Internal errors
+- **X** = Severity
+  - `1` = Error (prevents execution)
+  - `2` = Warning (potential issue)
+  - `3` = Info (informational)
+  - `4` = Hint (suggestion)
+
+- **Y** = Area
+  - `0` = Parser
+  - `1` = Runtime
+  - `2` = Compiler
+  - `3` = Type system
+  - `4` = Module/require
+  - `5` = Built-in libraries
+  - `9` = Internal
+
+- **ZZ** = Sequential number (01-99)
+
+Examples:
+- `FLU-1001`: Error in Parser (Unexpected token)
+- `FLU-2201`: Warning in Compiler (Dynamic feature used)
+- `FLU-4101`: Hint for Runtime (Use local variable)
 
 ## Error Message Format
 
@@ -95,32 +109,34 @@ public interface IDiagnosticCollector
 - Runtime context: Track call stack and variable scopes
 - Compiler context: Track compilation phase and current construct
 
-## Common Error Categories
+## Common Error Examples
 
-### Parser Errors
-- `FLU-0001`: Unexpected token
-- `FLU-0002`: Missing closing delimiter
-- `FLU-0003`: Invalid expression
-- `FLU-0004`: Reserved word misuse
-- `FLU-0005`: Invalid number format
+### Parser Errors (1-0-xx)
+- `FLU-1001`: Encountered '{' while parsing function call. Expected '(' or string.
+- `FLU-1002`: Missing closing ')'. The '(' opened here needs to be closed.
+- `FLU-1003`: 'then' is not a valid expression in assignment.
+- `FLU-1004`: Cannot use 'end' here. 'end' is a reserved word that can only be used to close blocks.
+- `FLU-1005`: '123abc' is not a valid number. Numbers should be like 123, 3.14, or 0xFF.
 
-### Runtime Errors
-- `FLU-1001`: Nil value access
-- `FLU-1002`: Type mismatch
-- `FLU-1003`: Unknown variable
-- `FLU-1004`: Stack overflow
-- `FLU-1005`: Invalid operation
+### Runtime Errors (1-1-xx)
+- `FLU-1101`: Attempted to index a nil value. Check that the table exists before accessing it.
+- `FLU-1102`: Cannot concatenate: expected string but got number.
+- `FLU-1103`: 'printt' is not defined. Did you forget to declare it with 'local printt'?
+- `FLU-1104`: Stack overflow in function call. Check for infinite recursion.
+- `FLU-1105`: Cannot perform arithmetic on table. This operation is not supported for this type.
 
-### Compiler Errors
-- `FLU-2001`: Unsupported feature in compiled code
-- `FLU-2002`: Code generation failure
-- `FLU-2003`: Invalid compilation target
-- `FLU-2004`: Missing runtime dependency
+### Compiler Errors (1-2-xx)
+- `FLU-1201`: Dynamic code loading (load/loadfile/dofile) is not supported in compiled executables.
+- `FLU-1202`: Failed to compile table constructor: invalid syntax.
+- `FLU-1203`: 'WebAssembly' is not a valid compilation target.
+- `FLU-1204`: Runtime library 'FLua.Runtime.dll' not found.
 
-### Compiler Warnings
-- `FLU-2501`: Dynamic feature used (e.g., load())
-- `FLU-2502`: Performance warning
-- `FLU-2503`: Potential runtime incompatibility
+### Compiler Warnings (2-2-xx)
+- `FLU-2201`: Using 'load' in compiled code will return an error at runtime.
+- `FLU-2202`: This loop could be optimized by moving invariant expressions outside.
+- `FLU-2203`: Code uses features that may not work in all runtime environments.
+- `FLU-2204`: Variable 'temp' is defined but never used.
+- `FLU-2205`: Variable 'x' shadows a previous declaration at line 10.
 
 ## Integration Points
 
