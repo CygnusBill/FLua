@@ -563,5 +563,25 @@ namespace FLua.Runtime
         }
 
         #endregion
+
+        #region Table Operations
+
+        /// <summary>
+        /// Creates a table from an array of key-value pairs
+        /// </summary>
+        public static LuaTable CreateTable(LuaValue[] keyValuePairs)
+        {
+            if (keyValuePairs.Length % 2 != 0)
+                throw new ArgumentException("Key-value pairs array must have even length");
+
+            var table = new LuaTable();
+            for (int i = 0; i < keyValuePairs.Length; i += 2)
+            {
+                table.Set(keyValuePairs[i], keyValuePairs[i + 1]);
+            }
+            return table;
+        }
+
+        #endregion
     }
 }

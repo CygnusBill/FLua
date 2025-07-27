@@ -1,0 +1,3 @@
+local t = {10, 20, 30}
+local sum = t[1] + t[2] + t[3]
+print(sum)

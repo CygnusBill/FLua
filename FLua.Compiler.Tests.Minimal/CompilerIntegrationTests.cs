@@ -197,4 +197,433 @@ public class CompilerIntegrationTests
         Assert.IsNotNull(assembly.EntryPoint, "Console app should have entry point");
         Assert.AreEqual("Main", assembly.EntryPoint.Name, "Entry point should be Main method");
     }
+
+    [TestMethod]
+    public void CompileAndExecute_IfStatement_WorksCorrectly()
+    {
+        // Testing Approach: Control Flow Testing - If/else statements
+        // Arrange
+        string luaCode = @"
+            local x = 10
+            local result = 0
+            
+            if x > 5 then
+                result = 1
+            elseif x == 5 then
+                result = 2
+            else
+                result = 3
+            end
+        ";
+        var ast = FLua.Parser.ParserHelper.ParseString(luaCode);
+        var outputPath = Path.Combine(_tempDir, "if_statement.dll");
+        var options = new CompilerOptions(outputPath);
+
+        // Act
+        var compileResult = _compiler.Compile(Microsoft.FSharp.Collections.ListModule.ToArray(ast), options);
+
+        // Assert
+        Assert.IsTrue(compileResult.Success, "If statement should compile successfully");
+        
+        // Execute and verify
+        var assembly = Assembly.LoadFile(outputPath);
+        var type = assembly.GetType("CompiledLuaScript.LuaScript");
+        var method = type.GetMethod("Execute");
+        var env = LuaEnvironment.CreateStandardEnvironment();
+        
+        method.Invoke(null, new object[] { env });
+        
+        var result = env.GetVariable("result");
+        Assert.IsTrue(result is LuaInteger, "result should be LuaInteger");
+        Assert.AreEqual(1L, ((LuaInteger)result).Value, "result should equal 1");
+    }
+
+    [TestMethod]
+    public void CompileAndExecute_WhileLoop_WorksCorrectly()
+    {
+        // Testing Approach: Control Flow Testing - While loops
+        // Arrange
+        string luaCode = @"
+            local i = 0
+            local sum = 0
+            
+            while i < 5 do
+                sum = sum + i
+                i = i + 1
+            end
+        ";
+        var ast = FLua.Parser.ParserHelper.ParseString(luaCode);
+        var outputPath = Path.Combine(_tempDir, "while_loop.dll");
+        var options = new CompilerOptions(outputPath);
+
+        // Act
+        var compileResult = _compiler.Compile(Microsoft.FSharp.Collections.ListModule.ToArray(ast), options);
+
+        // Assert
+        Assert.IsTrue(compileResult.Success, "While loop should compile successfully");
+        
+        // Execute and verify
+        var assembly = Assembly.LoadFile(outputPath);
+        var type = assembly.GetType("CompiledLuaScript.LuaScript");
+        var method = type.GetMethod("Execute");
+        var env = LuaEnvironment.CreateStandardEnvironment();
+        
+        method.Invoke(null, new object[] { env });
+        
+        var sum = env.GetVariable("sum");
+        Assert.IsTrue(sum is LuaInteger, "sum should be LuaInteger");
+        Assert.AreEqual(10L, ((LuaInteger)sum).Value, "sum should equal 10 (0+1+2+3+4)");
+    }
+
+    [TestMethod]
+    public void CompileAndExecute_RepeatUntilLoop_WorksCorrectly()
+    {
+        // Testing Approach: Control Flow Testing - Repeat/until loops
+        // Arrange
+        string luaCode = @"
+            local i = 0
+            local count = 0
+            
+            repeat
+                count = count + 1
+                i = i + 1
+            until i >= 3
+        ";
+        var ast = FLua.Parser.ParserHelper.ParseString(luaCode);
+        var outputPath = Path.Combine(_tempDir, "repeat_loop.dll");
+        var options = new CompilerOptions(outputPath);
+
+        // Act
+        var compileResult = _compiler.Compile(Microsoft.FSharp.Collections.ListModule.ToArray(ast), options);
+
+        // Assert
+        Assert.IsTrue(compileResult.Success, "Repeat/until loop should compile successfully");
+        
+        // Execute and verify
+        var assembly = Assembly.LoadFile(outputPath);
+        var type = assembly.GetType("CompiledLuaScript.LuaScript");
+        var method = type.GetMethod("Execute");
+        var env = LuaEnvironment.CreateStandardEnvironment();
+        
+        method.Invoke(null, new object[] { env });
+        
+        var count = env.GetVariable("count");
+        Assert.IsTrue(count is LuaInteger, "count should be LuaInteger");
+        Assert.AreEqual(3L, ((LuaInteger)count).Value, "count should equal 3");
+    }
+
+    [TestMethod]
+    public void CompileAndExecute_NumericFor_WorksCorrectly()
+    {
+        // Testing Approach: Control Flow Testing - Numeric for loops
+        // Arrange
+        string luaCode = @"
+            local sum = 0
+            
+            for i = 1, 5 do
+                sum = sum + i
+            end
+        ";
+        var ast = FLua.Parser.ParserHelper.ParseString(luaCode);
+        var outputPath = Path.Combine(_tempDir, "numeric_for.dll");
+        var options = new CompilerOptions(outputPath);
+
+        // Act
+        var compileResult = _compiler.Compile(Microsoft.FSharp.Collections.ListModule.ToArray(ast), options);
+
+        // Assert
+        Assert.IsTrue(compileResult.Success, "Numeric for loop should compile successfully");
+        
+        // Execute and verify
+        var assembly = Assembly.LoadFile(outputPath);
+        var type = assembly.GetType("CompiledLuaScript.LuaScript");
+        var method = type.GetMethod("Execute");
+        var env = LuaEnvironment.CreateStandardEnvironment();
+        
+        method.Invoke(null, new object[] { env });
+        
+        var sum = env.GetVariable("sum");
+        Assert.IsTrue(sum is LuaInteger, "sum should be LuaInteger");
+        Assert.AreEqual(15L, ((LuaInteger)sum).Value, "sum should equal 15 (1+2+3+4+5)");
+    }
+
+    [TestMethod]
+    public void CompileAndExecute_NumericForWithStep_WorksCorrectly()
+    {
+        // Testing Approach: Boundary Value Analysis - For loop with custom step
+        // Arrange
+        string luaCode = @"
+            local count = 0
+            
+            for i = 10, 1, -2 do
+                count = count + 1
+            end
+        ";
+        var ast = FLua.Parser.ParserHelper.ParseString(luaCode);
+        var outputPath = Path.Combine(_tempDir, "numeric_for_step.dll");
+        var options = new CompilerOptions(outputPath);
+
+        // Act
+        var compileResult = _compiler.Compile(Microsoft.FSharp.Collections.ListModule.ToArray(ast), options);
+
+        // Assert
+        Assert.IsTrue(compileResult.Success, "Numeric for loop with step should compile successfully");
+        
+        // Execute and verify
+        var assembly = Assembly.LoadFile(outputPath);
+        var type = assembly.GetType("CompiledLuaScript.LuaScript");
+        var method = type.GetMethod("Execute");
+        var env = LuaEnvironment.CreateStandardEnvironment();
+        
+        method.Invoke(null, new object[] { env });
+        
+        var count = env.GetVariable("count");
+        Assert.IsTrue(count is LuaInteger, "count should be LuaInteger");
+        Assert.AreEqual(5L, ((LuaInteger)count).Value, "count should equal 5 (10,8,6,4,2)");
+    }
+
+    [TestMethod]
+    public void CompileAndExecute_BreakStatement_WorksCorrectly()
+    {
+        // Testing Approach: Control Flow Testing - Break statements
+        // Arrange
+        string luaCode = @"
+            local count = 0
+            
+            while true do
+                count = count + 1
+                if count >= 3 then
+                    break
+                end
+            end
+        ";
+        var ast = FLua.Parser.ParserHelper.ParseString(luaCode);
+        var outputPath = Path.Combine(_tempDir, "break_statement.dll");
+        var options = new CompilerOptions(outputPath);
+
+        // Act
+        var compileResult = _compiler.Compile(Microsoft.FSharp.Collections.ListModule.ToArray(ast), options);
+
+        // Assert
+        Assert.IsTrue(compileResult.Success, "Break statement should compile successfully");
+        
+        // Execute and verify
+        var assembly = Assembly.LoadFile(outputPath);
+        var type = assembly.GetType("CompiledLuaScript.LuaScript");
+        var method = type.GetMethod("Execute");
+        var env = LuaEnvironment.CreateStandardEnvironment();
+        
+        method.Invoke(null, new object[] { env });
+        
+        var count = env.GetVariable("count");
+        Assert.IsTrue(count is LuaInteger, "count should be LuaInteger");
+        Assert.AreEqual(3L, ((LuaInteger)count).Value, "count should equal 3");
+    }
+
+    [TestMethod]
+    public void CompileAndExecute_EmptyTableConstructor_WorksCorrectly()
+    {
+        // Testing Approach: Boundary Value Analysis - Empty table
+        // Arrange
+        string luaCode = @"
+            local t = {}
+        ";
+        var ast = FLua.Parser.ParserHelper.ParseString(luaCode);
+        var outputPath = Path.Combine(_tempDir, "empty_table.dll");
+        var options = new CompilerOptions(outputPath);
+
+        // Act
+        var compileResult = _compiler.Compile(Microsoft.FSharp.Collections.ListModule.ToArray(ast), options);
+
+        // Assert
+        Assert.IsTrue(compileResult.Success, "Empty table constructor should compile successfully");
+        
+        // Execute and verify
+        var assembly = Assembly.LoadFile(outputPath);
+        var type = assembly.GetType("CompiledLuaScript.LuaScript");
+        var method = type.GetMethod("Execute");
+        var env = LuaEnvironment.CreateStandardEnvironment();
+        
+        method.Invoke(null, new object[] { env });
+        
+        var t = env.GetVariable("t");
+        Assert.IsTrue(t is LuaTable, "t should be LuaTable");
+        // Verify it's empty by checking a random key
+        var value = ((LuaTable)t).Get(new LuaInteger(1));
+        Assert.IsTrue(value is LuaNil, "Empty table should return nil for any key");
+    }
+
+    [TestMethod]
+    public void CompileAndExecute_ArrayStyleTable_WorksCorrectly()
+    {
+        // Testing Approach: Normal Case Testing - Array-style table constructor
+        // Arrange
+        string luaCode = @"
+local t = {10, 20, 30}
+local a = t[1]
+local b = t[2]
+local c = t[3]
+local sum = a + b + c
+        ";
+        var ast = FLua.Parser.ParserHelper.ParseString(luaCode);
+        var outputPath = Path.Combine(_tempDir, "array_table.dll");
+        var options = new CompilerOptions(outputPath);
+
+        // Act
+        var compileResult = _compiler.Compile(Microsoft.FSharp.Collections.ListModule.ToArray(ast), options);
+
+        // Assert
+        Assert.IsTrue(compileResult.Success, "Array-style table should compile successfully");
+        
+        // Execute and verify
+        var assembly = Assembly.LoadFile(outputPath);
+        var type = assembly.GetType("CompiledLuaScript.LuaScript");
+        var method = type.GetMethod("Execute");
+        var env = LuaEnvironment.CreateStandardEnvironment();
+        
+        method.Invoke(null, new object[] { env });
+        
+        var sum = env.GetVariable("sum");
+        Assert.IsTrue(sum is LuaInteger, "sum should be LuaInteger");
+        Assert.AreEqual(60L, ((LuaInteger)sum).Value, "sum should equal 60 (10+20+30)");
+    }
+
+    [TestMethod]
+    public void CompileAndExecute_NamedFieldTable_WorksCorrectly()
+    {
+        // Testing Approach: Equivalence Partitioning - Named field table constructor
+        // Arrange
+        string luaCode = @"
+local t = {x = 10, y = 20}
+local a = t.x
+local b = t.y
+local sum = a + b
+        ";
+        var ast = FLua.Parser.ParserHelper.ParseString(luaCode);
+        var outputPath = Path.Combine(_tempDir, "named_field_table.dll");
+        var options = new CompilerOptions(outputPath);
+
+        // Act
+        var compileResult = _compiler.Compile(Microsoft.FSharp.Collections.ListModule.ToArray(ast), options);
+
+        // Assert
+        Assert.IsTrue(compileResult.Success, "Named field table should compile successfully");
+        
+        // Execute and verify
+        var assembly = Assembly.LoadFile(outputPath);
+        var type = assembly.GetType("CompiledLuaScript.LuaScript");
+        var method = type.GetMethod("Execute");
+        var env = LuaEnvironment.CreateStandardEnvironment();
+        
+        method.Invoke(null, new object[] { env });
+        
+        var sum = env.GetVariable("sum");
+        Assert.IsTrue(sum is LuaInteger, "sum should be LuaInteger");
+        Assert.AreEqual(30L, ((LuaInteger)sum).Value, "sum should equal 30 (10+20)");
+    }
+
+    [TestMethod]
+    public void CompileAndExecute_TableAssignment_WorksCorrectly()
+    {
+        // Testing Approach: State Transition Testing - Table modification
+        // Arrange
+        string luaCode = @"
+local t = {10, 20}
+t[1] = 100
+t[3] = 300
+local a = t[1]
+local b = t[2]
+local c = t[3]
+local sum = a + b + c
+        ";
+        var ast = FLua.Parser.ParserHelper.ParseString(luaCode);
+        var outputPath = Path.Combine(_tempDir, "table_assignment.dll");
+        var options = new CompilerOptions(outputPath);
+
+        // Act
+        var compileResult = _compiler.Compile(Microsoft.FSharp.Collections.ListModule.ToArray(ast), options);
+
+        // Assert
+        Assert.IsTrue(compileResult.Success, "Table assignment should compile successfully");
+        
+        // Execute and verify
+        var assembly = Assembly.LoadFile(outputPath);
+        var type = assembly.GetType("CompiledLuaScript.LuaScript");
+        var method = type.GetMethod("Execute");
+        var env = LuaEnvironment.CreateStandardEnvironment();
+        
+        method.Invoke(null, new object[] { env });
+        
+        var sum = env.GetVariable("sum");
+        Assert.IsTrue(sum is LuaInteger, "sum should be LuaInteger");
+        Assert.AreEqual(420L, ((LuaInteger)sum).Value, "sum should equal 420 (100+20+300)");
+    }
+
+    [TestMethod]
+    public void CompileAndExecute_TableMethodCall_WorksCorrectly()
+    {
+        // Testing Approach: Integration Testing - Table method calls
+        // Arrange
+        string luaCode = @"
+local str = ""hello""
+local len = str:len()
+        ";
+        var ast = FLua.Parser.ParserHelper.ParseString(luaCode);
+        var outputPath = Path.Combine(_tempDir, "table_method_call.dll");
+        var options = new CompilerOptions(outputPath);
+
+        // Act
+        var compileResult = _compiler.Compile(Microsoft.FSharp.Collections.ListModule.ToArray(ast), options);
+
+        // Assert
+        Assert.IsTrue(compileResult.Success, "Table method call should compile successfully");
+        
+        // Execute and verify
+        var assembly = Assembly.LoadFile(outputPath);
+        var type = assembly.GetType("CompiledLuaScript.LuaScript");
+        var method = type.GetMethod("Execute");
+        var env = LuaEnvironment.CreateStandardEnvironment();
+        
+        method.Invoke(null, new object[] { env });
+        
+        var len = env.GetVariable("len");
+        Assert.IsTrue(len is LuaInteger, "len should be LuaInteger");
+        Assert.AreEqual(5L, ((LuaInteger)len).Value, "len should equal 5");
+    }
+
+    [TestMethod]
+    public void CompileAndExecute_MixedTableConstructor_WorksCorrectly()
+    {
+        // Testing Approach: Combinatorial Testing - Mixed table constructor
+        // Arrange
+        string luaCode = @"
+local t = {10, x = 20, [""key""] = 30, 40}
+local a = t[1]
+local b = t.x
+local c = t[""key""]
+local d = t[2]
+local sum = a + b + c + d
+        ";
+        var ast = FLua.Parser.ParserHelper.ParseString(luaCode);
+        var outputPath = Path.Combine(_tempDir, "mixed_table.dll");
+        var options = new CompilerOptions(outputPath);
+
+        // Act
+        var compileResult = _compiler.Compile(Microsoft.FSharp.Collections.ListModule.ToArray(ast), options);
+
+        // Assert
+        Assert.IsTrue(compileResult.Success, "Mixed table constructor should compile successfully");
+        
+        // Execute and verify
+        var assembly = Assembly.LoadFile(outputPath);
+        var type = assembly.GetType("CompiledLuaScript.LuaScript");
+        var method = type.GetMethod("Execute");
+        var env = LuaEnvironment.CreateStandardEnvironment();
+        
+        method.Invoke(null, new object[] { env });
+        
+        var sum = env.GetVariable("sum");
+        Assert.IsTrue(sum is LuaInteger, "sum should be LuaInteger");
+        Assert.AreEqual(100L, ((LuaInteger)sum).Value, "sum should equal 100 (10+20+30+40)");
+    }
 }

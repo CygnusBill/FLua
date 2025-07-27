@@ -28,6 +28,7 @@ namespace FLua.Compiler
         
         private Scope _currentScope = new Scope();
         private int _variableCounter = 0;
+        private int _tempVarCount = 0;
         
         public RoslynCodeGenerator()
         {
@@ -150,6 +151,14 @@ namespace FLua.Compiler
                 
                 return GenerateLocalAssignment(vars, exprs);
             }
+            else if (statement.IsAssignment)
+            {
+                var assign = (Statement.Assignment)statement;
+                var vars = FSharpListToList(assign.Item1);
+                var exprs = FSharpListToList(assign.Item2);
+                
+                return GenerateAssignment(vars, exprs);
+            }
             else if (statement.IsFunctionCall)
             {
                 var funcCall = (Statement.FunctionCall)statement;
@@ -180,6 +189,42 @@ namespace FLua.Compiler
                 var funcDef = (Statement.LocalFunctionDef)statement;
                 return GenerateLocalFunctionDef(funcDef.Item1, funcDef.Item2);
             }
+            else if (statement.IsWhile)
+            {
+                var whileStmt = (Statement.While)statement;
+                var condition = whileStmt.Item1;
+                var body = FSharpListToList(whileStmt.Item2);
+                return new[] { GenerateWhile(condition, body) };
+            }
+            else if (statement.IsRepeat)
+            {
+                var repeatStmt = (Statement.Repeat)statement;
+                var body = FSharpListToList(repeatStmt.Item1);
+                var condition = repeatStmt.Item2;
+                return new[] { GenerateRepeat(body, condition) };
+            }
+            else if (statement.IsNumericFor)
+            {
+                var forStmt = (Statement.NumericFor)statement;
+                var varName = forStmt.Item1;
+                var start = forStmt.Item2;
+                var stop = forStmt.Item3;
+                var step = forStmt.Item4;
+                var body = FSharpListToList(forStmt.Item5);
+                return new[] { GenerateNumericFor(varName, start, stop, step, body) };
+            }
+            else if (statement.IsGenericFor)
+            {
+                var forStmt = (Statement.GenericFor)statement;
+                var vars = FSharpListToList(forStmt.Item1);
+                var exprs = FSharpListToList(forStmt.Item2);
+                var body = FSharpListToList(forStmt.Item3);
+                return new[] { GenerateGenericFor(vars, exprs, body) };
+            }
+            else if (statement.IsBreak)
+            {
+                return new[] { BreakStatement() };
+            }
             else
             {
                 // Return a comment for unimplemented statement types
@@ -202,9 +247,9 @@ namespace FLua.Compiler
                 // Get mangled name for the variable
                 var mangledName = GetOrCreateMangledName(varName);
                 
-                // Create local variable declaration: var mangledName = expression;
+                // Create local variable declaration: LuaValue mangledName = expression;
                 var varDecl = LocalDeclarationStatement(
-                    VariableDeclaration(IdentifierName("var"))
+                    VariableDeclaration(IdentifierName("LuaValue"))
                         .AddVariables(
                             VariableDeclarator(Identifier(SanitizeIdentifier(mangledName)))
                                 .WithInitializer(EqualsValueClause(GenerateExpression(value)))));
@@ -223,6 +268,97 @@ namespace FLua.Compiler
                         Argument(IdentifierName(SanitizeIdentifier(mangledName)))));
                 
                 statements.Add(setVarCall);
+            }
+            
+            return statements;
+        }
+        
+        private IEnumerable<StatementSyntax> GenerateAssignment(IList<Expr> vars, IList<Expr> exprs)
+        {
+            var statements = new List<StatementSyntax>();
+            
+            for (int i = 0; i < vars.Count; i++)
+            {
+                var varExpr = vars[i];
+                var valueExpr = i < exprs.Count ? exprs[i] : Expr.CreateLiteral(FLua.Ast.Literal.CreateNil());
+                
+                if (varExpr.IsVar)
+                {
+                    // Simple variable assignment
+                    var varName = ((Expr.Var)varExpr).Item;
+                    
+                    // Check if it's a local variable
+                    if (IsLocalVariable(varName))
+                    {
+                        var mangledName = ResolveVariableName(varName);
+                        
+                        // Direct assignment to local variable
+                        var assignment = ExpressionStatement(
+                            AssignmentExpression(
+                                SyntaxKind.SimpleAssignmentExpression,
+                                IdentifierName(SanitizeIdentifier(mangledName)),
+                                GenerateExpression(valueExpr)));
+                        
+                        statements.Add(assignment);
+                        
+                        // Also update in environment
+                        var setVarCall = ExpressionStatement(
+                            InvocationExpression(
+                                MemberAccessExpression(
+                                    SyntaxKind.SimpleMemberAccessExpression,
+                                    IdentifierName("env"),
+                                    IdentifierName("SetVariable")))
+                            .AddArgumentListArguments(
+                                Argument(LiteralExpression(SyntaxKind.StringLiteralExpression, Literal(varName))),
+                                Argument(IdentifierName(SanitizeIdentifier(mangledName)))));
+                        
+                        statements.Add(setVarCall);
+                    }
+                    else
+                    {
+                        // Global variable assignment
+                        var setVarCall = ExpressionStatement(
+                            InvocationExpression(
+                                MemberAccessExpression(
+                                    SyntaxKind.SimpleMemberAccessExpression,
+                                    IdentifierName("env"),
+                                    IdentifierName("SetVariable")))
+                            .AddArgumentListArguments(
+                                Argument(LiteralExpression(SyntaxKind.StringLiteralExpression, Literal(varName))),
+                                Argument(GenerateExpression(valueExpr))));
+                        
+                        statements.Add(setVarCall);
+                    }
+                }
+                else if (varExpr.IsTableAccess)
+                {
+                    // Table indexing assignment: table[key] = value
+                    var tableAccess = (Expr.TableAccess)varExpr;
+                    
+                    // Cast table to LuaTable
+                    var tableExpr = ParenthesizedExpression(
+                        CastExpression(
+                            IdentifierName("LuaTable"),
+                            GenerateExpression(tableAccess.Item1)));
+                    
+                    var setCall = ExpressionStatement(
+                        InvocationExpression(
+                            MemberAccessExpression(
+                                SyntaxKind.SimpleMemberAccessExpression,
+                                tableExpr,
+                                IdentifierName("Set")))
+                        .AddArgumentListArguments(
+                            Argument(GenerateExpression(tableAccess.Item2)),
+                            Argument(GenerateExpression(valueExpr))));
+                    
+                    statements.Add(setCall);
+                }
+                else
+                {
+                    // TODO: Handle other complex assignments
+                    statements.Add(EmptyStatement().WithLeadingTrivia(
+                        Comment($"// TODO: Implement complex assignment for {varExpr.GetType().Name}")));
+                }
             }
             
             return statements;
@@ -249,6 +385,26 @@ namespace FLua.Compiler
             {
                 var funcCall = (Expr.FunctionCall)expr;
                 return GenerateFunctionCall(funcCall.Item1, FSharpListToList(funcCall.Item2));
+            }
+            else if (expr.IsUnary)
+            {
+                var unary = (Expr.Unary)expr;
+                return GenerateUnaryExpression(unary.Item1, unary.Item2);
+            }
+            else if (expr.IsTableConstructor)
+            {
+                var tableConstructor = (Expr.TableConstructor)expr;
+                return GenerateTableConstructor(FSharpListToList(tableConstructor.Item));
+            }
+            else if (expr.IsTableAccess)
+            {
+                var tableAccess = (Expr.TableAccess)expr;
+                return GenerateTableAccess(tableAccess.Item1, tableAccess.Item2);
+            }
+            else if (expr.IsMethodCall)
+            {
+                var methodCall = (Expr.MethodCall)expr;
+                return GenerateMethodCall(methodCall.Item1, methodCall.Item2, FSharpListToList(methodCall.Item3));
             }
             else
             {
@@ -359,6 +515,153 @@ namespace FLua.Compiler
                 .AddArgumentListArguments(
                     Argument(GenerateExpression(left)),
                     Argument(GenerateExpression(right)));
+        }
+        
+        private ExpressionSyntax GenerateUnaryExpression(UnaryOp op, Expr operand)
+        {
+            string methodName;
+            if (op.IsNegate) methodName = "Negate";
+            else if (op.IsNot) methodName = "Not";
+            else if (op.IsLength) methodName = "Length";
+            else if (op.IsBitNot) methodName = "BitNot";
+            else methodName = "Unknown";
+            
+            return InvocationExpression(
+                MemberAccessExpression(
+                    SyntaxKind.SimpleMemberAccessExpression,
+                    IdentifierName("LuaOperations"),
+                    IdentifierName(methodName)))
+                .AddArgumentListArguments(
+                    Argument(GenerateExpression(operand)));
+        }
+        
+        private ExpressionSyntax GenerateTableConstructor(IList<TableField> fields)
+        {
+            // Create new LuaTable
+            var tableCreation = ObjectCreationExpression(IdentifierName("LuaTable"))
+                .AddArgumentListArguments();
+            
+            if (fields.Count == 0)
+            {
+                return tableCreation;
+            }
+            
+            // For non-empty tables, we'll generate a helper method call
+            // LuaOperations.CreateTable(new object[] { key1, value1, key2, value2, ... })
+            var keyValuePairs = new List<ExpressionSyntax>();
+            
+            int arrayIndex = 1;
+            foreach (var field in fields)
+            {
+                if (field.IsExprField)
+                {
+                    // Array-style field: use integer key
+                    var exprField = (TableField.ExprField)field;
+                    keyValuePairs.Add(ObjectCreationExpression(IdentifierName("LuaInteger"))
+                        .AddArgumentListArguments(
+                            Argument(LiteralExpression(SyntaxKind.NumericLiteralExpression, Literal((long)arrayIndex)))));
+                    keyValuePairs.Add(GenerateExpression(exprField.Item));
+                    arrayIndex++;
+                }
+                else if (field.IsNamedField)
+                {
+                    // Named field: use string key
+                    var namedField = (TableField.NamedField)field;
+                    keyValuePairs.Add(ObjectCreationExpression(IdentifierName("LuaString"))
+                        .AddArgumentListArguments(
+                            Argument(LiteralExpression(SyntaxKind.StringLiteralExpression, Literal(namedField.Item1)))));
+                    keyValuePairs.Add(GenerateExpression(namedField.Item2));
+                }
+                else if (field.IsKeyField)
+                {
+                    // Key field: use expression as key
+                    var keyField = (TableField.KeyField)field;
+                    keyValuePairs.Add(GenerateExpression(keyField.Item1));
+                    keyValuePairs.Add(GenerateExpression(keyField.Item2));
+                }
+            }
+            
+            // Create the array of key-value pairs
+            var arrayCreation = ArrayCreationExpression(
+                ArrayType(IdentifierName("LuaValue"))
+                    .WithRankSpecifiers(SingletonList(ArrayRankSpecifier())))
+                .WithInitializer(InitializerExpression(
+                    SyntaxKind.ArrayInitializerExpression,
+                    SeparatedList(keyValuePairs)));
+            
+            // Call LuaOperations.CreateTable
+            return InvocationExpression(
+                MemberAccessExpression(
+                    SyntaxKind.SimpleMemberAccessExpression,
+                    IdentifierName("LuaOperations"),
+                    IdentifierName("CreateTable")))
+                .AddArgumentListArguments(
+                    Argument(arrayCreation));
+        }
+        
+        private ExpressionSyntax GenerateTableAccess(Expr table, Expr key)
+        {
+            // Generate: ((LuaTable)table).Get(key)
+            var tableExpr = ParenthesizedExpression(
+                CastExpression(
+                    IdentifierName("LuaTable"),
+                    GenerateExpression(table)));
+            
+            return InvocationExpression(
+                MemberAccessExpression(
+                    SyntaxKind.SimpleMemberAccessExpression,
+                    tableExpr,
+                    IdentifierName("Get")))
+                .AddArgumentListArguments(
+                    Argument(GenerateExpression(key)));
+        }
+        
+        private ExpressionSyntax GenerateMethodCall(Expr obj, string methodName, IList<Expr> args)
+        {
+            // Method call obj:method(args) is equivalent to obj.method(obj, args)
+            // First get the method from the object
+            var methodKey = ObjectCreationExpression(IdentifierName("LuaString"))
+                .AddArgumentListArguments(
+                    Argument(LiteralExpression(SyntaxKind.StringLiteralExpression, Literal(methodName))));
+            
+            // Cast object to LuaTable
+            var tableExpr = ParenthesizedExpression(
+                CastExpression(
+                    IdentifierName("LuaTable"),
+                    GenerateExpression(obj)));
+            
+            var methodAccess = InvocationExpression(
+                MemberAccessExpression(
+                    SyntaxKind.SimpleMemberAccessExpression,
+                    tableExpr,
+                    IdentifierName("Get")))
+                .AddArgumentListArguments(
+                    Argument(methodKey));
+            
+            // Cast to LuaFunction
+            var funcExpr = ParenthesizedExpression(
+                CastExpression(
+                    IdentifierName("LuaFunction"),
+                    methodAccess));
+            
+            // Prepare arguments with self as first argument
+            var allArgs = new List<ExpressionSyntax> { GenerateExpression(obj) };
+            allArgs.AddRange(args.Select(arg => GenerateExpression(arg)));
+            
+            var arrayCreation = ArrayCreationExpression(
+                ArrayType(IdentifierName("LuaValue"))
+                    .WithRankSpecifiers(SingletonList(ArrayRankSpecifier())))
+                .WithInitializer(InitializerExpression(
+                    SyntaxKind.ArrayInitializerExpression,
+                    SeparatedList(allArgs)));
+            
+            return InvocationExpression(
+                MemberAccessExpression(
+                    SyntaxKind.SimpleMemberAccessExpression,
+                    funcExpr,
+                    IdentifierName("Call")))
+                .AddArgumentListArguments(
+                    Argument(arrayCreation));
         }
         
         private ExpressionSyntax GenerateFunctionCall(Expr func, IList<Expr> args)
@@ -617,6 +920,449 @@ namespace FLua.Compiler
             statements.Add(setFuncCall);
             
             return statements;
+        }
+        
+        private StatementSyntax GenerateWhile(Expr condition, IList<Statement> body)
+        {
+            // Generate condition.IsTruthy
+            var conditionExpr = MemberAccessExpression(
+                SyntaxKind.SimpleMemberAccessExpression,
+                GenerateExpression(condition),
+                IdentifierName("IsTruthy"));
+            
+            // Generate body block
+            EnterScope();
+            var bodyStatements = body.SelectMany(s => GenerateStatement(s)).ToList();
+            ExitScope();
+            
+            return WhileStatement(conditionExpr, Block(bodyStatements));
+        }
+        
+        private StatementSyntax GenerateRepeat(IList<Statement> body, Expr condition)
+        {
+            // Generate body block
+            EnterScope();
+            var bodyStatements = body.SelectMany(s => GenerateStatement(s)).ToList();
+            
+            // In Lua, repeat...until stops when condition is true
+            // In C#, do...while continues when condition is true
+            // So we need to negate the condition
+            var notCondition = PrefixUnaryExpression(
+                SyntaxKind.LogicalNotExpression,
+                MemberAccessExpression(
+                    SyntaxKind.SimpleMemberAccessExpression,
+                    GenerateExpression(condition),
+                    IdentifierName("IsTruthy")));
+            
+            ExitScope();
+            
+            return DoStatement(Block(bodyStatements), notCondition);
+        }
+        
+        private StatementSyntax GenerateNumericFor(string varName, Expr start, Expr stop, Microsoft.FSharp.Core.FSharpOption<Expr> step, IList<Statement> body)
+        {
+            EnterScope();
+            var statements = new List<StatementSyntax>();
+            
+            // Get mangled name for the loop variable
+            var mangledName = GetOrCreateMangledName(varName);
+            
+            // Generate step value (default to 1 if not provided)
+            var stepExpr = OptionModule.IsSome(step) 
+                ? GenerateExpression(step.Value)
+                : ObjectCreationExpression(IdentifierName("LuaNumber"))
+                    .AddArgumentListArguments(Argument(LiteralExpression(SyntaxKind.NumericLiteralExpression, Literal(1.0))));
+            
+            // var start_val = start;
+            var startVarName = $"{mangledName}_start";
+            statements.Add(LocalDeclarationStatement(
+                VariableDeclaration(IdentifierName("var"))
+                    .AddVariables(
+                        VariableDeclarator(Identifier(startVarName))
+                            .WithInitializer(EqualsValueClause(GenerateExpression(start))))));
+            
+            // var stop_val = stop;
+            var stopVarName = $"{mangledName}_stop";
+            statements.Add(LocalDeclarationStatement(
+                VariableDeclaration(IdentifierName("var"))
+                    .AddVariables(
+                        VariableDeclarator(Identifier(stopVarName))
+                            .WithInitializer(EqualsValueClause(GenerateExpression(stop))))));
+            
+            // var step_val = step;
+            var stepVarName = $"{mangledName}_step";
+            statements.Add(LocalDeclarationStatement(
+                VariableDeclaration(IdentifierName("var"))
+                    .AddVariables(
+                        VariableDeclarator(Identifier(stepVarName))
+                            .WithInitializer(EqualsValueClause(stepExpr)))));
+            
+            // Convert to numbers and store in non-nullable variables
+            var startNumVarName = $"{mangledName}_start_num";
+            statements.Add(LocalDeclarationStatement(
+                VariableDeclaration(IdentifierName("double"))
+                    .AddVariables(
+                        VariableDeclarator(Identifier(startNumVarName))
+                            .WithInitializer(EqualsValueClause(
+                                BinaryExpression(
+                                    SyntaxKind.CoalesceExpression,
+                                    InvocationExpression(
+                                        MemberAccessExpression(
+                                            SyntaxKind.SimpleMemberAccessExpression,
+                                            IdentifierName("LuaTypeConversion"),
+                                            IdentifierName("ToNumber")))
+                                        .AddArgumentListArguments(Argument(IdentifierName(startVarName))),
+                                    LiteralExpression(SyntaxKind.NumericLiteralExpression, Literal(0.0))))))));
+            
+            var stopNumVarName = $"{mangledName}_stop_num";
+            statements.Add(LocalDeclarationStatement(
+                VariableDeclaration(IdentifierName("double"))
+                    .AddVariables(
+                        VariableDeclarator(Identifier(stopNumVarName))
+                            .WithInitializer(EqualsValueClause(
+                                BinaryExpression(
+                                    SyntaxKind.CoalesceExpression,
+                                    InvocationExpression(
+                                        MemberAccessExpression(
+                                            SyntaxKind.SimpleMemberAccessExpression,
+                                            IdentifierName("LuaTypeConversion"),
+                                            IdentifierName("ToNumber")))
+                                        .AddArgumentListArguments(Argument(IdentifierName(stopVarName))),
+                                    LiteralExpression(SyntaxKind.NumericLiteralExpression, Literal(0.0))))))));
+            
+            var stepNumVarName = $"{mangledName}_step_num";
+            statements.Add(LocalDeclarationStatement(
+                VariableDeclaration(IdentifierName("double"))
+                    .AddVariables(
+                        VariableDeclarator(Identifier(stepNumVarName))
+                            .WithInitializer(EqualsValueClause(
+                                BinaryExpression(
+                                    SyntaxKind.CoalesceExpression,
+                                    InvocationExpression(
+                                        MemberAccessExpression(
+                                            SyntaxKind.SimpleMemberAccessExpression,
+                                            IdentifierName("LuaTypeConversion"),
+                                            IdentifierName("ToNumber")))
+                                        .AddArgumentListArguments(Argument(IdentifierName(stepVarName))),
+                                    LiteralExpression(SyntaxKind.NumericLiteralExpression, Literal(1.0))))))));
+            
+            // Create loop variable as LuaValue
+            var loopVar = SanitizeIdentifier(mangledName);
+            statements.Add(LocalDeclarationStatement(
+                VariableDeclaration(IdentifierName("LuaValue"))
+                    .AddVariables(
+                        VariableDeclarator(Identifier(loopVar))
+                            .WithInitializer(EqualsValueClause(LiteralExpression(SyntaxKind.NullLiteralExpression))))));
+            
+            // for (double i_num = start_num; (step_num > 0 && i_num <= stop_num) || (step_num < 0 && i_num >= stop_num); i_num += step_num)
+            var loopNumVar = $"{loopVar}_num";
+            
+            // step_num > 0
+            var stepPositive = BinaryExpression(
+                SyntaxKind.GreaterThanExpression,
+                IdentifierName(stepNumVarName),
+                LiteralExpression(SyntaxKind.NumericLiteralExpression, Literal(0.0)));
+            
+            // i_num <= stop_num
+            var ascendingCond = BinaryExpression(
+                SyntaxKind.LessThanOrEqualExpression,
+                IdentifierName(loopNumVar),
+                IdentifierName(stopNumVarName));
+            
+            // step_num < 0
+            var stepNegative = BinaryExpression(
+                SyntaxKind.LessThanExpression,
+                IdentifierName(stepNumVarName),
+                LiteralExpression(SyntaxKind.NumericLiteralExpression, Literal(0.0)));
+            
+            // i_num >= stop_num
+            var descendingCond = BinaryExpression(
+                SyntaxKind.GreaterThanOrEqualExpression,
+                IdentifierName(loopNumVar),
+                IdentifierName(stopNumVarName));
+            
+            // (step > 0 && i <= stop) || (step < 0 && i >= stop)
+            var condition = BinaryExpression(
+                SyntaxKind.LogicalOrExpression,
+                ParenthesizedExpression(
+                    BinaryExpression(
+                        SyntaxKind.LogicalAndExpression,
+                        stepPositive,
+                        ascendingCond)),
+                ParenthesizedExpression(
+                    BinaryExpression(
+                        SyntaxKind.LogicalAndExpression,
+                        stepNegative,
+                        descendingCond)));
+            
+            // i_num += step_num
+            var incrementor = AssignmentExpression(
+                SyntaxKind.AddAssignmentExpression,
+                IdentifierName(loopNumVar),
+                IdentifierName(stepNumVarName));
+            
+            // Generate loop body
+            var loopBodyStatements = new List<StatementSyntax>();
+            
+            // Update loop variable: loopVar = new LuaNumber(i_num)
+            loopBodyStatements.Add(ExpressionStatement(
+                AssignmentExpression(
+                    SyntaxKind.SimpleAssignmentExpression,
+                    IdentifierName(loopVar),
+                    ObjectCreationExpression(IdentifierName("LuaNumber"))
+                        .AddArgumentListArguments(Argument(IdentifierName(loopNumVar))))));
+            
+            // Store loop variable in environment
+            loopBodyStatements.Add(ExpressionStatement(
+                InvocationExpression(
+                    MemberAccessExpression(
+                        SyntaxKind.SimpleMemberAccessExpression,
+                        IdentifierName("env"),
+                        IdentifierName("SetVariable")))
+                .AddArgumentListArguments(
+                    Argument(LiteralExpression(SyntaxKind.StringLiteralExpression, Literal(varName))),
+                    Argument(IdentifierName(loopVar)))));
+            
+            // Add user body statements
+            loopBodyStatements.AddRange(body.SelectMany(s => GenerateStatement(s)));
+            
+            var forLoop = ForStatement(Block(loopBodyStatements))
+                .WithDeclaration(VariableDeclaration(IdentifierName("double"))
+                    .AddVariables(VariableDeclarator(Identifier(loopNumVar))
+                        .WithInitializer(EqualsValueClause(IdentifierName(startNumVarName)))))
+                .WithCondition(condition)
+                .AddIncrementors(incrementor);
+            
+            statements.Add(forLoop);
+            ExitScope();
+            
+            return Block(statements);
+        }
+        
+        private StatementSyntax GenerateGenericFor(IList<(string, LuaAttribute)> vars, IList<Expr> exprs, IList<Statement> body)
+        {
+            EnterScope();
+            var statements = new List<StatementSyntax>();
+            
+            // Lua generic for loops work with iterators
+            // for k,v in pairs(t) do ... end
+            // Translates to calling the iterator function repeatedly until it returns nil
+            
+            // Get the iterator function (first expression)
+            if (exprs.Count == 0)
+            {
+                throw new InvalidOperationException("Generic for loop requires at least one expression");
+            }
+            
+            var iterExpr = exprs[0];
+            
+            // Call the iterator to get the actual iterator function, state, and initial value
+            var iterCallName = "_iter_call";
+            statements.Add(LocalDeclarationStatement(
+                VariableDeclaration(IdentifierName("var"))
+                    .AddVariables(
+                        VariableDeclarator(Identifier(iterCallName))
+                            .WithInitializer(EqualsValueClause(
+                                InvocationExpression(
+                                    MemberAccessExpression(
+                                        SyntaxKind.SimpleMemberAccessExpression,
+                                        ParenthesizedExpression(
+                                            CastExpression(
+                                                IdentifierName("LuaFunction"),
+                                                GenerateExpression(iterExpr))),
+                                        IdentifierName("Call")))
+                                .AddArgumentListArguments(
+                                    Argument(ArrayCreationExpression(
+                                        ArrayType(IdentifierName("LuaValue"))
+                                            .WithRankSpecifiers(SingletonList(ArrayRankSpecifier())))
+                                        .WithInitializer(InitializerExpression(
+                                            SyntaxKind.ArrayInitializerExpression)))))))));
+            
+            // Extract iterator function, state, and control variable
+            var iterFuncName = "_iter_func";
+            var iterStateName = "_iter_state";
+            var iterControlName = "_iter_control";
+            
+            statements.Add(LocalDeclarationStatement(
+                VariableDeclaration(IdentifierName("var"))
+                    .AddVariables(
+                        VariableDeclarator(Identifier(iterFuncName))
+                            .WithInitializer(EqualsValueClause(
+                                ConditionalExpression(
+                                    BinaryExpression(
+                                        SyntaxKind.GreaterThanOrEqualExpression,
+                                        MemberAccessExpression(
+                                            SyntaxKind.SimpleMemberAccessExpression,
+                                            IdentifierName(iterCallName),
+                                            IdentifierName("Length")),
+                                        LiteralExpression(SyntaxKind.NumericLiteralExpression, Literal(1))),
+                                    ElementAccessExpression(IdentifierName(iterCallName))
+                                        .AddArgumentListArguments(
+                                            Argument(LiteralExpression(SyntaxKind.NumericLiteralExpression, Literal(0)))),
+                                    MemberAccessExpression(
+                                        SyntaxKind.SimpleMemberAccessExpression,
+                                        IdentifierName("LuaValue"),
+                                        IdentifierName("Nil"))))))));
+            
+            statements.Add(LocalDeclarationStatement(
+                VariableDeclaration(IdentifierName("var"))
+                    .AddVariables(
+                        VariableDeclarator(Identifier(iterStateName))
+                            .WithInitializer(EqualsValueClause(
+                                ConditionalExpression(
+                                    BinaryExpression(
+                                        SyntaxKind.GreaterThanOrEqualExpression,
+                                        MemberAccessExpression(
+                                            SyntaxKind.SimpleMemberAccessExpression,
+                                            IdentifierName(iterCallName),
+                                            IdentifierName("Length")),
+                                        LiteralExpression(SyntaxKind.NumericLiteralExpression, Literal(2))),
+                                    ElementAccessExpression(IdentifierName(iterCallName))
+                                        .AddArgumentListArguments(
+                                            Argument(LiteralExpression(SyntaxKind.NumericLiteralExpression, Literal(1)))),
+                                    MemberAccessExpression(
+                                        SyntaxKind.SimpleMemberAccessExpression,
+                                        IdentifierName("LuaValue"),
+                                        IdentifierName("Nil"))))))));
+            
+            statements.Add(LocalDeclarationStatement(
+                VariableDeclaration(IdentifierName("var"))
+                    .AddVariables(
+                        VariableDeclarator(Identifier(iterControlName))
+                            .WithInitializer(EqualsValueClause(
+                                ConditionalExpression(
+                                    BinaryExpression(
+                                        SyntaxKind.GreaterThanOrEqualExpression,
+                                        MemberAccessExpression(
+                                            SyntaxKind.SimpleMemberAccessExpression,
+                                            IdentifierName(iterCallName),
+                                            IdentifierName("Length")),
+                                        LiteralExpression(SyntaxKind.NumericLiteralExpression, Literal(3))),
+                                    ElementAccessExpression(IdentifierName(iterCallName))
+                                        .AddArgumentListArguments(
+                                            Argument(LiteralExpression(SyntaxKind.NumericLiteralExpression, Literal(2)))),
+                                    MemberAccessExpression(
+                                        SyntaxKind.SimpleMemberAccessExpression,
+                                        IdentifierName("LuaValue"),
+                                        IdentifierName("Nil"))))))));
+            
+            // while (true)
+            var loopBodyStatements = new List<StatementSyntax>();
+            
+            // Call iterator function
+            var iterResultName = "_iter_result";
+            loopBodyStatements.Add(LocalDeclarationStatement(
+                VariableDeclaration(IdentifierName("var"))
+                    .AddVariables(
+                        VariableDeclarator(Identifier(iterResultName))
+                            .WithInitializer(EqualsValueClause(
+                                InvocationExpression(
+                                    MemberAccessExpression(
+                                        SyntaxKind.SimpleMemberAccessExpression,
+                                        ParenthesizedExpression(
+                                            CastExpression(
+                                                IdentifierName("LuaFunction"),
+                                                IdentifierName(iterFuncName))),
+                                        IdentifierName("Call")))
+                                .AddArgumentListArguments(
+                                    Argument(ArrayCreationExpression(
+                                        ArrayType(IdentifierName("LuaValue"))
+                                            .WithRankSpecifiers(SingletonList(ArrayRankSpecifier())))
+                                        .WithInitializer(InitializerExpression(
+                                            SyntaxKind.ArrayInitializerExpression,
+                                            SeparatedList(new ExpressionSyntax[] {
+                                                IdentifierName(iterStateName),
+                                                IdentifierName(iterControlName)
+                                            }))))))))));
+            
+            // Check if first result is nil (end of iteration)
+            var firstResultName = "_first_result";
+            loopBodyStatements.Add(LocalDeclarationStatement(
+                VariableDeclaration(IdentifierName("var"))
+                    .AddVariables(
+                        VariableDeclarator(Identifier(firstResultName))
+                            .WithInitializer(EqualsValueClause(
+                                ConditionalExpression(
+                                    BinaryExpression(
+                                        SyntaxKind.GreaterThanExpression,
+                                        MemberAccessExpression(
+                                            SyntaxKind.SimpleMemberAccessExpression,
+                                            IdentifierName(iterResultName),
+                                            IdentifierName("Length")),
+                                        LiteralExpression(SyntaxKind.NumericLiteralExpression, Literal(0))),
+                                    ElementAccessExpression(IdentifierName(iterResultName))
+                                        .AddArgumentListArguments(
+                                            Argument(LiteralExpression(SyntaxKind.NumericLiteralExpression, Literal(0)))),
+                                    MemberAccessExpression(
+                                        SyntaxKind.SimpleMemberAccessExpression,
+                                        IdentifierName("LuaValue"),
+                                        IdentifierName("Nil"))))))));
+            
+            // if (firstResult.IsNil) break;
+            loopBodyStatements.Add(IfStatement(
+                MemberAccessExpression(
+                    SyntaxKind.SimpleMemberAccessExpression,
+                    IdentifierName(firstResultName),
+                    IdentifierName("IsNil")),
+                BreakStatement()));
+            
+            // Update control variable for next iteration
+            loopBodyStatements.Add(ExpressionStatement(
+                AssignmentExpression(
+                    SyntaxKind.SimpleAssignmentExpression,
+                    IdentifierName(iterControlName),
+                    IdentifierName(firstResultName))));
+            
+            // Assign loop variables
+            for (int i = 0; i < vars.Count; i++)
+            {
+                var (varName, attr) = vars[i];
+                var mangledName = GetOrCreateMangledName(varName);
+                
+                // var mangledName = iterResult.Length > i ? iterResult[i] : LuaValue.Nil;
+                loopBodyStatements.Add(LocalDeclarationStatement(
+                    VariableDeclaration(IdentifierName("var"))
+                        .AddVariables(
+                            VariableDeclarator(Identifier(SanitizeIdentifier(mangledName)))
+                                .WithInitializer(EqualsValueClause(
+                                    ConditionalExpression(
+                                        BinaryExpression(
+                                            SyntaxKind.GreaterThanExpression,
+                                            MemberAccessExpression(
+                                                SyntaxKind.SimpleMemberAccessExpression,
+                                                IdentifierName(iterResultName),
+                                                IdentifierName("Length")),
+                                            LiteralExpression(SyntaxKind.NumericLiteralExpression, Literal(i))),
+                                        ElementAccessExpression(IdentifierName(iterResultName))
+                                            .AddArgumentListArguments(
+                                                Argument(LiteralExpression(SyntaxKind.NumericLiteralExpression, Literal(i)))),
+                                        MemberAccessExpression(
+                                            SyntaxKind.SimpleMemberAccessExpression,
+                                            IdentifierName("LuaValue"),
+                                            IdentifierName("Nil"))))))));
+                
+                // env.SetVariable(varName, mangledName);
+                loopBodyStatements.Add(ExpressionStatement(
+                    InvocationExpression(
+                        MemberAccessExpression(
+                            SyntaxKind.SimpleMemberAccessExpression,
+                            IdentifierName("env"),
+                            IdentifierName("SetVariable")))
+                    .AddArgumentListArguments(
+                        Argument(LiteralExpression(SyntaxKind.StringLiteralExpression, Literal(varName))),
+                        Argument(IdentifierName(SanitizeIdentifier(mangledName))))));
+            }
+            
+            // Add user body statements
+            loopBodyStatements.AddRange(body.SelectMany(s => GenerateStatement(s)));
+            
+            statements.Add(WhileStatement(
+                LiteralExpression(SyntaxKind.TrueLiteralExpression),
+                Block(loopBodyStatements)));
+            
+            ExitScope();
+            
+            return Block(statements);
         }
         
         #region Scope Management
