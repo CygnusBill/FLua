@@ -15,8 +15,10 @@ public class CSharpCodeGenerator
 {
     private readonly StringBuilder _code;
     private int _indentLevel;
+    #pragma warning disable CS0414 // Field is assigned but never used - reserved for future use
     private int _labelCounter;
     private int _tempVarCounter;
+    #pragma warning restore CS0414
     
     // Scope tracking for variable name mangling
     private class Scope

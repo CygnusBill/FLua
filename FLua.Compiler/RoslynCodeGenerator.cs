@@ -31,7 +31,6 @@ namespace FLua.Compiler
         
         private Scope _currentScope = new Scope();
         private int _variableCounter = 0;
-        private int _tempVarCount = 0;
         private int tempVarCounter = 0;
         private int _anonymousFunctionCounter = 0;
         private List<MethodDeclarationSyntax> _pendingMethods = new List<MethodDeclarationSyntax>();
@@ -894,7 +893,7 @@ namespace FLua.Compiler
             }
         }
         
-        private ExpressionSyntax GenerateFunctionCallRaw(Expr func, IList<Expr> args, ExpressionSyntax funcOverride = null)
+        private ExpressionSyntax GenerateFunctionCallRaw(Expr func, IList<Expr> args, ExpressionSyntax? funcOverride = null)
         {
             // Check if calling a dynamic loading function
             if (func.IsVar)
