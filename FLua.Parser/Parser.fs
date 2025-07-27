@@ -195,6 +195,21 @@ let pString : Parser<string, unit> =
 // Use a function to ensure lazy evaluation
 let varList = parse { return! sepBy1 expr (symbol ",") }
 
+// Check if an expression is a valid lvalue (can be assigned to)
+let isLvalue expr =
+    match expr with
+    | Expr.Var _ -> true
+    | Expr.TableAccess _ -> true
+    | _ -> false
+
+// Parse a list of lvalues for assignment
+let lvalueList = 
+    sepBy1 expr (symbol ",") >>= fun exprs ->
+        if List.forall isLvalue exprs then
+            preturn exprs
+        else
+            fail "Invalid assignment target"
+
 // ============================================================================
 // LITERAL AND VARIABLE PARSERS  
 // ============================================================================
@@ -556,10 +571,27 @@ let pVariableWithAttribute =
         preturn Attribute.NoAttribute
     ] .>> ws
 
+// Parse an lvalue expression (stops at = or ,)
+let pLvalue =
+    let pPrimaryLvalue =
+        choice [
+            attempt pVariable
+            attempt pParenExpr
+        ]
+    
+    // Parse postfix operations but stop at = or ,
+    let rec parsePostfix expr =
+        choice [
+            attempt (notFollowedBy (ws >>. (pstring "=" <|> pstring ",")) >>. pPostfixOp >>= fun op -> parsePostfix (op expr))
+            preturn expr
+        ]
+    
+    pPrimaryLvalue >>= parsePostfix .>> ws
+
 // Assignment statement: var1, var2, ... = expr1, expr2, ...
 let pAssignment =
-    varList .>> symbol "=" .>>. sepBy1 expr (symbol ",")
-    |>> Statement.Assignment
+    sepBy1 pLvalue (symbol ",") .>> symbol "=" .>>. sepBy1 expr (symbol ",")
+    |>> fun (lhs, rhs) -> Statement.Assignment(lhs, rhs)
 
 // Local variable declaration: local var1 [<attr>], var2 [<attr>], ... = expr1, expr2, ...
 let pLocalAssignment =
@@ -567,21 +599,32 @@ let pLocalAssignment =
     .>>. opt (symbol "=" >>. sepBy1 expr (symbol ","))
     |>> Statement.LocalAssignment
 
-// Function call statement - match any expression that is a function or method call
-let pFunctionCallStmt = 
-    expr >>= fun e ->
-        // Check if the expression is a function call or method call at any level
-        let rec isFunctionCall expr =
-            match expr with
-            | Expr.FunctionCall _ -> true
-            | Expr.MethodCall _ -> true
-            | Expr.Paren inner -> isFunctionCall inner  // Check inside parentheses
-            | _ -> false
-        
-        if isFunctionCall e then
-            preturn (Statement.FunctionCall e)
-        else
-            fail "Not a function call"
+// Parse assignment or function call by parsing lvalues with lookahead
+let pAssignmentOrCall =
+    // Use pLvalue to parse potential assignment targets
+    sepBy1 pLvalue (symbol ",") >>= fun exprs ->
+        choice [
+            // If we see =, it's an assignment
+            symbol "=" >>. sepBy1 expr (symbol ",") |>> fun rhs ->
+                Statement.Assignment(exprs, rhs)
+            
+            // Otherwise, check if it's a single function call
+            preturn () >>= fun _ ->
+                match exprs with
+                | [e] ->
+                    let rec isFunctionCall expr =
+                        match expr with
+                        | Expr.FunctionCall _ -> true
+                        | Expr.MethodCall _ -> true  
+                        | Expr.Paren inner -> isFunctionCall inner
+                        | _ -> false
+                    
+                    if isFunctionCall e then
+                        preturn (Statement.FunctionCall e)
+                    else
+                        fail "Expected assignment or function call"
+                | _ -> fail "Multiple expressions must be followed by ="
+        ]
 
 // Empty statement (just a semicolon)
 let pEmptyStmt = symbol ";" >>% Statement.Empty
@@ -743,8 +786,7 @@ let statementImpl =
         attempt pWhileStmt
         attempt pRepeatStmt
         attempt pDoBlock
-        attempt pFunctionCallStmt    // Try function calls BEFORE assignments
-        attempt pAssignment
+        attempt pAssignmentOrCall     // Combined parser handles both assignments and function calls
         pEmptyStmt
     ] .>> ws
 

@@ -470,25 +470,81 @@ let tests = testList "Parser Tests" [
             ]
         ]
         
-        testList "Known Parser Issues" [
-            // These tests document known parser limitations that need to be fixed
-            // They are commented out to avoid failing the test suite
+        testList "Parser Fixes" [
+            // Tests for recently fixed parser issues
             
-            testList "Table Assignment at Statement Level (TODO: Fix Parser)" [
-                // The parser doesn't support table indexing on the left side of assignments
-                // See PARSER_KNOWN_ISSUES.md for details
+            testList "Table Assignment at Statement Level (Fixed)" [
+                // Basic table assignments
+                testStmt "table index assignment" "t[1] = 100" 
+                    (Statement.Assignment([Expr.TableAccess(Expr.Var "t", Expr.Literal (Literal.Integer 1I))], [Expr.Literal (Literal.Integer 100I)]))
                 
-                // testStmt "table index assignment" "t[1] = 100" 
-                //     (Statement.Assignment([Expr.TableAccess(Expr.Var "t", Expr.Literal (Literal.Integer 1I))], [Expr.Literal (Literal.Integer 100I)]))
+                testStmt "table dot assignment" "t.field = \"value\"" 
+                    (Statement.Assignment([Expr.TableAccess(Expr.Var "t", Expr.Literal (Literal.String "field"))], [Expr.Literal (Literal.String "value")]))
                 
-                // testStmt "table dot assignment" "t.field = \"value\"" 
-                //     (Statement.Assignment([Expr.TableAccess(Expr.Var "t", Expr.Literal (Literal.String "field"))], [Expr.Literal (Literal.String "value")]))
+                testStmt "table string key assignment" "t[\"key\"] = true" 
+                    (Statement.Assignment([Expr.TableAccess(Expr.Var "t", Expr.Literal (Literal.String "key"))], [Expr.Literal (Literal.Boolean true)]))
                 
-                // testStmt "table string key assignment" "t[\"key\"] = true" 
-                //     (Statement.Assignment([Expr.TableAccess(Expr.Var "t", Expr.Literal (Literal.String "key"))], [Expr.Literal (Literal.Boolean true)]))
+                testStmt "nested table assignment" "t.a.b[1] = 42"
+                    (Statement.Assignment([Expr.TableAccess(Expr.TableAccess(Expr.TableAccess(Expr.Var "t", Expr.Literal (Literal.String "a")), Expr.Literal (Literal.String "b")), Expr.Literal (Literal.Integer 1I))], [Expr.Literal (Literal.Integer 42I)]))
                 
-                // testStmt "nested table assignment" "t.a.b[1] = 42"
-                //     (Statement.Assignment([Expr.TableAccess(Expr.TableAccess(Expr.TableAccess(Expr.Var "t", Expr.Literal (Literal.String "a")), Expr.Literal (Literal.String "b")), Expr.Literal (Literal.Integer 1I))], [Expr.Literal (Literal.Integer 42I)]))
+                testStmt "multiple table assignment" "a[1], b[2] = 10, 20"
+                    (Statement.Assignment([Expr.TableAccess(Expr.Var "a", Expr.Literal (Literal.Integer 1I)); Expr.TableAccess(Expr.Var "b", Expr.Literal (Literal.Integer 2I))], [Expr.Literal (Literal.Integer 10I); Expr.Literal (Literal.Integer 20I)]))
+                
+                // Complex cases
+                testStmt "table assignment with expression key" "t[x + 1] = y * 2"
+                    (Statement.Assignment([Expr.TableAccess(Expr.Var "t", Expr.Binary(Expr.Var "x", BinaryOp.Add, Expr.Literal (Literal.Integer 1I)))], [Expr.Binary(Expr.Var "y", BinaryOp.Multiply, Expr.Literal (Literal.Integer 2I))]))
+                
+                testStmt "mixed assignment" "x, t[1], y.z = 1, 2, 3"
+                    (Statement.Assignment([Expr.Var "x"; Expr.TableAccess(Expr.Var "t", Expr.Literal (Literal.Integer 1I)); Expr.TableAccess(Expr.Var "y", Expr.Literal (Literal.String "z"))], [Expr.Literal (Literal.Integer 1I); Expr.Literal (Literal.Integer 2I); Expr.Literal (Literal.Integer 3I)]))
+                
+                testStmt "table assignment from function call" "t.result = func()"
+                    (Statement.Assignment([Expr.TableAccess(Expr.Var "t", Expr.Literal (Literal.String "result"))], [Expr.FunctionCall(Expr.Var "func", [])]))
+                
+                testStmt "chained table assignment" "t1.t2.t3[\"key\"] = value"
+                    (Statement.Assignment([Expr.TableAccess(Expr.TableAccess(Expr.TableAccess(Expr.Var "t1", Expr.Literal (Literal.String "t2")), Expr.Literal (Literal.String "t3")), Expr.Literal (Literal.String "key"))], [Expr.Var "value"]))
+                
+                testStmt "table method result assignment" "t[1] = obj:method()"
+                    (Statement.Assignment([Expr.TableAccess(Expr.Var "t", Expr.Literal (Literal.Integer 1I))], [Expr.MethodCall(Expr.Var "obj", "method", [])]))
+            ]
+            
+            testList "Assignment vs Function Call Disambiguation" [
+                // Test that the parser correctly distinguishes between assignments and function calls
+                testStmt "simple function call" "print(x)" 
+                    (Statement.FunctionCall(Expr.FunctionCall(Expr.Var "print", [Expr.Var "x"])))
+                
+                testStmt "method call statement" "obj:method()" 
+                    (Statement.FunctionCall(Expr.MethodCall(Expr.Var "obj", "method", [])))
+                
+                testStmt "table access function call" "t.func()" 
+                    (Statement.FunctionCall(Expr.FunctionCall(Expr.TableAccess(Expr.Var "t", Expr.Literal (Literal.String "func")), [])))
+                
+                testStmt "parenthesized function call" "(func())()" 
+                    (Statement.FunctionCall(Expr.FunctionCall(Expr.Paren(Expr.FunctionCall(Expr.Var "func", [])), [])))
+                
+                // Edge cases with whitespace
+                testStmt "assignment with spaces" "t[1]   =   100" 
+                    (Statement.Assignment([Expr.TableAccess(Expr.Var "t", Expr.Literal (Literal.Integer 1I))], [Expr.Literal (Literal.Integer 100I)]))
+                
+                testStmt "assignment with newline" "t[1]\n= 100" 
+                    (Statement.Assignment([Expr.TableAccess(Expr.Var "t", Expr.Literal (Literal.Integer 1I))], [Expr.Literal (Literal.Integer 100I)]))
+            ]
+            
+            testList "Complex Assignment Patterns" [
+                // Test assignments that were problematic before the fix
+                testStmt "assignment after complex expression" "t[f(x)] = y"
+                    (Statement.Assignment([Expr.TableAccess(Expr.Var "t", Expr.FunctionCall(Expr.Var "f", [Expr.Var "x"]))], [Expr.Var "y"]))
+                
+                testStmt "assignment with table constructor key" "t[{1,2}] = 3"
+                    (Statement.Assignment([Expr.TableAccess(Expr.Var "t", Expr.TableConstructor [ExprField (Expr.Literal (Literal.Integer 1I)); ExprField (Expr.Literal (Literal.Integer 2I))])], [Expr.Literal (Literal.Integer 3I)]))
+                
+                testStmt "assignment with parenthesized lvalue" "(t)[1] = 100"
+                    (Statement.Assignment([Expr.TableAccess(Expr.Paren (Expr.Var "t"), Expr.Literal (Literal.Integer 1I))], [Expr.Literal (Literal.Integer 100I)]))
+                
+                testStmt "nil assignment to table" "t.x = nil"
+                    (Statement.Assignment([Expr.TableAccess(Expr.Var "t", Expr.Literal (Literal.String "x"))], [Expr.Literal Literal.Nil]))
+                
+                testStmt "table assignment in sequence" "t[1] = 2; t[2] = 3"
+                    (Statement.Assignment([Expr.TableAccess(Expr.Var "t", Expr.Literal (Literal.Integer 1I))], [Expr.Literal (Literal.Integer 2I)]))
             ]
             
             testList "Table Access in Binary Expressions (TODO: Fix Parser)" [

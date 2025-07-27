@@ -522,11 +522,8 @@ local sum = a + b
         Assert.AreEqual(30L, ((LuaInteger)sum).Value, "sum should equal 30 (10+20)");
     }
 
-    // TODO: Enable this test when parser supports table assignment at statement level
-    // Currently fails with: t[1] = 100 (parser doesn't recognize table indexing on left side of assignment)
-    // See PARSER_KNOWN_ISSUES.md for details
-    // [TestMethod]
-    public void CompileAndExecute_TableAssignment_WorksCorrectly_TODO_PARSER_FIX()
+    [TestMethod]
+    public void CompileAndExecute_TableAssignment_WorksCorrectly()
     {
         // Testing Approach: State Transition Testing - Table modification
         // Arrange

@@ -95,32 +95,26 @@ end
 
 **Status**: FIXED - Shebang lines are now properly ignored when they appear as the first line of a file.
 
-## Table Assignment at Statement Level
+## Table Assignment at Statement Level (FIXED)
 
-**Issue**: The parser fails to recognize table assignment statements like `t[1] = 100` at the statement level.
+**Issue**: The parser was failing to recognize table assignment statements like `t[1] = 100` at the statement level.
 
-**Examples that fail**:
+**Status**: FIXED - Table assignments now work correctly.
+
+**Fix Applied**: 
+- Created a specialized `pLvalue` parser that parses assignable expressions (variables and table access)
+- Modified the parser to stop at `=` or `,` to avoid consuming too much input
+- Properly handled whitespace with `notFollowedBy` checks
+- Combined assignment and function call parsing to resolve ambiguity
+
+**Examples that now work**:
 ```lua
-t[1] = 100           -- Fails: table indexing assignment
-t.field = "value"    -- Fails: dot notation assignment
-t["key"] = true      -- Fails: string key assignment
+t[1] = 100              -- Works: table indexing assignment
+t.field = "value"       -- Works: dot notation assignment
+t["key"] = true         -- Works: string key assignment
+t.a.b[1] = 42          -- Works: nested table assignment
+a[1], b[2] = 10, 20    -- Works: multiple table assignment
 ```
-
-**Examples that work**:
-```lua
-local t = {}
-t = {[1] = 100}      -- Works: table constructor with explicit keys
-local x = t[1]       -- Works: table access in expressions
--- Workaround: use a function
-local function set(t, k, v) t[k] = v end
-set(t, 1, 100)       -- Works: assignment inside function
-```
-
-**Root Cause**: The statement parser doesn't include table access expressions in the list of valid assignment targets. It only accepts simple variables and lists of variables.
-
-**Test Status**: One compiler test is failing due to this limitation (CompileAndExecute_TableAssignment_WorksCorrectly)
-
-**Priority**: High - This is a fundamental Lua feature that should be supported
 
 ## Table Access in Binary Expressions
 
