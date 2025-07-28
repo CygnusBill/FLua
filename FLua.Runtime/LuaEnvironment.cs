@@ -209,7 +209,7 @@ namespace FLua.Runtime
             env.SetVariable("load", new BuiltinFunction(Load));
             
             // Add standard libraries
-            // TODO: LuaCoroutineLib.AddCoroutineLibrary(env);
+            LuaCoroutineLib.AddCoroutineLibrary(env);
             LuaMathLib.AddMathLibrary(env);
             LuaStringLib.AddStringLibrary(env);
             LuaTableLib.AddTableLibrary(env);
