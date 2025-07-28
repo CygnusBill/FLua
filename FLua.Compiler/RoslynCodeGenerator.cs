@@ -40,6 +40,59 @@ namespace FLua.Compiler
             _diagnostics = diagnostics ?? new DiagnosticCollector();
         }
         
+        // Helper methods for creating LuaValue instances
+        private ExpressionSyntax LuaValueNil()
+        {
+            return MemberAccessExpression(
+                SyntaxKind.SimpleMemberAccessExpression,
+                IdentifierName("LuaValue"),
+                IdentifierName("Nil"));
+        }
+        
+        private ExpressionSyntax LuaValueString(string value)
+        {
+            return InvocationExpression(
+                MemberAccessExpression(
+                    SyntaxKind.SimpleMemberAccessExpression,
+                    IdentifierName("LuaValue"),
+                    IdentifierName("String")))
+                .AddArgumentListArguments(
+                    Argument(LiteralExpression(SyntaxKind.StringLiteralExpression, Literal(value))));
+        }
+        
+        private ExpressionSyntax LuaValueInteger(long value)
+        {
+            return InvocationExpression(
+                MemberAccessExpression(
+                    SyntaxKind.SimpleMemberAccessExpression,
+                    IdentifierName("LuaValue"),
+                    IdentifierName("Integer")))
+                .AddArgumentListArguments(
+                    Argument(LiteralExpression(SyntaxKind.NumericLiteralExpression, Literal(value))));
+        }
+        
+        private ExpressionSyntax LuaValueFloat(double value)
+        {
+            return InvocationExpression(
+                MemberAccessExpression(
+                    SyntaxKind.SimpleMemberAccessExpression,
+                    IdentifierName("LuaValue"),
+                    IdentifierName("Float")))
+                .AddArgumentListArguments(
+                    Argument(LiteralExpression(SyntaxKind.NumericLiteralExpression, Literal(value))));
+        }
+        
+        private ExpressionSyntax LuaValueBoolean(bool value)
+        {
+            return InvocationExpression(
+                MemberAccessExpression(
+                    SyntaxKind.SimpleMemberAccessExpression,
+                    IdentifierName("LuaValue"),
+                    IdentifierName("Boolean")))
+                .AddArgumentListArguments(
+                    Argument(LiteralExpression(value ? SyntaxKind.TrueLiteralExpression : SyntaxKind.FalseLiteralExpression)));
+        }
+        
         public CompilationUnitSyntax Generate(IList<Statement> block, CompilerOptions options)
         {
             _options = options;
@@ -233,6 +286,13 @@ namespace FLua.Compiler
             else if (statement.IsBreak)
             {
                 return [BreakStatement()];
+            }
+            else if (statement.IsFunctionDef)
+            {
+                var funcDef = (Statement.FunctionDef)statement;
+                var nameParts = FSharpListToList(funcDef.Item1);
+                var functionDef = funcDef.Item2;
+                return GenerateFunctionDef(nameParts, functionDef);
             }
             else
             {
@@ -620,11 +680,7 @@ namespace FLua.Compiler
             else if (literal.IsString)
             {
                 var value = ((Literal.String)literal).Item;
-                return ObjectCreationExpression(IdentifierName("LuaString"))
-                    .AddArgumentListArguments(
-                        Argument(LiteralExpression(
-                            SyntaxKind.StringLiteralExpression,
-                            Literal(value))));
+                return LuaValueString(value);
             }
             else if (literal.IsFloat)
             {
@@ -1157,6 +1213,67 @@ namespace FLua.Compiler
             return method;
         }
 
+        private IEnumerable<StatementSyntax> GenerateFunctionDef(IList<string> nameParts, FunctionDef funcDef)
+        {
+            // Function definitions like: function foo() ... end
+            // or: function t.a.b.c() ... end
+            // are assignments to global or table variables
+            
+            // Create the function value
+            var funcExpr = GenerateFunctionExpression(funcDef);
+            
+            if (nameParts.Count == 1)
+            {
+                // Simple case: function foo() becomes _G["foo"] = function
+                var setGlobal = InvocationExpression(
+                    MemberAccessExpression(
+                        SyntaxKind.SimpleMemberAccessExpression,
+                        IdentifierName("env"),
+                        IdentifierName("SetVariable")))
+                    .AddArgumentListArguments(
+                        Argument(LiteralExpression(SyntaxKind.StringLiteralExpression, Literal(nameParts[0]))),
+                        Argument(funcExpr));
+                
+                return [ExpressionStatement(setGlobal)];
+            }
+            else
+            {
+                // Complex case: function t.a.b.c() becomes t["a"]["b"]["c"] = function
+                // Start with the first identifier as a variable lookup
+                var target = InvocationExpression(
+                    MemberAccessExpression(
+                        SyntaxKind.SimpleMemberAccessExpression,
+                        IdentifierName("env"),
+                        IdentifierName("GetVariable")))
+                    .AddArgumentListArguments(
+                        Argument(LiteralExpression(SyntaxKind.StringLiteralExpression, Literal(nameParts[0]))));
+                
+                // Build up the table access chain for all but the last part
+                for (int i = 1; i < nameParts.Count - 1; i++)
+                {
+                    target = InvocationExpression(
+                        MemberAccessExpression(
+                            SyntaxKind.SimpleMemberAccessExpression,
+                            CastExpression(IdentifierName("LuaTable"), target),
+                            IdentifierName("Get")))
+                        .AddArgumentListArguments(
+                            Argument(LiteralExpression(SyntaxKind.StringLiteralExpression, Literal(nameParts[i]))));
+                }
+                
+                // Set the last part
+                var setTable = InvocationExpression(
+                    MemberAccessExpression(
+                        SyntaxKind.SimpleMemberAccessExpression,
+                        CastExpression(IdentifierName("LuaTable"), target),
+                        IdentifierName("Set")))
+                    .AddArgumentListArguments(
+                        Argument(LiteralExpression(SyntaxKind.StringLiteralExpression, Literal(nameParts[nameParts.Count - 1]))),
+                        Argument(funcExpr));
+                
+                return [ExpressionStatement(setTable)];
+            }
+        }
+        
         private IEnumerable<StatementSyntax> GenerateLocalFunctionDef(string name, FunctionDef funcDef)
         {
             var statements = new List<StatementSyntax>();

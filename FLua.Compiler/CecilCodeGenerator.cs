@@ -109,6 +109,13 @@ public class CecilCodeGenerator
             ModuleKind.Dll);
         
         _module = _assembly.MainModule;
+        
+        // Add reference to FLua.Runtime assembly
+        var runtimeAssemblyPath = typeof(LuaValue).Assembly.Location;
+        var runtimeAssembly = AssemblyDefinition.ReadAssembly(runtimeAssemblyPath);
+        var runtimeReference = AssemblyNameReference.Parse(runtimeAssembly.FullName);
+        _module.AssemblyReferences.Add(runtimeReference);
+        
         InitializeTypeReferences();
         
         if (options.Target == CompilationTarget.ConsoleApp)
@@ -640,6 +647,58 @@ public class CecilCodeGenerator
                     _il.Emit(OpCodes.Call, setVariable);
                 }
             }
+            else if (variables[i] is Expr.TableAccess tableAccess)
+            {
+                // Table assignment: t[k] = v or t.k = v
+                // Value is already on stack from GenerateExpression above
+                
+                // Store value in temp
+                var valueLocal = new VariableDefinition(_luaValueType);
+                _currentMethod!.Body.Variables.Add(valueLocal);
+                _il!.Emit(OpCodes.Stloc, valueLocal);
+                
+                // Generate table expression
+                GenerateExpression(tableAccess.Item1, environment);
+                
+                // Check if it's a table
+                _il.Emit(OpCodes.Dup);
+                var isTableProp = _module!.ImportReference(
+                    typeof(LuaValue).GetProperty("IsTable").GetMethod);
+                _il.Emit(OpCodes.Call, isTableProp);
+                
+                var isTable = _il.Create(OpCodes.Nop);
+                _il.Emit(OpCodes.Brtrue, isTable);
+                
+                // Not a table, throw error
+                _il.Emit(OpCodes.Pop);
+                _il.Emit(OpCodes.Ldstr, "Attempt to index a non-table value");
+                var exceptionCtor = _module.ImportReference(
+                    typeof(LuaRuntimeException).GetConstructor([typeof(string)]));
+                _il.Emit(OpCodes.Newobj, exceptionCtor);
+                _il.Emit(OpCodes.Throw);
+                
+                _il.Append(isTable);
+                
+                // Extract LuaTable from LuaValue
+                var asTableMethod = _module.ImportReference(
+                    typeof(LuaValue).GetMethod("AsTable")!.MakeGenericMethod(typeof(LuaTable)));
+                _il.Emit(OpCodes.Call, asTableMethod);
+                
+                // Generate key expression
+                GenerateExpression(tableAccess.Item2, environment);
+                
+                // Load value
+                _il.Emit(OpCodes.Ldloc, valueLocal);
+                
+                // Call table.Set(key, value)
+                var setMethod = _module.ImportReference(
+                    typeof(LuaTable).GetMethod("Set"));
+                _il.Emit(OpCodes.Callvirt, setMethod);
+            }
+            else
+            {
+                ReportError($"Assignment target type {variables[i].GetType().Name} not yet implemented", null);
+            }
         }
     }
     
@@ -904,7 +963,11 @@ public class CecilCodeGenerator
             typeof(LuaTable).GetConstructor(Type.EmptyTypes));
         _il!.Emit(OpCodes.Newobj, tableCtor);
         
-        // Store table in local for repeated access
+        // Convert to LuaValue and store in local for repeated access
+        var tableMethod = _module.ImportReference(
+            typeof(LuaValue).GetMethod("Table", [typeof(object)]));
+        _il.Emit(OpCodes.Call, tableMethod);
+        
         var tableLocal = new VariableDefinition(_luaValueType);
         _currentMethod!.Body.Variables.Add(tableLocal);
         _il.Emit(OpCodes.Stloc, tableLocal);
@@ -914,7 +977,13 @@ public class CecilCodeGenerator
         
         foreach (var field in fieldsList)
         {
-            _il.Emit(OpCodes.Ldloc, tableLocal); // Load table
+            _il.Emit(OpCodes.Ldloc, tableLocal); // Load LuaValue containing table
+            
+            // Extract the LuaTable from LuaValue
+            var asTableGeneric = typeof(LuaValue).GetMethod("AsTable");
+            var asTableMethod = _module.ImportReference(
+                asTableGeneric!.MakeGenericMethod(typeof(LuaTable)));
+            _il.Emit(OpCodes.Call, asTableMethod);
             
             if (field.IsExprField)
             {
@@ -973,18 +1042,24 @@ public class CecilCodeGenerator
     /// </summary>
     private void GenerateTableAccess(Expr table, Expr key, VariableDefinition environment)
     {
-        // Generate table expression
+        // Generate table expression (returns LuaValue)
         GenerateExpression(table, environment);
         
-        // Cast to LuaTable or throw
-        _il!.Emit(OpCodes.Dup);
-        _il.Emit(OpCodes.Isinst, _module!.ImportReference(typeof(LuaTable)));
+        // Store table value in local
+        var tableValueLocal = new VariableDefinition(_luaValueType);
+        _currentMethod!.Body.Variables.Add(tableValueLocal);
+        _il!.Emit(OpCodes.Stloc, tableValueLocal);
+        
+        // Check if it's a table
+        _il.Emit(OpCodes.Ldloc, tableValueLocal);
+        var isTableProp = _module!.ImportReference(
+            typeof(LuaValue).GetProperty("IsTable").GetMethod);
+        _il.Emit(OpCodes.Call, isTableProp);
         
         var isTable = _il.Create(OpCodes.Nop);
         _il.Emit(OpCodes.Brtrue, isTable);
         
         // Not a table, throw error
-        _il.Emit(OpCodes.Pop);
         _il.Emit(OpCodes.Ldstr, "Attempt to index a non-table value");
         var exceptionCtor = _module.ImportReference(
             typeof(LuaRuntimeException).GetConstructor([typeof(string)]));
@@ -992,6 +1067,12 @@ public class CecilCodeGenerator
         _il.Emit(OpCodes.Throw);
         
         _il.Append(isTable);
+        
+        // Extract LuaTable from LuaValue
+        _il.Emit(OpCodes.Ldloc, tableValueLocal);
+        var asTableMethod = _module.ImportReference(
+            typeof(LuaValue).GetMethod("AsTable").MakeGenericMethod(typeof(LuaTable)));
+        _il.Emit(OpCodes.Call, asTableMethod);
         
         // Generate key expression
         GenerateExpression(key, environment);
