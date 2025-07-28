@@ -1249,3 +1249,4 @@ MigrationBackup/
 
 # Claude AI assistant local settings
 .claude/
+FLua.Runtime.dll
