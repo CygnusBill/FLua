@@ -185,8 +185,8 @@ class Program
                 return 1;
             }
 
-            // Use Cecil backend for smaller executable size
-            var compiler = new CecilLuaCompiler();
+            // Use Roslyn backend for better debugging
+            var compiler = new RoslynLuaCompiler();
             var compilerOptions = new CompilerOptions(
                 OutputPath: options.OutputFile!,
                 Target: options.Target,

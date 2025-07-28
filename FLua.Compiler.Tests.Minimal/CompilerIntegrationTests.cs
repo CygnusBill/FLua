@@ -19,13 +19,13 @@ namespace FLua.Compiler.Tests.Minimal;
 [TestClass]
 public class CompilerIntegrationTests
 {
-    private CecilLuaCompiler _compiler;
+    private RoslynLuaCompiler _compiler;
     private string _tempDir;
 
     [TestInitialize]
     public void Setup()
     {
-        _compiler = new CecilLuaCompiler();
+        _compiler = new RoslynLuaCompiler();
         _tempDir = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
         Directory.CreateDirectory(_tempDir);
     }
@@ -62,7 +62,7 @@ public class CompilerIntegrationTests
         
         // Execute and verify
         var assembly = Assembly.LoadFile(outputPath);
-        var type = assembly.GetType("CompiledLuaScript+LuaScript");
+        var type = assembly.GetType("CompiledLuaScript.LuaScript");
         var method = type.GetMethod("Execute");
         var env = LuaEnvironment.CreateStandardEnvironment();
         
@@ -99,7 +99,7 @@ public class CompilerIntegrationTests
         
         // Execute and verify variable values
         var assembly = Assembly.LoadFile(outputPath);
-        var type = assembly.GetType("CompiledLuaScript+LuaScript");
+        var type = assembly.GetType("CompiledLuaScript.LuaScript");
         var method = type.GetMethod("Execute");
         var env = LuaEnvironment.CreateStandardEnvironment();
         
@@ -128,7 +128,7 @@ public class CompilerIntegrationTests
         
         // Execute empty program
         var assembly = Assembly.LoadFile(outputPath);
-        var type = assembly.GetType("CompiledLuaScript+LuaScript");
+        var type = assembly.GetType("CompiledLuaScript.LuaScript");
         var method = type.GetMethod("Execute");
         var env = LuaEnvironment.CreateStandardEnvironment();
         
@@ -176,7 +176,7 @@ public class CompilerIntegrationTests
         Assert.IsNull(assembly.EntryPoint, "Library should not have entry point");
         
         // Verify library has Execute method
-        var type = assembly.GetType("CompiledLuaScript+LuaScript");
+        var type = assembly.GetType("CompiledLuaScript.LuaScript");
         var executeMethod = type.GetMethod("Execute");
         Assert.IsNotNull(executeMethod, "Library should have Execute method");
         Assert.IsTrue(executeMethod.IsStatic, "Execute method should be static");
@@ -232,7 +232,7 @@ public class CompilerIntegrationTests
         
         // Execute and verify
         var assembly = Assembly.LoadFile(outputPath);
-        var type = assembly.GetType("CompiledLuaScript+LuaScript");
+        var type = assembly.GetType("CompiledLuaScript.LuaScript");
         var method = type.GetMethod("Execute");
         var env = LuaEnvironment.CreateStandardEnvironment();
         
@@ -269,7 +269,7 @@ public class CompilerIntegrationTests
         
         // Execute and verify
         var assembly = Assembly.LoadFile(outputPath);
-        var type = assembly.GetType("CompiledLuaScript+LuaScript");
+        var type = assembly.GetType("CompiledLuaScript.LuaScript");
         var method = type.GetMethod("Execute");
         var env = LuaEnvironment.CreateStandardEnvironment();
         
@@ -306,7 +306,7 @@ public class CompilerIntegrationTests
         
         // Execute and verify
         var assembly = Assembly.LoadFile(outputPath);
-        var type = assembly.GetType("CompiledLuaScript+LuaScript");
+        var type = assembly.GetType("CompiledLuaScript.LuaScript");
         var method = type.GetMethod("Execute");
         var env = LuaEnvironment.CreateStandardEnvironment();
         
@@ -341,7 +341,7 @@ public class CompilerIntegrationTests
         
         // Execute and verify
         var assembly = Assembly.LoadFile(outputPath);
-        var type = assembly.GetType("CompiledLuaScript+LuaScript");
+        var type = assembly.GetType("CompiledLuaScript.LuaScript");
         var method = type.GetMethod("Execute");
         var env = LuaEnvironment.CreateStandardEnvironment();
         
@@ -376,7 +376,7 @@ public class CompilerIntegrationTests
         
         // Execute and verify
         var assembly = Assembly.LoadFile(outputPath);
-        var type = assembly.GetType("CompiledLuaScript+LuaScript");
+        var type = assembly.GetType("CompiledLuaScript.LuaScript");
         var method = type.GetMethod("Execute");
         var env = LuaEnvironment.CreateStandardEnvironment();
         
@@ -414,7 +414,7 @@ public class CompilerIntegrationTests
         
         // Execute and verify
         var assembly = Assembly.LoadFile(outputPath);
-        var type = assembly.GetType("CompiledLuaScript+LuaScript");
+        var type = assembly.GetType("CompiledLuaScript.LuaScript");
         var method = type.GetMethod("Execute");
         var env = LuaEnvironment.CreateStandardEnvironment();
         
@@ -445,7 +445,7 @@ public class CompilerIntegrationTests
         
         // Execute and verify
         var assembly = Assembly.LoadFile(outputPath);
-        var type = assembly.GetType("CompiledLuaScript+LuaScript");
+        var type = assembly.GetType("CompiledLuaScript.LuaScript");
         var method = type.GetMethod("Execute");
         var env = LuaEnvironment.CreateStandardEnvironment();
         
@@ -482,7 +482,7 @@ local sum = a + b + c
         
         // Execute and verify
         var assembly = Assembly.LoadFile(outputPath);
-        var type = assembly.GetType("CompiledLuaScript+LuaScript");
+        var type = assembly.GetType("CompiledLuaScript.LuaScript");
         var method = type.GetMethod("Execute");
         var env = LuaEnvironment.CreateStandardEnvironment();
         
@@ -516,7 +516,7 @@ local sum = a + b
         
         // Execute and verify
         var assembly = Assembly.LoadFile(outputPath);
-        var type = assembly.GetType("CompiledLuaScript+LuaScript");
+        var type = assembly.GetType("CompiledLuaScript.LuaScript");
         var method = type.GetMethod("Execute");
         var env = LuaEnvironment.CreateStandardEnvironment();
         
@@ -553,7 +553,7 @@ local sum = a + b + c
         
         // Execute and verify
         var assembly = Assembly.LoadFile(outputPath);
-        var type = assembly.GetType("CompiledLuaScript+LuaScript");
+        var type = assembly.GetType("CompiledLuaScript.LuaScript");
         var method = type.GetMethod("Execute");
         var env = LuaEnvironment.CreateStandardEnvironment();
         
@@ -585,7 +585,7 @@ local len = str:len()
         
         // Execute and verify
         var assembly = Assembly.LoadFile(outputPath);
-        var type = assembly.GetType("CompiledLuaScript+LuaScript");
+        var type = assembly.GetType("CompiledLuaScript.LuaScript");
         var method = type.GetMethod("Execute");
         var env = LuaEnvironment.CreateStandardEnvironment();
         
@@ -621,7 +621,7 @@ local sum = a + b + c + d
         
         // Execute and verify
         var assembly = Assembly.LoadFile(outputPath);
-        var type = assembly.GetType("CompiledLuaScript+LuaScript");
+        var type = assembly.GetType("CompiledLuaScript.LuaScript");
         var method = type.GetMethod("Execute");
         var env = LuaEnvironment.CreateStandardEnvironment();
         
@@ -667,7 +667,7 @@ local p, q, r = dual()
         
         // Execute and verify
         var assembly = Assembly.LoadFile(outputPath);
-        var type = assembly.GetType("CompiledLuaScript+LuaScript");
+        var type = assembly.GetType("CompiledLuaScript.LuaScript");
         var method = type.GetMethod("Execute");
         var env = LuaEnvironment.CreateStandardEnvironment();
         
@@ -720,7 +720,7 @@ local d = nested.inner.data
         
         // Execute and verify
         var assembly = Assembly.LoadFile(outputPath);
-        var type = assembly.GetType("CompiledLuaScript+LuaScript");
+        var type = assembly.GetType("CompiledLuaScript.LuaScript");
         var method = type.GetMethod("Execute");
         var env = LuaEnvironment.CreateStandardEnvironment();
         

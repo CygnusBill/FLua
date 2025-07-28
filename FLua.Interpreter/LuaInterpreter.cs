@@ -851,10 +851,14 @@ namespace FLua.Interpreter
                 {
                     return [_environment.GetVariable(variable.Item1)];
                 }
-                catch (LuaRuntimeException ex) when (ex.Diagnostic == null)
+                catch (LuaRuntimeException ex) when (ex.ErrorCode == "UNKNOWN_VAR")
                 {
                     // Add position information to the error
-                    throw LuaRuntimeException.UnknownVariable(variable.Item1, variable.Item2);
+                    if (variable.Item2 != null)
+                    {
+                        ex.WithLocation(variable.Item2.FileName, variable.Item2.Line, variable.Item2.Column);
+                    }
+                    throw;
                 }
             }
             else if (expr.IsBinary)
@@ -946,10 +950,14 @@ namespace FLua.Interpreter
                     
                     throw new LuaRuntimeException("Attempt to call non-function");
                 }
-                catch (LuaRuntimeException ex) when (ex.Diagnostic == null)
+                catch (LuaRuntimeException ex) when (ex.SourceFile == null)
                 {
                     // Add position information to runtime errors
-                    throw new LuaRuntimeException(ex.Message) { LuaStackTrace = $"at {funcCall.Item3}" };
+                    if (funcCall.Item3 != null)
+                    {
+                        ex.WithLocation(funcCall.Item3.FileName, funcCall.Item3.Line, funcCall.Item3.Column);
+                    }
+                    throw;
                 }
             }
             else if (expr.IsMethodCall)

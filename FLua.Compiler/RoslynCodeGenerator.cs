@@ -535,11 +535,12 @@ namespace FLua.Compiler
                             IdentifierName("LuaTable"),
                             GenerateExpression(tableAccess.Item1)));
                     
+                    // Cast to LuaTable and call Set
                     var setCall = ExpressionStatement(
                         InvocationExpression(
                             MemberAccessExpression(
                                 SyntaxKind.SimpleMemberAccessExpression,
-                                tableExpr,
+                                CastExpression(IdentifierName("LuaTable"), tableExpr),
                                 IdentifierName("Set")))
                         .AddArgumentListArguments(
                             Argument(GenerateExpression(tableAccess.Item2)),
@@ -663,19 +664,12 @@ namespace FLua.Compiler
             else if (literal.IsBoolean)
             {
                 var value = ((Literal.Boolean)literal).Item;
-                return ObjectCreationExpression(IdentifierName("LuaBoolean"))
-                    .AddArgumentListArguments(
-                        Argument(LiteralExpression(
-                            value ? SyntaxKind.TrueLiteralExpression : SyntaxKind.FalseLiteralExpression)));
+                return LuaValueBoolean(value);
             }
             else if (literal.IsInteger)
             {
                 var value = ((Literal.Integer)literal).Item;
-                return ObjectCreationExpression(IdentifierName("LuaInteger"))
-                    .AddArgumentListArguments(
-                        Argument(LiteralExpression(
-                            SyntaxKind.NumericLiteralExpression, 
-                            Literal(long.Parse(value.ToString())))));
+                return LuaValueInteger(long.Parse(value.ToString()));
             }
             else if (literal.IsString)
             {
@@ -685,11 +679,7 @@ namespace FLua.Compiler
             else if (literal.IsFloat)
             {
                 var value = ((Literal.Float)literal).Item;
-                return ObjectCreationExpression(IdentifierName("LuaNumber"))
-                    .AddArgumentListArguments(
-                        Argument(LiteralExpression(
-                            SyntaxKind.NumericLiteralExpression,
-                            Literal(value))));
+                return LuaValueFloat(value);
             }
             else
             {
@@ -779,9 +769,15 @@ namespace FLua.Compiler
         
         private ExpressionSyntax GenerateTableConstructor(IList<TableField> fields)
         {
-            // Create new LuaTable
-            var tableCreation = ObjectCreationExpression(IdentifierName("LuaTable"))
-                .AddArgumentListArguments();
+            // Create new LuaTable wrapped in LuaValue
+            var tableCreation = InvocationExpression(
+                MemberAccessExpression(
+                    SyntaxKind.SimpleMemberAccessExpression,
+                    IdentifierName("LuaValue"),
+                    IdentifierName("Table")))
+                .AddArgumentListArguments(
+                    Argument(ObjectCreationExpression(IdentifierName("LuaTable"))
+                        .AddArgumentListArguments()));
             
             if (fields.Count == 0)
             {
@@ -799,9 +795,7 @@ namespace FLua.Compiler
                 {
                     // Array-style field: use integer key
                     var exprField = (TableField.ExprField)field;
-                    keyValuePairs.Add(ObjectCreationExpression(IdentifierName("LuaInteger"))
-                        .AddArgumentListArguments(
-                            Argument(LiteralExpression(SyntaxKind.NumericLiteralExpression, Literal((long)arrayIndex)))));
+                    keyValuePairs.Add(LuaValueInteger(arrayIndex));
                     keyValuePairs.Add(GenerateExpression(exprField.Item));
                     arrayIndex++;
                 }
@@ -809,9 +803,7 @@ namespace FLua.Compiler
                 {
                     // Named field: use string key
                     var namedField = (TableField.NamedField)field;
-                    keyValuePairs.Add(ObjectCreationExpression(IdentifierName("LuaString"))
-                        .AddArgumentListArguments(
-                            Argument(LiteralExpression(SyntaxKind.StringLiteralExpression, Literal(namedField.Item1)))));
+                    keyValuePairs.Add(LuaValueString(namedField.Item1));
                     keyValuePairs.Add(GenerateExpression(namedField.Item2));
                 }
                 else if (field.IsKeyField)
@@ -872,10 +864,16 @@ namespace FLua.Compiler
             var funcMethod = GenerateFunctionMethod(funcName, parameters, body, isVarArgs);
             _pendingMethods.Add(funcMethod);
             
-            // Create LuaUserFunction instance
-            return ObjectCreationExpression(IdentifierName("LuaUserFunction"))
+            // Create a BuiltinFunction that calls our generated method
+            return InvocationExpression(
+                MemberAccessExpression(
+                    SyntaxKind.SimpleMemberAccessExpression,
+                    IdentifierName("LuaValue"),
+                    IdentifierName("Function")))
                 .AddArgumentListArguments(
-                    Argument(IdentifierName(funcName)));
+                    Argument(ObjectCreationExpression(IdentifierName("BuiltinFunction"))
+                        .AddArgumentListArguments(
+                            Argument(IdentifierName(funcName)))));
         }
         
         private ExpressionSyntax GenerateMethodCall(Expr obj, string methodName, IList<Expr> args)
@@ -883,9 +881,7 @@ namespace FLua.Compiler
             // Method call obj:method(args) is equivalent to obj.method(obj, args)
             // We need to use LuaOperations.GetMethod to handle both tables and strings
             var objExpr = GenerateExpression(obj);
-            var methodKey = ObjectCreationExpression(IdentifierName("LuaString"))
-                .AddArgumentListArguments(
-                    Argument(LiteralExpression(SyntaxKind.StringLiteralExpression, Literal(methodName))));
+            var methodKey = LuaValueString(methodName);
             
             // Call LuaOperations.GetMethod(env, obj, methodName)
             var methodAccess = InvocationExpression(
@@ -898,11 +894,12 @@ namespace FLua.Compiler
                     Argument(objExpr),
                     Argument(methodKey));
             
-            // Cast to LuaFunction
-            var funcExpr = ParenthesizedExpression(
-                CastExpression(
-                    IdentifierName("LuaFunction"),
-                    methodAccess));
+            // Call AsFunction() on the method
+            var funcExpr = InvocationExpression(
+                MemberAccessExpression(
+                    SyntaxKind.SimpleMemberAccessExpression,
+                    methodAccess,
+                    IdentifierName("AsFunction")));
             
             // Prepare arguments with self as first argument
             var allArgs = new List<ExpressionSyntax> { GenerateExpression(obj) };
@@ -965,21 +962,23 @@ namespace FLua.Compiler
                 }
             }
             
-            // Generate: ((LuaFunction)func).Call(new LuaValue[] { args })
+            // Generate: func.AsFunction().Call(new LuaValue[] { args })
             ExpressionSyntax funcExpr;
             if (funcOverride != null)
             {
-                funcExpr = ParenthesizedExpression(
-                    CastExpression(
-                        IdentifierName("LuaFunction"),
-                        funcOverride));
+                funcExpr = InvocationExpression(
+                    MemberAccessExpression(
+                        SyntaxKind.SimpleMemberAccessExpression,
+                        funcOverride,
+                        IdentifierName("AsFunction")));
             }
             else
             {
-                funcExpr = ParenthesizedExpression(
-                    CastExpression(
-                        IdentifierName("LuaFunction"),
-                        GenerateExpression(func)));
+                funcExpr = InvocationExpression(
+                    MemberAccessExpression(
+                        SyntaxKind.SimpleMemberAccessExpression,
+                        GenerateExpression(func),
+                        IdentifierName("AsFunction")));
             }
             
             var argExpressions = args.Select(arg => GenerateExpression(arg)).ToArray();
@@ -1015,11 +1014,12 @@ namespace FLua.Compiler
                 var func = funcCall.Item1;
                 var args = FSharpListToList(funcCall.Item2);
                 
-                // Generate: ((LuaFunction)func).Call(new LuaValue[] { args })
-                var funcExpr = ParenthesizedExpression(
-                    CastExpression(
-                        IdentifierName("LuaFunction"),
-                        GenerateExpression(func)));
+                // Generate: func.AsFunction().Call(new LuaValue[] { args })
+                var funcExpr = InvocationExpression(
+                    MemberAccessExpression(
+                        SyntaxKind.SimpleMemberAccessExpression,
+                        GenerateExpression(func),
+                        IdentifierName("AsFunction")));
                 
                 var argExpressions = args.Select(arg => GenerateExpression(arg)).ToArray();
                 
@@ -1155,10 +1155,7 @@ namespace FLua.Compiler
                                             ElementAccessExpression(IdentifierName("args"))
                                                 .AddArgumentListArguments(
                                                     Argument(LiteralExpression(SyntaxKind.NumericLiteralExpression, Literal(paramIndex)))),
-                                            MemberAccessExpression(
-                                                SyntaxKind.SimpleMemberAccessExpression,
-                                                IdentifierName("LuaNil"),
-                                                IdentifierName("Instance")))))));
+                                            LuaValueNil())))));
                     
                     bodyStatements.Add(paramDecl);
                     paramIndex++;
@@ -1254,23 +1251,46 @@ namespace FLua.Compiler
                     target = InvocationExpression(
                         MemberAccessExpression(
                             SyntaxKind.SimpleMemberAccessExpression,
-                            CastExpression(IdentifierName("LuaTable"), target),
+                            InvocationExpression(
+                                MemberAccessExpression(
+                                    SyntaxKind.SimpleMemberAccessExpression,
+                                    target,
+                                    GenericName("AsTable")
+                                        .AddTypeArgumentListArguments(IdentifierName("LuaTable")))),
                             IdentifierName("Get")))
                         .AddArgumentListArguments(
-                            Argument(LiteralExpression(SyntaxKind.StringLiteralExpression, Literal(nameParts[i]))));
+                            Argument(LuaValueString(nameParts[i])));
                 }
                 
-                // Set the last part
-                var setTable = InvocationExpression(
-                    MemberAccessExpression(
-                        SyntaxKind.SimpleMemberAccessExpression,
-                        CastExpression(IdentifierName("LuaTable"), target),
-                        IdentifierName("Set")))
-                    .AddArgumentListArguments(
-                        Argument(LiteralExpression(SyntaxKind.StringLiteralExpression, Literal(nameParts[nameParts.Count - 1]))),
-                        Argument(funcExpr));
+                // Set the last part - need to get the table first, then set
+                var tableVar = "_table_" + tempVarCounter++;
+                var statements = new List<StatementSyntax>();
                 
-                return [ExpressionStatement(setTable)];
+                // var _table = target.AsTable<LuaTable>();
+                statements.Add(LocalDeclarationStatement(
+                    VariableDeclaration(IdentifierName("var"))
+                        .AddVariables(
+                            VariableDeclarator(Identifier(tableVar))
+                                .WithInitializer(EqualsValueClause(
+                                    InvocationExpression(
+                                        MemberAccessExpression(
+                                            SyntaxKind.SimpleMemberAccessExpression,
+                                            target,
+                                            GenericName("AsTable")
+                                                .AddTypeArgumentListArguments(IdentifierName("LuaTable")))))))));
+                
+                // _table.Set("method", function);
+                statements.Add(ExpressionStatement(
+                    InvocationExpression(
+                        MemberAccessExpression(
+                            SyntaxKind.SimpleMemberAccessExpression,
+                            IdentifierName(tableVar),
+                            IdentifierName("Set")))
+                        .AddArgumentListArguments(
+                            Argument(LuaValueString(nameParts[nameParts.Count - 1])),
+                            Argument(funcExpr))));
+                
+                return statements;
             }
         }
         

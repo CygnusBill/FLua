@@ -10,13 +10,13 @@ namespace FLua.Compiler.Tests.Minimal;
 [TestClass]
 public class InlineFunctionTests
 {
-    private CecilLuaCompiler _compiler;
+    private RoslynLuaCompiler _compiler;
     private string _tempDir;
 
     [TestInitialize]
     public void Setup()
     {
-        _compiler = new CecilLuaCompiler();
+        _compiler = new RoslynLuaCompiler();
         _tempDir = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
         Directory.CreateDirectory(_tempDir);
     }
@@ -50,7 +50,7 @@ local result = add(5, 3)
         
         // Execute and verify
         var assembly = Assembly.LoadFile(outputPath);
-        var type = assembly.GetType("CompiledLuaScript+LuaScript");
+        var type = assembly.GetType("CompiledLuaScript.LuaScript");
         var method = type.GetMethod("Execute");
         var env = LuaEnvironment.CreateStandardEnvironment();
         
@@ -85,7 +85,7 @@ local result2 = ops.add(7, 3)
         
         // Execute and verify
         var assembly = Assembly.LoadFile(outputPath);
-        var type = assembly.GetType("CompiledLuaScript+LuaScript");
+        var type = assembly.GetType("CompiledLuaScript.LuaScript");
         var method = type.GetMethod("Execute");
         var env = LuaEnvironment.CreateStandardEnvironment();
         
@@ -123,7 +123,7 @@ local result = apply(function(x, y) return x - y end, 10, 3)
         
         // Execute and verify
         var assembly = Assembly.LoadFile(outputPath);
-        var type = assembly.GetType("CompiledLuaScript+LuaScript");
+        var type = assembly.GetType("CompiledLuaScript.LuaScript");
         var method = type.GetMethod("Execute");
         var env = LuaEnvironment.CreateStandardEnvironment();
         
@@ -154,7 +154,7 @@ local message = greet()
         
         // Execute and verify
         var assembly = Assembly.LoadFile(outputPath);
-        var type = assembly.GetType("CompiledLuaScript+LuaScript");
+        var type = assembly.GetType("CompiledLuaScript.LuaScript");
         var method = type.GetMethod("Execute");
         var env = LuaEnvironment.CreateStandardEnvironment();
         

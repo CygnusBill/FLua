@@ -9,9 +9,4 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\FLua.Common\FLua.Common.csproj" />
-  </ItemGroup>
-
-
 </Project>

@@ -1,5 +1,4 @@
 using System;
-using FLua.Common.Diagnostics;
 
 namespace FLua.Runtime
 {
@@ -9,14 +8,29 @@ namespace FLua.Runtime
     public class LuaRuntimeException : Exception
     {
         /// <summary>
-        /// The diagnostic information for this exception
+        /// The error code for this exception (e.g., "CONST_ASSIGN", "NIL_ACCESS")
         /// </summary>
-        public FLuaDiagnostic? Diagnostic { get; }
+        public string? ErrorCode { get; }
         
         /// <summary>
         /// The call stack at the time of the error
         /// </summary>
         public string? LuaStackTrace { get; set; }
+        
+        /// <summary>
+        /// Line number where the error occurred (if available)
+        /// </summary>
+        public int? Line { get; set; }
+        
+        /// <summary>
+        /// Column number where the error occurred (if available)
+        /// </summary>
+        public int? Column { get; set; }
+        
+        /// <summary>
+        /// Source file name where the error occurred (if available)
+        /// </summary>
+        public string? SourceFile { get; set; }
         
         public LuaRuntimeException(string message) : base(message) { }
         
@@ -25,83 +39,75 @@ namespace FLua.Runtime
         {
         }
         
-        public LuaRuntimeException(FLuaDiagnostic diagnostic) 
-            : base(diagnostic.Message)
+        public LuaRuntimeException(string errorCode, string message) 
+            : base(message)
         {
-            Diagnostic = diagnostic;
+            ErrorCode = errorCode;
         }
         
-        public LuaRuntimeException(FLuaDiagnostic diagnostic, Exception innerException) 
-            : base(diagnostic.Message, innerException)
+        public LuaRuntimeException(string errorCode, string message, Exception innerException) 
+            : base(message, innerException)
         {
-            Diagnostic = diagnostic;
+            ErrorCode = errorCode;
         }
         
         /// <summary>
         /// Creates a nil value access exception
         /// </summary>
-        public static LuaRuntimeException NilValueAccess(string operation, SourceLocation? location = null)
+        public static LuaRuntimeException NilValueAccess(string operation)
         {
-            var diagnostic = DiagnosticBuilder.NilValueAccess(operation, location);
-            return new LuaRuntimeException(diagnostic);
+            return new LuaRuntimeException("NIL_ACCESS", $"Attempt to perform '{operation}' on a nil value");
         }
         
         /// <summary>
         /// Creates a type mismatch exception
         /// </summary>
-        public static LuaRuntimeException TypeMismatch(string operation, string expected, string actual, SourceLocation? location = null)
+        public static LuaRuntimeException TypeMismatch(string operation, string expected, string actual)
         {
-            var diagnostic = DiagnosticBuilder.TypeMismatch(operation, expected, actual, location);
-            return new LuaRuntimeException(diagnostic);
+            return new LuaRuntimeException("TYPE_MISMATCH", $"Type mismatch in '{operation}': expected {expected}, got {actual}");
         }
         
         /// <summary>
         /// Creates an unknown variable exception
         /// </summary>
-        public static LuaRuntimeException UnknownVariable(string name, SourceLocation? location = null)
+        public static LuaRuntimeException UnknownVariable(string name)
         {
-            var diagnostic = DiagnosticBuilder.UnknownVariable(name, location);
-            return new LuaRuntimeException(diagnostic);
+            return new LuaRuntimeException("UNKNOWN_VAR", $"Unknown variable '{name}'");
         }
         
         /// <summary>
         /// Creates a const assignment exception
         /// </summary>
-        public static LuaRuntimeException ConstAssignment(string variable, SourceLocation? location = null)
+        public static LuaRuntimeException ConstAssignment(string variable)
         {
-            var diagnostic = new FLuaDiagnostic(
-                ErrorCodes.ConstAssignment,
-                ErrorSeverity.Error,
-                DiagnosticMessages.ConstAssignment(variable),
-                location);
-            return new LuaRuntimeException(diagnostic);
+            return new LuaRuntimeException("CONST_ASSIGN", $"Attempt to assign to const variable '{variable}'");
         }
         
         /// <summary>
         /// Creates an invalid operation exception
         /// </summary>
-        public static LuaRuntimeException InvalidOperation(string operation, string type, SourceLocation? location = null)
+        public static LuaRuntimeException InvalidOperation(string operation, string type)
         {
-            var diagnostic = new FLuaDiagnostic(
-                ErrorCodes.InvalidOperation,
-                ErrorSeverity.Error,
-                DiagnosticMessages.InvalidOperation(operation, type),
-                location);
-            return new LuaRuntimeException(diagnostic);
+            return new LuaRuntimeException("INVALID_OP", $"Invalid operation '{operation}' on type '{type}'");
         }
         
         /// <summary>
         /// Creates a closed variable access exception
         /// </summary>
-        public static LuaRuntimeException ClosedVariableAccess(string variable, SourceLocation? location = null)
+        public static LuaRuntimeException ClosedVariableAccess(string variable)
         {
-            var diagnostic = new FLuaDiagnostic(
-                ErrorCodes.InvalidOperation,
-                ErrorSeverity.Error,
-                $"Attempt to use closed variable '{variable}'. Variables marked with <close> cannot be accessed after their scope ends.",
-                location);
-            diagnostic.Help = "Check that you're not accessing the variable after its scope has ended.";
-            return new LuaRuntimeException(diagnostic);
+            return new LuaRuntimeException("CLOSED_VAR", $"Attempt to use closed variable '{variable}'. Variables marked with <close> cannot be accessed after their scope ends.");
+        }
+        
+        /// <summary>
+        /// Sets the source location information
+        /// </summary>
+        public LuaRuntimeException WithLocation(string? sourceFile, int? line, int? column)
+        {
+            SourceFile = sourceFile;
+            Line = line;
+            Column = column;
+            return this;
         }
     }
-} 
+}
