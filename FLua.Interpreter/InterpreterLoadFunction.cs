@@ -32,10 +32,10 @@ public static class InterpreterLoadFunction
     private static LuaValue[] LoadImplementation(LuaValue[] args)
     {
         if (args.Length == 0)
-            return [LuaNil.Instance, new LuaString("no chunk to load")];
+            return [LuaValue.Nil, "no chunk to load"];
         
         if (!args[0].IsString)
-            return [LuaNil.Instance, new LuaString("bad argument #1 to 'load' (string expected)")];
+            return [LuaValue.Nil, "bad argument #1 to 'load' (string expected)"];
         
         var code = args[0].AsString();
         var chunkName = args.Length > 1 && args[1].IsString ? args[1].ToString() : "=(load)";
@@ -54,7 +54,7 @@ public static class InterpreterLoadFunction
         catch (Exception ex)
         {
             // Return nil and the error message
-            return [LuaNil.Instance, new LuaString($"{chunkName}: {ex.Message}")];
+            return [LuaValue.Nil, $"{chunkName}: {ex.Message}"];
         }
     }
     

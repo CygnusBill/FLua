@@ -102,8 +102,8 @@ public class CompilerIntegrationTests
         method.Invoke(null, new object[] { env });
         
         var yValue = env.GetVariable("y");
-        Assert.IsTrue(yValue.IsInteger, "y should be LuaInteger");
-        Assert.AreEqual(50L, yValue.AsInteger(), "y should equal 50");
+        Assert.IsTrue(yValue is LuaInteger, "y should be LuaInteger");
+        Assert.AreEqual(50L, ((LuaInteger)yValue).Value, "y should equal 50");
     }
 
     [TestMethod]
@@ -235,8 +235,8 @@ public class CompilerIntegrationTests
         method.Invoke(null, new object[] { env });
         
         var result = env.GetVariable("result");
-        Assert.IsTrue(result.IsInteger, "result should be LuaInteger");
-        Assert.AreEqual(1L, result.AsInteger(), "result should equal 1");
+        Assert.IsTrue(result is LuaInteger, "result should be LuaInteger");
+        Assert.AreEqual(1L, ((LuaInteger)result).Value, "result should equal 1");
     }
 
     [TestMethod]
@@ -272,8 +272,8 @@ public class CompilerIntegrationTests
         method.Invoke(null, new object[] { env });
         
         var sum = env.GetVariable("sum");
-        Assert.IsTrue(sum.IsInteger, "sum should be LuaInteger");
-        Assert.AreEqual(10L, sum.AsInteger(), "sum should equal 10 (0+1+2+3+4)");
+        Assert.IsTrue(sum is LuaInteger, "sum should be LuaInteger");
+        Assert.AreEqual(10L, ((LuaInteger)sum).Value, "sum should equal 10 (0+1+2+3+4)");
     }
 
     [TestMethod]
@@ -309,8 +309,8 @@ public class CompilerIntegrationTests
         method.Invoke(null, new object[] { env });
         
         var count = env.GetVariable("count");
-        Assert.IsTrue(count.IsInteger, "count should be LuaInteger");
-        Assert.AreEqual(3L, count.AsInteger(), "count should equal 3");
+        Assert.IsTrue(count is LuaInteger, "count should be LuaInteger");
+        Assert.AreEqual(3L, ((LuaInteger)count).Value, "count should equal 3");
     }
 
     [TestMethod]
@@ -344,8 +344,8 @@ public class CompilerIntegrationTests
         method.Invoke(null, new object[] { env });
         
         var sum = env.GetVariable("sum");
-        Assert.IsTrue(sum.IsInteger, "sum should be LuaInteger");
-        Assert.AreEqual(15L, sum.AsInteger(), "sum should equal 15 (1+2+3+4+5)");
+        Assert.IsTrue(sum is LuaInteger, "sum should be LuaInteger");
+        Assert.AreEqual(15L, ((LuaInteger)sum).Value, "sum should equal 15 (1+2+3+4+5)");
     }
 
     [TestMethod]
@@ -379,8 +379,8 @@ public class CompilerIntegrationTests
         method.Invoke(null, new object[] { env });
         
         var count = env.GetVariable("count");
-        Assert.IsTrue(count.IsInteger, "count should be LuaInteger");
-        Assert.AreEqual(5L, count.AsInteger(), "count should equal 5 (10,8,6,4,2)");
+        Assert.IsTrue(count is LuaInteger, "count should be LuaInteger");
+        Assert.AreEqual(5L, ((LuaInteger)count).Value, "count should equal 5 (10,8,6,4,2)");
     }
 
     [TestMethod]
@@ -417,8 +417,8 @@ public class CompilerIntegrationTests
         method.Invoke(null, new object[] { env });
         
         var count = env.GetVariable("count");
-        Assert.IsTrue(count.IsInteger, "count should be LuaInteger");
-        Assert.AreEqual(3L, count.AsInteger(), "count should equal 3");
+        Assert.IsTrue(count is LuaInteger, "count should be LuaInteger");
+        Assert.AreEqual(3L, ((LuaInteger)count).Value, "count should equal 3");
     }
 
     [TestMethod]
@@ -448,10 +448,10 @@ public class CompilerIntegrationTests
         method.Invoke(null, new object[] { env });
         
         var t = env.GetVariable("t");
-        Assert.IsTrue(t.IsTable, "t should be LuaTable");
+        Assert.IsTrue(t is LuaTable, "t should be LuaTable");
         // Verify it's empty by checking a random key
-        var value = t.AsTable<LuaTable>().Get(1);
-        Assert.IsTrue(value.IsNil, "Empty table should return nil for any key");
+        var value = ((LuaTable)t).Get(new LuaInteger(1));
+        Assert.IsTrue(value is LuaNil, "Empty table should return nil for any key");
     }
 
     [TestMethod]
@@ -485,8 +485,8 @@ local sum = a + b + c
         method.Invoke(null, new object[] { env });
         
         var sum = env.GetVariable("sum");
-        Assert.IsTrue(sum.IsInteger, "sum should be LuaInteger");
-        Assert.AreEqual(60L, sum.AsInteger(), "sum should equal 60 (10+20+30)");
+        Assert.IsTrue(sum is LuaInteger, "sum should be LuaInteger");
+        Assert.AreEqual(60L, ((LuaInteger)sum).Value, "sum should equal 60 (10+20+30)");
     }
 
     [TestMethod]
@@ -519,8 +519,8 @@ local sum = a + b
         method.Invoke(null, new object[] { env });
         
         var sum = env.GetVariable("sum");
-        Assert.IsTrue(sum.IsInteger, "sum should be LuaInteger");
-        Assert.AreEqual(30L, sum.AsInteger(), "sum should equal 30 (10+20)");
+        Assert.IsTrue(sum is LuaInteger, "sum should be LuaInteger");
+        Assert.AreEqual(30L, ((LuaInteger)sum).Value, "sum should equal 30 (10+20)");
     }
 
     [TestMethod]
@@ -556,8 +556,8 @@ local sum = a + b + c
         method.Invoke(null, new object[] { env });
         
         var sum = env.GetVariable("sum");
-        Assert.IsTrue(sum.IsInteger, "sum should be LuaInteger");
-        Assert.AreEqual(420L, sum.AsInteger(), "sum should equal 420 (100+20+300)");
+        Assert.IsTrue(sum is LuaInteger, "sum should be LuaInteger");
+        Assert.AreEqual(420L, ((LuaInteger)sum).Value, "sum should equal 420 (100+20+300)");
     }
 
     [TestMethod]
@@ -588,8 +588,8 @@ local len = str:len()
         method.Invoke(null, new object[] { env });
         
         var len = env.GetVariable("len");
-        Assert.IsTrue(len.IsInteger, "len should be LuaInteger");
-        Assert.AreEqual(5L, len.AsInteger(), "len should equal 5");
+        Assert.IsTrue(len is LuaInteger, "len should be LuaInteger");
+        Assert.AreEqual(5L, ((LuaInteger)len).Value, "len should equal 5");
     }
 
     [TestMethod]
@@ -624,8 +624,8 @@ local sum = a + b + c + d
         method.Invoke(null, new object[] { env });
         
         var sum = env.GetVariable("sum");
-        Assert.IsTrue(sum.IsInteger, "sum should be LuaInteger");
-        Assert.AreEqual(100L, sum.AsInteger(), "sum should equal 100 (10+20+30+40)");
+        Assert.IsTrue(sum is LuaInteger, "sum should be LuaInteger");
+        Assert.AreEqual(100L, ((LuaInteger)sum).Value, "sum should equal 100 (10+20+30+40)");
     }
 
     [TestMethod]
@@ -670,18 +670,18 @@ local p, q, r = dual()
         method.Invoke(null, new object[] { env });
         
         // Test 1: Equal variables and returns
-        Assert.AreEqual(10L, env.GetVariable("a").AsInteger(), "a should be 10");
-        Assert.AreEqual(20L, env.GetVariable("b").AsInteger(), "b should be 20");
-        Assert.AreEqual(30L, env.GetVariable("c").AsInteger(), "c should be 30");
+        Assert.AreEqual(10L, ((LuaInteger)env.GetVariable("a")).Value, "a should be 10");
+        Assert.AreEqual(20L, ((LuaInteger)env.GetVariable("b")).Value, "b should be 20");
+        Assert.AreEqual(30L, ((LuaInteger)env.GetVariable("c")).Value, "c should be 30");
         
         // Test 2: Fewer variables than returns
-        Assert.AreEqual(10L, env.GetVariable("x").AsInteger(), "x should be 10");
-        Assert.AreEqual(20L, env.GetVariable("y").AsInteger(), "y should be 20");
+        Assert.AreEqual(10L, ((LuaInteger)env.GetVariable("x")).Value, "x should be 10");
+        Assert.AreEqual(20L, ((LuaInteger)env.GetVariable("y")).Value, "y should be 20");
         
         // Test 3: More variables than returns
-        Assert.AreEqual(1L, env.GetVariable("p").AsInteger(), "p should be 1");
-        Assert.AreEqual(2L, env.GetVariable("q").AsInteger(), "q should be 2");
-        Assert.IsTrue(env.GetVariable("r").IsNil, "r should be nil");
+        Assert.AreEqual(1L, ((LuaInteger)env.GetVariable("p")).Value, "p should be 1");
+        Assert.AreEqual(2L, ((LuaInteger)env.GetVariable("q")).Value, "q should be 2");
+        Assert.IsTrue(env.GetVariable("r") is LuaNil, "r should be nil");
     }
 
     [TestMethod]
@@ -722,9 +722,9 @@ local d = nested.inner.data
         
         method.Invoke(null, new object[] { env });
         
-        Assert.AreEqual(42L, env.GetVariable("v").AsInteger(), "v should be 42");
-        Assert.AreEqual("test", env.GetVariable("n").AsString(), "n should be 'test'");
-        Assert.AreEqual(6L, env.GetVariable("idx").AsInteger(), "idx should be 6 (position of space)");
-        Assert.AreEqual(100L, env.GetVariable("d").AsInteger(), "d should be 100");
+        Assert.AreEqual(42L, ((LuaInteger)env.GetVariable("v")).Value, "v should be 42");
+        Assert.AreEqual("test", ((LuaString)env.GetVariable("n")).Value, "n should be 'test'");
+        Assert.AreEqual(6L, ((LuaInteger)env.GetVariable("idx")).Value, "idx should be 6 (position of space)");
+        Assert.AreEqual(100L, ((LuaInteger)env.GetVariable("d")).Value, "d should be 100");
     }
 }

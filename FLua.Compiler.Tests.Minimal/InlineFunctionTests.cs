@@ -57,8 +57,8 @@ local result = add(5, 3)
         method.Invoke(null, new object[] { env });
         
         var result = env.GetVariable("result");
-        Assert.IsTrue(result is LuaInteger, "result should be LuaInteger");
-        Assert.AreEqual(8L, ((LuaInteger)result).Value, "result should equal 8");
+        Assert.IsTrue(result.IsInteger, "result should be integer");
+        Assert.AreEqual(8L, result.AsInteger(), "result should equal 8");
     }
 
     [TestMethod]
@@ -92,12 +92,12 @@ local result2 = ops.add(7, 3)
         method.Invoke(null, new object[] { env });
         
         var result1 = env.GetVariable("result1");
-        Assert.IsTrue(result1 is LuaInteger, "result1 should be LuaInteger");
-        Assert.AreEqual(50L, ((LuaInteger)result1).Value, "result1 should equal 50");
+        Assert.IsTrue(result1.IsInteger, "result1 should be integer");
+        Assert.AreEqual(50L, result1.AsInteger(), "result1 should equal 50");
         
         var result2 = env.GetVariable("result2");
-        Assert.IsTrue(result2 is LuaInteger, "result2 should be LuaInteger");
-        Assert.AreEqual(10L, ((LuaInteger)result2).Value, "result2 should equal 10");
+        Assert.IsTrue(result2.IsInteger, "result2 should be integer");
+        Assert.AreEqual(10L, result2.AsInteger(), "result2 should equal 10");
     }
 
     [TestMethod]
@@ -130,8 +130,8 @@ local result = apply(function(x, y) return x - y end, 10, 3)
         method.Invoke(null, new object[] { env });
         
         var result = env.GetVariable("result");
-        Assert.IsTrue(result is LuaInteger, "result should be LuaInteger");
-        Assert.AreEqual(7L, ((LuaInteger)result).Value, "result should equal 7 (10-3)");
+        Assert.IsTrue(result.IsInteger, "result should be integer");
+        Assert.AreEqual(7L, result.AsInteger(), "result should equal 7 (10-3)");
     }
 
     [TestMethod]
@@ -161,7 +161,7 @@ local message = greet()
         method.Invoke(null, new object[] { env });
         
         var message = env.GetVariable("message");
-        Assert.IsTrue(message is LuaString, "message should be LuaString");
-        Assert.AreEqual("Hello from inline!", ((LuaString)message).Value, "message should match");
+        Assert.IsTrue(message.IsString, "message should be string");
+        Assert.AreEqual("Hello from inline!", message.AsString(), "message should match");
     }
 }

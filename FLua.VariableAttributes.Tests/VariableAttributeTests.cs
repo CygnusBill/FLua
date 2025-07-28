@@ -1,3 +1,4 @@
+using System.Reflection.Metadata;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using FLua.Ast;
 using FLua.Runtime;
@@ -23,8 +24,8 @@ public class ConstVariableTests
         var result = _interpreter.ExecuteCode("local x <const> = 42; return x");
         
         Assert.AreEqual(1, result.Length);
-        Assert.IsTrue(result[0] is LuaInteger);
-        Assert.AreEqual(42, ((LuaInteger)result[0]).Value);
+        Assert.IsTrue(result[0].IsInteger);
+        Assert.AreEqual(42, result[0]);
     }
 
     [TestMethod]
@@ -52,12 +53,9 @@ public class ConstVariableTests
         ");
         
         Assert.AreEqual(1, result.Length, $"Expected 1 result, got {result.Length}");
-        Assert.IsTrue(result[0] is LuaInteger || result[0] is LuaNumber, $"Expected LuaInteger or LuaNumber, got {result[0].GetType()}");
+        Assert.IsTrue(result[0].IsInteger || result[0].IsNumber, $"Expected LuaInteger or LuaNumber, got {result[0].GetType()}");
         
-        if (result[0] is LuaInteger intResult)
-            Assert.AreEqual(30, intResult.Value);
-        else if (result[0] is LuaNumber numResult)
-            Assert.AreEqual(30, (int)numResult.Value);
+        Assert.AreEqual(30, result[0]);
     }
 
     [TestMethod]
@@ -71,12 +69,9 @@ public class ConstVariableTests
         ");
         
         Assert.AreEqual(1, result.Length, $"Expected 1 result, got {result.Length}");
-        Assert.IsTrue(result[0] is LuaInteger || result[0] is LuaNumber, $"Expected LuaInteger or LuaNumber, got {result[0].GetType()}");
+        Assert.IsTrue(result[0].IsInteger || result[0].IsNumber, $"Expected LuaInteger or LuaNumber, got {result[0].GetType()}");
         
-        if (result[0] is LuaInteger intResult)
-            Assert.AreEqual(40, intResult.Value);
-        else if (result[0] is LuaNumber numResult)
-            Assert.AreEqual(40, (int)numResult.Value);
+        Assert.AreEqual(40, result[0]);
     }
 
     [TestMethod]
@@ -91,8 +86,8 @@ public class ConstVariableTests
         ");
         
         Assert.AreEqual(1, result.Length);
-        Assert.IsTrue(result[0] is LuaInteger);
-        Assert.AreEqual(100, ((LuaInteger)result[0]).Value);
+        Assert.IsTrue(result[0].IsInteger);
+        Assert.AreEqual(100, result[0]);
     }
 
     [TestMethod]
@@ -231,8 +226,8 @@ public class CloseVariableTests
         ");
         
         Assert.AreEqual(1, result.Length);
-        Assert.IsTrue(result[0] is LuaString);
-        Assert.AreEqual("returned early", ((LuaString)result[0]).Value);
+        Assert.IsTrue(result[0].IsString);
+        Assert.AreEqual("returned early", result[0]);
     }
 }
 
@@ -260,12 +255,9 @@ public class FunctionParameterAttributeTests
         ");
         
         Assert.AreEqual(1, result.Length, $"Expected 1 result, got {result.Length}");
-        Assert.IsTrue(result[0] is LuaInteger || result[0] is LuaNumber, $"Expected LuaInteger or LuaNumber, got {result[0].GetType()}");
+        Assert.IsTrue(result[0].IsInteger || result[0].IsNumber, $"Expected LuaInteger or LuaNumber, got {result[0].GetType()}");
         
-        if (result[0] is LuaInteger intResult)
-            Assert.AreEqual(10, intResult.Value);
-        else if (result[0] is LuaNumber numResult)
-            Assert.AreEqual(10, (int)numResult.Value);
+        Assert.AreEqual(10, result[0]);
     }
 
     [TestMethod]
@@ -343,12 +335,9 @@ public class FunctionParameterAttributeTests
         ");
         
         Assert.AreEqual(1, result.Length, $"Expected 1 result, got {result.Length}");
-        Assert.IsTrue(result[0] is LuaInteger || result[0] is LuaNumber, $"Expected LuaInteger or LuaNumber, got {result[0].GetType()}");
+        Assert.IsTrue(result[0].IsInteger || result[0].IsNumber, $"Expected LuaInteger or LuaNumber, got {result[0].GetType()}");
         
-        if (result[0] is LuaInteger intResult)
-            Assert.AreEqual(210, intResult.Value);
-        else if (result[0] is LuaNumber numResult)
-            Assert.AreEqual(210, (int)numResult.Value);
+        Assert.AreEqual(210, result[0]);
     }
 }
 
@@ -359,15 +348,15 @@ public class RuntimeVariableTests
     public void TestLuaVariableConstBehavior()
     {
         // Test LuaVariable const behavior directly
-        var constVar = new LuaVariable(new LuaInteger(42), FLua.Ast.Attribute.Const);
+        var constVar = new LuaVariable(42, LuaAttribute.Const);
         
-        Assert.AreEqual(42, ((LuaInteger)constVar.GetValue()).Value);
-        Assert.AreEqual(FLua.Ast.Attribute.Const, constVar.Attribute);
+        Assert.AreEqual(42, constVar.GetValue());
+        Assert.AreEqual(LuaAttribute.Const, constVar.Attribute);
         
         // Should throw when trying to modify
         Assert.ThrowsException<LuaRuntimeException>(() =>
         {
-            constVar.SetValue(new LuaInteger(50));
+            constVar.SetValue(50);
         });
     }
 
@@ -375,10 +364,11 @@ public class RuntimeVariableTests
     public void TestLuaVariableCloseBehavior()
     {
         // Test LuaVariable close behavior directly
-        var closeVar = new LuaVariable(new LuaInteger(42), FLua.Ast.Attribute.Close);
+        var closeVar = new LuaVariable(42, LuaAttribute.Close);
         
-        Assert.AreEqual(42, ((LuaInteger)closeVar.GetValue()).Value);
-        Assert.AreEqual(FLua.Ast.Attribute.Close, closeVar.Attribute);
+        Assert.AreEqual(42, closeVar.GetValue());
+        Assert.AreEqual(LuaAttribute.Close, closeVar.Attribute);
+        
         Assert.IsFalse(closeVar.IsClosed);
         
         // Close the variable
@@ -399,16 +389,16 @@ public class RuntimeVariableTests
         var env = new LuaEnvironment();
         
         // Set const variable
-        env.SetLocalVariable("constVar", new LuaInteger(42), FLua.Ast.Attribute.Const);
+        env.SetLocalVariable("constVar", 42, LuaAttribute.Const);
         
         // Should be able to read
         var value = env.GetVariable("constVar");
-        Assert.AreEqual(42, ((LuaInteger)value).Value);
+        Assert.AreEqual(42, value);
         
         // Should throw when trying to modify
         Assert.ThrowsException<LuaRuntimeException>(() =>
         {
-            env.SetVariable("constVar", new LuaInteger(50));
+            env.SetVariable("constVar", 50);
         });
     }
 
@@ -419,11 +409,11 @@ public class RuntimeVariableTests
         var env = new LuaEnvironment();
         
         // Set close variable
-        env.SetLocalVariable("closeVar", new LuaInteger(42), FLua.Ast.Attribute.Close);
+        env.SetLocalVariable("closeVar", 42, LuaAttribute.Close);
         
         // Should be able to read initially
         var value = env.GetVariable("closeVar");
-        Assert.AreEqual(42, ((LuaInteger)value).Value);
+        Assert.AreEqual(42, value);
         
         // Close all to-be-closed variables
         env.CloseToBeClosedVariables();

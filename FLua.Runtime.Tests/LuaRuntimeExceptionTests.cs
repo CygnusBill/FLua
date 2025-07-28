@@ -55,14 +55,14 @@ namespace FLua.Runtime.Tests
             var env = new LuaEnvironment();
             LuaStringLib.AddStringLibrary(env);
             
-            var string_table = (LuaTable)env.GetVariable("string");
-            var lenFunc = (LuaFunction)string_table.Get(new LuaString("len"));
+            var string_table = env.GetVariable("string").AsTable<LuaTable>();
+            var lenFunc = string_table.Get("len").AsFunction<LuaFunction>();
             
             try
             {
                 // This should work fine - testing that valid calls don't throw
-                var result = lenFunc.Call(new LuaValue[] { new LuaString("test") });
-                Assert.AreEqual(4, ((LuaInteger)result[0]).Value);
+                var result = lenFunc.Call(new LuaValue[] { "test" });
+                Assert.AreEqual(4, result[0]);
             }
             catch (LuaRuntimeException)
             {

@@ -16,11 +16,11 @@ namespace FLua.Runtime.Tests
             EnhancedCoroutineLib.AddEnhancedCoroutineLibrary(env);
             
             // Test creating a coroutine
-            var createFunc = (LuaFunction)env.GetVariable("coroutine").AsTable!.Get(new LuaString("create"));
+            var createFunc = (LuaFunction)env.GetVariable("coroutine").AsTable!.Get("create");
             
             var testFunc = new LuaUserFunction(args =>
             {
-                return new[] { new LuaString("Hello from coroutine!") };
+                return new[] { "Hello from coroutine!" };
             });
             
             var result = createFunc.Call(new[] { testFunc });
@@ -36,20 +36,20 @@ namespace FLua.Runtime.Tests
             EnhancedCoroutineLib.AddEnhancedCoroutineLibrary(env);
             
             var coroutineTable = env.GetVariable("coroutine").AsTable!;
-            var createFunc = (LuaFunction)coroutineTable.Get(new LuaString("create"));
-            var resumeFunc = (LuaFunction)coroutineTable.Get(new LuaString("resume"));
+            var createFunc = (LuaFunction)coroutineTable.Get("create");
+            var resumeFunc = (LuaFunction)coroutineTable.Get("resume");
             
             // Create a simple coroutine
             var testFunc = new LuaUserFunction(args =>
             {
-                return new[] { new LuaString("Result: "), args.Length > 0 ? args[0] : new LuaString("no args") };
+                return new[] { "Result: ", args.Length > 0 ? args[0] : "no args" };
             });
             
             var createResult = createFunc.Call(new[] { testFunc });
             var coroutine = createResult[0];
             
             // Resume the coroutine
-            var resumeResult = resumeFunc.Call(new[] { coroutine, new LuaString("test arg") });
+            var resumeResult = resumeFunc.Call(new[] { coroutine, "test arg" });
             
             Assert.IsTrue(resumeResult.Length >= 2);
             Assert.IsTrue(((LuaBoolean)resumeResult[0]).Value); // Success
@@ -62,15 +62,15 @@ namespace FLua.Runtime.Tests
             EnhancedCoroutineLib.AddEnhancedCoroutineLibrary(env);
             
             var coroutineTable = env.GetVariable("coroutine").AsTable!;
-            var createFunc = (LuaFunction)coroutineTable.Get(new LuaString("create"));
-            var resumeFunc = (LuaFunction)coroutineTable.Get(new LuaString("resume"));
-            var yieldFunc = (LuaFunction)coroutineTable.Get(new LuaString("yield"));
+            var createFunc = (LuaFunction)coroutineTable.Get("create");
+            var resumeFunc = (LuaFunction)coroutineTable.Get("resume");
+            var yieldFunc = (LuaFunction)coroutineTable.Get("yield");
             
             // Create a coroutine that yields
             var yieldingFunc = new LuaUserFunction(args =>
             {
                 // This would yield in a real implementation
-                return yieldFunc.Call(new[] { new LuaString("yielded value") });
+                return yieldFunc.Call(new[] { "yielded value" });
             });
             
             var createResult = createFunc.Call(new[] { yieldingFunc });
@@ -96,10 +96,10 @@ namespace FLua.Runtime.Tests
             EnhancedCoroutineLib.AddEnhancedCoroutineLibrary(env);
             
             var coroutineTable = env.GetVariable("coroutine").AsTable!;
-            var createFunc = (LuaFunction)coroutineTable.Get(new LuaString("create"));
-            var statusFunc = (LuaFunction)coroutineTable.Get(new LuaString("status"));
+            var createFunc = (LuaFunction)coroutineTable.Get("create");
+            var statusFunc = (LuaFunction)coroutineTable.Get("status");
             
-            var testFunc = new LuaUserFunction(args => new[] { new LuaString("done") });
+            var testFunc = new LuaUserFunction(args => new[] { "done" });
             
             var createResult = createFunc.Call(new[] { testFunc });
             var coroutine = createResult[0];
@@ -116,11 +116,11 @@ namespace FLua.Runtime.Tests
             EnhancedCoroutineLib.AddEnhancedCoroutineLibrary(env);
             
             var coroutineTable = env.GetVariable("coroutine").AsTable!;
-            var wrapFunc = (LuaFunction)coroutineTable.Get(new LuaString("wrap"));
+            var wrapFunc = (LuaFunction)coroutineTable.Get("wrap");
             
             var testFunc = new LuaUserFunction(args =>
             {
-                return new[] { new LuaString("wrapped result") };
+                return new[] { "wrapped result" };
             });
             
             var wrapResult = wrapFunc.Call(new[] { testFunc });
@@ -142,7 +142,7 @@ namespace FLua.Runtime.Tests
             EnhancedCoroutineLib.AddEnhancedCoroutineLibrary(env);
             
             var coroutineTable = env.GetVariable("coroutine").AsTable!;
-            var runningFunc = (LuaFunction)coroutineTable.Get(new LuaString("running"));
+            var runningFunc = (LuaFunction)coroutineTable.Get("running");
             
             // Outside of coroutine context
             var runningResult = runningFunc.Call(Array.Empty<LuaValue>());
@@ -158,7 +158,7 @@ namespace FLua.Runtime.Tests
             EnhancedCoroutineLib.AddEnhancedCoroutineLibrary(env);
             
             var coroutineTable = env.GetVariable("coroutine").AsTable!;
-            var isYieldableFunc = (LuaFunction)coroutineTable.Get(new LuaString("isyieldable"));
+            var isYieldableFunc = (LuaFunction)coroutineTable.Get("isyieldable");
             
             // Outside of coroutine context - should not be yieldable
             var result = isYieldableFunc.Call(Array.Empty<LuaValue>());

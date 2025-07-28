@@ -359,33 +359,33 @@ public class CecilCodeGenerator
         {
             var boolLit = (Literal.Boolean)literal;
             _il!.Emit(boolLit.Item ? OpCodes.Ldc_I4_1 : OpCodes.Ldc_I4_0);
-            var boolCtor = _module!.ImportReference(
-                typeof(LuaBoolean).GetConstructor([typeof(bool)]));
-            _il.Emit(OpCodes.Newobj, boolCtor);
+            var boolMethod = _module!.ImportReference(
+                typeof(LuaValue).GetMethod("Boolean", [typeof(bool)]));
+            _il.Emit(OpCodes.Call, boolMethod);
         }
         else if (literal.IsInteger)
         {
             var intLit = (Literal.Integer)literal;
             _il!.Emit(OpCodes.Ldc_I8, (long)intLit.Item);
-            var intCtor = _module!.ImportReference(
-                typeof(LuaInteger).GetConstructor([typeof(long)]));
-            _il.Emit(OpCodes.Newobj, intCtor);
+            var intMethod = _module!.ImportReference(
+                typeof(LuaValue).GetMethod("Integer", [typeof(long)]));
+            _il.Emit(OpCodes.Call, intMethod);
         }
         else if (literal.IsFloat)
         {
             var floatLit = (Literal.Float)literal;
             _il!.Emit(OpCodes.Ldc_R8, floatLit.Item);
-            var numberCtor = _module!.ImportReference(
-                typeof(LuaNumber).GetConstructor([typeof(double)]));
-            _il.Emit(OpCodes.Newobj, numberCtor);
+            var floatMethod = _module!.ImportReference(
+                typeof(LuaValue).GetMethod("Float", [typeof(double)]));
+            _il.Emit(OpCodes.Call, floatMethod);
         }
         else if (literal.IsString)
         {
             var stringLit = (Literal.String)literal;
             _il!.Emit(OpCodes.Ldstr, stringLit.Item);
-            var stringCtor = _module!.ImportReference(
-                typeof(LuaString).GetConstructor([typeof(string)]));
-            _il.Emit(OpCodes.Newobj, stringCtor);
+            var stringMethod = _module!.ImportReference(
+                typeof(LuaValue).GetMethod("String", [typeof(string)]));
+            _il.Emit(OpCodes.Call, stringMethod);
         }
     }
     
@@ -803,9 +803,9 @@ public class CecilCodeGenerator
         else
         {
             _il.Emit(OpCodes.Ldc_I8, 1L);
-            var intCtor = _module!.ImportReference(
-                typeof(LuaInteger).GetConstructor([typeof(long)]));
-            _il.Emit(OpCodes.Newobj, intCtor);
+            var intMethod = _module!.ImportReference(
+                typeof(LuaValue).GetMethod("Integer", [typeof(long)]));
+            _il.Emit(OpCodes.Call, intMethod);
         }
         _il.Emit(OpCodes.Stloc, stepVar);
         
@@ -821,9 +821,9 @@ public class CecilCodeGenerator
         // For negative step: loopVar >= limit
         _il.Emit(OpCodes.Ldloc, stepVar);
         _il.Emit(OpCodes.Ldc_I8, 0L);
-        var zeroInt = _module!.ImportReference(
-            typeof(LuaInteger).GetConstructor([typeof(long)]));
-        _il.Emit(OpCodes.Newobj, zeroInt);
+        var zeroMethod = _module!.ImportReference(
+            typeof(LuaValue).GetMethod("Integer", [typeof(long)]));
+        _il.Emit(OpCodes.Call, zeroMethod);
         var greater = _module.ImportReference(
             typeof(LuaOperations).GetMethod("Greater"));
         _il.Emit(OpCodes.Call, greater);
@@ -908,9 +908,9 @@ public class CecilCodeGenerator
                 
                 // Push index
                 _il.Emit(OpCodes.Ldc_I8, (long)arrayIndex);
-                var intCtor = _module.ImportReference(
-                    typeof(LuaInteger).GetConstructor([typeof(long)]));
-                _il.Emit(OpCodes.Newobj, intCtor);
+                var intMethod = _module.ImportReference(
+                    typeof(LuaValue).GetMethod("Integer", [typeof(long)]));
+                _il.Emit(OpCodes.Call, intMethod);
                 
                 // Push value
                 GenerateExpression(exprField.Item, environment);
@@ -924,9 +924,9 @@ public class CecilCodeGenerator
                 
                 // Push key (string)
                 _il.Emit(OpCodes.Ldstr, namedField.Item1);
-                var stringCtor = _module.ImportReference(
-                    typeof(LuaString).GetConstructor([typeof(string)]));
-                _il.Emit(OpCodes.Newobj, stringCtor);
+                var stringMethod = _module.ImportReference(
+                    typeof(LuaValue).GetMethod("String", [typeof(string)]));
+                _il.Emit(OpCodes.Call, stringMethod);
                 
                 // Push value
                 GenerateExpression(namedField.Item2, environment);

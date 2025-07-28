@@ -12,23 +12,23 @@ namespace FLua.Runtime.Tests
         [TestMethod]
         public void LuaNil_Instance_ShouldBeSingleton()
         {
-            var nil1 = LuaNil.Instance;
-            var nil2 = LuaNil.Instance;
-            Assert.AreSame(nil1, nil2);
+            var nil1 = LuaValue.Nil;
+            var nil2 = LuaValue.Nil;
+            Assert.AreEqual(nil1, nil2);
         }
 
         // State-Based Testing: Testing the falsy nature of nil
         [TestMethod]
         public void LuaNil_IsTruthy_ShouldBeFalse()
         {
-            Assert.IsFalse(LuaNil.Instance.IsTruthy);
+            Assert.IsFalse(LuaValue.Nil.IsTruthy());
         }
 
         // Domain Testing: Testing string representation
         [TestMethod]
         public void LuaNil_ToString_ShouldReturnNil()
         {
-            Assert.AreEqual("nil", LuaNil.Instance.ToString());
+            Assert.AreEqual("nil", LuaValue.Nil.ToString());
         }
 
         #endregion
@@ -39,18 +39,18 @@ namespace FLua.Runtime.Tests
         [TestMethod]
         public void LuaBoolean_TrueValue_ShouldBeTruthy()
         {
-            var luaBool = new LuaBoolean(true);
-            Assert.IsTrue(luaBool.IsTruthy);
-            Assert.IsTrue(luaBool.Value);
+            var luaBool = LuaValue.Boolean(true);
+            Assert.IsTrue(luaBool.IsTruthy());
+            Assert.IsTrue(luaBool.AsBoolean());
             Assert.AreEqual("true", luaBool.ToString());
         }
 
         [TestMethod]
         public void LuaBoolean_FalseValue_ShouldBeFalsy()
         {
-            var luaBool = new LuaBoolean(false);
-            Assert.IsFalse(luaBool.IsTruthy);
-            Assert.IsFalse(luaBool.Value);
+            var luaBool = LuaValue.Boolean(false);
+            Assert.IsFalse(luaBool.IsTruthy());
+            Assert.IsFalse(luaBool.AsBoolean());
             Assert.AreEqual("false", luaBool.ToString());
         }
 
@@ -62,46 +62,44 @@ namespace FLua.Runtime.Tests
         [TestMethod]
         public void LuaInteger_MinValue_ShouldHandleCorrectly()
         {
-            var luaInt = new LuaInteger(long.MinValue);
-            Assert.AreEqual(long.MinValue, luaInt.Value);
-            Assert.AreEqual(long.MinValue, luaInt.AsInteger);
-            Assert.AreEqual((double)long.MinValue, luaInt.AsNumber);
+            var luaInt = LuaValue.Integer(long.MinValue);
+            Assert.AreEqual(long.MinValue, luaInt.AsInteger());
+            Assert.AreEqual((double)long.MinValue, luaInt.AsNumber());
         }
 
         [TestMethod]
         public void LuaInteger_MaxValue_ShouldHandleCorrectly()
         {
-            var luaInt = new LuaInteger(long.MaxValue);
-            Assert.AreEqual(long.MaxValue, luaInt.Value);
-            Assert.AreEqual(long.MaxValue, luaInt.AsInteger);
-            Assert.AreEqual((double)long.MaxValue, luaInt.AsNumber);
+            var luaInt = LuaValue.Integer(long.MaxValue);
+            Assert.AreEqual(long.MaxValue, luaInt.AsInteger());
+            Assert.AreEqual((double)long.MaxValue, luaInt.AsNumber());
         }
 
         // Equivalence Class Testing: Testing zero, positive, and negative integers
         [TestMethod]
         public void LuaInteger_Zero_ShouldHandleCorrectly()
         {
-            var luaInt = new LuaInteger(0);
-            Assert.AreEqual(0, luaInt.Value);
-            Assert.IsTrue(luaInt.IsTruthy); // In Lua, 0 is truthy
+            var luaInt = LuaValue.Integer(0);
+            Assert.AreEqual(0, luaInt.AsInteger());
+            Assert.IsTrue(luaInt.IsTruthy()); // In Lua, 0 is truthy
             Assert.AreEqual("0", luaInt.ToString());
         }
 
         [TestMethod]
         public void LuaInteger_PositiveValue_ShouldHandleCorrectly()
         {
-            var luaInt = new LuaInteger(42);
-            Assert.AreEqual(42, luaInt.Value);
-            Assert.IsTrue(luaInt.IsTruthy);
+            var luaInt = LuaValue.Integer(42);
+            Assert.AreEqual(42, luaInt.AsInteger());
+            Assert.IsTrue(luaInt.IsTruthy());
             Assert.AreEqual("42", luaInt.ToString());
         }
 
         [TestMethod]
         public void LuaInteger_NegativeValue_ShouldHandleCorrectly()
         {
-            var luaInt = new LuaInteger(-42);
-            Assert.AreEqual(-42, luaInt.Value);
-            Assert.IsTrue(luaInt.IsTruthy);
+            var luaInt = LuaValue.Integer(-42);
+            Assert.AreEqual(-42, luaInt.AsInteger());
+            Assert.IsTrue(luaInt.IsTruthy());
             Assert.AreEqual("-42", luaInt.ToString());
         }
 
@@ -113,38 +111,38 @@ namespace FLua.Runtime.Tests
         [TestMethod]
         public void LuaNumber_PositiveInfinity_ShouldHandleCorrectly()
         {
-            var luaNum = new LuaNumber(double.PositiveInfinity);
-            Assert.AreEqual(double.PositiveInfinity, luaNum.Value);
-            Assert.AreEqual(double.PositiveInfinity, luaNum.AsNumber);
-            Assert.IsTrue(luaNum.IsTruthy);
+            var luaNum = LuaValue.Number(double.PositiveInfinity);
+            Assert.AreEqual(double.PositiveInfinity, luaNum.AsNumber());
+            Assert.AreEqual(double.PositiveInfinity, luaNum.AsNumber());
+            Assert.IsTrue(luaNum.IsTruthy());
         }
 
         [TestMethod]
         public void LuaNumber_NegativeInfinity_ShouldHandleCorrectly()
         {
-            var luaNum = new LuaNumber(double.NegativeInfinity);
-            Assert.AreEqual(double.NegativeInfinity, luaNum.Value);
-            Assert.AreEqual(double.NegativeInfinity, luaNum.AsNumber);
-            Assert.IsTrue(luaNum.IsTruthy);
+            var luaNum = LuaValue.Number(double.NegativeInfinity);
+            Assert.AreEqual(double.NegativeInfinity, luaNum.AsNumber());
+            Assert.AreEqual(double.NegativeInfinity, luaNum.AsNumber());
+            Assert.IsTrue(luaNum.IsTruthy());
         }
 
         [TestMethod]
         public void LuaNumber_NaN_ShouldHandleCorrectly()
         {
-            var luaNum = new LuaNumber(double.NaN);
-            Assert.IsTrue(double.IsNaN(luaNum.Value));
-            Assert.IsTrue(double.IsNaN(luaNum.AsNumber!.Value));
-            Assert.IsTrue(luaNum.IsTruthy);
+            var luaNum = LuaValue.Number(double.NaN);
+            Assert.IsTrue(double.IsNaN(luaNum.AsNumber()));
+            Assert.IsTrue(double.IsNaN(luaNum.AsNumber()));
+            Assert.IsTrue(luaNum.IsTruthy());
         }
 
         // Domain Testing: Testing normal floating-point values
         [TestMethod]
         public void LuaNumber_RegularValue_ShouldHandleCorrectly()
         {
-            var luaNum = new LuaNumber(3.14159);
-            Assert.AreEqual(3.14159, luaNum.Value, 0.000001);
-            Assert.AreEqual(3.14159, luaNum.AsNumber!.Value, 0.000001);
-            Assert.IsTrue(luaNum.IsTruthy);
+            var luaNum = LuaValue.Number(3.14159);
+            Assert.AreEqual(3.14159, luaNum.AsNumber(), 0.000001);
+            Assert.AreEqual(3.14159, luaNum.AsNumber(), 0.000001);
+            Assert.IsTrue(luaNum.IsTruthy());
         }
 
         #endregion
@@ -156,55 +154,54 @@ namespace FLua.Runtime.Tests
         public void FromObject_Null_ShouldReturnNil()
         {
             var result = LuaValue.FromObject(null!);
-            Assert.AreSame(LuaNil.Instance, result);
+            Assert.AreSame(LuaValue.Nil, result);
         }
 
         [TestMethod]
         public void FromObject_Bool_ShouldReturnLuaBoolean()
         {
             var result = LuaValue.FromObject(true);
-            Assert.IsInstanceOfType(result, typeof(LuaBoolean));
-            Assert.IsTrue(((LuaBoolean)result).Value);
+            Assert.IsTrue(result.IsTruthy());
         }
 
         [TestMethod]
         public void FromObject_Int_ShouldReturnLuaInteger()
         {
             var result = LuaValue.FromObject(42);
-            Assert.IsInstanceOfType(result, typeof(LuaInteger));
-            Assert.AreEqual(42, ((LuaInteger)result).Value);
+            Assert.IsTrue(result.IsInteger);
+            Assert.AreEqual(42, result);
         }
 
         [TestMethod]
         public void FromObject_Long_ShouldReturnLuaInteger()
         {
             var result = LuaValue.FromObject(42L);
-            Assert.IsInstanceOfType(result, typeof(LuaInteger));
-            Assert.AreEqual(42L, ((LuaInteger)result).Value);
+            Assert.IsTrue(result.IsInteger);
+            Assert.AreEqual(42L, result);
         }
 
         [TestMethod]
         public void FromObject_Double_ShouldReturnLuaNumber()
         {
             var result = LuaValue.FromObject(3.14);
-            Assert.IsInstanceOfType(result, typeof(LuaNumber));
-            Assert.AreEqual(3.14, ((LuaNumber)result).Value, 0.000001);
+            Assert.IsTrue(result.IsTruthy());
+            Assert.AreEqual(3.14, result.AsFloat(), 0.000001);
         }
 
         [TestMethod]
         public void FromObject_Float_ShouldReturnLuaNumber()
         {
             var result = LuaValue.FromObject(3.14f);
-            Assert.IsInstanceOfType(result, typeof(LuaNumber));
-            Assert.AreEqual(3.14f, ((LuaNumber)result).Value, 0.000001);
+            Assert.IsTrue(result.IsFloat);
+            Assert.AreEqual(3.14, result.AsFloat(), 0.000001);
         }
 
         [TestMethod]
         public void FromObject_String_ShouldReturnLuaString()
         {
             var result = LuaValue.FromObject("hello");
-            Assert.IsInstanceOfType(result, typeof(LuaString));
-            Assert.AreEqual("hello", ((LuaString)result).Value);
+            Assert.IsTrue(result.IsTruthy());
+            Assert.AreEqual("hello", result);
         }
 
         // Risk-Based Testing: Testing unsupported type conversion
@@ -223,41 +220,41 @@ namespace FLua.Runtime.Tests
         [TestMethod]
         public void IsValueTruthy_Null_ShouldReturnFalse()
         {
-            Assert.IsFalse(LuaValue.IsValueTruthy(null!));
+            Assert.IsFalse((null!));
         }
 
         [TestMethod]
         public void IsValueTruthy_Nil_ShouldReturnFalse()
         {
-            Assert.IsFalse(LuaValue.IsValueTruthy(LuaNil.Instance));
+            Assert.IsFalse(!LuaValue.Nil.IsTruthy());
         }
 
         [TestMethod]
         public void IsValueTruthy_FalseBoolean_ShouldReturnFalse()
         {
-            Assert.IsFalse(LuaValue.IsValueTruthy(new LuaBoolean(false)));
+            Assert.IsFalse(!LuaValue.Boolean(false).IsTruthy());
         }
 
         [TestMethod]
         public void IsValueTruthy_TrueBoolean_ShouldReturnTrue()
         {
-            Assert.IsTrue(LuaValue.IsValueTruthy(new LuaBoolean(true)));
+            Assert.IsTrue(LuaValue.Boolean(true).IsTruthy());
         }
 
         [TestMethod]
         public void IsValueTruthy_Integer_ShouldReturnTrue()
         {
-            Assert.IsTrue(LuaValue.IsValueTruthy(new LuaInteger(0))); // Even 0 is truthy in Lua
-            Assert.IsTrue(LuaValue.IsValueTruthy(new LuaInteger(42)));
-            Assert.IsTrue(LuaValue.IsValueTruthy(new LuaInteger(-1)));
+            Assert.IsTrue(LuaValue.Integer(0).IsTruthy()); // Even 0 is truthy in Lua
+            Assert.IsTrue(LuaValue.Integer(42).IsTruthy());
+            Assert.IsTrue(LuaValue.Integer(-1).IsTruthy());
         }
 
         [TestMethod]
         public void IsValueTruthy_Number_ShouldReturnTrue()
         {
-            Assert.IsTrue(LuaValue.IsValueTruthy(new LuaNumber(0.0))); // Even 0.0 is truthy in Lua
-            Assert.IsTrue(LuaValue.IsValueTruthy(new LuaNumber(3.14)));
-            Assert.IsTrue(LuaValue.IsValueTruthy(new LuaNumber(-2.7)));
+            Assert.IsTrue(LuaValue.Number(0.0).IsTruthy()); // Even 0.0 is truthy in Lua
+            Assert.IsTrue(LuaValue.Number(3.14).IsTruthy());
+            Assert.IsTrue(LuaValue.Number(-2.7).IsTruthy());
         }
 
         #endregion

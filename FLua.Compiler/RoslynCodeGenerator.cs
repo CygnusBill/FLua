@@ -272,7 +272,7 @@ namespace FLua.Compiler
                     var (varName, attr) = vars[i];
                     var mangledName = GetOrCreateMangledName(varName);
                     
-                    // LuaValue mangledName = (_results.Length > i) ? _results[i] : LuaNil.Instance;
+                    // LuaValue mangledName = (_results.Length > i) ? _results[i] : LuaValue.Nil;
                     var valueExpr = ConditionalExpression(
                         BinaryExpression(
                             SyntaxKind.GreaterThanExpression,
@@ -374,7 +374,7 @@ namespace FLua.Compiler
                 {
                     var varExpr = vars[i];
                     
-                    // LuaValue value = (_results.Length > i) ? _results[i] : LuaNil.Instance;
+                    // LuaValue value = (_results.Length > i) ? _results[i] : LuaValue.Nil;
                     var valueExpr = ConditionalExpression(
                         BinaryExpression(
                             SyntaxKind.GreaterThanExpression,
@@ -1082,7 +1082,7 @@ namespace FLua.Compiler
                     var paramName = namedParam.Item1;
                     var paramMangledName = GetOrCreateMangledName(paramName);
                     
-                    // var paramMangledName = args.Length > paramIndex ? args[paramIndex] : LuaNil.Instance;
+                    // var paramMangledName = args.Length > paramIndex ? args[paramIndex] : LuaValue.Nil;
                     var paramDecl = LocalDeclarationStatement(
                         VariableDeclaration(IdentifierName("var"))
                             .AddVariables(
@@ -1464,7 +1464,7 @@ namespace FLua.Compiler
             // Generate loop body
             var loopBodyStatements = new List<StatementSyntax>();
             
-            // Update loop variable: loopVar = new LuaNumber(i_num)
+            // Update loop variable: loopVar = i_num
             loopBodyStatements.Add(ExpressionStatement(
                 AssignmentExpression(
                     SyntaxKind.SimpleAssignmentExpression,

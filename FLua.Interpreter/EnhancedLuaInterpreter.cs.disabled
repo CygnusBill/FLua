@@ -82,13 +82,13 @@ namespace FLua.Interpreter
             catch (LuaRuntimeException)
             {
                 // Close to-be-closed variables with error
-                _environment.CloseToBeClosedVariablesWithError(new LuaString("error during execution"));
+                _environment.CloseToBeClosedVariablesWithError("error during execution");
                 throw;
             }
             catch (Exception ex)
             {
                 // Close to-be-closed variables with error
-                _environment.CloseToBeClosedVariablesWithError(new LuaString($"Internal error: {ex.Message}"));
+                _environment.CloseToBeClosedVariablesWithError($"Internal error: {ex.Message}");
                 throw new LuaRuntimeException($"Internal error: {ex.Message}");
             }
 
@@ -123,13 +123,13 @@ namespace FLua.Interpreter
             catch (LuaRuntimeException)
             {
                 // Close to-be-closed variables with error
-                _environment.CloseToBeClosedVariablesWithError(new LuaString("error during execution"));
+                _environment.CloseToBeClosedVariablesWithError("error during execution");
                 throw;
             }
             catch (Exception ex)
             {
                 // Close to-be-closed variables with error
-                _environment.CloseToBeClosedVariablesWithError(new LuaString($"Internal error: {ex.Message}"));
+                _environment.CloseToBeClosedVariablesWithError($"Internal error: {ex.Message}");
                 throw new LuaRuntimeException($"Internal error: {ex.Message}");
             }
 
@@ -177,7 +177,7 @@ namespace FLua.Interpreter
                 for (int i = 0; i < variables.Length; i++)
                 {
                     var (name, attribute) = variables[i];
-                    var value = i < values.Length ? values[i] : LuaNil.Instance;
+                    var value = i < values.Length ? values[i] : LuaValue.Nil;
                     
                     // Convert F# attribute to proper enum
                     var luaAttribute = ConvertAttribute(attribute);
@@ -211,7 +211,7 @@ namespace FLua.Interpreter
                 for (int i = 0; i < varExprs.Length; i++)
                 {
                     var varExpr = varExprs[i];
-                    var value = i < values.Count ? values[i] : LuaNil.Instance;
+                    var value = i < values.Count ? values[i] : LuaValue.Nil;
                     
                     if (varExpr.IsVar)
                     {
@@ -266,7 +266,7 @@ namespace FLua.Interpreter
                 catch (LuaRuntimeException)
                 {
                     // Close to-be-closed variables with error
-                    blockEnv.CloseToBeClosedVariablesWithError(new LuaString("error in do block"));
+                    blockEnv.CloseToBeClosedVariablesWithError("error in do block");
                     throw;
                 }
                 finally
@@ -331,7 +331,7 @@ namespace FLua.Interpreter
                     }
                     else
                     {
-                        values = new[] { LuaNil.Instance };
+                        values = new[] { LuaValue.Nil };
                     }
                     
                     return new StatementResult { ReturnValues = values };
@@ -352,7 +352,7 @@ namespace FLua.Interpreter
         /// </summary>
         private LuaValue EvaluateExpr(Expr expr)
         {
-            return EvaluateExprWithMultipleReturns(expr).FirstOrDefault() ?? LuaNil.Instance;
+            return EvaluateExprWithMultipleReturns(expr).FirstOrDefault() ?? LuaValue.Nil;
         }
 
         /// <summary>
@@ -388,7 +388,7 @@ namespace FLua.Interpreter
         {
             if (literal.IsNil)
             {
-                return LuaNil.Instance;
+                return LuaValue.Nil;
             }
             else if (literal.IsBoolean)
             {
@@ -398,17 +398,17 @@ namespace FLua.Interpreter
             else if (literal.IsInteger)
             {
                 var intLiteral = (Literal.Integer)literal;
-                return new LuaInteger((long)intLiteral.Item);
+                return (longintLiteral.Item);
             }
             else if (literal.IsFloat)
             {
                 var floatLiteral = (Literal.Float)literal;
-                return new LuaNumber(floatLiteral.Item);
+                return floatLiteral.Item;
             }
             else if (literal.IsString)
             {
                 var stringLiteral = (Literal.String)literal;
-                return new LuaString(stringLiteral.Item);
+                return stringLiteral.Item;
             }
             else
             {

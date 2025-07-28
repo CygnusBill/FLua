@@ -9,34 +9,34 @@ namespace test_console_app
     {
         public static LuaValue[] Execute(LuaEnvironment env)
         {
-            ((LuaFunction)env.GetVariable("print")).Call(new LuaValue[] { new LuaString("FLua Console Application Test") });
-            ((LuaFunction)env.GetVariable("print")).Call(new LuaValue[] { new LuaString("=============================") });
-            var x = new LuaInteger(42L);
+            ((LuaFunction)env.GetVariable("print")).Call(new LuaValue[] { "FLua Console Application Test" });
+            ((LuaFunction)env.GetVariable("print")).Call(new LuaValue[] { "=============================" });
+            var x = 42L;
             env.SetVariable("x", x);
-            var y = new LuaInteger(8L);
+            var y = 8L;
             env.SetVariable("y", y);
             var result = LuaOperations.Add(x, y);
             env.SetVariable("result", result);
-            ((LuaFunction)env.GetVariable("print")).Call(new LuaValue[] { LuaOperations.Concat(new LuaString("Calculation: "), LuaOperations.Concat(x, LuaOperations.Concat(new LuaString(" + "), LuaOperations.Concat(y, LuaOperations.Concat(new LuaString(" = "), result))))) });
+            ((LuaFunction)env.GetVariable("print")).Call(new LuaValue[] { LuaOperations.Concat("Calculation: ", LuaOperations.Concat(x, LuaOperations.Concat(" + ", LuaOperations.Concat(y, LuaOperations.Concat(" = ", result))))) });
             LuaValue[] greet(params LuaValue[] args)
             {
                 var name = args.Length > 0 ? args[0] : LuaValue.Nil;
                 env.SetVariable("name", name);
                 return new LuaValue[]
                 {
-                    LuaOperations.Concat(new LuaString("Hello, "), LuaOperations.Concat(name, new LuaString("!")))
+                    LuaOperations.Concat("Hello, ", LuaOperations.Concat(name, "!"))
                 };
             }
 
             var greet_func = new LuaUserFunction(greet);
             env.SetVariable("greet", greet_func);
-            var message = ((LuaFunction)greet_func).Call(new LuaValue[] { new LuaString("World") })[0];
+            var message = ((LuaFunction)greet_func).Call(new LuaValue[] { "World" })[0];
             env.SetVariable("message", message);
             ((LuaFunction)env.GetVariable("print")).Call(new LuaValue[] { message });
-            ((LuaFunction)env.GetVariable("print")).Call(new LuaValue[] { new LuaString("Test completed successfully!") });
+            ((LuaFunction)env.GetVariable("print")).Call(new LuaValue[] { "Test completed successfully!" });
             return new LuaValue[]
             {
-                new LuaInteger(0L)
+                0L
             };
         }
 

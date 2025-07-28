@@ -41,16 +41,16 @@ public class DebugTests
         Console.WriteLine($"Function param: {result3[0].GetType().Name} = {result3[0]}");
         
         // Test the actual type checks that are failing
-        Console.WriteLine($"Is result1 LuaInteger? {result1[0] is LuaInteger}");
-        Console.WriteLine($"Is result1 LuaNumber? {result1[0] is LuaNumber}");
-        Console.WriteLine($"Is result2 LuaInteger? {result2[0] is LuaInteger}");
-        Console.WriteLine($"Is result2 LuaNumber? {result2[0] is LuaNumber}");
-        Console.WriteLine($"Is result3 LuaInteger? {result3[0] is LuaInteger}");
-        Console.WriteLine($"Is result3 LuaNumber? {result3[0] is LuaNumber}");
+        Console.WriteLine($"Is result1 LuaInteger? {result1[0].IsInteger}");
+        Console.WriteLine($"Is result1 LuaNumber? {result1[0].IsNumber}");
+        Console.WriteLine($"Is result2 LuaInteger? {result2[0].IsInteger}");
+        Console.WriteLine($"Is result2 LuaNumber? {result2[0].IsNumber}");
+        Console.WriteLine($"Is result3 LuaInteger? {result3[0].IsInteger}");
+        Console.WriteLine($"Is result3 LuaNumber? {result3[0].IsNumber}");
         
         // Just verify the types exist
-        Assert.IsTrue(result1[0] is LuaValue);
-        Assert.IsTrue(result2[0] is LuaValue);
-        Assert.IsTrue(result3[0] is LuaValue);
+        Assert.IsTrue(result1[0].IsTruthy());
+        Assert.IsTrue(result2[0].IsTruthy());
+        Assert.IsTrue(result3[0].IsTruthy());
     }
 }

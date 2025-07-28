@@ -486,17 +486,17 @@ public class CSharpCodeGenerator
         else if (literal.IsInteger)
         {
             var value = ((Literal.Integer)literal).Item;
-            Write($"new LuaInteger({value})");
+            Write($"{value}");
         }
         else if (literal.IsFloat)
         {
             var value = ((Literal.Float)literal).Item;
-            Write($"new LuaNumber({value}d)");
+            Write($"{value}d");
         }
         else if (literal.IsString)
         {
             var value = ((Literal.String)literal).Item;
-            Write($"new LuaString({EscapeString(value)})");
+            Write($"{EscapeString(value)})");
         }
     }
 

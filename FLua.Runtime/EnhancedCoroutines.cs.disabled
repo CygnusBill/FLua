@@ -90,12 +90,12 @@ namespace FLua.Runtime
         {
             if (_status == CoroutineStatus.Dead)
             {
-                return new LuaValue[] { new LuaBoolean(false), new LuaString("cannot resume dead coroutine") };
+                return new LuaValue[] { new LuaBoolean(false), "cannot resume dead coroutine" };
             }
 
             if (_status == CoroutineStatus.Running)
             {
-                return new LuaValue[] { new LuaBoolean(false), new LuaString("cannot resume running coroutine") };
+                return new LuaValue[] { new LuaBoolean(false), "cannot resume running coroutine" };
             }
 
             var previousCoroutine = CurrentCoroutine;
@@ -141,14 +141,14 @@ namespace FLua.Runtime
             {
                 _state.Error = ex;
                 _status = CoroutineStatus.Dead;
-                return new LuaValue[] { new LuaBoolean(false), new LuaString(ex.Message) };
+                return new LuaValue[] { new LuaBoolean(false), ex.Message };
             }
             catch (Exception ex)
             {
                 var luaEx = new LuaRuntimeException($"Internal error: {ex.Message}");
                 _state.Error = luaEx;
                 _status = CoroutineStatus.Dead;
-                return new LuaValue[] { new LuaBoolean(false), new LuaString(luaEx.Message) };
+                return new LuaValue[] { new LuaBoolean(false), luaEx.Message };
             }
             finally
             {
@@ -249,14 +249,14 @@ namespace FLua.Runtime
         {
             var coroutineTable = new LuaTable();
             
-            coroutineTable.Set(new LuaString("create"), new BuiltinFunction(Create));
-            coroutineTable.Set(new LuaString("resume"), new BuiltinFunction(Resume));
-            coroutineTable.Set(new LuaString("yield"), new BuiltinFunction(Yield));
-            coroutineTable.Set(new LuaString("status"), new BuiltinFunction(Status));
-            coroutineTable.Set(new LuaString("running"), new BuiltinFunction(Running));
-            coroutineTable.Set(new LuaString("isyieldable"), new BuiltinFunction(IsYieldable));
-            coroutineTable.Set(new LuaString("wrap"), new BuiltinFunction(Wrap));
-            coroutineTable.Set(new LuaString("close"), new BuiltinFunction(Close));
+            coroutineTable.Set("create", new BuiltinFunction(Create));
+            coroutineTable.Set("resume", new BuiltinFunction(Resume));
+            coroutineTable.Set("yield", new BuiltinFunction(Yield));
+            coroutineTable.Set("status", new BuiltinFunction(Status));
+            coroutineTable.Set("running", new BuiltinFunction(Running));
+            coroutineTable.Set("isyieldable", new BuiltinFunction(IsYieldable));
+            coroutineTable.Set("wrap", new BuiltinFunction(Wrap));
+            coroutineTable.Set("close", new BuiltinFunction(Close));
             
             env.SetVariable("coroutine", coroutineTable);
         }
@@ -311,7 +311,7 @@ namespace FLua.Runtime
                 throw new LuaRuntimeException("bad argument #1 to 'status' (coroutine expected)");
             }
             
-            return new LuaValue[] { new LuaString(co.Status) };
+            return new LuaValue[] { co.Status };
         }
 
         /// <summary>
@@ -325,7 +325,7 @@ namespace FLua.Runtime
                 return new LuaValue[] { current, new LuaBoolean(false) };
             }
             
-            return new LuaValue[] { LuaNil.Instance, new LuaBoolean(true) };
+            return new LuaValue[] { LuaValue.Nil, new LuaBoolean(true) };
         }
 
         /// <summary>
@@ -396,7 +396,7 @@ namespace FLua.Runtime
                 return new LuaValue[] { new LuaBoolean(true) };
             }
             
-            return new LuaValue[] { new LuaBoolean(false), new LuaString("cannot close dead coroutine") };
+            return new LuaValue[] { new LuaBoolean(false), "cannot close dead coroutine" };
         }
     }
 
@@ -497,7 +497,7 @@ namespace FLua.Runtime
                 {
                     // This is where yields can occur
                     var results = function.Call(args);
-                    return results.Length > 0 ? results[0] : LuaNil.Instance;
+                    return results.Length > 0 ? results[0] : LuaValue.Nil;
                 }
                 
                 throw new LuaRuntimeException("Attempt to call non-function");
@@ -509,7 +509,7 @@ namespace FLua.Runtime
             }
             // Add more expression handlers
 
-            return LuaNil.Instance;
+            return LuaValue.Nil;
         }
     }
 }

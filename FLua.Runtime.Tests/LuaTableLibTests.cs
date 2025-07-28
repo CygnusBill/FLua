@@ -1,6 +1,4 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using FLua.Runtime;
-using System;
 
 namespace FLua.Runtime.Tests
 {
@@ -31,8 +29,8 @@ namespace FLua.Runtime.Tests
         public void LuaTable_SetAndGet_ShouldMaintainState()
         {
             var table = new LuaTable();
-            var key = new LuaString("test");
-            var value = new LuaString("value");
+            var key = "test";
+            var value = "value";
             
             table.Set(key, value);
             var retrieved = table.Get(key);
@@ -45,33 +43,33 @@ namespace FLua.Runtime.Tests
         public void LuaTable_StringKey_ShouldStoreCorrectly()
         {
             var table = new LuaTable();
-            table.Set(new LuaString("name"), new LuaString("Alice"));
+            table.Set("name", "Alice");
             
-            var result = table.Get(new LuaString("name"));
-            Assert.AreEqual("Alice", ((LuaString)result).Value);
+            var result = table.Get("name");
+            Assert.AreEqual("Alice", result);
         }
 
         [TestMethod]
         public void LuaTable_IntegerKey_ShouldStoreInArray()
         {
             var table = new LuaTable();
-            table.Set(new LuaInteger(1), new LuaString("first"));
-            table.Set(new LuaInteger(2), new LuaString("second"));
+            table.Set(1, "first");
+            table.Set(2, "second");
             
-            var result1 = table.Get(new LuaInteger(1));
-            var result2 = table.Get(new LuaInteger(2));
+            var result1 = table.Get(1);
+            var result2 = table.Get(2);
             
-            Assert.AreEqual("first", ((LuaString)result1).Value);
-            Assert.AreEqual("second", ((LuaString)result2).Value);
+            Assert.AreEqual("first", result1);
+            Assert.AreEqual("second", result2);
         }
 
         [TestMethod]
         public void LuaTable_NonExistentKey_ShouldReturnNil()
         {
             var table = new LuaTable();
-            var result = table.Get(new LuaString("nonexistent"));
+            var result = table.Get("nonexistent");
             
-            Assert.IsInstanceOfType(result, typeof(LuaNil));
+            Assert.IsTrue(result.IsNil);
         }
 
         #endregion
@@ -82,49 +80,49 @@ namespace FLua.Runtime.Tests
         [TestMethod]
         public void TableInsert_AtEnd_ShouldAppendToArray()
         {
-            var table_lib = (LuaTable)_env.GetVariable("table");
-            var insertFunc = (LuaFunction)table_lib.Get(new LuaString("insert"));
+            var tableLib = _env.GetVariable("table").AsTable<LuaTable>();
+            var insertFunc = tableLib.Get("insert").AsFunction<LuaFunction>();
             var testTable = new LuaTable();
             
             // Insert at end
-            insertFunc.Call(new LuaValue[] { testTable, new LuaString("first") });
-            insertFunc.Call(new LuaValue[] { testTable, new LuaString("second") });
+            insertFunc.Call(testTable, "first");
+            insertFunc.Call(testTable, "second");
             
-            Assert.AreEqual("first", ((LuaString)testTable.Get(new LuaInteger(1))).Value);
-            Assert.AreEqual("second", ((LuaString)testTable.Get(new LuaInteger(2))).Value);
+            Assert.AreEqual("first", testTable.Get(1));
+            Assert.AreEqual("second", testTable.Get(2));
         }
 
         [TestMethod]
         public void TableInsert_AtPosition_ShouldInsertCorrectly()
         {
-            var table_lib = (LuaTable)_env.GetVariable("table");
-            var insertFunc = (LuaFunction)table_lib.Get(new LuaString("insert"));
+            var tableLib = _env.GetVariable("table").AsTable<LuaTable>();
+            var insertFunc = tableLib.Get("insert").AsFunction<LuaFunction>();
             var testTable = new LuaTable();
             
-            testTable.Set(new LuaInteger(1), new LuaString("first"));
-            testTable.Set(new LuaInteger(2), new LuaString("third"));
+            testTable.Set(1, "first");
+            testTable.Set(2, "third");
             
             // Insert at position 2
-            insertFunc.Call(new LuaValue[] { testTable, new LuaInteger(2), new LuaString("second") });
+            insertFunc.Call(testTable, 2, "second");
             
-            Assert.AreEqual("first", ((LuaString)testTable.Get(new LuaInteger(1))).Value);
-            Assert.AreEqual("second", ((LuaString)testTable.Get(new LuaInteger(2))).Value);
-            Assert.AreEqual("third", ((LuaString)testTable.Get(new LuaInteger(3))).Value);
+            Assert.AreEqual("first", testTable.Get(1));
+            Assert.AreEqual("second", testTable.Get(2));
+            Assert.AreEqual("third", testTable.Get(3));
         }
 
         // Boundary Value Testing: Testing insert at boundaries
         [TestMethod]
         public void TableInsert_AtBeginning_ShouldShiftElements()
         {
-            var table_lib = (LuaTable)_env.GetVariable("table");
-            var insertFunc = (LuaFunction)table_lib.Get(new LuaString("insert"));
+            var tableLib = _env.GetVariable("table").AsTable<LuaTable>();
+            var insertFunc = tableLib.Get("insert").AsFunction<LuaFunction>();
             var testTable = new LuaTable();
             
-            testTable.Set(new LuaInteger(1), new LuaString("second"));
-            insertFunc.Call(new LuaValue[] { testTable, new LuaInteger(1), new LuaString("first") });
+            testTable.Set(1, "second");
+            insertFunc.Call(testTable, 1, "first");
             
-            Assert.AreEqual("first", ((LuaString)testTable.Get(new LuaInteger(1))).Value);
-            Assert.AreEqual("second", ((LuaString)testTable.Get(new LuaInteger(2))).Value);
+            Assert.AreEqual("first", testTable.Get(1));
+            Assert.AreEqual("second", testTable.Get(2));
         }
 
         #endregion
@@ -135,53 +133,53 @@ namespace FLua.Runtime.Tests
         [TestMethod]
         public void TableRemove_LastElement_ShouldRemoveAndReturn()
         {
-            var table_lib = (LuaTable)_env.GetVariable("table");
-            var insertFunc = (LuaFunction)table_lib.Get(new LuaString("insert"));
-            var removeFunc = (LuaFunction)table_lib.Get(new LuaString("remove"));
+            var tableLib = _env.GetVariable("table").AsTable<LuaTable>();
+            var insertFunc = tableLib.Get("insert").AsFunction<LuaFunction>();
+            var removeFunc = tableLib.Get("remove").AsFunction<LuaFunction>();
             var testTable = new LuaTable();
             
-            insertFunc.Call(new LuaValue[] { testTable, new LuaString("first") });
-            insertFunc.Call(new LuaValue[] { testTable, new LuaString("second") });
+            insertFunc.Call(testTable, "first");
+            insertFunc.Call(testTable, "second");
             
-            var result = removeFunc.Call(new LuaValue[] { testTable });
+            var result = removeFunc.Call(testTable);
             
             Assert.AreEqual(1, result.Length);
-            Assert.AreEqual("second", ((LuaString)result[0]).Value);
-            Assert.IsInstanceOfType(testTable.Get(new LuaInteger(2)), typeof(LuaNil));
+            Assert.AreEqual("second", result[0]);
+            Assert.IsTrue(testTable.Get(2).IsNil);
         }
 
         [TestMethod]
         public void TableRemove_AtPosition_ShouldRemoveAndShift()
         {
-            var table_lib = (LuaTable)_env.GetVariable("table");
-            var insertFunc = (LuaFunction)table_lib.Get(new LuaString("insert"));
-            var removeFunc = (LuaFunction)table_lib.Get(new LuaString("remove"));
+            var tableLib = _env.GetVariable("table").AsTable<LuaTable>();
+            var insertFunc = tableLib.Get("insert").AsFunction<LuaFunction>();
+            var removeFunc = tableLib.Get("remove").AsFunction<LuaFunction>();
             var testTable = new LuaTable();
             
-            insertFunc.Call(new LuaValue[] { testTable, new LuaString("first") });
-            insertFunc.Call(new LuaValue[] { testTable, new LuaString("second") });
-            insertFunc.Call(new LuaValue[] { testTable, new LuaString("third") });
+            insertFunc.Call(testTable, "first");
+            insertFunc.Call(testTable, "second");
+            insertFunc.Call(testTable, "third");
             
-            var result = removeFunc.Call(new LuaValue[] { testTable, new LuaInteger(2) });
+            var result = removeFunc.Call(testTable, 2);
             
             Assert.AreEqual(1, result.Length);
-            Assert.AreEqual("second", ((LuaString)result[0]).Value);
-            Assert.AreEqual("first", ((LuaString)testTable.Get(new LuaInteger(1))).Value);
-            Assert.AreEqual("third", ((LuaString)testTable.Get(new LuaInteger(2))).Value);
+            Assert.AreEqual("second", result[0]);
+            Assert.AreEqual("first", testTable.Get(1));
+            Assert.AreEqual("third", testTable.Get(2));
         }
 
         // Boundary Value Testing: Testing remove edge cases
         [TestMethod]
         public void TableRemove_EmptyTable_ShouldReturnNil()
         {
-            var table_lib = (LuaTable)_env.GetVariable("table");
-            var removeFunc = (LuaFunction)table_lib.Get(new LuaString("remove"));
+            var tableLib = _env.GetVariable("table").AsTable<LuaTable>();
+            var removeFunc = tableLib.Get("remove").AsFunction<LuaFunction>();
             var testTable = new LuaTable();
             
-            var result = removeFunc.Call(new LuaValue[] { testTable });
+            var result = removeFunc.Call(testTable);
             
             Assert.AreEqual(1, result.Length);
-            Assert.IsInstanceOfType(result[0], typeof(LuaNil));
+            Assert.IsTrue(result[0].IsNil);
         }
 
         #endregion
@@ -192,51 +190,51 @@ namespace FLua.Runtime.Tests
         [TestMethod]
         public void TableSort_Numbers_ShouldSortAscending()
         {
-            var table_lib = (LuaTable)_env.GetVariable("table");
-            var insertFunc = (LuaFunction)table_lib.Get(new LuaString("insert"));
-            var sortFunc = (LuaFunction)table_lib.Get(new LuaString("sort"));
+            var tableLib = _env.GetVariable("table").AsTable<LuaTable>();
+            var insertFunc = tableLib.Get("insert").AsFunction<LuaFunction>();
+            var sortFunc = tableLib.Get("sort").AsFunction<LuaFunction>();
             var testTable = new LuaTable();
             
-            insertFunc.Call(new LuaValue[] { testTable, new LuaNumber(3.5) });
-            insertFunc.Call(new LuaValue[] { testTable, new LuaNumber(1.2) });
-            insertFunc.Call(new LuaValue[] { testTable, new LuaNumber(2.8) });
+            insertFunc.Call(testTable, 3.5);
+            insertFunc.Call(testTable, 1.2);
+            insertFunc.Call(testTable, 2.8);
             
-            sortFunc.Call(new LuaValue[] { testTable });
+            sortFunc.Call(testTable);
             
-            Assert.AreEqual(1.2, ((LuaNumber)testTable.Get(new LuaInteger(1))).Value, 0.001);
-            Assert.AreEqual(2.8, ((LuaNumber)testTable.Get(new LuaInteger(2))).Value, 0.001);
-            Assert.AreEqual(3.5, ((LuaNumber)testTable.Get(new LuaInteger(3))).Value, 0.001);
+            Assert.AreEqual(1.2, testTable.Get(LuaValue.Integer(1)).AsNumber(), 0.001);
+            Assert.AreEqual(2.8, testTable.Get(LuaValue.Integer(2)).AsNumber(), 0.001);
+            Assert.AreEqual(3.5, testTable.Get(LuaValue.Integer(3)).AsNumber(), 0.001);
         }
 
         [TestMethod]
         public void TableSort_Strings_ShouldSortAlphabetically()
         {
-            var table_lib = (LuaTable)_env.GetVariable("table");
-            var insertFunc = (LuaFunction)table_lib.Get(new LuaString("insert"));
-            var sortFunc = (LuaFunction)table_lib.Get(new LuaString("sort"));
+            var tableLib = _env.GetVariable("table").AsTable<LuaTable>();
+            var insertFunc = tableLib.Get("insert").AsFunction<LuaFunction>();
+            var sortFunc = tableLib.Get("sort").AsFunction<LuaFunction>();
             var testTable = new LuaTable();
             
-            insertFunc.Call(new LuaValue[] { testTable, new LuaString("charlie") });
-            insertFunc.Call(new LuaValue[] { testTable, new LuaString("alice") });
-            insertFunc.Call(new LuaValue[] { testTable, new LuaString("bob") });
+            insertFunc.Call(testTable, "charlie");
+            insertFunc.Call(testTable, "alice");
+            insertFunc.Call(testTable, "bob");
             
-            sortFunc.Call(new LuaValue[] { testTable });
+            sortFunc.Call(testTable);
             
-            Assert.AreEqual("alice", ((LuaString)testTable.Get(new LuaInteger(1))).Value);
-            Assert.AreEqual("bob", ((LuaString)testTable.Get(new LuaInteger(2))).Value);
-            Assert.AreEqual("charlie", ((LuaString)testTable.Get(new LuaInteger(3))).Value);
+            Assert.AreEqual("alice", testTable.Get(LuaValue.Integer(1)).AsString());
+            Assert.AreEqual("bob", testTable.Get(LuaValue.Integer(2)).AsString());
+            Assert.AreEqual("charlie", testTable.Get(LuaValue.Integer(3)).AsString());
         }
 
         // Edge Case Testing: Testing sort with special cases
         [TestMethod]
         public void TableSort_EmptyTable_ShouldNotFail()
         {
-            var table_lib = (LuaTable)_env.GetVariable("table");
-            var sortFunc = (LuaFunction)table_lib.Get(new LuaString("sort"));
+            var tableLib = _env.GetVariable("table").AsTable<LuaTable>();
+            var sortFunc = tableLib.Get("sort").AsFunction<LuaFunction>();
             var testTable = new LuaTable();
             
             // Should not throw an exception
-            sortFunc.Call(new LuaValue[] { testTable });
+            sortFunc.Call(testTable);
             
             Assert.AreEqual(0, testTable.Array.Count);
         }
@@ -244,15 +242,15 @@ namespace FLua.Runtime.Tests
         [TestMethod]
         public void TableSort_SingleElement_ShouldRemainUnchanged()
         {
-            var table_lib = (LuaTable)_env.GetVariable("table");
-            var insertFunc = (LuaFunction)table_lib.Get(new LuaString("insert"));
-            var sortFunc = (LuaFunction)table_lib.Get(new LuaString("sort"));
+            var tableLib = _env.GetVariable("table").AsTable<LuaTable>();
+            var insertFunc = tableLib.Get("insert").AsFunction<LuaFunction>();
+            var sortFunc = tableLib.Get("sort").AsFunction<LuaFunction>();
             var testTable = new LuaTable();
             
-            insertFunc.Call(new LuaValue[] { testTable, new LuaString("only") });
-            sortFunc.Call(new LuaValue[] { testTable });
+            insertFunc.Call(testTable, "only");
+            sortFunc.Call(testTable);
             
-            Assert.AreEqual("only", ((LuaString)testTable.Get(new LuaInteger(1))).Value);
+            Assert.AreEqual("only", testTable.Get(1));
         }
 
         #endregion
@@ -263,74 +261,69 @@ namespace FLua.Runtime.Tests
         [TestMethod]
         public void TableConcat_WithoutSeparator_ShouldConcatenateDirectly()
         {
-            var table_lib = (LuaTable)_env.GetVariable("table");
-            var insertFunc = (LuaFunction)table_lib.Get(new LuaString("insert"));
-            var concatFunc = (LuaFunction)table_lib.Get(new LuaString("concat"));
+            var tableLib = _env.GetVariable("table").AsTable<LuaTable>();
+            var insertFunc = tableLib.Get("insert").AsFunction<LuaFunction>();
+            var concatFunc = tableLib.Get("concat").AsFunction<LuaFunction>();
             var testTable = new LuaTable();
             
-            insertFunc.Call(new LuaValue[] { testTable, new LuaString("Hello") });
-            insertFunc.Call(new LuaValue[] { testTable, new LuaString("World") });
+            insertFunc.Call(testTable, "Hello");
+            insertFunc.Call(testTable, "World");
             
-            var result = concatFunc.Call(new LuaValue[] { testTable });
+            var result = concatFunc.Call(testTable);
             
             Assert.AreEqual(1, result.Length);
-            Assert.AreEqual("HelloWorld", ((LuaString)result[0]).Value);
+            Assert.AreEqual("HelloWorld", result[0]);
         }
 
         [TestMethod]
         public void TableConcat_WithSeparator_ShouldUseSeparator()
         {
-            var table_lib = (LuaTable)_env.GetVariable("table");
-            var insertFunc = (LuaFunction)table_lib.Get(new LuaString("insert"));
-            var concatFunc = (LuaFunction)table_lib.Get(new LuaString("concat"));
+            var tableLib = _env.GetVariable("table").AsTable<LuaTable>();
+            var insertFunc = tableLib.Get("insert").AsFunction<LuaFunction>();
+            var concatFunc = tableLib.Get("concat").AsFunction<LuaFunction>();
             var testTable = new LuaTable();
             
-            insertFunc.Call(new LuaValue[] { testTable, new LuaString("apple") });
-            insertFunc.Call(new LuaValue[] { testTable, new LuaString("banana") });
-            insertFunc.Call(new LuaValue[] { testTable, new LuaString("cherry") });
+            insertFunc.Call(testTable, "apple");
+            insertFunc.Call(testTable, "banana");
+            insertFunc.Call(testTable, "cherry");
             
-            var result = concatFunc.Call(new LuaValue[] { testTable, new LuaString(", ") });
+            var result = concatFunc.Call(testTable, ", ");
             
             Assert.AreEqual(1, result.Length);
-            Assert.AreEqual("apple, banana, cherry", ((LuaString)result[0]).Value);
+            Assert.AreEqual("apple, banana, cherry", result[0]);
         }
 
         // Boundary Value Testing: Testing concat with range
         [TestMethod]
         public void TableConcat_WithRange_ShouldConcatenateSubset()
         {
-            var table_lib = (LuaTable)_env.GetVariable("table");
-            var insertFunc = (LuaFunction)table_lib.Get(new LuaString("insert"));
-            var concatFunc = (LuaFunction)table_lib.Get(new LuaString("concat"));
+            var tableLib = _env.GetVariable("table").AsTable<LuaTable>();
+            var insertFunc = tableLib.Get("insert").AsFunction<LuaFunction>();
+            var concatFunc = tableLib.Get("concat").AsFunction<LuaFunction>();
             var testTable = new LuaTable();
             
-            insertFunc.Call(new LuaValue[] { testTable, new LuaString("a") });
-            insertFunc.Call(new LuaValue[] { testTable, new LuaString("b") });
-            insertFunc.Call(new LuaValue[] { testTable, new LuaString("c") });
-            insertFunc.Call(new LuaValue[] { testTable, new LuaString("d") });
+            insertFunc.Call(testTable, "a");
+            insertFunc.Call(testTable, "b");
+            insertFunc.Call(testTable, "c");
+            insertFunc.Call(testTable, "d");
             
-            var result = concatFunc.Call(new LuaValue[] { 
-                testTable, 
-                new LuaString("-"), 
-                new LuaInteger(2), 
-                new LuaInteger(3) 
-            });
+            var result = concatFunc.Call(testTable, "-", 2, 3);
             
             Assert.AreEqual(1, result.Length);
-            Assert.AreEqual("b-c", ((LuaString)result[0]).Value);
+            Assert.AreEqual("b-c", result[0]);
         }
 
         [TestMethod]
         public void TableConcat_EmptyTable_ShouldReturnEmptyString()
         {
-            var table_lib = (LuaTable)_env.GetVariable("table");
-            var concatFunc = (LuaFunction)table_lib.Get(new LuaString("concat"));
+            var tableLib = _env.GetVariable("table").AsTable<LuaTable>();
+            var concatFunc = tableLib.Get("concat").AsFunction<LuaFunction>();
             var testTable = new LuaTable();
             
-            var result = concatFunc.Call(new LuaValue[] { testTable });
+            var result = concatFunc.Call(testTable);
             
             Assert.AreEqual(1, result.Length);
-            Assert.AreEqual("", ((LuaString)result[0]).Value);
+            Assert.AreEqual("", result[0]);
         }
 
         #endregion
@@ -356,13 +349,13 @@ namespace FLua.Runtime.Tests
             var metatable = new LuaTable();
             var indexTable = new LuaTable();
             
-            indexTable.Set(new LuaString("default"), new LuaString("fallback"));
-            metatable.Set(new LuaString("__index"), indexTable);
+            indexTable.Set("default", "fallback");
+            metatable.Set("__index", indexTable);
             table.Metatable = metatable;
             
-            var result = table.Get(new LuaString("default"));
+            var result = table.Get("default");
             
-            Assert.AreEqual("fallback", ((LuaString)result).Value);
+            Assert.AreEqual("fallback", result);
         }
 
         // Risk-Based Testing: Testing metatable edge cases
@@ -370,9 +363,9 @@ namespace FLua.Runtime.Tests
         public void LuaTable_NoMetatable_ShouldReturnNilForMissingKeys()
         {
             var table = new LuaTable();
-            var result = table.Get(new LuaString("missing"));
+            var result = table.Get("missing");
             
-            Assert.IsInstanceOfType(result, typeof(LuaNil));
+            Assert.IsTrue(result.IsNil);
         }
 
         #endregion

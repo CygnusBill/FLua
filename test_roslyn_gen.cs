@@ -9,14 +9,14 @@ namespace test_roslyn_gen
     {
         public static LuaValue[] Execute(LuaEnvironment env)
         {
-            ((LuaFunction)env.GetVariable("print")).Call(new LuaValue[] { new LuaString("Testing Roslyn code generator") });
-            var x = new LuaInteger(42L);
+            ((LuaFunction)env.GetVariable("print")).Call(new LuaValue[] { "Testing Roslyn code generator" });
+            var x = 42L;
             env.SetVariable("x", x);
-            var y = LuaOperations.Add(x, new LuaInteger(8L));
+            var y = LuaOperations.Add(x, 8L);
             env.SetVariable("y", y);
-            ((LuaFunction)env.GetVariable("print")).Call(new LuaValue[] { new LuaString("x ="), x });
-            ((LuaFunction)env.GetVariable("print")).Call(new LuaValue[] { new LuaString("y ="), y });
-            ((LuaFunction)env.GetVariable("print")).Call(new LuaValue[] { new LuaString("Test completed!") });
+            ((LuaFunction)env.GetVariable("print")).Call(new LuaValue[] { "x =", x });
+            ((LuaFunction)env.GetVariable("print")).Call(new LuaValue[] { "y =", y });
+            ((LuaFunction)env.GetVariable("print")).Call(new LuaValue[] { "Test completed!" });
             return new LuaValue[]
             {
             };

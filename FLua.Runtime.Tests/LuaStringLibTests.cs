@@ -23,23 +23,23 @@ namespace FLua.Runtime.Tests
         [TestMethod]
         public void StringLen_RegularString_ShouldReturnCorrectLength()
         {
-            var string_table = (LuaTable)_env.GetVariable("string");
-            var lenFunc = (LuaFunction)string_table.Get(new LuaString("len"));
-            var result = lenFunc.Call(new LuaValue[] { new LuaString("hello") });
+            var stringTable = _env.GetVariable("string");
+            var lenFunc = stringTable.AsTable<LuaTable>().Get("len");
+            var result = lenFunc.AsFunction<LuaFunction>().Call(new LuaValue[] { "hello" });
             
             Assert.AreEqual(1, result.Length);
-            Assert.AreEqual(5, ((LuaInteger)result[0]).Value);
+            Assert.AreEqual(5, result[0]);
         }
 
         [TestMethod]
         public void StringLen_EmptyString_ShouldReturnZero()
         {
-            var string_table = (LuaTable)_env.GetVariable("string");
-            var lenFunc = (LuaFunction)string_table.Get(new LuaString("len"));
-            var result = lenFunc.Call(new LuaValue[] { new LuaString("") });
+            var stringTable = _env.GetVariable("string");
+            var lenFunc = stringTable.AsTable<LuaTable>().Get("len");
+            var result = lenFunc.AsFunction<LuaFunction>().Call(new LuaValue[] { "" });
             
             Assert.AreEqual(1, result.Length);
-            Assert.AreEqual(0, ((LuaInteger)result[0]).Value);
+            Assert.AreEqual(0, result[0]);
         }
 
         // Boundary Value Testing: Testing with very long string
@@ -47,24 +47,24 @@ namespace FLua.Runtime.Tests
         public void StringLen_LongString_ShouldReturnCorrectLength()
         {
             var longString = new string('a', 10000);
-            var string_table = (LuaTable)_env.GetVariable("string");
-            var lenFunc = (LuaFunction)string_table.Get(new LuaString("len"));
-            var result = lenFunc.Call(new LuaValue[] { new LuaString(longString) });
+            var stringTable = _env.GetVariable("string");
+            var lenFunc = stringTable.AsTable<LuaTable>().Get("len");
+            var result = lenFunc.AsFunction<LuaFunction>().Call(new LuaValue[] { longString });
             
             Assert.AreEqual(1, result.Length);
-            Assert.AreEqual(10000, ((LuaInteger)result[0]).Value);
+            Assert.AreEqual(10000, result[0]);
         }
 
         // Domain Testing: Testing with number inputs
         [TestMethod]
         public void StringLen_NumberInput_ShouldReturnStringLength()
         {
-            var string_table = (LuaTable)_env.GetVariable("string");
-            var lenFunc = (LuaFunction)string_table.Get(new LuaString("len"));
-            var result = lenFunc.Call(new LuaValue[] { new LuaInteger(12345) });
+            var stringTable = _env.GetVariable("string");
+            var lenFunc = stringTable.AsTable<LuaTable>().Get("len");
+            var result = lenFunc.AsFunction<LuaFunction>().Call(new LuaValue[] { 12345 });
             
             Assert.AreEqual(1, result.Length);
-            Assert.AreEqual(5, ((LuaInteger)result[0]).Value); // "12345" has 5 characters
+            Assert.AreEqual(5, result[0]); // "12345" has 5 characters
         }
 
         #endregion
@@ -75,61 +75,61 @@ namespace FLua.Runtime.Tests
         [TestMethod]
         public void StringSub_PositiveIndices_ShouldReturnCorrectSubstring()
         {
-            var string_table = (LuaTable)_env.GetVariable("string");
-            var subFunc = (LuaFunction)string_table.Get(new LuaString("sub"));
-            var result = subFunc.Call(new LuaValue[] { 
-                new LuaString("hello world"), 
-                new LuaInteger(7), 
-                new LuaInteger(11) 
+            var stringTable = _env.GetVariable("string");
+            var subFunc = stringTable.AsTable<LuaTable>().Get("sub");
+            var result = subFunc.AsFunction<LuaFunction>().Call(new LuaValue[] { 
+                "hello world", 
+                7, 
+                11 
             });
             
             Assert.AreEqual(1, result.Length);
-            Assert.AreEqual("world", ((LuaString)result[0]).Value);
+            Assert.AreEqual("world", result[0]);
         }
 
         [TestMethod]
         public void StringSub_NegativeIndices_ShouldReturnCorrectSubstring()
         {
-            var string_table = (LuaTable)_env.GetVariable("string");
-            var subFunc = (LuaFunction)string_table.Get(new LuaString("sub"));
-            var result = subFunc.Call(new LuaValue[] { 
-                new LuaString("hello world"), 
-                new LuaInteger(-5), 
-                new LuaInteger(-1) 
+            var stringTable = _env.GetVariable("string");
+            var subFunc = stringTable.AsTable<LuaTable>().Get("sub");
+            var result = subFunc.AsFunction<LuaFunction>().Call(new LuaValue[] { 
+                "hello world", 
+                -5, 
+                -1 
             });
             
             Assert.AreEqual(1, result.Length);
-            Assert.AreEqual("world", ((LuaString)result[0]).Value);
+            Assert.AreEqual("world", result[0]);
         }
 
         // Boundary Value Testing: Testing edge cases
         [TestMethod]
         public void StringSub_StartIndexOnly_ShouldReturnRestOfString()
         {
-            var string_table = (LuaTable)_env.GetVariable("string");
-            var subFunc = (LuaFunction)string_table.Get(new LuaString("sub"));
-            var result = subFunc.Call(new LuaValue[] { 
-                new LuaString("hello world"), 
-                new LuaInteger(7)
+            var stringTable = _env.GetVariable("string");
+            var subFunc = stringTable.AsTable<LuaTable>().Get("sub");
+            var result = subFunc.AsFunction<LuaFunction>().Call(new LuaValue[] { 
+                "hello world", 
+                7
             });
             
             Assert.AreEqual(1, result.Length);
-            Assert.AreEqual("world", ((LuaString)result[0]).Value);
+            Assert.AreEqual("world", result[0]);
         }
 
         [TestMethod]
         public void StringSub_OutOfBounds_ShouldReturnEmptyString()
         {
-            var string_table = (LuaTable)_env.GetVariable("string");
-            var subFunc = (LuaFunction)string_table.Get(new LuaString("sub"));
-            var result = subFunc.Call(new LuaValue[] { 
-                new LuaString("hello"), 
-                new LuaInteger(10), 
-                new LuaInteger(15) 
+            var stringTable = _env.GetVariable("string");
+            var subFunc = stringTable.AsTable<LuaTable>().Get("sub");
+            var result = subFunc.AsFunction<LuaFunction>().Call(new LuaValue[] { 
+                "hello", 
+                10, 
+                15 
             });
             
             Assert.AreEqual(1, result.Length);
-            Assert.AreEqual("", ((LuaString)result[0]).Value);
+            Assert.AreEqual("", result[0]);
         }
 
         #endregion
@@ -140,46 +140,46 @@ namespace FLua.Runtime.Tests
         [TestMethod]
         public void StringUpper_MixedCase_ShouldReturnUppercase()
         {
-            var string_table = (LuaTable)_env.GetVariable("string");
-            var upperFunc = (LuaFunction)string_table.Get(new LuaString("upper"));
-            var result = upperFunc.Call(new LuaValue[] { new LuaString("Hello World") });
+            var stringTable = _env.GetVariable("string");
+            var upperFunc = stringTable.AsTable<LuaTable>().Get("upper");
+            var result = upperFunc.AsFunction<LuaFunction>().Call(new LuaValue[] { "Hello World" });
             
             Assert.AreEqual(1, result.Length);
-            Assert.AreEqual("HELLO WORLD", ((LuaString)result[0]).Value);
+            Assert.AreEqual("HELLO WORLD", result[0]);
         }
 
         [TestMethod]
         public void StringLower_MixedCase_ShouldReturnLowercase()
         {
-            var string_table = (LuaTable)_env.GetVariable("string");
-            var lowerFunc = (LuaFunction)string_table.Get(new LuaString("lower"));
-            var result = lowerFunc.Call(new LuaValue[] { new LuaString("Hello World") });
+            var stringTable = _env.GetVariable("string");
+            var lowerFunc = stringTable.AsTable<LuaTable>().Get("lower");
+            var result = lowerFunc.AsFunction<LuaFunction>().Call(new LuaValue[] { "Hello World" });
             
             Assert.AreEqual(1, result.Length);
-            Assert.AreEqual("hello world", ((LuaString)result[0]).Value);
+            Assert.AreEqual("hello world", result[0]);
         }
 
         // Domain Testing: Testing with special characters
         [TestMethod]
         public void StringUpper_WithNumbers_ShouldKeepNumbersUnchanged()
         {
-            var string_table = (LuaTable)_env.GetVariable("string");
-            var upperFunc = (LuaFunction)string_table.Get(new LuaString("upper"));
-            var result = upperFunc.Call(new LuaValue[] { new LuaString("abc123def") });
+            var stringTable = _env.GetVariable("string");
+            var upperFunc = stringTable.AsTable<LuaTable>().Get("upper");
+            var result = upperFunc.AsFunction<LuaFunction>().Call(new LuaValue[] { "abc123def" });
             
             Assert.AreEqual(1, result.Length);
-            Assert.AreEqual("ABC123DEF", ((LuaString)result[0]).Value);
+            Assert.AreEqual("ABC123DEF", result[0]);
         }
 
         [TestMethod]
         public void StringLower_EmptyString_ShouldReturnEmptyString()
         {
-            var string_table = (LuaTable)_env.GetVariable("string");
-            var lowerFunc = (LuaFunction)string_table.Get(new LuaString("lower"));
-            var result = lowerFunc.Call(new LuaValue[] { new LuaString("") });
+            var stringTable = _env.GetVariable("string");
+            var lowerFunc = stringTable.AsTable<LuaTable>().Get("lower");
+            var result = lowerFunc.AsFunction<LuaFunction>().Call(new LuaValue[] { "" });
             
             Assert.AreEqual(1, result.Length);
-            Assert.AreEqual("", ((LuaString)result[0]).Value);
+            Assert.AreEqual("", result[0]);
         }
 
         #endregion
@@ -190,46 +190,46 @@ namespace FLua.Runtime.Tests
         [TestMethod]
         public void StringReverse_RegularString_ShouldReturnReversed()
         {
-            var string_table = (LuaTable)_env.GetVariable("string");
-            var reverseFunc = (LuaFunction)string_table.Get(new LuaString("reverse"));
-            var result = reverseFunc.Call(new LuaValue[] { new LuaString("hello") });
+            var stringTable = _env.GetVariable("string");
+            var reverseFunc = stringTable.AsTable<LuaTable>().Get("reverse");
+            var result = reverseFunc.AsFunction<LuaFunction>().Call(new LuaValue[] { "hello" });
             
             Assert.AreEqual(1, result.Length);
-            Assert.AreEqual("olleh", ((LuaString)result[0]).Value);
+            Assert.AreEqual("olleh", result[0]);
         }
 
         [TestMethod]
         public void StringReverse_Palindrome_ShouldReturnSameString()
         {
-            var string_table = (LuaTable)_env.GetVariable("string");
-            var reverseFunc = (LuaFunction)string_table.Get(new LuaString("reverse"));
-            var result = reverseFunc.Call(new LuaValue[] { new LuaString("racecar") });
+            var stringTable = _env.GetVariable("string");
+            var reverseFunc = stringTable.AsTable<LuaTable>().Get("reverse");
+            var result = reverseFunc.AsFunction<LuaFunction>().Call(new LuaValue[] { "racecar" });
             
             Assert.AreEqual(1, result.Length);
-            Assert.AreEqual("racecar", ((LuaString)result[0]).Value);
+            Assert.AreEqual("racecar", result[0]);
         }
 
         // Boundary Value Testing: Testing edge cases
         [TestMethod]
         public void StringReverse_SingleCharacter_ShouldReturnSameCharacter()
         {
-            var string_table = (LuaTable)_env.GetVariable("string");
-            var reverseFunc = (LuaFunction)string_table.Get(new LuaString("reverse"));
-            var result = reverseFunc.Call(new LuaValue[] { new LuaString("a") });
+            var stringTable = _env.GetVariable("string");
+            var reverseFunc = stringTable.AsTable<LuaTable>().Get("reverse");
+            var result = reverseFunc.AsFunction<LuaFunction>().Call(new LuaValue[] { "a" });
             
             Assert.AreEqual(1, result.Length);
-            Assert.AreEqual("a", ((LuaString)result[0]).Value);
+            Assert.AreEqual("a", result[0]);
         }
 
         [TestMethod]
         public void StringReverse_EmptyString_ShouldReturnEmptyString()
         {
-            var string_table = (LuaTable)_env.GetVariable("string");
-            var reverseFunc = (LuaFunction)string_table.Get(new LuaString("reverse"));
-            var result = reverseFunc.Call(new LuaValue[] { new LuaString("") });
+            var stringTable = _env.GetVariable("string");
+            var reverseFunc = stringTable.AsTable<LuaTable>().Get("reverse");
+            var result = reverseFunc.AsFunction<LuaFunction>().Call(new LuaValue[] { "" });
             
             Assert.AreEqual(1, result.Length);
-            Assert.AreEqual("", ((LuaString)result[0]).Value);
+            Assert.AreEqual("", result[0]);
         }
 
         #endregion
@@ -240,48 +240,48 @@ namespace FLua.Runtime.Tests
         [TestMethod]
         public void StringRep_PositiveCount_ShouldRepeatString()
         {
-            var string_table = (LuaTable)_env.GetVariable("string");
-            var repFunc = (LuaFunction)string_table.Get(new LuaString("rep"));
-            var result = repFunc.Call(new LuaValue[] { new LuaString("ab"), new LuaInteger(3) });
+            var stringTable = _env.GetVariable("string");
+            var repFunc = stringTable.AsTable<LuaTable>().Get("rep");
+            var result = repFunc.AsFunction<LuaFunction>().Call(new LuaValue[] { "ab", 3 });
             
             Assert.AreEqual(1, result.Length);
-            Assert.AreEqual("ababab", ((LuaString)result[0]).Value);
+            Assert.AreEqual("ababab", result[0]);
         }
 
         // Boundary Value Testing: Testing edge cases
         [TestMethod]
         public void StringRep_ZeroCount_ShouldReturnEmptyString()
         {
-            var string_table = (LuaTable)_env.GetVariable("string");
-            var repFunc = (LuaFunction)string_table.Get(new LuaString("rep"));
-            var result = repFunc.Call(new LuaValue[] { new LuaString("hello"), new LuaInteger(0) });
+            var stringTable = _env.GetVariable("string");
+            var repFunc = stringTable.AsTable<LuaTable>().Get("rep");
+            var result = repFunc.AsFunction<LuaFunction>().Call(new LuaValue[] { "hello", 0 });
             
             Assert.AreEqual(1, result.Length);
-            Assert.AreEqual("", ((LuaString)result[0]).Value);
+            Assert.AreEqual("", result[0]);
         }
 
         [TestMethod]
         public void StringRep_OneCount_ShouldReturnOriginalString()
         {
-            var string_table = (LuaTable)_env.GetVariable("string");
-            var repFunc = (LuaFunction)string_table.Get(new LuaString("rep"));
-            var result = repFunc.Call(new LuaValue[] { new LuaString("hello"), new LuaInteger(1) });
+            var stringTable = _env.GetVariable("string");
+            var repFunc = stringTable.AsTable<LuaTable>().Get("rep");
+            var result = repFunc.AsFunction<LuaFunction>().Call(new LuaValue[] { "hello", 1 });
             
             Assert.AreEqual(1, result.Length);
-            Assert.AreEqual("hello", ((LuaString)result[0]).Value);
+            Assert.AreEqual("hello", result[0]);
         }
 
         // Risk-Based Testing: Testing with large repeat count
         [TestMethod]
         public void StringRep_LargeCount_ShouldHandleCorrectly()
         {
-            var string_table = (LuaTable)_env.GetVariable("string");
-            var repFunc = (LuaFunction)string_table.Get(new LuaString("rep"));
-            var result = repFunc.Call(new LuaValue[] { new LuaString("x"), new LuaInteger(1000) });
+            var stringTable = _env.GetVariable("string");
+            var repFunc = stringTable.AsTable<LuaTable>().Get("rep");
+            var result = repFunc.AsFunction<LuaFunction>().Call(new LuaValue[] { "x", 1000 });
             
             Assert.AreEqual(1, result.Length);
-            Assert.AreEqual(1000, ((LuaString)result[0]).Value.Length);
-            Assert.IsTrue(((LuaString)result[0]).Value.All(c => c == 'x'));
+            Assert.AreEqual(1000, result[0].AsString().Length);
+            Assert.IsTrue(result[0].AsString().All(c => c == 'x'));
         }
 
         #endregion
@@ -292,78 +292,78 @@ namespace FLua.Runtime.Tests
         [TestMethod]
         public void StringChar_SingleCode_ShouldReturnCharacter()
         {
-            var string_table = (LuaTable)_env.GetVariable("string");
-            var charFunc = (LuaFunction)string_table.Get(new LuaString("char"));
-            var result = charFunc.Call(new LuaValue[] { new LuaInteger(65) }); // ASCII for 'A'
+            var stringTable = _env.GetVariable("string");
+            var charFunc = stringTable.AsTable<LuaTable>().Get("char");
+            var result = charFunc.AsFunction<LuaFunction>().Call(new LuaValue[] { 65 }); // ASCII for 'A'
             
             Assert.AreEqual(1, result.Length);
-            Assert.AreEqual("A", ((LuaString)result[0]).Value);
+            Assert.AreEqual("A", result[0]);
         }
 
         [TestMethod]
         public void StringChar_MultipleCodes_ShouldReturnString()
         {
-            var string_table = (LuaTable)_env.GetVariable("string");
-            var charFunc = (LuaFunction)string_table.Get(new LuaString("char"));
-            var result = charFunc.Call(new LuaValue[] { 
-                new LuaInteger(72),  // 'H'
-                new LuaInteger(105), // 'i'
-                new LuaInteger(33)   // '!'
+            var stringTable = _env.GetVariable("string");
+            var charFunc = stringTable.AsTable<LuaTable>().Get("char");
+            var result = charFunc.AsFunction<LuaFunction>().Call(new LuaValue[] { 
+                72,  // 'H'
+                105, // 'i'
+                33   // '!'
             });
             
             Assert.AreEqual(1, result.Length);
-            Assert.AreEqual("Hi!", ((LuaString)result[0]).Value);
+            Assert.AreEqual("Hi!", result[0]);
         }
 
         [TestMethod]
         public void StringByte_SingleCharacter_ShouldReturnCode()
         {
-            var string_table = (LuaTable)_env.GetVariable("string");
-            var byteFunc = (LuaFunction)string_table.Get(new LuaString("byte"));
-            var result = byteFunc.Call(new LuaValue[] { new LuaString("A") });
+            var stringTable = _env.GetVariable("string");
+            var byteFunc = stringTable.AsTable<LuaTable>().Get("byte");
+            var result = byteFunc.AsFunction<LuaFunction>().Call(new LuaValue[] { "A" });
             
             Assert.AreEqual(1, result.Length);
-            Assert.AreEqual(65, ((LuaInteger)result[0]).Value);
+            Assert.AreEqual(65, result[0]);
         }
 
         [TestMethod]
         public void StringByte_MultipleCharacters_ShouldReturnMultipleCodes()
         {
-            var string_table = (LuaTable)_env.GetVariable("string");
-            var byteFunc = (LuaFunction)string_table.Get(new LuaString("byte"));
-            var result = byteFunc.Call(new LuaValue[] { 
-                new LuaString("Hi!"), 
-                new LuaInteger(1), 
-                new LuaInteger(3) 
+            var stringTable = _env.GetVariable("string");
+            var byteFunc = stringTable.AsTable<LuaTable>().Get("byte");
+            var result = byteFunc.AsFunction<LuaFunction>().Call(new LuaValue[] { 
+                "Hi!", 
+                1, 
+                3 
             });
             
             Assert.AreEqual(3, result.Length);
-            Assert.AreEqual(72, ((LuaInteger)result[0]).Value);  // 'H'
-            Assert.AreEqual(105, ((LuaInteger)result[1]).Value); // 'i'
-            Assert.AreEqual(33, ((LuaInteger)result[2]).Value);  // '!'
+            Assert.AreEqual(72, result[0]);  // 'H'
+            Assert.AreEqual(105, result[1]); // 'i'
+            Assert.AreEqual(33, result[2]);  // '!'
         }
 
         // Boundary Value Testing: Testing with boundary ASCII values
         [TestMethod]
         public void StringChar_NullCharacter_ShouldReturnNullChar()
         {
-            var string_table = (LuaTable)_env.GetVariable("string");
-            var charFunc = (LuaFunction)string_table.Get(new LuaString("char"));
-            var result = charFunc.Call(new LuaValue[] { new LuaInteger(0) });
+            var stringTable = _env.GetVariable("string");
+            var charFunc = stringTable.AsTable<LuaTable>().Get("char");
+            var result = charFunc.AsFunction<LuaFunction>().Call(new LuaValue[] { 0 });
             
             Assert.AreEqual(1, result.Length);
-            Assert.AreEqual("\0", ((LuaString)result[0]).Value);
+            Assert.AreEqual("\0", result[0]);
         }
 
         [TestMethod]
         public void StringChar_MaxASCII_ShouldReturnCharacter()
         {
-            var string_table = (LuaTable)_env.GetVariable("string");
-            var charFunc = (LuaFunction)string_table.Get(new LuaString("char"));
-            var result = charFunc.Call(new LuaValue[] { new LuaInteger(255) });
+            var stringTable = _env.GetVariable("string");
+            var charFunc = stringTable.AsTable<LuaTable>().Get("char");
+            var result = charFunc.AsFunction<LuaFunction>().Call(new LuaValue[] { 255 });
             
             Assert.AreEqual(1, result.Length);
-            Assert.AreEqual(((char)255).ToString(), ((LuaString)result[0]).Value);
+            Assert.AreEqual(((char)255).ToString(), result[0]);
         }
 
         #endregion
@@ -374,29 +374,29 @@ namespace FLua.Runtime.Tests
         [TestMethod]
         public void StringFormat_IntegerSpecifier_ShouldFormatCorrectly()
         {
-            var string_table = (LuaTable)_env.GetVariable("string");
-            var formatFunc = (LuaFunction)string_table.Get(new LuaString("format"));
-            var result = formatFunc.Call(new LuaValue[] { 
-                new LuaString("Number: %d"), 
-                new LuaInteger(42) 
+            var stringTable = _env.GetVariable("string");
+            var formatFunc = stringTable.AsTable<LuaTable>().Get("format");
+            var result = formatFunc.AsFunction<LuaFunction>().Call(new LuaValue[] { 
+                "Number: %d", 
+                42 
             });
             
             Assert.AreEqual(1, result.Length);
-            Assert.AreEqual("Number: 42", ((LuaString)result[0]).Value);
+            Assert.AreEqual("Number: 42", result[0]);
         }
 
         [TestMethod]
         public void StringFormat_FloatSpecifier_ShouldFormatCorrectly()
         {
-            var string_table = (LuaTable)_env.GetVariable("string");
-            var formatFunc = (LuaFunction)string_table.Get(new LuaString("format"));
-            var result = formatFunc.Call(new LuaValue[] { 
-                new LuaString("Value: %.2f"), 
-                new LuaNumber(3.14159) 
+            var stringTable = _env.GetVariable("string");
+            var formatFunc = stringTable.AsTable<LuaTable>().Get("format");
+            var result = formatFunc.AsFunction<LuaFunction>().Call(new LuaValue[] { 
+                "Value: %.2f", 
+                3.14159 
             });
             
             Assert.AreEqual(1, result.Length);
-            string resultStr = ((LuaString)result[0]).Value;
+            string resultStr = result[0].AsString();
             Assert.IsTrue(resultStr.StartsWith("Value: ") && resultStr.Contains("3.14"), 
                 $"Expected format 'Value: 3.14*' but got '{resultStr}'");
         }
@@ -404,32 +404,32 @@ namespace FLua.Runtime.Tests
         [TestMethod]
         public void StringFormat_StringSpecifier_ShouldFormatCorrectly()
         {
-            var string_table = (LuaTable)_env.GetVariable("string");
-            var formatFunc = (LuaFunction)string_table.Get(new LuaString("format"));
-            var result = formatFunc.Call(new LuaValue[] { 
-                new LuaString("Hello, %s!"), 
-                new LuaString("World") 
+            var stringTable = _env.GetVariable("string");
+            var formatFunc = stringTable.AsTable<LuaTable>().Get("format");
+            var result = formatFunc.AsFunction<LuaFunction>().Call(new LuaValue[] { 
+                "Hello, %s!", 
+                "World" 
             });
             
             Assert.AreEqual(1, result.Length);
-            Assert.AreEqual("Hello, World!", ((LuaString)result[0]).Value);
+            Assert.AreEqual("Hello, World!", result[0]);
         }
 
         // Scenario Testing: Testing complex format strings
         [TestMethod]
         public void StringFormat_MultipleSpecifiers_ShouldFormatCorrectly()
         {
-            var string_table = (LuaTable)_env.GetVariable("string");
-            var formatFunc = (LuaFunction)string_table.Get(new LuaString("format"));
-            var result = formatFunc.Call(new LuaValue[] { 
-                new LuaString("%s scored %d points with %.1f%% accuracy"), 
-                new LuaString("Alice"),
-                new LuaInteger(95),
-                new LuaNumber(87.5)
+            var stringTable = _env.GetVariable("string");
+            var formatFunc = stringTable.AsTable<LuaTable>().Get("format");
+            var result = formatFunc.AsFunction<LuaFunction>().Call(new LuaValue[] { 
+                "%s scored %d points with %.1f%% accuracy", 
+                "Alice",
+                95,
+                87.5
             });
             
             Assert.AreEqual(1, result.Length);
-            var formatted = ((LuaString)result[0]).Value;
+            var formatted = result[0].AsString();
             Assert.IsTrue(formatted.Contains("Alice"), $"Result should contain 'Alice': {formatted}");
             Assert.IsTrue(formatted.Contains("95"), $"Result should contain '95': {formatted}");
             Assert.IsTrue(formatted.Contains("87.5") || formatted.Contains("87,5"), $"Result should contain '87.5' or '87,5': {formatted}");
@@ -444,46 +444,43 @@ namespace FLua.Runtime.Tests
         [TestMethod]
         public void StringFind_PatternExists_ShouldReturnPosition()
         {
-            var string_table = (LuaTable)_env.GetVariable("string");
-            var findFunc = (LuaFunction)string_table.Get(new LuaString("find"));
-            var result = findFunc.Call(new LuaValue[] { 
-                new LuaString("hello world"), 
-                new LuaString("world") 
+            var stringTable = _env.GetVariable("string");
+            var findFunc = stringTable.AsTable<LuaTable>().Get("find");
+            var result = findFunc.AsFunction<LuaFunction>().Call(new LuaValue[] { 
+                "hello world", 
+                "world" 
             });
             
             Assert.AreEqual(2, result.Length);
-            Assert.AreEqual(7, ((LuaInteger)result[0]).Value); // 1-indexed position
-            Assert.AreEqual(11, ((LuaInteger)result[1]).Value); // end position
+            Assert.AreEqual(7, result[0]); // 1-indexed position
+            Assert.AreEqual(11, result[1]); // end position
         }
 
         [TestMethod]
         public void StringFind_PatternNotFound_ShouldReturnNil()
         {
-            var string_table = (LuaTable)_env.GetVariable("string");
-            var findFunc = (LuaFunction)string_table.Get(new LuaString("find"));
-            var result = findFunc.Call(new LuaValue[] { 
-                new LuaString("hello world"), 
-                new LuaString("xyz") 
-            });
+            var stringTable = _env.GetVariable("string");
+            var findFunc = stringTable.AsTable<LuaTable>().Get("find");
+            var result = findFunc.AsFunction<LuaFunction>().Call(["hello world", "xyz"]);
             
             Assert.AreEqual(1, result.Length);
-            Assert.IsInstanceOfType(result[0], typeof(LuaNil));
+            Assert.IsTrue(result[0].IsNil);
         }
 
         // Boundary Value Testing: Testing edge cases
         [TestMethod]
         public void StringFind_EmptyPattern_ShouldFindAtBeginning()
         {
-            var string_table = (LuaTable)_env.GetVariable("string");
-            var findFunc = (LuaFunction)string_table.Get(new LuaString("find"));
-            var result = findFunc.Call(new LuaValue[] { 
-                new LuaString("hello"), 
-                new LuaString("") 
+            var stringTable = _env.GetVariable("string");
+            var findFunc = stringTable.AsTable<LuaTable>().Get("find");
+            var result = findFunc.AsFunction<LuaFunction>().Call(new LuaValue[] { 
+                "hello", 
+                "" 
             });
             
             Assert.AreEqual(2, result.Length);
-            Assert.AreEqual(1, ((LuaInteger)result[0]).Value);
-            Assert.AreEqual(0, ((LuaInteger)result[1]).Value);
+            Assert.AreEqual(1, result[0]);
+            Assert.AreEqual(0, result[1]);
         }
 
         #endregion

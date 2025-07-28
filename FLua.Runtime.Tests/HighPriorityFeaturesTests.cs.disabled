@@ -18,7 +18,7 @@ namespace FLua.Runtime.Tests
                 var env = new EnhancedLuaEnvironment();
                 
                 // Set a const variable
-                env.SetVariableWithAttribute("x", new LuaInteger(42), Attribute.Const);
+                env.SetVariableWithAttribute("x", 42, Attribute.Const);
                 
                 // Verify we can read it
                 Assert.AreEqual(42L, ((LuaInteger)env.GetVariable("x")).Value);
@@ -26,7 +26,7 @@ namespace FLua.Runtime.Tests
                 // Verify we cannot modify it
                 Assert.ThrowsException<LuaRuntimeException>(() =>
                 {
-                    env.SetVariable("x", new LuaInteger(100));
+                    env.SetVariable("x", 100);
                 }, "Should not be able to assign to const variable");
             }
 
@@ -39,7 +39,7 @@ namespace FLua.Runtime.Tests
                 // Create a table with __close metamethod
                 var table = new LuaTable();
                 var metatable = new LuaTable();
-                metatable.Set(new LuaString("__close"), new LuaUserFunction(args =>
+                metatable.Set("__close", new LuaUserFunction(args =>
                 {
                     closeCalled = true;
                     return Array.Empty<LuaValue>();
@@ -62,11 +62,11 @@ namespace FLua.Runtime.Tests
                 var warnFunc = (LuaFunction)env.GetVariable("warn");
                 
                 // Test basic warning
-                var result = warnFunc.Call(new[] { new LuaString("test warning") });
+                var result = warnFunc.Call(new[] { "test warning" });
                 Assert.AreEqual(0, result.Length); // warn returns nothing
                 
                 // Test with control parameter
-                var result2 = warnFunc.Call(new[] { new LuaString("test warning"), new LuaString("@on") });
+                var result2 = warnFunc.Call(new[] { "test warning", "@on" });
                 Assert.AreEqual(0, result2.Length);
             }
         }
@@ -136,11 +136,11 @@ namespace FLua.Runtime.Tests
                 ContinuationCoroutineLib.AddContinuationCoroutineLibrary(env);
                 
                 var coroutineTable = env.GetVariable("coroutine").AsTable!;
-                var createFunc = (LuaFunction)coroutineTable.Get(new LuaString("create"));
+                var createFunc = (LuaFunction)coroutineTable.Get("create");
                 
                 var testFunc = new LuaUserFunction(args =>
                 {
-                    return new[] { new LuaString("Hello from coroutine!") };
+                    return new[] { "Hello from coroutine!" };
                 });
                 
                 var result = createFunc.Call(new[] { testFunc });
@@ -156,11 +156,11 @@ namespace FLua.Runtime.Tests
                 ContinuationCoroutineLib.AddContinuationCoroutineLibrary(env);
                 
                 var coroutineTable = env.GetVariable("coroutine").AsTable!;
-                var createFunc = (LuaFunction)coroutineTable.Get(new LuaString("create"));
-                var statusFunc = (LuaFunction)coroutineTable.Get(new LuaString("status"));
-                var resumeFunc = (LuaFunction)coroutineTable.Get(new LuaString("resume"));
+                var createFunc = (LuaFunction)coroutineTable.Get("create");
+                var statusFunc = (LuaFunction)coroutineTable.Get("status");
+                var resumeFunc = (LuaFunction)coroutineTable.Get("resume");
                 
-                var testFunc = new LuaUserFunction(args => new[] { new LuaString("done") });
+                var testFunc = new LuaUserFunction(args => new[] { "done" });
                 
                 // Create coroutine
                 var createResult = createFunc.Call(new[] { testFunc });
@@ -186,19 +186,19 @@ namespace FLua.Runtime.Tests
                 ContinuationCoroutineLib.AddContinuationCoroutineLibrary(env);
                 
                 var coroutineTable = env.GetVariable("coroutine").AsTable!;
-                var wrapFunc = (LuaFunction)coroutineTable.Get(new LuaString("wrap"));
+                var wrapFunc = (LuaFunction)coroutineTable.Get("wrap");
                 
                 var testFunc = new LuaUserFunction(args =>
                 {
                     var input = args.Length > 0 ? ((LuaInteger)args[0]).Value : 0;
-                    return new[] { new LuaInteger(input * 2) };
+                    return new[] { input * 2 };
                 });
                 
                 var wrapResult = wrapFunc.Call(new[] { testFunc });
                 var wrappedFunc = (LuaFunction)wrapResult[0];
                 
                 // Call the wrapped function
-                var callResult = wrappedFunc.Call(new[] { new LuaInteger(21) });
+                var callResult = wrappedFunc.Call(new[] { 21 });
                 
                 Assert.AreEqual(1, callResult.Length);
                 Assert.AreEqual(42L, ((LuaInteger)callResult[0]).Value);
@@ -211,8 +211,8 @@ namespace FLua.Runtime.Tests
                 ContinuationCoroutineLib.AddContinuationCoroutineLibrary(env);
                 
                 var coroutineTable = env.GetVariable("coroutine").AsTable!;
-                var runningFunc = (LuaFunction)coroutineTable.Get(new LuaString("running"));
-                var isYieldableFunc = (LuaFunction)coroutineTable.Get(new LuaString("isyieldable"));
+                var runningFunc = (LuaFunction)coroutineTable.Get("running");
+                var isYieldableFunc = (LuaFunction)coroutineTable.Get("isyieldable");
                 
                 // Outside coroutine context
                 var running1 = runningFunc.Call(Array.Empty<LuaValue>());
@@ -234,7 +234,7 @@ namespace FLua.Runtime.Tests
                 var env = new EnhancedLuaEnvironment();
                 
                 // Set const in outer scope
-                env.SetVariableWithAttribute("CONST_VALUE", new LuaInteger(100), Attribute.Const);
+                env.SetVariableWithAttribute("CONST_VALUE", 100, Attribute.Const);
                 
                 // Create child environment
                 var childEnv = new EnhancedLuaEnvironment(env);
@@ -245,7 +245,7 @@ namespace FLua.Runtime.Tests
                 // Should not be able to modify const in child
                 Assert.ThrowsException<LuaRuntimeException>(() =>
                 {
-                    childEnv.SetVariable("CONST_VALUE", new LuaInteger(200));
+                    childEnv.SetVariable("CONST_VALUE", 200);
                 });
             }
 
@@ -261,7 +261,7 @@ namespace FLua.Runtime.Tests
                     var table = new LuaTable();
                     var metatable = new LuaTable();
                     var index = i; // Capture for closure
-                    metatable.Set(new LuaString("__close"), new LuaUserFunction(args =>
+                    metatable.Set("__close", new LuaUserFunction(args =>
                     {
                         closeOrder.Add(index);
                         return Array.Empty<LuaValue>();
@@ -285,16 +285,16 @@ namespace FLua.Runtime.Tests
                 
                 var env = LuaEnvironment.CreateStandardEnvironment();
                 var stringTable = env.GetVariable("string").AsTable!;
-                var findFunc = (LuaFunction)stringTable.Get(new LuaString("find"));
+                var findFunc = (LuaFunction)stringTable.Get("find");
                 
                 // Test pattern matching
                 var result = findFunc.Call(new[] {
-                    new LuaString("hello123world"),
-                    new LuaString("%d+") // Lua pattern for digits
+                    "hello123world",
+                    "%d+" // Lua pattern for digits
                 });
                 
                 Assert.IsTrue(result.Length >= 2);
-                Assert.AreEqual(6L, ((LuaInteger)result[0]).Value); // Start position
+                Assert.AreEqual(6L, result[0]); // Start position
                 Assert.AreEqual(9L, ((LuaInteger)result[1]).Value);  // End position
             }
         }

@@ -9,7 +9,7 @@ public static class LuaScript
 {
     public static LuaValue[] Execute(LuaEnvironment env)
     {
-((LuaFunction)env.GetVariable("print")).Call(new LuaValue[] { new LuaString("Hello World") })        ;
+((LuaFunction)env.GetVariable("print")).Call(new LuaValue[] { "Hello World" })        ;
         return new LuaValue[0];
     }
 }

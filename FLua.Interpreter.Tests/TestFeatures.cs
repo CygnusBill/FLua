@@ -30,34 +30,34 @@ namespace FLua.Interpreter.Tests
             Assert.AreEqual(2.0, GetNumericValue(_interpreter.EvaluateExpression("5 // 2")));
             
             // Comparison
-            Assert.IsTrue(((LuaBoolean)_interpreter.EvaluateExpression("1 < 2")).Value);
-            Assert.IsTrue(((LuaBoolean)_interpreter.EvaluateExpression("2 <= 2")).Value);
-            Assert.IsTrue(((LuaBoolean)_interpreter.EvaluateExpression("3 > 2")).Value);
-            Assert.IsTrue(((LuaBoolean)_interpreter.EvaluateExpression("3 >= 3")).Value);
-            Assert.IsTrue(((LuaBoolean)_interpreter.EvaluateExpression("2 == 2")).Value);
-            Assert.IsTrue(((LuaBoolean)_interpreter.EvaluateExpression("2 ~= 3")).Value);
+            Assert.IsTrue(_interpreter.EvaluateExpression("1 < 2").AsBoolean());
+            Assert.IsTrue(_interpreter.EvaluateExpression("2 <= 2").AsBoolean());
+            Assert.IsTrue(_interpreter.EvaluateExpression("3 > 2").AsBoolean());
+            Assert.IsTrue(_interpreter.EvaluateExpression("3 >= 3").AsBoolean());
+            Assert.IsTrue(_interpreter.EvaluateExpression("2 == 2").AsBoolean());
+            Assert.IsTrue(_interpreter.EvaluateExpression("2 ~= 3").AsBoolean());
             
             // Logical
-            Assert.IsTrue(((LuaBoolean)_interpreter.EvaluateExpression("true and true")).Value);
-            Assert.IsFalse(((LuaBoolean)_interpreter.EvaluateExpression("true and false")).Value);
-            Assert.IsTrue(((LuaBoolean)_interpreter.EvaluateExpression("true or false")).Value);
-            Assert.IsFalse(((LuaBoolean)_interpreter.EvaluateExpression("false or false")).Value);
-            Assert.IsFalse(((LuaBoolean)_interpreter.EvaluateExpression("not true")).Value);
-            Assert.IsTrue(((LuaBoolean)_interpreter.EvaluateExpression("not false")).Value);
+            Assert.IsTrue(_interpreter.EvaluateExpression("true and true").AsBoolean());
+            Assert.IsFalse(_interpreter.EvaluateExpression("true and false").AsBoolean());
+            Assert.IsTrue(_interpreter.EvaluateExpression("true or false").AsBoolean());
+            Assert.IsFalse(_interpreter.EvaluateExpression("false or false").AsBoolean());
+            Assert.IsFalse(_interpreter.EvaluateExpression("not true").AsBoolean());
+            Assert.IsTrue(_interpreter.EvaluateExpression("not false").AsBoolean());
             
             // Bitwise
-            Assert.AreEqual(3L, ((LuaInteger)_interpreter.EvaluateExpression("1 | 2")).Value);
-            Assert.AreEqual(0L, ((LuaInteger)_interpreter.EvaluateExpression("1 & 2")).Value);
-            Assert.AreEqual(3L, ((LuaInteger)_interpreter.EvaluateExpression("1 ~ 2")).Value);
-            Assert.AreEqual(4L, ((LuaInteger)_interpreter.EvaluateExpression("1 << 2")).Value);
-            Assert.AreEqual(1L, ((LuaInteger)_interpreter.EvaluateExpression("4 >> 2")).Value);
-            Assert.AreEqual(-2L, ((LuaInteger)_interpreter.EvaluateExpression("~1")).Value);
+            Assert.AreEqual(3L, _interpreter.EvaluateExpression("1 | 2").AsInteger());
+            Assert.AreEqual(0L, _interpreter.EvaluateExpression("1 & 2").AsInteger());
+            Assert.AreEqual(3L, _interpreter.EvaluateExpression("1 ~ 2").AsInteger());
+            Assert.AreEqual(4L, _interpreter.EvaluateExpression("1 << 2").AsInteger());
+            Assert.AreEqual(1L, _interpreter.EvaluateExpression("4 >> 2").AsInteger());
+            Assert.AreEqual(-2L, _interpreter.EvaluateExpression("~1").AsInteger());
             
             // Concatenation
-            Assert.AreEqual("hello world", ((LuaString)_interpreter.EvaluateExpression("'hello ' .. 'world'")).Value);
+            Assert.AreEqual("hello world", _interpreter.EvaluateExpression("'hello ' .. 'world'").AsString());
             
             // Length
-            Assert.AreEqual(5L, ((LuaInteger)_interpreter.EvaluateExpression("#'hello'")).Value);
+            Assert.AreEqual(5L, _interpreter.EvaluateExpression("#'hello'").AsInteger());
             
             // Parentheses
             Assert.AreEqual(7.0, GetNumericValue(_interpreter.EvaluateExpression("1 + (2 * 3)")));
@@ -89,21 +89,15 @@ namespace FLua.Interpreter.Tests
             Assert.AreEqual(30.0, GetNumericValue(_interpreter.EvaluateExpression("t[3]")));
             
             // Test table length
-            Assert.AreEqual(3L, ((LuaInteger)_interpreter.EvaluateExpression("#t")).Value);
+            Assert.AreEqual(3L, _interpreter.EvaluateExpression("#t").AsInteger());
         }
         
         // Helper method to handle both LuaNumber and LuaInteger
         private double GetNumericValue(LuaValue value)
         {
-            if (value is LuaNumber number)
-            {
-                return number.Value;
-            }
-            else if (value is LuaInteger integer)
-            {
-                return integer.Value;
-            }
-            throw new InvalidCastException($"Cannot convert {value.GetType().Name} to a numeric value");
+            if (value.IsNumber)
+                return value.AsNumber();
+            throw new InvalidCastException($"Cannot convert {value.Type} to a numeric value");
         }
     }
 } 

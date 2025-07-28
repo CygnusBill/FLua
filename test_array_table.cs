@@ -12,17 +12,17 @@ namespace CompiledLuaScript
             LuaValue t = () =>
             {
                 var table_0 = new LuaTable();
-                table_0.Set(new LuaInteger(1L), new LuaInteger(10L));
-                table_0.Set(new LuaInteger(2L), new LuaInteger(20L));
-                table_0.Set(new LuaInteger(3L), new LuaInteger(30L));
+                table_0.Set(1L, 10L);
+                table_0.Set(2L, 20L);
+                table_0.Set(3L, 30L);
                 return table_0;
             }();
             env.SetVariable("t", t);
-            LuaValue a = ((LuaTable)t).Get(new LuaInteger(1L));
+            LuaValue a = ((LuaTable)t).Get(1L);
             env.SetVariable("a", a);
-            LuaValue b = ((LuaTable)t).Get(new LuaInteger(2L));
+            LuaValue b = ((LuaTable)t).Get(2L);
             env.SetVariable("b", b);
-            LuaValue c = ((LuaTable)t).Get(new LuaInteger(3L));
+            LuaValue c = ((LuaTable)t).Get(3L);
             env.SetVariable("c", c);
             LuaValue sum = LuaOperations.Add(LuaOperations.Add(a, b), c);
             env.SetVariable("sum", sum);

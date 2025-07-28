@@ -142,7 +142,7 @@ class Program
             var result = interpreter.ExecuteCode(code);
             
             // Only output if there's a return value and verbose mode is on
-            if (verbose && result.Length > 0 && result[0] != LuaNil.Instance)
+            if (verbose && result.Length > 0 && result[0] != LuaValue.Nil)
             {
                 Console.WriteLine($"Script returned: {result[0]}");
             }

@@ -188,7 +188,7 @@ namespace FLua.Runtime
             var result = x.AsNumber() % y.AsNumber();
             
             // Preserve integer type if both inputs are integers
-            if (x is LuaInteger && y is LuaInteger)
+            if (x.IsInteger && y.IsInteger)
                 return [LuaValue.Integer((long)result)];
             
             return [LuaValue.Number(result)];
