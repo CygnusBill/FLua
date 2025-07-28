@@ -34,7 +34,7 @@ namespace FLua.Runtime
                         }
                     }
                 }
-                return LuaValue.Nil;
+                return null;
             }
 
             // Try left operand first

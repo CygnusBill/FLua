@@ -193,8 +193,8 @@ namespace FLua.Runtime
             if (metamethodResult.HasValue)
                 return metamethodResult.Value;
 
-            // Simple equality check for now
-            return LuaValue.Boolean(left.ToString() == right.ToString());
+            // Use the built-in Equals method which handles all the type-specific comparisons
+            return LuaValue.Boolean(left.Equals(right));
         }
 
         /// <summary>
