@@ -123,7 +123,20 @@ namespace FLua.Runtime
 
         public static LuaValue FromObject(object? obj)
         {
-            return obj is null ? Nil : UserData(obj);
+            return obj switch
+            {
+                int i => Integer(i),
+                long l => Integer(l),
+                float f => Float(f),
+                double d => Float(d),
+                bool b => Boolean(b),
+                string s => String(s),
+                LuaTable t => Table(t),
+                LuaFunction f => Function(f),
+                LuaValue v => v,
+                null => Nil,
+                _ => throw new ArgumentException("Cannot convert object to LuaValue")
+            };
         }
 
         public static LuaValue Thread(object thread)
