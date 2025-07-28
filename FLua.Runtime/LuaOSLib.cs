@@ -158,7 +158,7 @@ namespace FLua.Runtime
             if (!t2.IsNumber || !t1.IsNumber)
                 throw new LuaRuntimeException("bad argument to 'difftime' (number expected)");
             
-            var diff = t2.AsNumber() - t1.AsNumber();
+            var diff = t2.AsDouble() - t1.AsDouble();
             return [LuaValue.Number(diff)];
         }
         

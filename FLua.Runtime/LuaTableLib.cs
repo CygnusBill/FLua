@@ -283,7 +283,7 @@ namespace FLua.Runtime
                 {
                     // Compare numbers numerically
                     if (a.IsNumber && b.IsNumber)
-                        return a.AsNumber().CompareTo(b.AsNumber());
+                        return a.AsDouble().CompareTo(b.AsDouble());
                     
                     // Compare strings lexicographically
                     return string.Compare(a.ToString(), b.ToString(), StringComparison.Ordinal);

@@ -16,7 +16,7 @@ namespace FLua.Runtime
         public static double? ToNumber(LuaValue value)
         {
             if (value.IsNumber)
-                return value.AsNumber();
+                return value.AsDouble();
                 
             if (value.IsString)
             {

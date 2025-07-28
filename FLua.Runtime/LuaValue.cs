@@ -183,7 +183,7 @@ namespace FLua.Runtime
             return BitConverter.ToDouble(Data);
         }
 
-        public double AsNumber()
+        public double AsDouble()
         {
             return Type switch
             {
@@ -228,6 +228,19 @@ namespace FLua.Runtime
             var ptr = new IntPtr(BitConverter.ToInt64(Data));
             var handle = GCHandle.FromIntPtr(ptr);
             return (T)handle.Target!;
+        }
+        
+        /// <summary>
+        /// Non-generic version for IL generation compatibility
+        /// </summary>
+        public LuaFunction AsFunction()
+        {
+            if (Type != LuaType.Function)
+                throw new InvalidOperationException($"Value is not a function, it's {Type}");
+                
+            var ptr = new IntPtr(BitConverter.ToInt64(Data));
+            var handle = GCHandle.FromIntPtr(ptr);
+            return (LuaFunction)handle.Target!;
         }
 
         public T AsUserData<T>() where T : class
@@ -435,7 +448,7 @@ namespace FLua.Runtime
             }
 
             // Otherwise, use float arithmetic
-            return Float(left.AsNumber() + right.AsNumber());
+            return Float(left.AsDouble() + right.AsDouble());
         }
 
         public static LuaValue Subtract(LuaValue left, LuaValue right)
@@ -458,7 +471,7 @@ namespace FLua.Runtime
                 }
             }
 
-            return Float(left.AsNumber() - right.AsNumber());
+            return Float(left.AsDouble() - right.AsDouble());
         }
 
         public static LuaValue Multiply(LuaValue left, LuaValue right)
@@ -481,7 +494,7 @@ namespace FLua.Runtime
                 }
             }
 
-            return Float(left.AsNumber() * right.AsNumber());
+            return Float(left.AsDouble() * right.AsDouble());
         }
 
         public static LuaValue Divide(LuaValue left, LuaValue right)
@@ -490,7 +503,7 @@ namespace FLua.Runtime
                 throw new InvalidOperationException("Cannot perform arithmetic on non-numeric values");
 
             // Division always results in float in Lua 5.3+
-            return Float(left.AsNumber() / right.AsNumber());
+            return Float(left.AsDouble() / right.AsDouble());
         }
 
         public static LuaValue FloorDivide(LuaValue left, LuaValue right)
@@ -498,7 +511,7 @@ namespace FLua.Runtime
             if (!left.IsNumber || !right.IsNumber)
                 throw new InvalidOperationException("Cannot perform arithmetic on non-numeric values");
 
-            var result = Math.Floor(left.AsNumber() / right.AsNumber());
+            var result = Math.Floor(left.AsDouble() / right.AsDouble());
 
             // Try to keep as integer if possible
             if (left.IsInteger && right.IsInteger &&
@@ -521,7 +534,7 @@ namespace FLua.Runtime
                 return Integer(left.AsInteger() % right.AsInteger());
             }
 
-            return Float(left.AsNumber() % right.AsNumber());
+            return Float(left.AsDouble() % right.AsDouble());
         }
 
         public static LuaValue Power(LuaValue left, LuaValue right)
@@ -530,7 +543,7 @@ namespace FLua.Runtime
                 throw new InvalidOperationException("Cannot perform arithmetic on non-numeric values");
 
             // Power always results in float
-            return Float(Math.Pow(left.AsNumber(), right.AsNumber()));
+            return Float(Math.Pow(left.AsDouble(), right.AsDouble()));
         }
 
         public static LuaValue UnaryMinus(LuaValue value)
@@ -545,7 +558,7 @@ namespace FLua.Runtime
                     return Integer(-intVal);
             }
 
-            return Float(-value.AsNumber());
+            return Float(-value.AsDouble());
         }
 
         #endregion
@@ -651,7 +664,7 @@ namespace FLua.Runtime
                 if ((Type == LuaType.Integer && other.Type == LuaType.Float) ||
                     (Type == LuaType.Float && other.Type == LuaType.Integer))
                 {
-                    return Math.Abs(AsNumber() - other.AsNumber()) < double.Epsilon;
+                    return Math.Abs(AsDouble() - other.AsDouble()) < double.Epsilon;
                 }
 
                 return false;

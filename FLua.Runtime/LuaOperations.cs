@@ -85,12 +85,12 @@ namespace FLua.Runtime
 
             if (left.IsNumber && right.IsNumber)
             {
-                if (right.AsNumber() == 0)
+                if (right.AsDouble() == 0)
                 {
                     throw new LuaRuntimeException("Division by zero");
                 }
 
-                return LuaValue.Float(left.AsNumber() / right.AsNumber());
+                return LuaValue.Float(left.AsDouble() / right.AsDouble());
             }
 
             throw new LuaRuntimeException("Attempt to divide non-numbers");
@@ -108,12 +108,12 @@ namespace FLua.Runtime
 
             if (left.IsNumber && right.IsNumber)
             {
-                if (right.AsNumber() == 0)
+                if (right.AsDouble() == 0)
                 {
                     throw new LuaRuntimeException("Division by zero");
                 }
 
-                return LuaValue.Number(Math.Floor(left.AsNumber() / right.AsNumber()));
+                return LuaValue.Number(Math.Floor(left.AsDouble() / right.AsDouble()));
             }
 
             throw new LuaRuntimeException("Attempt to perform floor division on non-numbers");
@@ -131,12 +131,12 @@ namespace FLua.Runtime
 
             if (left.IsNumber && right.IsNumber)
             {
-                if (right.AsNumber() == 0)
+                if (right.AsDouble() == 0)
                 {
                     throw new LuaRuntimeException("Modulo by zero");
                 }
 
-                return LuaValue.Number(left.AsNumber() % right.AsNumber());
+                return LuaValue.Number(left.AsDouble() % right.AsDouble());
             }
 
             throw new LuaRuntimeException("Attempt to perform modulo on non-numbers");
@@ -154,7 +154,7 @@ namespace FLua.Runtime
 
             if (left.IsNumber && right.IsNumber)
             {
-                return LuaValue.Float(Math.Pow(left.AsNumber(), right.AsNumber()));
+                return LuaValue.Float(Math.Pow(left.AsDouble(), right.AsDouble()));
             }
 
             throw new LuaRuntimeException("Attempt to perform power operation on non-numbers");
@@ -223,7 +223,7 @@ namespace FLua.Runtime
 
             if (left.IsNumber && right.IsNumber)
             {
-                return LuaValue.Boolean(left.AsNumber() < right.AsNumber());
+                return LuaValue.Boolean(left.AsDouble() < right.AsDouble());
             }
             else if (left.IsString && right.IsString)
             {
@@ -245,7 +245,7 @@ namespace FLua.Runtime
 
             if (left.IsNumber && right.IsNumber)
             {
-                return LuaValue.Boolean(left.AsNumber() <= right.AsNumber());
+                return LuaValue.Boolean(left.AsDouble() <= right.AsDouble());
             }
             else if (left.IsString && right.IsString)
             {
@@ -440,7 +440,7 @@ namespace FLua.Runtime
 
             if (value.IsNumber)
             {
-                return LuaValue.Number(-value.AsNumber());
+                return LuaValue.Number(-value.AsDouble());
             }
 
             throw new LuaRuntimeException("Attempt to negate non-number");

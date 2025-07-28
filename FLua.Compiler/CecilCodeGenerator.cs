@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using BindingFlags = System.Reflection.BindingFlags;
+using System.Runtime.InteropServices;
 using FLua.Ast;
 using FLua.Runtime;
 using FLua.Common.Diagnostics;
@@ -338,8 +340,8 @@ public class CecilCodeGenerator
                 ReportError($"Expression type {expression.GetType().Name} not yet implemented in Cecil backend", null);
                 // Push nil as fallback
                 var nilGetter = _module!.ImportReference(
-                    typeof(LuaValue).GetProperty("Nil")!.GetGetMethod());
-                _il!.Emit(OpCodes.Call, nilGetter);
+                    typeof(LuaValue).GetField("Nil"));
+                _il!.Emit(OpCodes.Ldsfld, nilGetter);
                 break;
         }
     }
@@ -352,8 +354,8 @@ public class CecilCodeGenerator
         if (literal.IsNil)
         {
             var nilGetter = _module!.ImportReference(
-                typeof(LuaValue).GetProperty("Nil")!.GetGetMethod());
-            _il!.Emit(OpCodes.Call, nilGetter);
+                typeof(LuaValue).GetField("Nil"));
+            _il!.Emit(OpCodes.Ldsfld, nilGetter);
         }
         else if (literal.IsBoolean)
         {
@@ -435,7 +437,7 @@ public class CecilCodeGenerator
             _il.Emit(OpCodes.Dup);
             _il.Emit(OpCodes.Ldc_I4, i);
             GenerateExpression(argsList[i], environment);
-            _il.Emit(OpCodes.Stelem_Ref);
+            _il.Emit(OpCodes.Stelem_Any, _luaValueType);
         }
         
         // Store args array
@@ -443,26 +445,39 @@ public class CecilCodeGenerator
         _currentMethod.Body.Variables.Add(argsLocal);
         _il.Emit(OpCodes.Stloc, argsLocal);
         
-        // Load function and check if it's a LuaFunction
+        // Check if it's a function
         _il.Emit(OpCodes.Ldloc, funcLocal);
-        _il.Emit(OpCodes.Isinst, _module!.ImportReference(typeof(LuaFunction)));
+        var isFunctionProperty = _module!.ImportReference(
+            typeof(LuaValue).GetProperty("IsFunction")!.GetGetMethod());
+        _il.Emit(OpCodes.Call, isFunctionProperty);
         
-        // Check for null (not a function)
         var isFunction = _il.Create(OpCodes.Nop);
-        
-        _il.Emit(OpCodes.Dup);
         _il.Emit(OpCodes.Brtrue, isFunction);
         
-        // If null, throw error
-        _il.Emit(OpCodes.Pop);
+        // If not a function, throw error
         _il.Emit(OpCodes.Ldstr, "Attempt to call a non-function value");
         var exceptionCtor = _module.ImportReference(
             typeof(LuaRuntimeException).GetConstructor([typeof(string)]));
         _il.Emit(OpCodes.Newobj, exceptionCtor);
         _il.Emit(OpCodes.Throw);
         
-        // If it is a function, call it
+        // If it is a function, extract and call it
         _il.Append(isFunction);
+        _il.Emit(OpCodes.Ldloc, funcLocal);
+        
+        // Use the non-generic AsFunction() method
+        var asFunctionMethods = typeof(LuaValue).GetMethods()
+            .Where(m => m.Name == "AsFunction")
+            .ToArray();
+        
+        var nonGenericAsFunction = asFunctionMethods.FirstOrDefault(m => !m.IsGenericMethodDefinition);
+        if (nonGenericAsFunction == null)
+        {
+            throw new InvalidOperationException("Could not find non-generic AsFunction method on LuaValue");
+        }
+        
+        var asFunctionMethod = _module.ImportReference(nonGenericAsFunction);
+        _il.Emit(OpCodes.Call, asFunctionMethod);
         _il.Emit(OpCodes.Ldloc, argsLocal);
         var callMethod = _module.ImportReference(
             typeof(LuaFunction).GetMethod("Call"));
@@ -485,14 +500,14 @@ public class CecilCodeGenerator
         // Return first element
         _il.Emit(OpCodes.Ldloc, tempResults);
         _il.Emit(OpCodes.Ldc_I4_0);
-        _il.Emit(OpCodes.Ldelem_Ref);
+        _il.Emit(OpCodes.Ldelem_Any, _luaValueType);
         _il.Emit(OpCodes.Br, done);
         
         // Return nil if no results
         _il.Append(nilResult);
         var nilGetter = _module.ImportReference(
-            typeof(LuaValue).GetProperty("Nil")!.GetGetMethod());
-        _il.Emit(OpCodes.Call, nilGetter);
+            typeof(LuaValue).GetField("Nil"));
+        _il.Emit(OpCodes.Ldsfld, nilGetter);
         
         _il.Append(done);
     }
@@ -554,8 +569,8 @@ public class CecilCodeGenerator
             else
             {
                 var nilGetter = _module!.ImportReference(
-                    typeof(LuaValue).GetProperty("Nil")!.GetGetMethod());
-                _il!.Emit(OpCodes.Call, nilGetter);
+                    typeof(LuaValue).GetField("Nil"));
+                _il!.Emit(OpCodes.Ldsfld, nilGetter);
             }
             
             var local = new VariableDefinition(_luaValueType);
@@ -588,8 +603,8 @@ public class CecilCodeGenerator
             else
             {
                 var nilGetter = _module!.ImportReference(
-                    typeof(LuaValue).GetProperty("Nil")!.GetGetMethod());
-                _il!.Emit(OpCodes.Call, nilGetter);
+                    typeof(LuaValue).GetField("Nil"));
+                _il!.Emit(OpCodes.Ldsfld, nilGetter);
             }
             
             // Store to variable
@@ -641,8 +656,8 @@ public class CecilCodeGenerator
         else
         {
             var nilGetter = _module!.ImportReference(
-                typeof(LuaValue).GetProperty("Nil")!.GetGetMethod());
-            _il!.Emit(OpCodes.Call, nilGetter);
+                typeof(LuaValue).GetField("Nil"));
+            _il!.Emit(OpCodes.Ldsfld, nilGetter);
         }
         _il!.Emit(OpCodes.Ret);
     }
@@ -664,8 +679,8 @@ public class CecilCodeGenerator
         {
             GenerateExpression(condition, environment);
             var isTruthy = _module!.ImportReference(
-                typeof(LuaValue).GetProperty("IsTruthy")!.GetGetMethod());
-            _il.Emit(OpCodes.Callvirt, isTruthy);
+                typeof(LuaValue).GetMethod("IsTruthy"));
+            _il.Emit(OpCodes.Call, isTruthy);
             _il.Emit(OpCodes.Brfalse, nextLabel);
             
             var blockStatements = FSharpListHelpers.ToList(block);
@@ -705,8 +720,8 @@ public class CecilCodeGenerator
         _il.Append(loopStart);
         GenerateExpression(condition, environment);
         var isTruthy = _module!.ImportReference(
-            typeof(LuaValue).GetProperty("IsTruthy")!.GetGetMethod());
-        _il.Emit(OpCodes.Callvirt, isTruthy);
+            typeof(LuaValue).GetMethod("IsTruthy"));
+        _il.Emit(OpCodes.Call, isTruthy);
         _il.Emit(OpCodes.Brfalse, loopEnd);
         
         var blockStatements = FSharpListHelpers.ToList(block);
@@ -745,8 +760,8 @@ public class CecilCodeGenerator
         // Evaluate condition
         GenerateExpression(condition, environment);
         var isTruthy = _module!.ImportReference(
-            typeof(LuaValue).GetProperty("IsTruthy")!.GetGetMethod());
-        _il.Emit(OpCodes.Callvirt, isTruthy);
+            typeof(LuaValue).GetMethod("IsTruthy"));
+        _il.Emit(OpCodes.Call, isTruthy);
         
         // Loop if condition is false (until means loop while false)
         _il.Emit(OpCodes.Brfalse, loopStart);
@@ -828,8 +843,8 @@ public class CecilCodeGenerator
             typeof(LuaOperations).GetMethod("Greater"));
         _il.Emit(OpCodes.Call, greater);
         var isTruthy = _module.ImportReference(
-            typeof(LuaValue).GetProperty("IsTruthy")!.GetGetMethod());
-        _il.Emit(OpCodes.Callvirt, isTruthy);
+            typeof(LuaValue).GetMethod("IsTruthy"));
+        _il.Emit(OpCodes.Call, isTruthy);
         
         var checkNegativeStep = _il.Create(OpCodes.Nop);
         var executeBlock = _il.Create(OpCodes.Nop);
@@ -842,7 +857,7 @@ public class CecilCodeGenerator
         var lessEqual = _module.ImportReference(
             typeof(LuaOperations).GetMethod("LessEqual"));
         _il.Emit(OpCodes.Call, lessEqual);
-        _il.Emit(OpCodes.Callvirt, isTruthy);
+        _il.Emit(OpCodes.Call, isTruthy);
         _il.Emit(OpCodes.Brtrue, executeBlock);
         _il.Emit(OpCodes.Br, loopEnd);
         
@@ -853,7 +868,7 @@ public class CecilCodeGenerator
         var greaterEqual = _module.ImportReference(
             typeof(LuaOperations).GetMethod("GreaterEqual"));
         _il.Emit(OpCodes.Call, greaterEqual);
-        _il.Emit(OpCodes.Callvirt, isTruthy);
+        _il.Emit(OpCodes.Call, isTruthy);
         _il.Emit(OpCodes.Brfalse, loopEnd);
         
         // Execute block

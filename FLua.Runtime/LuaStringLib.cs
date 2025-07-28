@@ -523,11 +523,11 @@ namespace FLua.Runtime
                 "u" => FormatUnsigned(value.IsInteger ? value.AsInteger() : 0),
                 "x" => FormatHex(value.IsInteger ? value.AsInteger() : 0, false, altForm),
                 "X" => FormatHex(value.IsInteger ? value.AsInteger() : 0, true, altForm),
-                "f" or "F" => FormatFloat(value.IsNumber ? value.AsNumber() : 0, precision >= 0 ? precision : 6, specifier == "F"),
-                "e" => FormatExponential(value.IsNumber ? value.AsNumber() : 0, precision >= 0 ? precision : 6, false),
-                "E" => FormatExponential(value.IsNumber ? value.AsNumber() : 0, precision >= 0 ? precision : 6, true),
-                "g" => FormatGeneral(value.IsNumber ? value.AsNumber() : 0, precision >= 0 ? precision : 6, false, altForm),
-                "G" => FormatGeneral(value.IsNumber ? value.AsNumber() : 0, precision >= 0 ? precision : 6, true, altForm),
+                "f" or "F" => FormatFloat(value.IsNumber ? value.AsDouble() : 0, precision >= 0 ? precision : 6, specifier == "F"),
+                "e" => FormatExponential(value.IsNumber ? value.AsDouble() : 0, precision >= 0 ? precision : 6, false),
+                "E" => FormatExponential(value.IsNumber ? value.AsDouble() : 0, precision >= 0 ? precision : 6, true),
+                "g" => FormatGeneral(value.IsNumber ? value.AsDouble() : 0, precision >= 0 ? precision : 6, false, altForm),
+                "G" => FormatGeneral(value.IsNumber ? value.AsDouble() : 0, precision >= 0 ? precision : 6, true, altForm),
                 "c" => FormatCharacter(value),
                 "s" => FormatString(value, precision),
                 "q" => FormatQuotedString(value),
@@ -937,7 +937,7 @@ namespace FLua.Runtime
                 case 'f': // float
                     {
                         var value = getValue();
-                        var num = value.IsNumber ? value.AsNumber() : 0;
+                        var num = value.IsNumber ? value.AsDouble() : 0;
                         var bytes = BitConverter.GetBytes((float)num);
                         output.AddRange(bytes);
                         return (4, true);
@@ -947,7 +947,7 @@ namespace FLua.Runtime
                 case 'n': // Lua number
                     {
                         var value = getValue();
-                        var num = value.IsNumber ? value.AsNumber() : 0;
+                        var num = value.IsNumber ? value.AsDouble() : 0;
                         var bytes = BitConverter.GetBytes(num);
                         output.AddRange(bytes);
                         return (8, true);

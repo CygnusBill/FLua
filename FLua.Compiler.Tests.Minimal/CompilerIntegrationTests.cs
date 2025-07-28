@@ -53,7 +53,11 @@ public class CompilerIntegrationTests
         var compileResult = _compiler.Compile(Microsoft.FSharp.Collections.ListModule.ToArray(ast), options);
         
         // Assert
-        Assert.IsTrue(compileResult.Success, "Simple print should compile successfully");
+        if (!compileResult.Success)
+        {
+            Console.WriteLine($"Compilation failed: {string.Join("\n", compileResult.Errors ?? [])}");
+        }
+        Assert.IsTrue(compileResult.Success, $"Simple print should compile successfully. Error: {string.Join("\n", compileResult.Errors ?? [])}");
         Assert.IsTrue(File.Exists(outputPath), "Output DLL should be created");
         
         // Execute and verify

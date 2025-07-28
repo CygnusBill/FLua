@@ -655,9 +655,9 @@ namespace FLua.Interpreter
                     throw new LuaRuntimeException("For loop limits and step must be numbers");
                 }
                 
-                double start = startVal.AsNumber();
-                double end = endVal.AsNumber();
-                double step = stepVal.AsNumber();
+                double start = startVal.AsDouble();
+                double end = endVal.AsDouble();
+                double step = stepVal.AsDouble();
                 
                 if (step == 0)
                 {

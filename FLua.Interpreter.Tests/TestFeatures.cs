@@ -96,7 +96,7 @@ namespace FLua.Interpreter.Tests
         private double GetNumericValue(LuaValue value)
         {
             if (value.IsNumber)
-                return value.AsNumber();
+                return value.AsDouble();
             throw new InvalidCastException($"Cannot convert {value.Type} to a numeric value");
         }
     }

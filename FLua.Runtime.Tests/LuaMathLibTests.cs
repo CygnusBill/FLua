@@ -225,9 +225,9 @@ namespace FLua.Runtime.Tests
         [TestMethod]
         public void MathCos_Zero_ShouldReturnOne()
         {
-            var math = _env.GetVariable("math");
-            var cosFunc = math.AsTable<LuaTable>().Get("cos").AsFunction<LuaFunction>();
-            var result = cosFunc.Call(new LuaValue[] { 0 });
+            var math = _env.GetVariable("math").AsTable<LuaTable>();
+            var cosFunc = math.Get("cos").AsFunction<LuaFunction>();
+            var result = cosFunc.Call(new LuaValue[] { 0f });
             
             Assert.AreEqual(1, result.Length);
             Assert.AreEqual(1.0, result[0].AsFloat(), 0.000001);
@@ -385,7 +385,7 @@ namespace FLua.Runtime.Tests
             var result = randomFunc.Call(new LuaValue[] { 10 });
             
             Assert.AreEqual(1, result.Length);
-            var value = result[0].AsFloat();
+            var value = result[0].AsInteger();
             Assert.IsTrue(value >= 1 && value <= 10, $"Random value {value} should be between 1 and 10");
         }
 
@@ -397,7 +397,7 @@ namespace FLua.Runtime.Tests
             var result = randomFunc.Call(new LuaValue[] { 5, 15 });
             
             Assert.AreEqual(1, result.Length);
-            var value = result[0].AsFloat();
+            var value = result[0].AsInteger();
             Assert.IsTrue(value >= 5 && value <= 15, $"Random value {value} should be between 5 and 15");
         }
 

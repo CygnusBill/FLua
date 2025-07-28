@@ -295,7 +295,7 @@ namespace FLua.Runtime
             var value = args[0];
             
             if (value.IsNumber)
-                return [(LuaValue)value.AsNumber()];
+                return [(LuaValue)value.AsDouble()];
             
             if (value.IsString)
             {
@@ -769,7 +769,7 @@ namespace FLua.Runtime
             // Handle numeric selector
             if (selector.IsNumber)
             {
-                int index = (int)selector.AsNumber();
+                int index = (int)selector.AsDouble();
                 
                 // Handle negative indices (from end)
                 if (index < 0)
@@ -810,14 +810,14 @@ namespace FLua.Runtime
             int start = 1;
             if (args.Length > 1 && args[1].IsNumber)
             {
-                start = (int)args[1].AsNumber();
+                start = (int)args[1].AsDouble();
             }
             
             // Get end index (default table length)
             int end = start;
             if (args.Length > 2 && args[2].IsNumber)
             {
-                end = (int)args[2].AsNumber();
+                end = (int)args[2].AsDouble();
             }
             else
             {

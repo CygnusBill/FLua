@@ -201,9 +201,9 @@ namespace FLua.Runtime.Tests
             
             sortFunc.Call(testTable);
             
-            Assert.AreEqual(1.2, testTable.Get(LuaValue.Integer(1)).AsNumber(), 0.001);
-            Assert.AreEqual(2.8, testTable.Get(LuaValue.Integer(2)).AsNumber(), 0.001);
-            Assert.AreEqual(3.5, testTable.Get(LuaValue.Integer(3)).AsNumber(), 0.001);
+            Assert.AreEqual(1.2, testTable.Get(LuaValue.Integer(1)).AsDouble(), 0.001);
+            Assert.AreEqual(2.8, testTable.Get(LuaValue.Integer(2)).AsDouble(), 0.001);
+            Assert.AreEqual(3.5, testTable.Get(LuaValue.Integer(3)).AsDouble(), 0.001);
         }
 
         [TestMethod]
