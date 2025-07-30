@@ -148,6 +148,24 @@ public class RoslynLuaCompiler : ILuaCompiler
         if (!string.IsNullOrEmpty(options.OutputPath))
         {
             File.WriteAllBytes(options.OutputPath, assembly);
+            
+            // For console apps, also generate runtime config file
+            if (options.Target == CompilationTarget.ConsoleApp)
+            {
+                var runtimeConfigPath = Path.ChangeExtension(options.OutputPath, ".runtimeconfig.json");
+                var runtimeConfig = $$"""
+                {
+                  "runtimeOptions": {
+                    "tfm": "net10.0",
+                    "framework": {
+                      "name": "Microsoft.NETCore.App",
+                      "version": "10.0.0-preview.4.25258.110"
+                    }
+                  }
+                }
+                """;
+                File.WriteAllText(runtimeConfigPath, runtimeConfig);
+            }
         }
 
         return new CompilationResult(
