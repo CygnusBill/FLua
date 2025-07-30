@@ -366,7 +366,8 @@ USAGE:
     ./publish.sh [command|platform] [configuration]
 
 COMMANDS:
-    (no args)      Full build and publish for all supported platforms
+    (no args)      Build and publish for osx-arm64 (default platform)
+    all            Build and publish for all supported platforms
     help           Show this help message
     clean          Clean previous builds only  
     test           Build and test only (no publishing)
@@ -382,15 +383,16 @@ SUPPORTED PLATFORMS:
     • win-arm64     - Windows ARM64
 
 EXAMPLES:
-    ./publish.sh                    # Full publish all platforms, Release (recommended)
-    ./publish.sh Debug              # Full publish all platforms, Debug
+    ./publish.sh                    # Build for osx-arm64 (default), Release
+    ./publish.sh all                # Build for all platforms, Release
+    ./publish.sh all Debug          # Build for all platforms, Debug
     ./publish.sh help               # Show this help
     ./publish.sh clean              # Clean previous builds
     ./publish.sh test               # Build and test only
     ./publish.sh osx-arm64          # Build only for macOS Apple Silicon, Release
     ./publish.sh osx-arm64 Debug    # Build only for macOS Apple Silicon, Debug
     ./publish.sh linux-x64 Release  # Build only for Linux x64, Release
-    ./publish.sh Debug osx-arm64    # Arguments can be in any order
+    ./publish.sh Debug              # Build for osx-arm64 (default), Debug
 
 OUTPUT:
     The script creates optimized executables in ./publish/ directory:
@@ -457,20 +459,28 @@ main() {
         create_single_package "$target_platform"
         show_single_summary "$target_platform"
     else
-        # All platforms build (original behavior)
-        print_section "FLua Multi-Platform Publisher" "==============================="
-        print_status "Starting publication process..."
+        # Default to osx-arm64 when no platform specified
+        target_platform="osx-arm64"
+        print_section "FLua Platform Publisher" "========================"
+        print_status "No platform specified, defaulting to: $target_platform"
         print_status "Configuration: $configuration"
         echo
+        print_status "To build for all platforms, use: ./publish.sh all"
+        print_status "To see available platforms, use: ./publish.sh help"
+        echo
         
-        # Execute all steps
+        # Execute build steps for default platform
         check_prerequisites
         clean_build "$configuration"
         restore_packages
         build_and_test "$configuration"
-        publish_all_platforms "$configuration"
-        create_packages
-        show_summary
+        
+        print_section "Publishing FLua CLI for $target_platform ($configuration)"
+        publish_single_platform "$target_platform" "$configuration"
+        
+        # Create single platform package
+        create_single_package "$target_platform"
+        show_single_summary "$target_platform"
     fi
     
     print_section "Publication Complete!" "======================"
@@ -552,6 +562,26 @@ case "${1:-}" in
         check_prerequisites
         restore_packages
         build_and_test "${2:-Release}"
+        ;;
+    all)
+        # Build for all platforms
+        local config="${2:-Release}"
+        print_section "FLua Multi-Platform Publisher" "==============================="
+        print_status "Building for ALL platforms"
+        print_status "Configuration: $config"
+        echo
+        
+        check_prerequisites
+        clean_build "$config"
+        restore_packages
+        build_and_test "$config"
+        publish_all_platforms "$config"
+        create_packages
+        show_summary
+        
+        print_section "Publication Complete!" "======================"
+        print_success "Build completed successfully!"
+        echo
         ;;
     *)
         main "$@"
