@@ -45,6 +45,20 @@ dotnet run --project FLua.Cli -- script.lua
 ./flua --help
 ```
 
+### **Compile Lua Scripts**
+```bash
+# Compile to .NET console application (can run with 'dotnet')
+./flua compile script.lua -o script.dll --target ConsoleApp
+dotnet script.dll
+
+# Compile to native executable (1MB, no .NET required)
+./flua compile script.lua -o script --target NativeAot
+./script
+
+# Compile to library for use from other .NET code
+./flua compile script.lua -o script.dll --target Library
+```
+
 ## 🎯 Usage Examples
 
 ### **REPL Commands**
@@ -114,6 +128,13 @@ lua> .quit        # Exit
 - **Multi-line input**: Support for functions and complex constructs
 - **Built-in commands**: Help, environment inspection, clear screen
 - **Error handling**: Graceful error reporting and recovery
+
+### ✅ Lua Compiler
+- **Multiple targets**: Console apps, libraries, and native executables
+- **Native AOT**: Compile to 1MB standalone executables (no .NET required)
+- **.NET integration**: Generate standard .NET assemblies
+- **Auto-configuration**: Runtime config generated automatically for console apps
+- **Cross-platform**: Supports Windows, macOS, and Linux targets
 
 ## Supported Syntax
 

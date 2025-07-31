@@ -278,9 +278,9 @@ Following Lee Copeland testing methodologies:
 - Decision table testing
 - State transition testing
 
-### Compiler Backend Comparison
-- **Roslyn Backend**: Generates readable C# code, ~70MB executables, easier debugging
-- **Cecil Backend**: Direct IL generation, ~16MB executables (77% size reduction), faster compilation
+### Compiler Backend Status
+- **Roslyn Backend (Active)**: Generates C# code, now produces 1MB native executables with AOT
+- **Cecil Backend (Deprecated)**: Direct IL generation experiment, has assembly loading issues
 
 ### Pending Compiler Features
 High Priority:
@@ -304,15 +304,19 @@ dotnet build FLua.Compiler/FLua.Compiler.csproj
 # Run compiler tests (minimal suite that works)
 dotnet test FLua.Compiler.Tests.Minimal/FLua.Compiler.Tests.Minimal.csproj
 
-# Compile a Lua script (uses Cecil backend by default)
-dotnet run --project FLua.Cli -- compile script.lua [--target Library|ConsoleApp]
+# Compile a Lua script (uses Roslyn backend by default)
+dotnet run --project FLua.Cli -- compile script.lua --target ConsoleApp
+dotnet script.dll  # Runtime config is auto-generated
 
-# Run compiled script (requires FLua.Runtime.dll in same directory)
-dotnet script.dll
+# Compile to native executable (1MB, no .NET required)
+dotnet run --project FLua.Cli -- compile script.lua --target NativeAot
+
+# Compile to library for use from other .NET code  
+dotnet run --project FLua.Cli -- compile script.lua --target Library
 ```
 
 ### Current Status
-#### Cecil Backend (Default)
+#### Roslyn Backend (Default)
 - **Completed**: Direct IL generation using Mono.Cecil
 - **Completed**: 77% executable size reduction (70MB → 16MB)
 - **Completed**: Console application support with LuaConsoleRunner
