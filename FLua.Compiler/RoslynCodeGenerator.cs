@@ -345,8 +345,8 @@ namespace FLua.Compiler
                             .AddArgumentListArguments(Argument(LiteralExpression(SyntaxKind.NumericLiteralExpression, Literal(i)))),
                         MemberAccessExpression(
                             SyntaxKind.SimpleMemberAccessExpression,
-                            IdentifierName("LuaNil"),
-                            IdentifierName("Instance")));
+                            IdentifierName("LuaValue"),
+                            IdentifierName("Nil")));
                     
                     var varDecl = LocalDeclarationStatement(
                         VariableDeclaration(IdentifierName("LuaValue"))
@@ -447,8 +447,8 @@ namespace FLua.Compiler
                             .AddArgumentListArguments(Argument(LiteralExpression(SyntaxKind.NumericLiteralExpression, Literal(i)))),
                         MemberAccessExpression(
                             SyntaxKind.SimpleMemberAccessExpression,
-                            IdentifierName("LuaNil"),
-                            IdentifierName("Instance")));
+                            IdentifierName("LuaValue"),
+                            IdentifierName("Nil")));
                     
                     statements.AddRange(GenerateSingleAssignment(varExpr, valueExpr));
                 }
@@ -462,8 +462,8 @@ namespace FLua.Compiler
                     var valueExpr = i < exprs.Count ? GenerateExpression(exprs[i]) : 
                         MemberAccessExpression(
                             SyntaxKind.SimpleMemberAccessExpression,
-                            IdentifierName("LuaNil"),
-                            IdentifierName("Instance"));
+                            IdentifierName("LuaValue"),
+                            IdentifierName("Nil"));
                     
                     statements.AddRange(GenerateSingleAssignment(varExpr, valueExpr));
                 }
@@ -970,6 +970,7 @@ namespace FLua.Compiler
             ExpressionSyntax funcExpr;
             if (funcOverride != null)
             {
+                // funcOverride is already a LuaValue containing a function
                 funcExpr = InvocationExpression(
                     MemberAccessExpression(
                         SyntaxKind.SimpleMemberAccessExpression,
@@ -1392,16 +1393,22 @@ namespace FLua.Compiler
             funcDecl = funcDecl.WithBody(Block(bodyStatements));
             statements.Add(funcDecl);
             
-            // Create LuaUserFunction wrapper
+            // Create BuiltinFunction wrapper and wrap in LuaValue
             var wrapperVarName = $"{SanitizeIdentifier(mangledName)}_func";
             var wrapperDecl = LocalDeclarationStatement(
                 VariableDeclaration(IdentifierName("var"))
                     .AddVariables(
                         VariableDeclarator(Identifier(wrapperVarName))
                             .WithInitializer(EqualsValueClause(
-                                ObjectCreationExpression(IdentifierName("LuaUserFunction"))
+                                InvocationExpression(
+                                    MemberAccessExpression(
+                                        SyntaxKind.SimpleMemberAccessExpression,
+                                        IdentifierName("LuaValue"),
+                                        IdentifierName("Function")))
                                     .AddArgumentListArguments(
-                                        Argument(IdentifierName(SanitizeIdentifier(mangledName))))))));
+                                        Argument(ObjectCreationExpression(IdentifierName("BuiltinFunction"))
+                                            .AddArgumentListArguments(
+                                                Argument(IdentifierName(SanitizeIdentifier(mangledName))))))))));
             
             statements.Add(wrapperDecl);
             
