@@ -1042,6 +1042,12 @@ namespace FLua.Compiler
                         IdentifierName("Call")))
                     .AddArgumentListArguments(Argument(arrayCreation));
             }
+            else if (expr.IsMethodCall)
+            {
+                var methodCall = (Expr.MethodCall)expr;
+                // Return the method call array directly (statement context doesn't need [0])
+                return GenerateMethodCall(methodCall.Item1, methodCall.Item2, FSharpListToList(methodCall.Item3));
+            }
             
             // Fallback for non-function call expressions
             return GenerateExpression(expr);
