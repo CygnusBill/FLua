@@ -530,17 +530,19 @@ namespace FLua.Compiler
                     var tableAccess = (Expr.TableAccess)varExpr;
                     
                     // Cast table to LuaTable
-                    var tableExpr = ParenthesizedExpression(
-                        CastExpression(
-                            IdentifierName("LuaTable"),
-                            GenerateExpression(tableAccess.Item1)));
+                    var tableExpr = GenerateExpression(tableAccess.Item1);
                     
-                    // Cast to LuaTable and call Set
+                    // Get table using AsTable<LuaTable>() and call Set
                     var setCall = ExpressionStatement(
                         InvocationExpression(
                             MemberAccessExpression(
                                 SyntaxKind.SimpleMemberAccessExpression,
-                                CastExpression(IdentifierName("LuaTable"), tableExpr),
+                                InvocationExpression(
+                                    MemberAccessExpression(
+                                        SyntaxKind.SimpleMemberAccessExpression,
+                                        tableExpr,
+                                        GenericName("AsTable")
+                                            .AddTypeArgumentListArguments(IdentifierName("LuaTable")))),
                                 IdentifierName("Set")))
                         .AddArgumentListArguments(
                             Argument(GenerateExpression(tableAccess.Item2)),
@@ -835,11 +837,13 @@ namespace FLua.Compiler
         
         private ExpressionSyntax GenerateTableAccess(Expr table, Expr key)
         {
-            // Generate: ((LuaTable)table).Get(key)
-            var tableExpr = ParenthesizedExpression(
-                CastExpression(
-                    IdentifierName("LuaTable"),
-                    GenerateExpression(table)));
+            // Generate: table.AsTable<LuaTable>().Get(key)
+            var tableExpr = InvocationExpression(
+                MemberAccessExpression(
+                    SyntaxKind.SimpleMemberAccessExpression,
+                    GenerateExpression(table),
+                    GenericName("AsTable")
+                        .AddTypeArgumentListArguments(IdentifierName("LuaTable"))));
             
             return InvocationExpression(
                 MemberAccessExpression(
@@ -1066,11 +1070,12 @@ namespace FLua.Compiler
             {
                 var (condition, body) = clauses[i];
                 
-                // Generate condition.IsTruthy
-                var conditionExpr = MemberAccessExpression(
-                    SyntaxKind.SimpleMemberAccessExpression,
-                    GenerateExpression(condition),
-                    IdentifierName("IsTruthy"));
+                // Generate condition.IsTruthy()
+                var conditionExpr = InvocationExpression(
+                    MemberAccessExpression(
+                        SyntaxKind.SimpleMemberAccessExpression,
+                        GenerateExpression(condition),
+                        IdentifierName("IsTruthy")));
                 
                 // Generate body block
                 EnterScope();
@@ -1421,11 +1426,12 @@ namespace FLua.Compiler
         
         private StatementSyntax GenerateWhile(Expr condition, IList<Statement> body)
         {
-            // Generate condition.IsTruthy
-            var conditionExpr = MemberAccessExpression(
-                SyntaxKind.SimpleMemberAccessExpression,
-                GenerateExpression(condition),
-                IdentifierName("IsTruthy"));
+            // Generate condition.IsTruthy()
+            var conditionExpr = InvocationExpression(
+                MemberAccessExpression(
+                    SyntaxKind.SimpleMemberAccessExpression,
+                    GenerateExpression(condition),
+                    IdentifierName("IsTruthy")));
             
             // Generate body block
             EnterScope();
@@ -1446,10 +1452,11 @@ namespace FLua.Compiler
             // So we need to negate the condition
             var notCondition = PrefixUnaryExpression(
                 SyntaxKind.LogicalNotExpression,
-                MemberAccessExpression(
-                    SyntaxKind.SimpleMemberAccessExpression,
-                    GenerateExpression(condition),
-                    IdentifierName("IsTruthy")));
+                InvocationExpression(
+                    MemberAccessExpression(
+                        SyntaxKind.SimpleMemberAccessExpression,
+                        GenerateExpression(condition),
+                        IdentifierName("IsTruthy"))));
             
             ExitScope();
             
@@ -1467,7 +1474,11 @@ namespace FLua.Compiler
             // Generate step value (default to 1 if not provided)
             var stepExpr = OptionModule.IsSome(step) 
                 ? GenerateExpression(step.Value)
-                : ObjectCreationExpression(IdentifierName("LuaNumber"))
+                : InvocationExpression(
+                    MemberAccessExpression(
+                        SyntaxKind.SimpleMemberAccessExpression,
+                        IdentifierName("LuaValue"),
+                        IdentifierName("Number")))
                     .AddArgumentListArguments(Argument(LiteralExpression(SyntaxKind.NumericLiteralExpression, Literal(1.0))));
             
             // var start_val = start;
@@ -1549,7 +1560,11 @@ namespace FLua.Compiler
                 VariableDeclaration(IdentifierName("LuaValue"))
                     .AddVariables(
                         VariableDeclarator(Identifier(loopVar))
-                            .WithInitializer(EqualsValueClause(LiteralExpression(SyntaxKind.NullLiteralExpression))))));
+                            .WithInitializer(EqualsValueClause(
+                                MemberAccessExpression(
+                                    SyntaxKind.SimpleMemberAccessExpression,
+                                    IdentifierName("LuaValue"),
+                                    IdentifierName("Nil")))))));
             
             // for (double i_num = start_num; (step_num > 0 && i_num <= stop_num) || (step_num < 0 && i_num >= stop_num); i_num += step_num)
             var loopNumVar = $"{loopVar}_num";
@@ -1606,7 +1621,11 @@ namespace FLua.Compiler
                 AssignmentExpression(
                     SyntaxKind.SimpleAssignmentExpression,
                     IdentifierName(loopVar),
-                    ObjectCreationExpression(IdentifierName("LuaNumber"))
+                    InvocationExpression(
+                        MemberAccessExpression(
+                            SyntaxKind.SimpleMemberAccessExpression,
+                            IdentifierName("LuaValue"),
+                            IdentifierName("Number")))
                         .AddArgumentListArguments(Argument(IdentifierName(loopNumVar))))));
             
             // Store loop variable in environment

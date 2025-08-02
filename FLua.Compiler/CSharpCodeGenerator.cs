@@ -277,7 +277,7 @@ public class CSharpCodeGenerator
             }
             
             GenerateExpression(condition);
-            WriteLine(".IsTruthy)");
+            WriteLine(".IsTruthy())");
             WriteLine("{");
             IncreaseIndent();
             EnterScope();
@@ -304,7 +304,7 @@ public class CSharpCodeGenerator
     {
         Write("while (");
         GenerateExpression(condition);
-        WriteLine(".IsTruthy)");
+        WriteLine(".IsTruthy())");
         WriteLine("{");
         IncreaseIndent();
         EnterScope();
