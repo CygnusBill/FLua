@@ -106,6 +106,9 @@ namespace FLua.Compiler
             // Add any pending methods (from anonymous functions)
             classMembers.AddRange(_pendingMethods);
             
+            // Add helper methods
+            classMembers.Add(CreateExtractVarargsFromTableMethod());
+            
             // Add Main method for console applications
             if (options.Target == CompilationTarget.ConsoleApp)
             {
@@ -201,6 +204,116 @@ namespace FLua.Compiler
             method = method.WithBody(Block(runCall));
             
             return method;
+        }
+        
+        private MethodDeclarationSyntax CreateExtractVarargsFromTableMethod()
+        {
+            // Create method: private static LuaValue[] ExtractVarargsFromTable(LuaValue varargTable)
+            return MethodDeclaration(
+                    ArrayType(IdentifierName("LuaValue"))
+                        .WithRankSpecifiers(SingletonList(ArrayRankSpecifier())),
+                    "ExtractVarargsFromTable")
+                .AddModifiers(Token(SyntaxKind.PrivateKeyword), Token(SyntaxKind.StaticKeyword))
+                .AddParameterListParameters(
+                    Parameter(Identifier("varargTable"))
+                        .WithType(IdentifierName("LuaValue")))
+                .WithBody(Block(
+                    // if (!varargTable.IsTable) return new LuaValue[0];
+                    IfStatement(
+                        PrefixUnaryExpression(
+                            SyntaxKind.LogicalNotExpression,
+                            MemberAccessExpression(
+                                SyntaxKind.SimpleMemberAccessExpression,
+                                IdentifierName("varargTable"),
+                                IdentifierName("IsTable"))),
+                        ReturnStatement(
+                            ArrayCreationExpression(
+                                ArrayType(IdentifierName("LuaValue"))
+                                    .WithRankSpecifiers(SingletonList(ArrayRankSpecifier())))
+                                .WithInitializer(InitializerExpression(
+                                    SyntaxKind.ArrayInitializerExpression)))),
+                    // var table = varargTable.AsTable<LuaTable>();
+                    LocalDeclarationStatement(
+                        VariableDeclaration(IdentifierName("var"))
+                            .AddVariables(
+                                VariableDeclarator(Identifier("table"))
+                                    .WithInitializer(EqualsValueClause(
+                                        InvocationExpression(
+                                            MemberAccessExpression(
+                                                SyntaxKind.SimpleMemberAccessExpression,
+                                                IdentifierName("varargTable"),
+                                                GenericName(Identifier("AsTable"))
+                                                    .WithTypeArgumentList(
+                                                        TypeArgumentList(SingletonSeparatedList<TypeSyntax>(
+                                                            IdentifierName("LuaTable")))))))))),
+                    // var values = new List<LuaValue>();
+                    LocalDeclarationStatement(
+                        VariableDeclaration(IdentifierName("var"))
+                            .AddVariables(
+                                VariableDeclarator(Identifier("values"))
+                                    .WithInitializer(EqualsValueClause(
+                                        ObjectCreationExpression(
+                                            GenericName(Identifier("List"))
+                                                .WithTypeArgumentList(
+                                                    TypeArgumentList(SingletonSeparatedList<TypeSyntax>(
+                                                        IdentifierName("LuaValue")))))
+                                            .AddArgumentListArguments())))),
+                    // for (long i = 1; ; i++)
+                    ForStatement(
+                        Block(
+                            // var value = table.Get(LuaValue.Integer(i));
+                            LocalDeclarationStatement(
+                                VariableDeclaration(IdentifierName("var"))
+                                    .AddVariables(
+                                        VariableDeclarator(Identifier("value"))
+                                            .WithInitializer(EqualsValueClause(
+                                                InvocationExpression(
+                                                    MemberAccessExpression(
+                                                        SyntaxKind.SimpleMemberAccessExpression,
+                                                        IdentifierName("table"),
+                                                        IdentifierName("Get")))
+                                                    .AddArgumentListArguments(
+                                                        Argument(InvocationExpression(
+                                                            MemberAccessExpression(
+                                                                SyntaxKind.SimpleMemberAccessExpression,
+                                                                IdentifierName("LuaValue"),
+                                                                IdentifierName("Integer")))
+                                                            .AddArgumentListArguments(
+                                                                Argument(IdentifierName("i"))))))))),
+                            // if (value.IsNil) break;
+                            IfStatement(
+                                MemberAccessExpression(
+                                    SyntaxKind.SimpleMemberAccessExpression,
+                                    IdentifierName("value"),
+                                    IdentifierName("IsNil")),
+                                BreakStatement()),
+                            // values.Add(value);
+                            ExpressionStatement(
+                                InvocationExpression(
+                                    MemberAccessExpression(
+                                        SyntaxKind.SimpleMemberAccessExpression,
+                                        IdentifierName("values"),
+                                        IdentifierName("Add")))
+                                    .AddArgumentListArguments(
+                                        Argument(IdentifierName("value"))))))
+                        .WithDeclaration(
+                            VariableDeclaration(PredefinedType(Token(SyntaxKind.LongKeyword)))
+                                .AddVariables(
+                                    VariableDeclarator(Identifier("i"))
+                                        .WithInitializer(EqualsValueClause(
+                                            LiteralExpression(SyntaxKind.NumericLiteralExpression, Literal(1L))))))
+                        .WithIncrementors(
+                            SingletonSeparatedList<ExpressionSyntax>(
+                                PostfixUnaryExpression(
+                                    SyntaxKind.PostIncrementExpression,
+                                    IdentifierName("i")))),
+                    // return values.ToArray();
+                    ReturnStatement(
+                        InvocationExpression(
+                            MemberAccessExpression(
+                                SyntaxKind.SimpleMemberAccessExpression,
+                                IdentifierName("values"),
+                                IdentifierName("ToArray"))))));
         }
         
         private IEnumerable<StatementSyntax> GenerateStatement(Statement statement)
@@ -646,6 +759,37 @@ namespace FLua.Compiler
             {
                 var funcDef = (Expr.FunctionDef)expr;
                 return GenerateFunctionExpression(funcDef.Item);
+            }
+            else if (expr.IsVararg)
+            {
+                // Access varargs stored in "..." variable as a table
+                // For now, just return the first value or nil
+                var ellipsisVarName = "ellipsis__";
+                
+                // Check if varargs table exists and get first value
+                return ConditionalExpression(
+                    BinaryExpression(
+                        SyntaxKind.LogicalAndExpression,
+                        IdentifierName(ellipsisVarName),
+                        MemberAccessExpression(
+                            SyntaxKind.SimpleMemberAccessExpression,
+                            IdentifierName(ellipsisVarName),
+                            IdentifierName("IsTable"))),
+                    InvocationExpression(
+                        MemberAccessExpression(
+                            SyntaxKind.SimpleMemberAccessExpression,
+                            InvocationExpression(
+                                MemberAccessExpression(
+                                    SyntaxKind.SimpleMemberAccessExpression,
+                                    IdentifierName(ellipsisVarName),
+                                    GenericName(Identifier("AsTable"))
+                                        .WithTypeArgumentList(
+                                            TypeArgumentList(SingletonSeparatedList<TypeSyntax>(
+                                                IdentifierName("LuaTable")))))),
+                            IdentifierName("Get")))
+                        .AddArgumentListArguments(
+                            Argument(LuaValueInteger(1))),
+                    LuaValueNil());
             }
             else
             {
@@ -1185,30 +1329,95 @@ namespace FLua.Compiler
                 }
                 else if (param.IsVararg)
                 {
-                    // Handle varargs - create local array using range syntax
-                    var varArgsDecl = LocalDeclarationStatement(
+                    // Handle varargs - create a LuaTable and store as "..."
+                    var varArgTableVar = "varargTable__";
+                    var ellipsisVarName = "ellipsis__";
+                    
+                    // Create the vararg table
+                    var createTableStmt = LocalDeclarationStatement(
                         VariableDeclaration(IdentifierName("var"))
                             .AddVariables(
-                                VariableDeclarator(Identifier("varargs__"))
+                                VariableDeclarator(Identifier(varArgTableVar))
                                     .WithInitializer(EqualsValueClause(
-                                        ConditionalExpression(
-                                            BinaryExpression(
-                                                SyntaxKind.GreaterThanExpression,
-                                                MemberAccessExpression(
-                                                    SyntaxKind.SimpleMemberAccessExpression,
-                                                    IdentifierName("args"),
-                                                    IdentifierName("Length")),
-                                                LiteralExpression(SyntaxKind.NumericLiteralExpression, Literal(paramIndex))),
-                                            ElementAccessExpression(IdentifierName("args"))
-                                                .AddArgumentListArguments(
-                                                    Argument(
-                                                        RangeExpression()
-                                                            .WithLeftOperand(LiteralExpression(SyntaxKind.NumericLiteralExpression, Literal(paramIndex))))),
-                                            ArrayCreationExpression(
-                                                ArrayType(IdentifierName("LuaValue"))
-                                                    .WithRankSpecifiers(SingletonList(ArrayRankSpecifier(SingletonSeparatedList<ExpressionSyntax>(OmittedArraySizeExpression()))))))))));
+                                        ObjectCreationExpression(IdentifierName("LuaTable"))
+                                            .AddArgumentListArguments()))));
+                    bodyStatements.Add(createTableStmt);
                     
-                    bodyStatements.Add(varArgsDecl);
+                    // Fill the table with varargs if any exist
+                    var fillTableCondition = IfStatement(
+                        BinaryExpression(
+                            SyntaxKind.GreaterThanExpression,
+                            MemberAccessExpression(
+                                SyntaxKind.SimpleMemberAccessExpression,
+                                IdentifierName("args"),
+                                IdentifierName("Length")),
+                            LiteralExpression(SyntaxKind.NumericLiteralExpression, Literal(paramIndex))),
+                        Block(
+                            // var varargIndex = 1L;
+                            LocalDeclarationStatement(
+                                VariableDeclaration(IdentifierName("var"))
+                                    .AddVariables(
+                                        VariableDeclarator(Identifier("varargIndex__"))
+                                            .WithInitializer(EqualsValueClause(
+                                                LiteralExpression(SyntaxKind.NumericLiteralExpression, Literal(1L)))))),
+                            // for (int i = paramIndex; i < args.Length; i++)
+                            ForStatement(
+                                Block(
+                                    // varargTable.Set(LuaValue.Integer(varargIndex++), args[i]);
+                                    ExpressionStatement(
+                                        InvocationExpression(
+                                            MemberAccessExpression(
+                                                SyntaxKind.SimpleMemberAccessExpression,
+                                                IdentifierName(varArgTableVar),
+                                                IdentifierName("Set")))
+                                            .AddArgumentListArguments(
+                                                Argument(InvocationExpression(
+                                                    MemberAccessExpression(
+                                                        SyntaxKind.SimpleMemberAccessExpression,
+                                                        IdentifierName("LuaValue"),
+                                                        IdentifierName("Integer")))
+                                                    .AddArgumentListArguments(
+                                                        Argument(PostfixUnaryExpression(
+                                                            SyntaxKind.PostIncrementExpression,
+                                                            IdentifierName("varargIndex__"))))),
+                                                Argument(ElementAccessExpression(IdentifierName("args"))
+                                                    .AddArgumentListArguments(
+                                                        Argument(IdentifierName("i"))))))))
+                                .WithDeclaration(
+                                    VariableDeclaration(PredefinedType(Token(SyntaxKind.IntKeyword)))
+                                        .AddVariables(
+                                            VariableDeclarator(Identifier("i"))
+                                                .WithInitializer(EqualsValueClause(
+                                                    LiteralExpression(SyntaxKind.NumericLiteralExpression, Literal(paramIndex))))))
+                                .WithCondition(
+                                    BinaryExpression(
+                                        SyntaxKind.LessThanExpression,
+                                        IdentifierName("i"),
+                                        MemberAccessExpression(
+                                            SyntaxKind.SimpleMemberAccessExpression,
+                                            IdentifierName("args"),
+                                            IdentifierName("Length"))))
+                                .WithIncrementors(
+                                    SingletonSeparatedList<ExpressionSyntax>(
+                                        PostfixUnaryExpression(
+                                            SyntaxKind.PostIncrementExpression,
+                                            IdentifierName("i"))))));
+                    bodyStatements.Add(fillTableCondition);
+                    
+                    // Store the table as "..."
+                    var storeVarArgStmt = LocalDeclarationStatement(
+                        VariableDeclaration(IdentifierName("var"))
+                            .AddVariables(
+                                VariableDeclarator(Identifier(ellipsisVarName))
+                                    .WithInitializer(EqualsValueClause(
+                                        InvocationExpression(
+                                            MemberAccessExpression(
+                                                SyntaxKind.SimpleMemberAccessExpression,
+                                                IdentifierName("LuaValue"),
+                                                IdentifierName("Table")))
+                                            .AddArgumentListArguments(
+                                                Argument(IdentifierName(varArgTableVar)))))));
+                    bodyStatements.Add(storeVarArgStmt);
                 }
             }
             
