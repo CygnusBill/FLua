@@ -44,15 +44,15 @@ public class TrustLevelSecurityTests
         Assert.IsNotNull(env.GetVariable("tonumber"));
         
         // Assert - Advanced functions not available
-        Assert.IsNull(env.GetVariable("pcall"));
-        Assert.IsNull(env.GetVariable("error"));
-        Assert.IsNull(env.GetVariable("load"));
-        Assert.IsNull(env.GetVariable("require"));
+        Assert.AreEqual(LuaValue.Nil, env.GetVariable("pcall"));
+        Assert.AreEqual(LuaValue.Nil, env.GetVariable("error"));
+        Assert.AreEqual(LuaValue.Nil, env.GetVariable("load"));
+        Assert.AreEqual(LuaValue.Nil, env.GetVariable("require"));
         
         // Assert - No libraries available
-        Assert.IsNull(env.GetVariable("io"));
-        Assert.IsNull(env.GetVariable("os"));
-        Assert.IsNull(env.GetVariable("debug"));
+        Assert.AreEqual(LuaValue.Nil, env.GetVariable("io"));
+        Assert.AreEqual(LuaValue.Nil, env.GetVariable("os"));
+        Assert.AreEqual(LuaValue.Nil, env.GetVariable("debug"));
     }
 
     [TestMethod]
@@ -79,9 +79,9 @@ public class TrustLevelSecurityTests
         Assert.IsNotNull(env.GetVariable("coroutine"));
         
         // Assert - Dangerous functions/libraries not available
-        Assert.IsNull(env.GetVariable("load"));
-        Assert.IsNull(env.GetVariable("io"));
-        Assert.IsNull(env.GetVariable("os"));
+        Assert.AreEqual(LuaValue.Nil, env.GetVariable("load"));
+        Assert.AreEqual(LuaValue.Nil, env.GetVariable("io"));
+        Assert.AreEqual(LuaValue.Nil, env.GetVariable("os"));
     }
 
     [TestMethod]
@@ -100,7 +100,7 @@ public class TrustLevelSecurityTests
         Assert.IsNotNull(env.GetVariable("os"));
         
         // Assert - Debug library still not available
-        Assert.IsNull(env.GetVariable("debug"));
+        Assert.AreEqual(LuaValue.Nil, env.GetVariable("debug"));
     }
 
     [TestMethod]
@@ -211,7 +211,7 @@ public class TrustLevelSecurityTests
 
         // Act & Assert
         var debugLib = env.GetVariable("debug");
-        Assert.IsNull(debugLib, "Debug library should not be accessible at Restricted trust level");
+        Assert.AreEqual(LuaValue.Nil, debugLib, "Debug library should not be accessible at Restricted trust level");
     }
 
     [TestMethod]
@@ -225,7 +225,7 @@ public class TrustLevelSecurityTests
         var dangerousFunctions = new[] { "load", "loadfile", "dofile", "require", "collectgarbage" };
         foreach (var func in dangerousFunctions)
         {
-            Assert.IsNull(env.GetVariable(func), 
+            Assert.AreEqual(LuaValue.Nil, env.GetVariable(func), 
                 $"Dangerous function '{func}' should not be available at Untrusted level");
         }
     }
@@ -251,7 +251,7 @@ public class TrustLevelSecurityTests
         // Assert
         var customFunc = env.GetVariable("customFunc");
         Assert.IsNotNull(customFunc, "Host function should be added to environment");
-        Assert.IsInstanceOfType(customFunc, typeof(BuiltinFunction));
+        Assert.AreEqual(LuaType.Function, customFunc.Type, "Host function should be of function type");
     }
 
     [TestMethod]

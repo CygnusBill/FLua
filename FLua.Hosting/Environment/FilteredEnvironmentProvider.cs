@@ -21,11 +21,11 @@ public class FilteredEnvironmentProvider : IEnvironmentProvider
     
     public LuaEnvironment CreateEnvironment(TrustLevel trustLevel, LuaHostOptions? options = null)
     {
-        var env = new LuaEnvironment();
+        // Start with the standard environment and then filter it
+        var env = LuaEnvironment.CreateStandardEnvironment();
         
-        // Add functions based on trust level
-        AddBasicFunctions(env, trustLevel);
-        AddLibraries(env, trustLevel);
+        // Filter functions based on trust level
+        FilterEnvironmentByTrustLevel(env, trustLevel);
         
         // Configure module system if resolver provided
         if (options?.ModuleResolver != null)
@@ -46,6 +46,66 @@ public class FilteredEnvironmentProvider : IEnvironmentProvider
         }
         
         return env;
+    }
+    
+    private void FilterEnvironmentByTrustLevel(LuaEnvironment env, TrustLevel trustLevel)
+    {
+        // Remove dangerous functions based on trust level
+        var functionsToRemove = new List<string>();
+        
+        switch (trustLevel)
+        {
+            case TrustLevel.Untrusted:
+                // Remove everything except the most basic functions
+                functionsToRemove.AddRange(new[] {
+                    "load", "loadfile", "dofile", "require",
+                    "io", "os", "debug", "package",
+                    "collectgarbage", "rawget", "rawset", "rawequal", "rawlen",
+                    "setmetatable", "getmetatable",
+                    "pcall", "xpcall", "error"
+                });
+                break;
+                
+            case TrustLevel.Sandbox:
+                // Remove dangerous functions but keep safe libraries
+                functionsToRemove.AddRange(new[] {
+                    "load", "loadfile", "dofile", "require",
+                    "io", "os", "debug"
+                });
+                break;
+                
+            case TrustLevel.Restricted:
+                // Remove file I/O and dangerous OS functions
+                functionsToRemove.AddRange(new[] {
+                    "loadfile", "dofile",
+                    "io", "debug"
+                });
+                // Also remove dangerous OS functions (but keep time functions)
+                if (env.GetVariable("os").AsTable<LuaTable>() is { } osTable)
+                {
+                    osTable.Set("execute", LuaValue.Nil);
+                    osTable.Set("exit", LuaValue.Nil);
+                    osTable.Set("setenv", LuaValue.Nil);
+                    osTable.Set("remove", LuaValue.Nil);
+                    osTable.Set("rename", LuaValue.Nil);
+                }
+                break;
+                
+            case TrustLevel.Trusted:
+                // Remove only debug library
+                functionsToRemove.Add("debug");
+                break;
+                
+            case TrustLevel.FullTrust:
+                // Keep everything
+                break;
+        }
+        
+        // Remove the functions
+        foreach (var func in functionsToRemove)
+        {
+            env.SetVariable(func, LuaValue.Nil);
+        }
     }
     
     public void ConfigureModuleSystem(LuaEnvironment environment, IModuleResolver? moduleResolver, TrustLevel trustLevel)
@@ -99,107 +159,6 @@ public class FilteredEnvironmentProvider : IEnvironmentProvider
             // Convert .NET objects to LuaValue
             var luaValue = ConvertToLuaValue(value);
             environment.SetVariable(name, luaValue);
-        }
-    }
-    
-    private void AddBasicFunctions(LuaEnvironment env, TrustLevel trustLevel)
-    {
-        // Copy implementations from LuaEnvironment.CreateStandardEnvironment()
-        // but only add functions allowed by trust level
-        
-        // Always available functions
-        env.SetVariable("print", new BuiltinFunction(args => 
-        {
-            Console.WriteLine(string.Join("\t", args.Select(a => a.ToString())));
-            return Array.Empty<LuaValue>();
-        }));
-        
-        env.SetVariable("type", new BuiltinFunction(args =>
-        {
-            if (args.Length == 0)
-                return new[] { (LuaValue)"no value" };
-            
-            var value = args[0];
-            string type = value.Type switch
-            {
-                LuaType.Nil => "nil",
-                LuaType.Boolean => "boolean",
-                LuaType.Float => "number",
-                LuaType.Integer => "number",
-                LuaType.String => "string",
-                LuaType.Table => "table",
-                LuaType.Function => "function",
-                LuaType.Thread => "thread",
-                _ => "userdata"
-            };
-            
-            return new[] { (LuaValue)type };
-        }));
-        
-        // Based on the LuaEnvironment source, we'll create our own implementations
-        // instead of trying to call private methods
-        if (trustLevel >= TrustLevel.Untrusted)
-        {
-            // Add more basic functions as needed
-        }
-        
-        if (trustLevel >= TrustLevel.Sandbox)
-        {
-            // Error handling functions
-            env.SetVariable("error", new BuiltinFunction(args =>
-            {
-                if (args.Length == 0)
-                    throw new LuaRuntimeException("error");
-                throw new LuaRuntimeException(args[0].ToString());
-            }));
-            
-            // Add more sandbox-level functions
-        }
-        
-        if (trustLevel >= TrustLevel.Trusted)
-        {
-            // Add trusted-level functions
-        }
-    }
-    
-    private void AddLibraries(LuaEnvironment env, TrustLevel trustLevel)
-    {
-        // Always safe libraries
-        if (_securityPolicy.IsAllowedLibrary("math", trustLevel))
-            LuaMathLib.AddMathLibrary(env);
-        if (_securityPolicy.IsAllowedLibrary("string", trustLevel))
-            LuaStringLib.AddStringLibrary(env);
-        
-        if (trustLevel >= TrustLevel.Sandbox)
-        {
-            if (_securityPolicy.IsAllowedLibrary("table", trustLevel))
-                LuaTableLib.AddTableLibrary(env);
-            if (_securityPolicy.IsAllowedLibrary("coroutine", trustLevel))
-                LuaCoroutineLib.AddCoroutineLibrary(env);
-            if (_securityPolicy.IsAllowedLibrary("utf8", trustLevel))
-                LuaUTF8Lib.AddUTF8Library(env);
-        }
-        
-        if (trustLevel >= TrustLevel.Restricted)
-        {
-            // IO with restrictions would be added here
-            // But since host controls I/O, we might provide a limited facade
-        }
-        
-        if (trustLevel >= TrustLevel.Trusted)
-        {
-            if (_securityPolicy.IsAllowedLibrary("io", trustLevel))
-                LuaIOLib.AddIOLibrary(env);
-            if (_securityPolicy.IsAllowedLibrary("os", trustLevel))
-                LuaOSLib.AddOSLibrary(env);
-            if (_securityPolicy.IsAllowedLibrary("package", trustLevel))
-                LuaPackageLib.AddPackageLibrary(env);
-        }
-        
-        if (trustLevel >= TrustLevel.FullTrust)
-        {
-            if (_securityPolicy.IsAllowedLibrary("debug", trustLevel))
-                LuaDebugLib.AddDebugLibrary(env);
         }
     }
     

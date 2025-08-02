@@ -5,6 +5,7 @@
     <ProjectReference Include="..\FLua.Compiler\FLua.Compiler.csproj" />
     <ProjectReference Include="..\FLua.Ast\FLua.Ast.fsproj" />
     <ProjectReference Include="..\FLua.Parser\FLua.Parser.fsproj" />
+    <ProjectReference Include="..\FLua.Interpreter\FLua.Interpreter.csproj" />
   </ItemGroup>
 
   <PropertyGroup>

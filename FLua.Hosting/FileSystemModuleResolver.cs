@@ -9,7 +9,7 @@ namespace FLua.Hosting;
 public class FileSystemModuleResolver : IModuleResolver
 {
     private readonly List<string> _searchPaths;
-    private readonly Dictionary<string, string> _moduleCache = new();
+    private readonly Dictionary<string, (string sourceCode, string path)> _moduleCache = new();
     private readonly bool _enableCaching;
     
     public IReadOnlyList<string> SearchPaths => _searchPaths.AsReadOnly();
@@ -23,18 +23,9 @@ public class FileSystemModuleResolver : IModuleResolver
     public async Task<ModuleResolutionResult> ResolveModuleAsync(string moduleName, ModuleContext context)
     {
         // Check cache first
-        if (_enableCaching && _moduleCache.TryGetValue(moduleName, out var cachedPath))
+        if (_enableCaching && _moduleCache.TryGetValue(moduleName, out var cached))
         {
-            try
-            {
-                var cachedSource = await File.ReadAllTextAsync(cachedPath);
-                return ModuleResolutionResult.CreateSuccess(cachedSource, cachedPath);
-            }
-            catch
-            {
-                // Cache might be stale, remove and continue
-                _moduleCache.Remove(moduleName);
-            }
+            return ModuleResolutionResult.CreateSuccess(cached.sourceCode, cached.path, cacheable: true);
         }
         
         // Convert module name to file path (e.g., "foo.bar" -> "foo/bar.lua")
@@ -58,13 +49,13 @@ public class FileSystemModuleResolver : IModuleResolver
                     
                     var sourceCode = await File.ReadAllTextAsync(fullPath);
                     
-                    // Cache the resolved path
+                    // Cache the resolved module
                     if (_enableCaching)
                     {
-                        _moduleCache[moduleName] = fullPath;
+                        _moduleCache[moduleName] = (sourceCode, fullPath);
                     }
                     
-                    return ModuleResolutionResult.CreateSuccess(sourceCode, fullPath);
+                    return ModuleResolutionResult.CreateSuccess(sourceCode, fullPath, cacheable: true);
                 }
                 catch (Exception ex)
                 {
@@ -94,10 +85,10 @@ public class FileSystemModuleResolver : IModuleResolver
                     
                     if (_enableCaching)
                     {
-                        _moduleCache[moduleName] = initPath;
+                        _moduleCache[moduleName] = (sourceCode, initPath);
                     }
                     
-                    return ModuleResolutionResult.CreateSuccess(sourceCode, initPath);
+                    return ModuleResolutionResult.CreateSuccess(sourceCode, initPath, cacheable: true);
                 }
                 catch (Exception ex)
                 {
@@ -118,8 +109,9 @@ public class FileSystemModuleResolver : IModuleResolver
         {
             TrustLevel.Untrusted => false, // No module loading
             TrustLevel.Sandbox => IsStandardLibraryModule(moduleName), // Only standard safe modules
-            TrustLevel.Restricted => !IsDangerousModule(moduleName), // Most modules except dangerous ones
-            TrustLevel.Trusted or TrustLevel.FullTrust => true, // All modules allowed
+            TrustLevel.Restricted => !IsDangerousModule(moduleName) && moduleName != "io", // Most modules except dangerous ones and io
+            TrustLevel.Trusted => moduleName != "debug" && !IsDangerousModule(moduleName), // All except debug
+            TrustLevel.FullTrust => true, // All modules allowed
             _ => false
         };
     }
@@ -151,10 +143,11 @@ public class FileSystemModuleResolver : IModuleResolver
     
     private bool IsDangerousModule(string moduleName)
     {
-        // Define potentially dangerous modules
+        // Define potentially dangerous modules (for Restricted level)
+        // Only debug and ffi are considered truly dangerous
         var dangerousModules = new HashSet<string>
         {
-            "ffi", "debug", "io", "os", "package"
+            "ffi", "debug"
         };
         
         return dangerousModules.Contains(moduleName.Split('.')[0]);
