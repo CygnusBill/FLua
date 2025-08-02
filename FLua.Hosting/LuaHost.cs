@@ -146,15 +146,62 @@ public class LuaHost : ILuaHost
             throw new LuaRuntimeException($"Compilation failed: {string.Join("; ", result.Errors ?? Enumerable.Empty<string>())}");
         }
         
-        // For now, return a placeholder delegate
-        // TODO: Extract the actual delegate from the compiled assembly
-        if (result.Assembly != null)
+        // Check if we got a compiled delegate
+        if (result.CompiledDelegate != null)
         {
-            // Need to extract the delegate from the assembly
-            throw new NotImplementedException("Lambda extraction from assembly not yet implemented");
+            // Wrap the compiled delegate to match the expected signature
+            var executeDelegate = (Func<LuaEnvironment, LuaValue[]>)result.CompiledDelegate;
+            
+            // Create a wrapper that matches the requested delegate type
+            if (delegateType == typeof(Func<LuaValue>))
+            {
+                return new Func<LuaValue>(() =>
+                {
+                    var env = _environmentProvider.CreateEnvironment(options.TrustLevel, options);
+                    var results = executeDelegate(env);
+                    return results.Length > 0 ? results[0] : LuaValue.Nil;
+                });
+            }
+            else if (delegateType.IsGenericType && delegateType.GetGenericTypeDefinition() == typeof(Func<>))
+            {
+                // Handle Func<T> where T is the return type
+                var returnType = delegateType.GetGenericArguments()[0];
+                var wrapperMethod = typeof(LuaHost).GetMethod(nameof(CreateTypedWrapper), BindingFlags.NonPublic | BindingFlags.Instance);
+                var genericMethod = wrapperMethod!.MakeGenericMethod(returnType);
+                return (Delegate)genericMethod.Invoke(this, new object[] { executeDelegate, options })!;
+            }
+            else
+            {
+                // For more complex delegate types, we'd need more sophisticated wrapping
+                throw new NotSupportedException($"Delegate type {delegateType} is not yet supported for lambda compilation");
+            }
         }
         
-        throw new NotImplementedException("Lambda generation not yet implemented in compiler");
+        throw new LuaRuntimeException("Lambda compilation did not produce a delegate");
+    }
+    
+    private Func<T> CreateTypedWrapper<T>(Func<LuaEnvironment, LuaValue[]> executeDelegate, LuaHostOptions options)
+    {
+        return () =>
+        {
+            var env = _environmentProvider.CreateEnvironment(options.TrustLevel, options);
+            var results = executeDelegate(env);
+            var result = results.Length > 0 ? results[0] : LuaValue.Nil;
+            
+            // Convert LuaValue to the requested type
+            if (typeof(T) == typeof(double))
+                return (T)(object)result.AsDouble();
+            else if (typeof(T) == typeof(long))
+                return (T)(object)result.AsInteger();
+            else if (typeof(T) == typeof(string))
+                return (T)(object)result.AsString();
+            else if (typeof(T) == typeof(bool))
+                return (T)(object)result.AsBoolean();
+            else if (typeof(T) == typeof(LuaValue))
+                return (T)(object)result;
+            else
+                throw new InvalidCastException($"Cannot convert LuaValue to type {typeof(T)}");
+        };
     }
     
     public Expression<Func<T>> CompileToExpression<T>(string luaCode, LuaHostOptions? options = null)

@@ -1,5 +1,6 @@
 using FLua.Ast;
 using FLua.Common.Diagnostics;
+using FLua.Runtime;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using System.Reflection;
@@ -22,7 +23,8 @@ public class RoslynLuaCompiler : ILuaCompiler
     [
         CompilationTarget.Library,
         CompilationTarget.ConsoleApp,
-        CompilationTarget.NativeAot
+        CompilationTarget.NativeAot,
+        CompilationTarget.Lambda
     ];
 
     public CompilationResult Compile(IList<Statement> ast, CompilerOptions options)
@@ -70,10 +72,14 @@ public class RoslynLuaCompiler : ILuaCompiler
                 File.WriteAllText(debugFile, csharpCode);
             }
             
-            // Handle AOT compilation differently
+            // Handle special compilation targets
             if (options.Target == CompilationTarget.NativeAot)
             {
                 return CompileAot(csharpCode, options, diagnostics);
+            }
+            else if (options.Target == CompilationTarget.Lambda)
+            {
+                return CompileLambda(csharpCode, ast, options, diagnostics);
             }
             
             // Compile using Roslyn for regular targets
@@ -365,6 +371,90 @@ public class RoslynLuaCompiler : ILuaCompiler
             {
                 // Ignore cleanup errors
             }
+        }
+    }
+    
+    private CompilationResult CompileLambda(string csharpCode, IList<Statement> ast, CompilerOptions options, IDiagnosticCollector diagnostics)
+    {
+        try
+        {
+            var syntaxTree = CSharpSyntaxTree.ParseText(csharpCode);
+            var references = GetReferences(options);
+            
+            var compilation = CSharpCompilation.Create(
+                assemblyName: options.AssemblyName ?? "LuaLambda",
+                syntaxTrees: [syntaxTree],
+                references: references,
+                options: new CSharpCompilationOptions(
+                    outputKind: OutputKind.DynamicallyLinkedLibrary,
+                    optimizationLevel: options.Optimization == OptimizationLevel.Release 
+                        ? Microsoft.CodeAnalysis.OptimizationLevel.Release 
+                        : Microsoft.CodeAnalysis.OptimizationLevel.Debug
+                )
+            );
+
+            using var ms = new MemoryStream();
+            var result = compilation.Emit(ms);
+
+            if (!result.Success)
+            {
+                var errors = result.Diagnostics
+                    .Where(d => d.Severity == DiagnosticSeverity.Error)
+                    .Select(d => d.ToString());
+                    
+                return new CompilationResult(
+                    Success: false,
+                    Errors: errors,
+                    Warnings: diagnostics.GetDiagnostics()
+                        .Where(d => d.Severity == ErrorSeverity.Warning)
+                        .Select(d => d.Message)
+                );
+            }
+
+            // Load the assembly and create a delegate
+            var assembly = Assembly.Load(ms.ToArray());
+            var scriptType = assembly.GetType($"{options.AssemblyName ?? "CompiledLuaScript"}.LuaScript");
+            
+            if (scriptType == null)
+            {
+                return new CompilationResult(
+                    Success: false,
+                    Errors: ["Could not find LuaScript type in compiled assembly"]
+                );
+            }
+            
+            var executeMethod = scriptType.GetMethod("Execute", BindingFlags.Public | BindingFlags.Static);
+            if (executeMethod == null)
+            {
+                return new CompilationResult(
+                    Success: false,
+                    Errors: ["Could not find Execute method in LuaScript type"]
+                );
+            }
+            
+            // Create a delegate that wraps the Execute method
+            var delegateType = typeof(Func<LuaEnvironment, LuaValue[]>);
+            var compiledDelegate = Delegate.CreateDelegate(delegateType, executeMethod);
+
+            return new CompilationResult(
+                Success: true,
+                Assembly: ms.ToArray(),
+                CompiledDelegate: compiledDelegate,
+                GeneratedType: scriptType,
+                Warnings: diagnostics.GetDiagnostics()
+                    .Where(d => d.Severity == ErrorSeverity.Warning)
+                    .Select(d => d.Message)
+            );
+        }
+        catch (Exception ex)
+        {
+            return new CompilationResult(
+                Success: false,
+                Errors: [$"Lambda compilation failed: {ex.Message}"],
+                Warnings: diagnostics.GetDiagnostics()
+                    .Where(d => d.Severity == ErrorSeverity.Warning)
+                    .Select(d => d.Message)
+            );
         }
     }
 }
