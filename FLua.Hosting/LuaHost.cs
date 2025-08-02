@@ -90,8 +90,31 @@ public class LuaHost : ILuaHost
     
     private LuaValue ExecuteInternal(FSharpList<Statement> statements, LuaEnvironment env)
     {
-        var results = _interpreter.ExecuteStatements(statements);
-        return results.Length > 0 ? results[0] : LuaValue.Nil;
+        // Save current interpreter environment
+        var originalEnv = _interpreter.GetType()
+            .GetField("_environment", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
+            ?.GetValue(_interpreter) as LuaEnvironment;
+        
+        try
+        {
+            // Set our custom environment
+            _interpreter.GetType()
+                .GetField("_environment", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
+                ?.SetValue(_interpreter, env);
+                
+            var results = _interpreter.ExecuteStatements(statements);
+            return results.Length > 0 ? results[0] : LuaValue.Nil;
+        }
+        finally
+        {
+            // Restore original environment
+            if (originalEnv != null)
+            {
+                _interpreter.GetType()
+                    .GetField("_environment", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
+                    ?.SetValue(_interpreter, originalEnv);
+            }
+        }
     }
     
     public async Task<LuaValue> ExecuteAsync(string luaCode, LuaHostOptions? options = null, CancellationToken cancellationToken = default)
