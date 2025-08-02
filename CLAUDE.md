@@ -342,3 +342,8 @@ dotnet run --project FLua.Cli -- compile script.lua --target Library
 - `LuaTests/`: Official Lua test suite (for compatibility testing)
 - `ARCHITECTURE_COMPLIANCE_REPORT.md`: Architectural analysis and compliance status
 - `TODO_COMPILER.md`: Compiler development task list and progress tracking
+
+## Compiler Internals Documentation
+- `docs/compiler-internals/lua-5.4-language-fundamentals.md`: Core Lua 5.4 concepts for compiler implementation
+- `docs/compiler-internals/roslyn-syntax-generation.md`: Comprehensive guide to Roslyn syntax generation APIs
+- `docs/compiler-internals/flua-compiler-architecture.md`: Detailed compiler architecture and code generation patterns
