@@ -1669,57 +1669,167 @@ namespace FLua.Compiler
             
             // Lua generic for loops work with iterators
             // for k,v in pairs(t) do ... end
-            // Translates to calling the iterator function repeatedly until it returns nil
+            // The iterator expressions should evaluate to 3 values: iterator function, state, initial value
             
-            // Get the iterator function (first expression)
             if (exprs.Count == 0)
             {
                 throw new InvalidOperationException("Generic for loop requires at least one expression");
             }
             
-            var iterExpr = exprs[0];
+            // First, we need to evaluate all iterator expressions and collect the results
+            // Similar to how we handle multiple assignment
+            var iterValuesName = "_iter_values";
+            var allIterValues = new List<ExpressionSyntax>();
             
-            // Call the iterator to get the actual iterator function, state, and initial value
-            var iterCallName = "_iter_call";
+            for (int i = 0; i < exprs.Count; i++)
+            {
+                var expr = exprs[i];
+                
+                // If this is the last expression and it returns multiple values, we need to handle that
+                if (i == exprs.Count - 1)
+                {
+                    // Check if it's a function call that might return multiple values
+                    if (expr.IsFunctionCall)
+                    {
+                        var funcCall = (Expr.FunctionCall)expr;
+                        var func = funcCall.Item1;
+                        var args = FSharpListToList(funcCall.Item2);
+                        // Generate the function call expression that returns LuaValue[]
+                        allIterValues.Add(GenerateFunctionCallRaw(func, args));
+                    }
+                    else if (expr.IsMethodCall)
+                    {
+                        var methodCall = (Expr.MethodCall)expr;
+                        // Generate the method call expression that returns LuaValue[]
+                        allIterValues.Add(GenerateMethodCall(methodCall.Item1, methodCall.Item2, FSharpListToList(methodCall.Item3)));
+                    }
+                    else
+                    {
+                        // Single value - wrap in array
+                        var lastExprResult = GenerateExpression(expr);
+                        allIterValues.Add(ArrayCreationExpression(
+                            ArrayType(IdentifierName("LuaValue"))
+                                .WithRankSpecifiers(SingletonList(ArrayRankSpecifier())))
+                            .WithInitializer(InitializerExpression(
+                                SyntaxKind.ArrayInitializerExpression,
+                                SeparatedList<ExpressionSyntax>(new[] { lastExprResult }))));
+                    }
+                }
+                else
+                {
+                    // Not the last expression - only use first return value
+                    var exprResult = GenerateExpression(expr);
+                    allIterValues.Add(ArrayCreationExpression(
+                        ArrayType(IdentifierName("LuaValue"))
+                            .WithRankSpecifiers(SingletonList(ArrayRankSpecifier())))
+                        .WithInitializer(InitializerExpression(
+                            SyntaxKind.ArrayInitializerExpression,
+                            SeparatedList<ExpressionSyntax>(new[] { exprResult }))));
+                }
+            }
+            
+            // Combine all iterator values into a single array
+            // In Lua, only the last expression can return multiple values, all others are truncated to 1
+            // So we need to manually combine arrays
+            ExpressionSyntax iterValuesExpr;
+            if (allIterValues.Count == 1)
+            {
+                iterValuesExpr = allIterValues[0];
+            }
+            else
+            {
+                // Create a list to collect all values
+                var allValuesElements = new List<ExpressionSyntax>();
+                
+                // Add all but the last (these are single-value arrays)
+                for (int i = 0; i < allIterValues.Count - 1; i++)
+                {
+                    // Each of these is a single-element array, so we just take [0]
+                    allValuesElements.Add(
+                        ElementAccessExpression(allIterValues[i])
+                            .AddArgumentListArguments(
+                                Argument(LiteralExpression(SyntaxKind.NumericLiteralExpression, Literal(0)))));
+                }
+                
+                // For the last one, we need to add all its elements
+                // We'll create a more complex expression that handles this at runtime
+                var tempListName = "_iter_temp_list";
+                statements.Add(LocalDeclarationStatement(
+                    VariableDeclaration(
+                        GenericName(Identifier("List"))
+                            .WithTypeArgumentList(
+                                TypeArgumentList(SingletonSeparatedList<TypeSyntax>(IdentifierName("LuaValue")))))
+                        .AddVariables(
+                            VariableDeclarator(Identifier(tempListName))
+                                .WithInitializer(EqualsValueClause(
+                                    ObjectCreationExpression(
+                                        GenericName(Identifier("List"))
+                                            .WithTypeArgumentList(
+                                                TypeArgumentList(SingletonSeparatedList<TypeSyntax>(IdentifierName("LuaValue")))))
+                                        .WithArgumentList(ArgumentList()))))));
+                
+                // Add all but last values
+                for (int i = 0; i < allIterValues.Count - 1; i++)
+                {
+                    statements.Add(ExpressionStatement(
+                        InvocationExpression(
+                            MemberAccessExpression(
+                                SyntaxKind.SimpleMemberAccessExpression,
+                                IdentifierName(tempListName),
+                                IdentifierName("Add")))
+                            .AddArgumentListArguments(
+                                Argument(ElementAccessExpression(allIterValues[i])
+                                    .AddArgumentListArguments(
+                                        Argument(LiteralExpression(SyntaxKind.NumericLiteralExpression, Literal(0))))))));
+                }
+                
+                // Add all values from the last array
+                statements.Add(ExpressionStatement(
+                    InvocationExpression(
+                        MemberAccessExpression(
+                            SyntaxKind.SimpleMemberAccessExpression,
+                            IdentifierName(tempListName),
+                            IdentifierName("AddRange")))
+                        .AddArgumentListArguments(
+                            Argument(allIterValues[allIterValues.Count - 1]))));
+                
+                // Convert list to array
+                iterValuesExpr = InvocationExpression(
+                    MemberAccessExpression(
+                        SyntaxKind.SimpleMemberAccessExpression,
+                        IdentifierName(tempListName),
+                        IdentifierName("ToArray")));
+            }
+            
+            // Store the combined iterator values
             statements.Add(LocalDeclarationStatement(
-                VariableDeclaration(IdentifierName("var"))
+                VariableDeclaration(
+                    ArrayType(IdentifierName("LuaValue"))
+                        .WithRankSpecifiers(SingletonList(ArrayRankSpecifier())))
                     .AddVariables(
-                        VariableDeclarator(Identifier(iterCallName))
-                            .WithInitializer(EqualsValueClause(
-                                InvocationExpression(
-                                    MemberAccessExpression(
-                                        SyntaxKind.SimpleMemberAccessExpression,
-                                        ParenthesizedExpression(
-                                            CastExpression(
-                                                IdentifierName("LuaFunction"),
-                                                GenerateExpression(iterExpr))),
-                                        IdentifierName("Call")))
-                                .AddArgumentListArguments(
-                                    Argument(ArrayCreationExpression(
-                                        ArrayType(IdentifierName("LuaValue"))
-                                            .WithRankSpecifiers(SingletonList(ArrayRankSpecifier())))
-                                        .WithInitializer(InitializerExpression(
-                                            SyntaxKind.ArrayInitializerExpression)))))))));
+                        VariableDeclarator(Identifier(iterValuesName))
+                            .WithInitializer(EqualsValueClause(iterValuesExpr)))));
             
-            // Extract iterator function, state, and control variable
+            // Extract iterator function, state, and initial value (pad with nil if needed)
             var iterFuncName = "_iter_func";
             var iterStateName = "_iter_state";
             var iterControlName = "_iter_control";
             
+            // Iterator function (index 0, required)
             statements.Add(LocalDeclarationStatement(
-                VariableDeclaration(IdentifierName("var"))
+                VariableDeclaration(IdentifierName("LuaValue"))
                     .AddVariables(
                         VariableDeclarator(Identifier(iterFuncName))
                             .WithInitializer(EqualsValueClause(
                                 ConditionalExpression(
                                     BinaryExpression(
-                                        SyntaxKind.GreaterThanOrEqualExpression,
+                                        SyntaxKind.GreaterThanExpression,
                                         MemberAccessExpression(
                                             SyntaxKind.SimpleMemberAccessExpression,
-                                            IdentifierName(iterCallName),
+                                            IdentifierName(iterValuesName),
                                             IdentifierName("Length")),
-                                        LiteralExpression(SyntaxKind.NumericLiteralExpression, Literal(1))),
-                                    ElementAccessExpression(IdentifierName(iterCallName))
+                                        LiteralExpression(SyntaxKind.NumericLiteralExpression, Literal(0))),
+                                    ElementAccessExpression(IdentifierName(iterValuesName))
                                         .AddArgumentListArguments(
                                             Argument(LiteralExpression(SyntaxKind.NumericLiteralExpression, Literal(0)))),
                                     MemberAccessExpression(
@@ -1727,20 +1837,36 @@ namespace FLua.Compiler
                                         IdentifierName("LuaValue"),
                                         IdentifierName("Nil"))))))));
             
+            // Check that we have a function
+            statements.Add(IfStatement(
+                PrefixUnaryExpression(
+                    SyntaxKind.LogicalNotExpression,
+                    MemberAccessExpression(
+                        SyntaxKind.SimpleMemberAccessExpression,
+                        IdentifierName(iterFuncName),
+                        IdentifierName("IsFunction"))),
+                ThrowStatement(
+                    ObjectCreationExpression(IdentifierName("LuaRuntimeException"))
+                        .AddArgumentListArguments(
+                            Argument(LiteralExpression(
+                                SyntaxKind.StringLiteralExpression,
+                                Literal("bad argument #1 to 'for iterator' (function expected)")))))));
+            
+            // State value (index 1, default to nil)
             statements.Add(LocalDeclarationStatement(
-                VariableDeclaration(IdentifierName("var"))
+                VariableDeclaration(IdentifierName("LuaValue"))
                     .AddVariables(
                         VariableDeclarator(Identifier(iterStateName))
                             .WithInitializer(EqualsValueClause(
                                 ConditionalExpression(
                                     BinaryExpression(
-                                        SyntaxKind.GreaterThanOrEqualExpression,
+                                        SyntaxKind.GreaterThanExpression,
                                         MemberAccessExpression(
                                             SyntaxKind.SimpleMemberAccessExpression,
-                                            IdentifierName(iterCallName),
+                                            IdentifierName(iterValuesName),
                                             IdentifierName("Length")),
-                                        LiteralExpression(SyntaxKind.NumericLiteralExpression, Literal(2))),
-                                    ElementAccessExpression(IdentifierName(iterCallName))
+                                        LiteralExpression(SyntaxKind.NumericLiteralExpression, Literal(1))),
+                                    ElementAccessExpression(IdentifierName(iterValuesName))
                                         .AddArgumentListArguments(
                                             Argument(LiteralExpression(SyntaxKind.NumericLiteralExpression, Literal(1)))),
                                     MemberAccessExpression(
@@ -1748,20 +1874,21 @@ namespace FLua.Compiler
                                         IdentifierName("LuaValue"),
                                         IdentifierName("Nil"))))))));
             
+            // Initial control value (index 2, default to nil)
             statements.Add(LocalDeclarationStatement(
-                VariableDeclaration(IdentifierName("var"))
+                VariableDeclaration(IdentifierName("LuaValue"))
                     .AddVariables(
                         VariableDeclarator(Identifier(iterControlName))
                             .WithInitializer(EqualsValueClause(
                                 ConditionalExpression(
                                     BinaryExpression(
-                                        SyntaxKind.GreaterThanOrEqualExpression,
+                                        SyntaxKind.GreaterThanExpression,
                                         MemberAccessExpression(
                                             SyntaxKind.SimpleMemberAccessExpression,
-                                            IdentifierName(iterCallName),
+                                            IdentifierName(iterValuesName),
                                             IdentifierName("Length")),
-                                        LiteralExpression(SyntaxKind.NumericLiteralExpression, Literal(3))),
-                                    ElementAccessExpression(IdentifierName(iterCallName))
+                                        LiteralExpression(SyntaxKind.NumericLiteralExpression, Literal(2))),
+                                    ElementAccessExpression(IdentifierName(iterValuesName))
                                         .AddArgumentListArguments(
                                             Argument(LiteralExpression(SyntaxKind.NumericLiteralExpression, Literal(2)))),
                                     MemberAccessExpression(
@@ -1775,17 +1902,23 @@ namespace FLua.Compiler
             // Call iterator function
             var iterResultName = "_iter_result";
             loopBodyStatements.Add(LocalDeclarationStatement(
-                VariableDeclaration(IdentifierName("var"))
+                VariableDeclaration(
+                    ArrayType(IdentifierName("LuaValue"))
+                        .WithRankSpecifiers(SingletonList(ArrayRankSpecifier())))
                     .AddVariables(
                         VariableDeclarator(Identifier(iterResultName))
                             .WithInitializer(EqualsValueClause(
                                 InvocationExpression(
                                     MemberAccessExpression(
                                         SyntaxKind.SimpleMemberAccessExpression,
-                                        ParenthesizedExpression(
-                                            CastExpression(
-                                                IdentifierName("LuaFunction"),
-                                                IdentifierName(iterFuncName))),
+                                        InvocationExpression(
+                                            MemberAccessExpression(
+                                                SyntaxKind.SimpleMemberAccessExpression,
+                                                IdentifierName(iterFuncName),
+                                                GenericName(Identifier("AsFunction"))
+                                                    .WithTypeArgumentList(
+                                                        TypeArgumentList(SingletonSeparatedList<TypeSyntax>(
+                                                            IdentifierName("LuaFunction")))))),
                                         IdentifierName("Call")))
                                 .AddArgumentListArguments(
                                     Argument(ArrayCreationExpression(
@@ -1801,7 +1934,7 @@ namespace FLua.Compiler
             // Check if first result is nil (end of iteration)
             var firstResultName = "_first_result";
             loopBodyStatements.Add(LocalDeclarationStatement(
-                VariableDeclaration(IdentifierName("var"))
+                VariableDeclaration(IdentifierName("LuaValue"))
                     .AddVariables(
                         VariableDeclarator(Identifier(firstResultName))
                             .WithInitializer(EqualsValueClause(
@@ -1842,9 +1975,9 @@ namespace FLua.Compiler
                 var (varName, attr) = vars[i];
                 var mangledName = GetOrCreateMangledName(varName);
                 
-                // var mangledName = iterResult.Length > i ? iterResult[i] : LuaValue.Nil;
+                // LuaValue mangledName = iterResult.Length > i ? iterResult[i] : LuaValue.Nil;
                 loopBodyStatements.Add(LocalDeclarationStatement(
-                    VariableDeclaration(IdentifierName("var"))
+                    VariableDeclaration(IdentifierName("LuaValue"))
                         .AddVariables(
                             VariableDeclarator(Identifier(SanitizeIdentifier(mangledName)))
                                 .WithInitializer(EqualsValueClause(
