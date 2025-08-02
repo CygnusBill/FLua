@@ -1055,6 +1055,17 @@ namespace FLua.Compiler
         
         private StatementSyntax GenerateReturn(IList<Expr> exprs)
         {
+            if (exprs.Count == 0)
+            {
+                // Return empty array
+                var emptyArray = ArrayCreationExpression(
+                    ArrayType(IdentifierName("LuaValue"))
+                        .WithRankSpecifiers(SingletonList(ArrayRankSpecifier(SingletonSeparatedList<ExpressionSyntax>(
+                            LiteralExpression(SyntaxKind.NumericLiteralExpression, Literal(0)))))));
+                
+                return ReturnStatement(emptyArray);
+            }
+            
             var exprArray = exprs.Select(e => GenerateExpression(e)).ToArray();
             
             var arrayCreation = ArrayCreationExpression(
@@ -1210,10 +1221,13 @@ namespace FLua.Compiler
             // Add default return if needed
             if (bodyStatements.Count == 0 || !IsReturnStatement(bodyStatements.Last()))
             {
-                bodyStatements.Add(ReturnStatement(
-                    ArrayCreationExpression(
-                        ArrayType(IdentifierName("LuaValue"))
-                            .WithRankSpecifiers(SingletonList(ArrayRankSpecifier(SingletonSeparatedList<ExpressionSyntax>(OmittedArraySizeExpression())))))));
+                // Return empty array - new LuaValue[0]
+                var emptyArray = ArrayCreationExpression(
+                    ArrayType(IdentifierName("LuaValue"))
+                        .WithRankSpecifiers(SingletonList(ArrayRankSpecifier())))
+                    .WithInitializer(InitializerExpression(
+                        SyntaxKind.ArrayInitializerExpression));
+                bodyStatements.Add(ReturnStatement(emptyArray));
             }
             
             ExitScope();
