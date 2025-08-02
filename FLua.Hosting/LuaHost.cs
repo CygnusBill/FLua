@@ -135,11 +135,8 @@ public class LuaHost : ILuaHost
             GenerateInMemory: true
         );
         
-        // Parse the code first
-        var stmts = ParserHelper.ParseString(luaCode);
-        
         // Compile to assembly
-        var result = _compiler.Compile(System.Linq.Enumerable.ToList(stmts), compilerOptions);
+        var result = _compiler.Compile(System.Linq.Enumerable.ToList(statements), compilerOptions);
         
         if (!result.Success)
         {
@@ -204,6 +201,27 @@ public class LuaHost : ILuaHost
         };
     }
     
+    private static T ConvertExpressionResult<T>(Func<LuaEnvironment, LuaValue[]> compiledFunc, LuaHost host, LuaHostOptions options)
+    {
+        var env = host._environmentProvider.CreateEnvironment(options.TrustLevel, options);
+        var results = compiledFunc(env);
+        var result = results.Length > 0 ? results[0] : LuaValue.Nil;
+        
+        // Convert based on type
+        if (typeof(T) == typeof(double))
+            return (T)(object)result.AsDouble();
+        else if (typeof(T) == typeof(long))
+            return (T)(object)result.AsInteger();
+        else if (typeof(T) == typeof(string))
+            return (T)(object)result.AsString();
+        else if (typeof(T) == typeof(bool))
+            return (T)(object)result.AsBoolean();
+        else if (typeof(T) == typeof(LuaValue))
+            return (T)(object)result;
+        else
+            throw new InvalidCastException($"Cannot convert LuaValue to type {typeof(T)}");
+    }
+    
     public Expression<Func<T>> CompileToExpression<T>(string luaCode, LuaHostOptions? options = null)
     {
         options ??= new LuaHostOptions();
@@ -235,15 +253,37 @@ public class LuaHost : ILuaHost
             throw new LuaRuntimeException($"Compilation failed: {string.Join("; ", result.Errors ?? Enumerable.Empty<string>())}");
         }
         
-        // For now, return a placeholder expression
-        // TODO: Extract the actual expression from the compiled result
-        if (result.Assembly != null)
+        // Check if we got an expression tree
+        if (result.ExpressionTree != null)
         {
-            // Need to extract the expression from the assembly
-            throw new NotImplementedException("Expression extraction from assembly not yet implemented");
+            // If the compiler can generate typed expressions directly, use that
+            if (result.ExpressionTree is Expression<Func<T>> typedExpr)
+            {
+                return typedExpr;
+            }
+            
+            // Otherwise, we need to adapt the expression
+            var untypedExpr = (Expression<Func<LuaEnvironment, LuaValue[]>>)result.ExpressionTree;
+            
+            // Compile the expression and create a wrapper
+            var compiledFunc = untypedExpr.Compile();
+            var hostRef = this;
+            var optionsRef = options;
+            
+            // Create a proper expression tree wrapper
+            // We can't directly call ConvertExpressionResult in an expression tree,
+            // so we need to build the expression manually
+            var wrapperFunc = new Func<T>(() => ConvertExpressionResult<T>(compiledFunc, hostRef, optionsRef));
+            
+            // Create an expression that invokes our wrapper function
+            var wrapperExpr = Expression.Lambda<Func<T>>(
+                Expression.Invoke(Expression.Constant(wrapperFunc))
+            );
+            
+            return wrapperExpr;
         }
         
-        throw new NotImplementedException("Expression tree generation not yet implemented in compiler");
+        throw new LuaRuntimeException("Expression tree generation did not produce an expression");
     }
     
     public Assembly CompileToAssembly(string luaCode, LuaHostOptions? options = null)

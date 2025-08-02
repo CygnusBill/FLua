@@ -24,7 +24,8 @@ public class RoslynLuaCompiler : ILuaCompiler
         CompilationTarget.Library,
         CompilationTarget.ConsoleApp,
         CompilationTarget.NativeAot,
-        CompilationTarget.Lambda
+        CompilationTarget.Lambda,
+        CompilationTarget.Expression
     ];
 
     public CompilationResult Compile(IList<Statement> ast, CompilerOptions options)
@@ -80,6 +81,10 @@ public class RoslynLuaCompiler : ILuaCompiler
             else if (options.Target == CompilationTarget.Lambda)
             {
                 return CompileLambda(csharpCode, ast, options, diagnostics);
+            }
+            else if (options.Target == CompilationTarget.Expression)
+            {
+                return CompileExpression(ast, options, diagnostics);
             }
             
             // Compile using Roslyn for regular targets
@@ -451,6 +456,33 @@ public class RoslynLuaCompiler : ILuaCompiler
             return new CompilationResult(
                 Success: false,
                 Errors: [$"Lambda compilation failed: {ex.Message}"],
+                Warnings: diagnostics.GetDiagnostics()
+                    .Where(d => d.Severity == ErrorSeverity.Warning)
+                    .Select(d => d.Message)
+            );
+        }
+    }
+    
+    private CompilationResult CompileExpression(IList<Statement> ast, CompilerOptions options, IDiagnosticCollector diagnostics)
+    {
+        try
+        {
+            var generator = new MinimalExpressionTreeGenerator(diagnostics);
+            var expressionTree = generator.Generate(ast);
+            
+            return new CompilationResult(
+                Success: true,
+                ExpressionTree: expressionTree,
+                Warnings: diagnostics.GetDiagnostics()
+                    .Where(d => d.Severity == ErrorSeverity.Warning)
+                    .Select(d => d.Message)
+            );
+        }
+        catch (Exception ex)
+        {
+            return new CompilationResult(
+                Success: false,
+                Errors: [$"Expression tree generation failed: {ex.Message}"],
                 Warnings: diagnostics.GetDiagnostics()
                     .Where(d => d.Severity == ErrorSeverity.Warning)
                     .Select(d => d.Message)
