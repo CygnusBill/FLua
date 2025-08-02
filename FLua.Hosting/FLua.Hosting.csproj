@@ -1,0 +1,16 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\FLua.Runtime\FLua.Runtime.csproj" />
+    <ProjectReference Include="..\FLua.Compiler\FLua.Compiler.csproj" />
+    <ProjectReference Include="..\FLua.Ast\FLua.Ast.fsproj" />
+    <ProjectReference Include="..\FLua.Parser\FLua.Parser.fsproj" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+</Project>

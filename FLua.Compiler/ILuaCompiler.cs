@@ -3,6 +3,8 @@ using System.Collections.Generic;
 
 namespace FLua.Compiler;
 
+using System.Linq.Expressions;
+
 /// <summary>
 /// Represents the output of a Lua compilation
 /// </summary>
@@ -11,7 +13,11 @@ public record CompilationResult(
     byte[]? Assembly = null,
     string? AssemblyPath = null,
     IEnumerable<string>? Errors = null,
-    IEnumerable<string>? Warnings = null
+    IEnumerable<string>? Warnings = null,
+    // Hosting-specific results
+    Delegate? CompiledDelegate = null,
+    LambdaExpression? ExpressionTree = null,
+    Type? GeneratedType = null
 );
 
 /// <summary>
@@ -23,7 +29,12 @@ public record CompilerOptions(
     OptimizationLevel Optimization = OptimizationLevel.Release,
     bool IncludeDebugInfo = false,
     string? AssemblyName = null,
-    IEnumerable<string>? References = null
+    IEnumerable<string>? References = null,
+    // Hosting-specific options
+    bool GenerateExpressionTree = false,
+    bool GenerateInMemory = false,
+    string? ModuleResolverTypeName = null,
+    Dictionary<string, string>? HostProvidedTypes = null
 );
 
 /// <summary>
@@ -33,7 +44,9 @@ public enum CompilationTarget
 {
     Library,        // .dll
     ConsoleApp,     // .exe
-    NativeAot       // native executable (future)
+    NativeAot,      // native executable (future)
+    Lambda,         // in-memory lambda/delegate
+    Expression      // expression tree
 }
 
 /// <summary>
