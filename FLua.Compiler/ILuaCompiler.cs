@@ -1,9 +1,9 @@
 using FLua.Ast;
+using System;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 
 namespace FLua.Compiler;
-
-using System.Linq.Expressions;
 
 /// <summary>
 /// Represents the output of a Lua compilation

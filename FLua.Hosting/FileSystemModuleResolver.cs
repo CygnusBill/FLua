@@ -183,7 +183,7 @@ public class FileSystemModuleResolver : IModuleResolver
         yield return Path.Combine(AppContext.BaseDirectory, "modules"); // Application modules
         
         // Add LUA_PATH environment variable paths if set
-        var luaPath = Environment.GetEnvironmentVariable("LUA_PATH");
+        var luaPath = System.Environment.GetEnvironmentVariable("LUA_PATH");
         if (!string.IsNullOrEmpty(luaPath))
         {
             foreach (var path in luaPath.Split(';'))

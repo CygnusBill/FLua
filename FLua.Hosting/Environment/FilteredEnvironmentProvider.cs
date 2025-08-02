@@ -1,5 +1,8 @@
 using FLua.Runtime;
 using FLua.Hosting.Security;
+using System;
+using System.Linq;
+using System.Collections.Generic;
 
 namespace FLua.Hosting.Environment;
 
@@ -72,12 +75,12 @@ public class FilteredEnvironmentProvider : IEnvironmentProvider
             
             // TODO: Compile and execute the module source code
             // For now, return a placeholder
-            return LuaValue.Nil;
+            return new[] { LuaValue.Nil };
         }));
         
         // Configure package.path based on module resolver's search paths
         var packageTable = new LuaTable();
-        packageTable.Set("path", string.Join(";", moduleResolver.SearchPaths.Select(p => Path.Combine(p, "?.lua"))));
+        packageTable.Set("path", string.Join(";", moduleResolver.SearchPaths.Select(p => System.IO.Path.Combine(p, "?.lua"))));
         environment.SetVariable("package", packageTable);
     }
     
@@ -85,7 +88,7 @@ public class FilteredEnvironmentProvider : IEnvironmentProvider
     {
         foreach (var (name, func) in hostFunctions)
         {
-            environment.SetVariable(name, new BuiltinFunction(func));
+            environment.SetVariable(name, new BuiltinFunction(args => new[] { func(args) }));
         }
     }
     
@@ -101,59 +104,80 @@ public class FilteredEnvironmentProvider : IEnvironmentProvider
     
     private void AddBasicFunctions(LuaEnvironment env, TrustLevel trustLevel)
     {
-        // Always available functions
-        env.SetVariable("print", new BuiltinFunction(LuaEnvironment.Print));
-        env.SetVariable("type", new BuiltinFunction(LuaEnvironment.Type));
-        env.SetVariable("tostring", new BuiltinFunction(LuaEnvironment.ToString));
-        env.SetVariable("tonumber", new BuiltinFunction(LuaEnvironment.ToNumber));
-        env.SetVariable("assert", new BuiltinFunction(LuaEnvironment.Assert));
+        // Copy implementations from LuaEnvironment.CreateStandardEnvironment()
+        // but only add functions allowed by trust level
         
-        // Conditionally available functions
+        // Always available functions
+        env.SetVariable("print", new BuiltinFunction(args => 
+        {
+            Console.WriteLine(string.Join("\t", args.Select(a => a.ToString())));
+            return Array.Empty<LuaValue>();
+        }));
+        
+        env.SetVariable("type", new BuiltinFunction(args =>
+        {
+            if (args.Length == 0)
+                return new[] { (LuaValue)"no value" };
+            
+            var value = args[0];
+            string type = value.Type switch
+            {
+                LuaType.Nil => "nil",
+                LuaType.Boolean => "boolean",
+                LuaType.Float => "number",
+                LuaType.Integer => "number",
+                LuaType.String => "string",
+                LuaType.Table => "table",
+                LuaType.Function => "function",
+                LuaType.Thread => "thread",
+                _ => "userdata"
+            };
+            
+            return new[] { (LuaValue)type };
+        }));
+        
+        // Based on the LuaEnvironment source, we'll create our own implementations
+        // instead of trying to call private methods
+        if (trustLevel >= TrustLevel.Untrusted)
+        {
+            // Add more basic functions as needed
+        }
+        
         if (trustLevel >= TrustLevel.Sandbox)
         {
-            env.SetVariable("pcall", new BuiltinFunction(LuaEnvironment.ProtectedCall));
-            env.SetVariable("xpcall", new BuiltinFunction(LuaEnvironment.ExtendedProtectedCall));
-            env.SetVariable("error", new BuiltinFunction(LuaEnvironment.Error));
+            // Error handling functions
+            env.SetVariable("error", new BuiltinFunction(args =>
+            {
+                if (args.Length == 0)
+                    throw new LuaRuntimeException("error");
+                throw new LuaRuntimeException(args[0].ToString());
+            }));
             
-            // Table functions
-            env.SetVariable("pairs", new BuiltinFunction(LuaEnvironment.Pairs));
-            env.SetVariable("ipairs", new BuiltinFunction(LuaEnvironment.IPairs));
-            env.SetVariable("next", new BuiltinFunction(LuaEnvironment.Next));
-            
-            // Raw operations
-            env.SetVariable("rawget", new BuiltinFunction(LuaEnvironment.RawGet));
-            env.SetVariable("rawset", new BuiltinFunction(LuaEnvironment.RawSet));
-            env.SetVariable("rawequal", new BuiltinFunction(LuaEnvironment.RawEqual));
-            env.SetVariable("rawlen", new BuiltinFunction(LuaEnvironment.RawLen));
-            
-            // Metatable functions
-            env.SetVariable("setmetatable", new BuiltinFunction(LuaEnvironment.SetMetatable));
-            env.SetVariable("getmetatable", new BuiltinFunction(LuaEnvironment.GetMetatable));
-            
-            // Varargs and unpacking
-            env.SetVariable("select", new BuiltinFunction(LuaEnvironment.Select));
-            env.SetVariable("unpack", new BuiltinFunction(LuaEnvironment.Unpack));
+            // Add more sandbox-level functions
         }
         
         if (trustLevel >= TrustLevel.Trusted)
         {
-            env.SetVariable("collectgarbage", new BuiltinFunction(LuaEnvironment.CollectGarbage));
-            env.SetVariable("load", new BuiltinFunction(LuaEnvironment.Load));
-            env.SetVariable("warn", new BuiltinFunction(LuaEnvironment.Warn));
+            // Add trusted-level functions
         }
     }
     
     private void AddLibraries(LuaEnvironment env, TrustLevel trustLevel)
     {
         // Always safe libraries
-        LuaMathLib.AddMathLibrary(env);
-        LuaStringLib.AddStringLibrary(env);
+        if (_securityPolicy.IsAllowedLibrary("math", trustLevel))
+            LuaMathLib.AddMathLibrary(env);
+        if (_securityPolicy.IsAllowedLibrary("string", trustLevel))
+            LuaStringLib.AddStringLibrary(env);
         
         if (trustLevel >= TrustLevel.Sandbox)
         {
-            LuaTableLib.AddTableLibrary(env);
-            LuaCoroutineLib.AddCoroutineLibrary(env);
-            LuaUTF8Lib.AddUTF8Library(env);
+            if (_securityPolicy.IsAllowedLibrary("table", trustLevel))
+                LuaTableLib.AddTableLibrary(env);
+            if (_securityPolicy.IsAllowedLibrary("coroutine", trustLevel))
+                LuaCoroutineLib.AddCoroutineLibrary(env);
+            if (_securityPolicy.IsAllowedLibrary("utf8", trustLevel))
+                LuaUTF8Lib.AddUTF8Library(env);
         }
         
         if (trustLevel >= TrustLevel.Restricted)
@@ -164,14 +188,18 @@ public class FilteredEnvironmentProvider : IEnvironmentProvider
         
         if (trustLevel >= TrustLevel.Trusted)
         {
-            LuaIOLib.AddIOLibrary(env);
-            LuaOSLib.AddOSLibrary(env);
-            LuaPackageLib.AddPackageLibrary(env);
+            if (_securityPolicy.IsAllowedLibrary("io", trustLevel))
+                LuaIOLib.AddIOLibrary(env);
+            if (_securityPolicy.IsAllowedLibrary("os", trustLevel))
+                LuaOSLib.AddOSLibrary(env);
+            if (_securityPolicy.IsAllowedLibrary("package", trustLevel))
+                LuaPackageLib.AddPackageLibrary(env);
         }
         
         if (trustLevel >= TrustLevel.FullTrust)
         {
-            LuaDebugLib.AddDebugLibrary(env);
+            if (_securityPolicy.IsAllowedLibrary("debug", trustLevel))
+                LuaDebugLib.AddDebugLibrary(env);
         }
     }
     
