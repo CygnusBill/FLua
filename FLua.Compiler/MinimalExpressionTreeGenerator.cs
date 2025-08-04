@@ -19,11 +19,13 @@ public class MinimalExpressionTreeGenerator
 {
     private readonly IDiagnosticCollector _diagnostics;
     private readonly ParameterExpression _envParameter;
+    private readonly Dictionary<string, ParameterExpression> _locals;
     
     public MinimalExpressionTreeGenerator(IDiagnosticCollector diagnostics)
     {
         _diagnostics = diagnostics;
         _envParameter = Expression.Parameter(typeof(LuaEnvironment), "env");
+        _locals = new Dictionary<string, ParameterExpression>();
     }
     
     /// <summary>
@@ -31,12 +33,40 @@ public class MinimalExpressionTreeGenerator
     /// </summary>
     public Expression<Func<LuaEnvironment, LuaValue[]>> Generate(IList<Statement> statements)
     {
+        var expressions = new List<Expression>();
         Expression returnValue = Expression.NewArrayInit(typeof(LuaValue));
         
-        // Only handle the first return statement found
+        // Process all statements
         foreach (var stmt in statements)
         {
-            if (stmt.IsReturn)
+            if (stmt.IsLocalAssignment)
+            {
+                var localStmt = (Statement.LocalAssignment)stmt;
+                var vars = localStmt.Item1;
+                var initExprs = localStmt.Item2;
+                
+                // Create local variables
+                for (int i = 0; i < vars.Length; i++)
+                {
+                    var (varName, _) = vars[i];
+                    var localVar = Expression.Variable(typeof(LuaValue), varName);
+                    _locals[varName] = localVar;
+                    
+                    // Initialize with value or nil
+                    Expression initValue = Expression.Field(null, typeof(LuaValue), nameof(LuaValue.Nil));
+                    if (OptionModule.IsSome(initExprs))
+                    {
+                        var exprArray = ListModule.ToArray(initExprs.Value);
+                        if (i < exprArray.Length)
+                        {
+                            initValue = GenerateExpression(exprArray[i]);
+                        }
+                    }
+                    
+                    expressions.Add(Expression.Assign(localVar, initValue));
+                }
+            }
+            else if (stmt.IsReturn)
             {
                 var returnStmt = (Statement.Return)stmt;
                 var exprOption = returnStmt.Item;
@@ -55,7 +85,15 @@ public class MinimalExpressionTreeGenerator
             }
         }
         
-        return Expression.Lambda<Func<LuaEnvironment, LuaValue[]>>(returnValue, _envParameter);
+        // Add the return expression
+        expressions.Add(returnValue);
+        
+        // Create block with local variables
+        var body = _locals.Count > 0 
+            ? Expression.Block(_locals.Values, expressions)
+            : Expression.Block(expressions);
+        
+        return Expression.Lambda<Func<LuaEnvironment, LuaValue[]>>(body, _envParameter);
     }
     
     private Expression GenerateExpression(Expr expr)
@@ -67,7 +105,12 @@ public class MinimalExpressionTreeGenerator
                 return GenerateLiteral(literal.Item);
                 
             case Expr.Var variable:
-                // Get variable from environment
+                // Check if it's a local variable first
+                if (_locals.TryGetValue(variable.Item, out var localVar))
+                {
+                    return localVar;
+                }
+                // Otherwise get from environment
                 var getMethod = typeof(LuaEnvironment).GetMethod(nameof(LuaEnvironment.GetVariable))!;
                 return Expression.Call(_envParameter, getMethod, Expression.Constant(variable.Item));
                 
@@ -75,6 +118,32 @@ public class MinimalExpressionTreeGenerator
                 var left = GenerateExpression(binary.Item1);
                 var right = GenerateExpression(binary.Item3);
                 return GenerateBinaryOp(left, binary.Item2, right);
+                
+            case Expr.TableAccess tableAccess:
+                // Handle table access like math.floor
+                var table = GenerateExpression(tableAccess.Item1);
+                var key = GenerateExpression(tableAccess.Item2);
+                var tableGetMethod = typeof(LuaTable).GetMethod(nameof(LuaTable.Get))!;
+                // Use the generic AsTable<T> method with LuaTable as the type parameter
+                var asTableMethod = typeof(LuaValue).GetMethod(nameof(LuaValue.AsTable), 1, Type.EmptyTypes)!
+                    .MakeGenericMethod(typeof(LuaTable));
+                var tableExpr = Expression.Call(table, asTableMethod);
+                return Expression.Call(tableExpr, tableGetMethod, key);
+                
+            case Expr.FunctionCall funcCall:
+                // Handle function calls
+                var func = GenerateExpression(funcCall.Item1);
+                var args = ListModule.ToArray(funcCall.Item2).Select(GenerateExpression).ToArray();
+                var argsArray = Expression.NewArrayInit(typeof(LuaValue), args);
+                var callMethod = typeof(LuaFunction).GetMethod(nameof(LuaFunction.Call))!;
+                // Use the non-generic AsFunction() method - need to filter since there's also a generic one
+                var asFuncMethod = typeof(LuaValue).GetMethods()
+                    .Where(m => m.Name == nameof(LuaValue.AsFunction) && !m.IsGenericMethodDefinition && m.GetParameters().Length == 0)
+                    .First();
+                var funcExpr = Expression.Call(func, asFuncMethod);
+                var callExpr = Expression.Call(funcExpr, callMethod, argsArray);
+                // Function calls return arrays, get first element
+                return Expression.ArrayIndex(callExpr, Expression.Constant(0));
                 
             default:
                 // Return nil for unsupported expressions
@@ -135,8 +204,8 @@ public class MinimalExpressionTreeGenerator
             return Expression.Call(null, typeof(LuaValue).GetMethod("op_Division", new[] { typeof(LuaValue), typeof(LuaValue) })!, left, right);
             
         if (op.IsConcat)
-            // String concatenation uses + operator in LuaValue
-            return Expression.Call(null, typeof(LuaValue).GetMethod("op_Addition", new[] { typeof(LuaValue), typeof(LuaValue) })!, left, right);
+            // String concatenation uses LuaOperations.Concat
+            return Expression.Call(typeof(LuaOperations), nameof(LuaOperations.Concat), null, left, right);
             
         if (op.IsEqual)
             return Expression.Call(typeof(LuaValue), nameof(LuaValue.Boolean), null,
