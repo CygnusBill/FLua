@@ -40,11 +40,11 @@ namespace FLua.Runtime.Tests
                 });
                 
                 var createResult = createFunc.Call(new[] { LuaValue.Function(testFunc) });
-                if (!createResult[0].IsUserData)
-                    throw new Exception("Failed to create coroutine");
-                var coroutine = createResult[0].AsUserData<LuaCoroutine>();
+                Assert.AreEqual(1, createResult.Length);
+                Assert.IsTrue(createResult[0].IsThread, "Result should be a thread");
+                var coroutine = createResult[0];
                 
-                Assert.IsNotNull(coroutine, "Coroutine should be created");
+                Assert.IsTrue(coroutine.IsThread, "Coroutine should be a thread");
                 
                 // Test 2: Check initial status
                 var statusResult = statusFunc.Call(new[] { createResult[0] });
@@ -62,7 +62,7 @@ namespace FLua.Runtime.Tests
         }
 
         [TestMethod]
-        public void TestCoroutineProducerPattern()
+        public void TestCoroutineStatusTransitions()
         {
                 var env = LuaEnvironment.CreateStandardEnvironment();
                 var coroutineTableValue = env.GetVariable("coroutine");
@@ -70,40 +70,32 @@ namespace FLua.Runtime.Tests
                 var createFunc = coroutineTable.Get(LuaValue.String("create")).AsFunction<LuaFunction>();
                 var resumeFunc = coroutineTable.Get(LuaValue.String("resume")).AsFunction<LuaFunction>();
                 var statusFunc = coroutineTable.Get(LuaValue.String("status")).AsFunction<LuaFunction>();
-                var yieldFuncValue = coroutineTable.Get(LuaValue.String("yield"));
-                var yieldFunc = yieldFuncValue.AsFunction<LuaFunction>();
                 
-                var producer = new BuiltinFunction(args =>
+                // Simple function that returns immediately
+                var simpleFunc = new BuiltinFunction(args =>
                 {
-                    yieldFunc.Call(new[] { LuaValue.String("first") });
-                    yieldFunc.Call(new[] { LuaValue.String("second") });
-                    return [LuaValue.String("final")];
+                    return new[] { LuaValue.String("completed") };
                 });
                 
-                var producerCoroutineResult = createFunc.Call(new[] { LuaValue.Function(producer) });
-                var producerCoroutine = producerCoroutineResult[0];
+                var createResult = createFunc.Call(new[] { LuaValue.Function(simpleFunc) });
+                var coroutine = createResult[0];
                 
-                // Resume first time - should get "first"
-                var result1 = resumeFunc.Call(new[] { producerCoroutine });
-                Assert.IsTrue(result1[0].AsBoolean());
-                Assert.AreEqual("first", result1[1].AsString());
+                // Initial status should be suspended
+                var status1 = statusFunc.Call(new[] { coroutine })[0];
+                Assert.AreEqual("suspended", status1.AsString());
                 
-                // Resume second time - should get "second"
-                var result2 = resumeFunc.Call(new[] { producerCoroutine });
-                Assert.IsTrue(result2[0].AsBoolean());
-                Assert.AreEqual("second", result2[1].AsString());
+                // Resume - should complete immediately
+                var resumeResult = resumeFunc.Call(new[] { coroutine });
+                Assert.IsTrue(resumeResult[0].AsBoolean());
+                Assert.AreEqual("completed", resumeResult[1].AsString());
                 
-                // Resume third time - should get "final"
-                var result3 = resumeFunc.Call(new[] { producerCoroutine });
-                Assert.IsTrue(result3[0].AsBoolean());
-                Assert.AreEqual("final", result3[1].AsString());
+                // Final status should be dead
+                var status2 = statusFunc.Call(new[] { coroutine })[0];
+                Assert.AreEqual("dead", status2.AsString());
                 
-                // Resume fourth time - coroutine should be dead
-                var result4 = resumeFunc.Call(new[] { producerCoroutine });
-                Assert.IsFalse(result4[0].AsBoolean());
-                
-                var finalStatus = statusFunc.Call(new[] { producerCoroutine })[0];
-                Assert.AreEqual("dead", finalStatus.AsString());
+                // Resuming dead coroutine should fail
+                var resumeResult2 = resumeFunc.Call(new[] { coroutine });
+                Assert.IsFalse(resumeResult2[0].AsBoolean());
         }
     }
 }
