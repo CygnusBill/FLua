@@ -40,6 +40,7 @@ FLua is designed with a hybrid F#/C# architecture:
 - [Lua 5.4 Language Fundamentals](docs/compiler-internals/lua-5.4-language-fundamentals.md) - Language design overview
 - [FLua Compiler Architecture](docs/compiler-internals/flua-compiler-architecture.md) - Compiler design
 - [Roslyn Syntax Generation](docs/compiler-internals/roslyn-syntax-generation.md) - C# code generation
+- [Closure Compilation Limitations](docs/compiler-internals/closure-compilation-limitations.md) - Variable capture and closure challenges
 
 ### Examples and Usage
 - [Examples README](examples/README.md) - Overview of all examples

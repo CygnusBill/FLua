@@ -36,6 +36,16 @@ Detailed description of the FLua compiler architecture:
 - Testing approach
 - Known limitations
 
+### [closure-compilation-limitations.md](closure-compilation-limitations.md)
+In-depth analysis of closure and variable capture limitations in compiled Lua:
+- Why closures are difficult to compile to static code
+- Variable capture and upvalue challenges
+- Current compilation behavior (what works/doesn't work)
+- Module compilation issues with private state
+- Practical workarounds and refactoring patterns
+- Best practices for compilable code
+- Future possibilities for closure support
+
 ## Purpose
 
 These documents serve as a reference for:
