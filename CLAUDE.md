@@ -160,3 +160,57 @@ The FLua hosting model allows embedding Lua scripts in .NET applications with va
 3. Add tests for new functionality
 4. Update relevant documentation
 5. Submit pull requests with clear descriptions
+
+## Use Cases
+
+### Lambda from Configuration
+The primary use case is compiling Lua expressions from configuration files into strongly-typed .NET lambdas for high-performance evaluation:
+
+```csharp
+// The Lua expression uses named variables
+string snippet = "a.prop1 * foo < 10";
+
+// At runtime, we have the actual values
+var complexObject = new SomeClass { prop1 = 5 };
+var fooValue = 6;
+
+public record Context(SomeClass A, int Foo);
+// Either through a dictionary/context object:
+var context = new Context(complexObject, fooValue);
+
+// Need to bind the Lua variable names to the actual values
+var ll = LuaLambdaCompiler.Create<Context, bool>(snippet, context);
+
+public static class LuaLambdaCompiler
+{
+   public Func<TContext, TResult> Create<TContext, TResult>(string snippet, TContext context)
+   { ... }
+}
+```
+
+#### Requirements for This Use Case:
+1. **Multiple statements** - Support full Lua scripts, not just expressions
+2. **Name translation** - Map .NET naming (PascalCase) to Lua conventions (snake_case/camelCase)
+   - `Context.SomeClass` → `some_class` or `someClass` in Lua
+   - `object.PropName` → `prop_name` or `propName` in Lua
+3. **Method calls** - Objects in context can have methods that Lua can invoke
+4. **Return value** - The last statement/expression is the return value
+5. **Direct .NET types** - No LuaValue wrapping, use native .NET types throughout
+6. **High performance** - Compiled delegates should run at near-native speed
+6. **Variable binding** - Need a way to connect expression variables to actual values
+
+#### This Simplifies Our Architecture:
+- Don't need full closure support (context is passed explicitly)
+- Don't need bytecode VM (expressions are simple)
+- Can use expression trees or IL generation
+- Type inference from context type
+- AOT compilation friendly
+
+#### Implementation Approach:
+1. Parse Lua expression to AST
+2. Analyze context type via reflection
+3. Generate expression tree or IL that:
+   - Maps property access to context
+   - Handles type conversions
+   - Compiles to native delegate
+4. Cache compiled delegates by expression + context type
