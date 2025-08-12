@@ -78,7 +78,7 @@ public class FilteredEnvironmentProvider : IEnvironmentProvider
             case TrustLevel.Sandbox:
                 // Remove dangerous functions but keep safe libraries
                 functionsToRemove.AddRange(new[] {
-                    "load", "loadfile", "dofile", "require",
+                    "load", "loadfile", "dofile", // Don't remove require - it will be replaced with controlled version
                     "io", "os", "debug"
                 });
                 break;
@@ -262,27 +262,26 @@ public class FilteredEnvironmentProvider : IEnvironmentProvider
             }
             
             // Interpret the module
-            // Create a new interpreter instance for this module execution
+            // Create a new interpreter instance with the shared environment
             var moduleInterpreter = new LuaInterpreter();
             
-            // Get the current environment to save state
-            var originalEnv = moduleInterpreter.GetType()
-                .GetField("_environment", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
-                ?.GetValue(moduleInterpreter) as LuaEnvironment;
+            // HACK: Use reflection to set the environment since there's no public constructor
+            // This should be improved by adding a constructor that accepts an environment
+            var envField = moduleInterpreter.GetType()
+                .GetField("_environment", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
             
-            // Create module environment as child of the provided environment
-            var moduleEnv = new LuaEnvironment(environment);
-            
-            // Set module-specific variables
-            moduleEnv.SetVariable("...", moduleName); // Module name vararg
-            
-            // Temporarily set the module environment
-            moduleInterpreter.GetType()
-                .GetField("_environment", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
-                ?.SetValue(moduleInterpreter, moduleEnv);
-            
-            try
+            if (envField != null)
             {
+                // Create module environment as a child of the current environment
+                // This allows the module to see global functions including require
+                var moduleEnv = new LuaEnvironment(environment);
+                
+                // Set module-specific variables
+                moduleEnv.SetVariable("...", moduleName); // Module name vararg
+                
+                // Set the environment
+                envField.SetValue(moduleInterpreter, moduleEnv);
+                
                 // Execute the module
                 var moduleResults = moduleInterpreter.ExecuteStatements(statements);
                 
@@ -297,15 +296,9 @@ public class FilteredEnvironmentProvider : IEnvironmentProvider
                 var emptyTable = new LuaTable();
                 return new LuaValue[] { emptyTable };
             }
-            finally
+            else
             {
-                // Restore original environment if needed
-                if (originalEnv != null)
-                {
-                    moduleInterpreter.GetType()
-                        .GetField("_environment", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
-                        ?.SetValue(moduleInterpreter, originalEnv);
-                }
+                throw new InvalidOperationException("Cannot access interpreter environment field");
             }
         }
         catch (Exception ex) when (!(ex is LuaRuntimeException))

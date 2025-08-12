@@ -155,9 +155,14 @@ public class FileSystemModuleResolver : IModuleResolver
     
     private bool IsInSandboxPath(string fullPath)
     {
-        // Check if path is within allowed sandbox directories
-        // This is a simplified check - real implementation would be more robust
-        return fullPath.Contains("sandbox") || fullPath.Contains("modules");
+        // Check if path is within the configured search paths
+        // Sandbox level can only load modules from explicitly configured paths
+        var normalizedPath = Path.GetFullPath(fullPath).Replace('\\', '/');
+        return _searchPaths.Any(searchPath => 
+        {
+            var normalizedSearchPath = Path.GetFullPath(searchPath).Replace('\\', '/');
+            return normalizedPath.StartsWith(normalizedSearchPath, StringComparison.OrdinalIgnoreCase);
+        });
     }
     
     private bool IsSystemPath(string fullPath)
