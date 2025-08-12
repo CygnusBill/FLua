@@ -41,8 +41,6 @@ public class CecilCodeGenerator
     }
     
     private Scope _currentScope = new Scope();
-    private int _variableCounter = 0;
-    private int _anonymousFunctionCounter = 0;
     
     // Cached type references
     private TypeReference? _luaValueType;
@@ -190,7 +188,10 @@ public class CecilCodeGenerator
         _il.Emit(OpCodes.Ret);
         
         // Set entry point
-        _assembly.EntryPoint = mainMethod;
+        if (_assembly is not null)
+        {
+            _assembly.EntryPoint = mainMethod;
+        }
     }
     
     /// <summary>
@@ -663,7 +664,7 @@ public class CecilCodeGenerator
                 // Check if it's a table
                 _il.Emit(OpCodes.Dup);
                 var isTableProp = _module!.ImportReference(
-                    typeof(LuaValue).GetProperty("IsTable").GetMethod);
+                    typeof(LuaValue).GetProperty("IsTable")?.GetMethod!);
                 _il.Emit(OpCodes.Call, isTableProp);
                 
                 var isTable = _il.Create(OpCodes.Nop);
@@ -1053,7 +1054,7 @@ public class CecilCodeGenerator
         // Check if it's a table
         _il.Emit(OpCodes.Ldloc, tableValueLocal);
         var isTableProp = _module!.ImportReference(
-            typeof(LuaValue).GetProperty("IsTable").GetMethod);
+            typeof(LuaValue).GetProperty("IsTable")?.GetMethod!);
         _il.Emit(OpCodes.Call, isTableProp);
         
         var isTable = _il.Create(OpCodes.Nop);
@@ -1071,7 +1072,7 @@ public class CecilCodeGenerator
         // Extract LuaTable from LuaValue
         _il.Emit(OpCodes.Ldloc, tableValueLocal);
         var asTableMethod = _module.ImportReference(
-            typeof(LuaValue).GetMethod("AsTable").MakeGenericMethod(typeof(LuaTable)));
+            typeof(LuaValue).GetMethod("AsTable")?.MakeGenericMethod(typeof(LuaTable))!);
         _il.Emit(OpCodes.Call, asTableMethod);
         
         // Generate key expression
