@@ -66,6 +66,33 @@ public class MinimalExpressionTreeGenerator
                     expressions.Add(Expression.Assign(localVar, initValue));
                 }
             }
+            else if (stmt.IsLocalFunctionDef)
+            {
+                // Local function definitions are not supported in minimal expression trees
+                _diagnostics.Report(new FLuaDiagnostic
+                {
+                    Code = "EXPR-001",
+                    Severity = ErrorSeverity.Error,
+                    Message = "Local function definitions are not supported in expression tree compilation. Use a different compilation target for complex Lua programs."
+                });
+                // Create a local variable for the function name but set it to nil
+                var localFuncStmt = (Statement.LocalFunctionDef)stmt;
+                var funcName = localFuncStmt.Item1;
+                var localVar = Expression.Variable(typeof(LuaValue), funcName);
+                _locals[funcName] = localVar;
+                expressions.Add(Expression.Assign(localVar, Expression.Field(null, typeof(LuaValue), nameof(LuaValue.Nil))));
+            }
+            else if (stmt.IsFunctionDef)
+            {
+                // Global function definitions are not supported in minimal expression trees
+                _diagnostics.Report(new FLuaDiagnostic
+                {
+                    Code = "EXPR-002",
+                    Severity = ErrorSeverity.Error,
+                    Message = "Function definitions are not supported in expression tree compilation. Use a different compilation target for complex Lua programs."
+                });
+                // Skip this statement - global functions would be set in the environment
+            }
             else if (stmt.IsReturn)
             {
                 var returnStmt = (Statement.Return)stmt;
@@ -131,12 +158,30 @@ public class MinimalExpressionTreeGenerator
                 return Expression.Call(tableExpr, tableGetMethod, key);
                 
             case Expr.FunctionCall funcCall:
-                // Handle function calls
+                // Handle function calls with proper Lua-like error handling
                 var func = GenerateExpression(funcCall.Item1);
                 var args = ListModule.ToArray(funcCall.Item2).Select(GenerateExpression).ToArray();
                 var argsArray = Expression.NewArrayInit(typeof(LuaValue), args);
-                var callMethod = typeof(LuaFunction).GetMethod(nameof(LuaFunction.Call))!;
-                // Use the non-generic AsFunction() method - need to filter since there's also a generic one
+                
+                // Check if the value is nil and throw proper Lua error
+                var isNilCheck = Expression.Equal(
+                    Expression.Field(func, nameof(LuaValue.Type)),
+                    Expression.Constant(LuaType.Nil));
+                    
+                var nilErrorMessage = Expression.Constant("attempt to call a nil value");
+                var throwNilError = Expression.Throw(
+                    Expression.New(typeof(LuaRuntimeException).GetConstructor(new[] { typeof(string) })!, nilErrorMessage));
+                
+                // Check if the value is a function
+                var isFunctionCheck = Expression.Equal(
+                    Expression.Field(func, nameof(LuaValue.Type)),
+                    Expression.Constant(LuaType.Function));
+                    
+                var throwNotFunctionError = Expression.Throw(
+                    Expression.New(typeof(LuaRuntimeException).GetConstructor(new[] { typeof(string) })!, 
+                        Expression.Constant("attempt to call a non-function value")));
+                
+                // Use the non-generic AsFunction() method
                 var asFuncMethod = typeof(LuaValue).GetMethods()
                     .Where(m => m.Name == nameof(LuaValue.AsFunction) && !m.IsGenericMethodDefinition && m.GetParameters().Length == 0)
                     .FirstOrDefault();
@@ -145,13 +190,85 @@ public class MinimalExpressionTreeGenerator
                 {
                     throw new InvalidOperationException("Could not find non-generic AsFunction() method on LuaValue");
                 }
+                
                 var funcExpr = Expression.Call(func, asFuncMethod);
+                var callMethod = typeof(LuaFunction).GetMethod(nameof(LuaFunction.Call))!;
                 var callExpr = Expression.Call(funcExpr, callMethod, argsArray);
-                // Function calls return arrays, get first element
-                return Expression.ArrayIndex(callExpr, Expression.Constant(0));
+                
+                // Create conditional expression: if nil -> throw, else if not function -> throw, else call
+                var conditionalCall = Expression.Condition(
+                    isNilCheck,
+                    Expression.Block(typeof(LuaValue), throwNilError, Expression.Field(null, typeof(LuaValue), nameof(LuaValue.Nil))),
+                    Expression.Condition(
+                        isFunctionCheck,
+                        Expression.ArrayIndex(callExpr, Expression.Constant(0)), // Function calls return arrays, get first element
+                        Expression.Block(typeof(LuaValue), throwNotFunctionError, Expression.Field(null, typeof(LuaValue), nameof(LuaValue.Nil)))
+                    )
+                );
+                
+                return conditionalCall;
+                
+            case Expr.TableConstructor tableConstructor:
+                // Handle table constructors like {a = 10, b = 20}
+                var tableVar = Expression.Variable(typeof(LuaTable), "tableVar");
+                var newTable = Expression.New(typeof(LuaTable));
+                var setMethod = typeof(LuaTable).GetMethod(nameof(LuaTable.Set))!;
+                var blockExpressions = new List<Expression> { Expression.Assign(tableVar, newTable) };
+                
+                var fields = ListModule.ToArray(tableConstructor.Item);
+                foreach (var field in fields)
+                {
+                    if (field.IsNamedField)
+                    {
+                        // Handle {a = 10} style fields
+                        var namedField = (TableField.NamedField)field;
+                        var fieldKey = Expression.Call(typeof(LuaValue), nameof(LuaValue.String), null, Expression.Constant(namedField.Item1));
+                        var fieldValue = GenerateExpression(namedField.Item2);
+                        blockExpressions.Add(Expression.Call(tableVar, setMethod, fieldKey, fieldValue));
+                    }
+                    else if (field.IsKeyField)
+                    {
+                        // Handle {[key] = value} style fields
+                        var keyField = (TableField.KeyField)field;
+                        var fieldKey = GenerateExpression(keyField.Item1);
+                        var fieldValue = GenerateExpression(keyField.Item2);
+                        blockExpressions.Add(Expression.Call(tableVar, setMethod, fieldKey, fieldValue));
+                    }
+                    else if (field.IsExprField)
+                    {
+                        // Handle {value} style fields (array-like)
+                        var exprField = (TableField.ExprField)field;
+                        // For simple expressions, add as indexed values (1, 2, 3...)
+                        var indexKey = Expression.Call(typeof(LuaValue), nameof(LuaValue.Number), null, Expression.Constant((double)(blockExpressions.Count - 1)));
+                        var fieldValue = GenerateExpression(exprField.Item);
+                        blockExpressions.Add(Expression.Call(tableVar, setMethod, indexKey, fieldValue));
+                    }
+                }
+                
+                // Return the table wrapped in LuaValue
+                blockExpressions.Add(Expression.Call(typeof(LuaValue), nameof(LuaValue.Table), null, tableVar));
+                
+                return Expression.Block(new[] { tableVar }, blockExpressions);
+                
+            case Expr.FunctionDef functionDef:
+                // Function definitions are not supported in minimal expression trees
+                _diagnostics.Report(new FLuaDiagnostic
+                {
+                    Code = "EXPR-003",
+                    Severity = ErrorSeverity.Error,
+                    Message = "Function definitions are not supported in expression tree compilation. Use a different compilation target for complex Lua programs."
+                });
+                return Expression.Field(null, typeof(LuaValue), nameof(LuaValue.Nil));
                 
             default:
-                // Return nil for unsupported expressions
+                // Log what expression type is not supported
+                var exprType = expr.GetType().Name;
+                _diagnostics.Report(new FLuaDiagnostic
+                {
+                    Code = "EXPR-004",
+                    Severity = ErrorSeverity.Error,
+                    Message = $"Expression type '{exprType}' is not supported in minimal expression tree compilation."
+                });
                 return Expression.Field(null, typeof(LuaValue), nameof(LuaValue.Nil));
         }
     }
