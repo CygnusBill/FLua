@@ -23,11 +23,21 @@ namespace FLua.Interpreter
     public class LuaRepl
     {
         private readonly LuaInterpreter _interpreter;
+        private readonly TextReader _input;
+        private readonly TextWriter _output;
+        private readonly bool _exitOnQuit;
         private string? _incompleteInput;
         
-        public LuaRepl()
+        public LuaRepl() : this(Console.In, Console.Out, exitOnQuit: true)
+        {
+        }
+        
+        public LuaRepl(TextReader input, TextWriter output, bool exitOnQuit = false)
         {
             _interpreter = new LuaInterpreter();
+            _input = input ?? throw new ArgumentNullException(nameof(input));
+            _output = output ?? throw new ArgumentNullException(nameof(output));
+            _exitOnQuit = exitOnQuit;
             _incompleteInput = null;
         }
         
@@ -42,16 +52,16 @@ namespace FLua.Interpreter
             {
                 // Show appropriate prompt based on whether we're continuing input
                 string prompt = _incompleteInput != null ? "  >> " : "lua> ";
-                Console.Write(prompt);
-                string? line = Console.ReadLine();
+                _output.Write(prompt);
+                string? line = _input.ReadLine();
                 
                 // Handle end of input (null when piped input ends or Ctrl+D)
                 if (line == null)
                 {
                     if (_incompleteInput != null)
                     {
-                        Console.WriteLine();
-                        Console.WriteLine("❌ Incomplete input at end of stream");
+                        _output.WriteLine();
+                        _output.WriteLine("❌ Incomplete input at end of stream");
                     }
                     break;
                 }
@@ -70,6 +80,11 @@ namespace FLua.Interpreter
                 // Handle REPL commands
                 if (_incompleteInput == null && HandleReplCommands(line))
                 {
+                    // Check if it was a quit command and we're not supposed to exit
+                    if (!_exitOnQuit && (line.Trim().ToLowerInvariant() == ".quit" || line.Trim().ToLowerInvariant() == ".exit"))
+                    {
+                        break;
+                    }
                     continue;
                 }
                 
@@ -102,24 +117,24 @@ namespace FLua.Interpreter
                 }
             }
             
-            Console.WriteLine("Goodbye! 👋");
+            _output.WriteLine("Goodbye! 👋");
         }
         
         private void PrintBanner()
         {
-            Console.WriteLine();
-            Console.WriteLine("🚀 FLua Interactive REPL v2.1 (C#)");
-            Console.WriteLine("====================================");
-            Console.WriteLine("C# implementation of Lua interpreter");
-            Console.WriteLine("✨ Now with full module system support!");
-            Console.WriteLine();
-            Console.WriteLine("Commands:");
-            Console.WriteLine("  .help     - Show help");
-            Console.WriteLine("  .quit     - Exit the REPL");
-            Console.WriteLine("  .clear    - Clear screen");
-            Console.WriteLine();
-            Console.WriteLine("Enter Lua expressions or statements:");
-            Console.WriteLine();
+            _output.WriteLine();
+            _output.WriteLine("🚀 FLua Interactive REPL v2.1 (C#)");
+            _output.WriteLine("====================================");
+            _output.WriteLine("C# implementation of Lua interpreter");
+            _output.WriteLine("✨ Now with full module system support!");
+            _output.WriteLine();
+            _output.WriteLine("Commands:");
+            _output.WriteLine("  .help     - Show help");
+            _output.WriteLine("  .quit     - Exit the REPL");
+            _output.WriteLine("  .clear    - Clear screen");
+            _output.WriteLine();
+            _output.WriteLine("Enter Lua expressions or statements:");
+            _output.WriteLine();
         }
         
         private bool HandleReplCommands(string input)
@@ -128,16 +143,23 @@ namespace FLua.Interpreter
             {
                 case ".quit":
                 case ".exit":
-                    Console.WriteLine("Goodbye! 👋");
-                    Environment.Exit(0);
-                    return true; // Never reached
+                    _output.WriteLine("Goodbye! 👋");
+                    if (_exitOnQuit)
+                    {
+                        Environment.Exit(0);
+                    }
+                    return true;
                 
                 case ".help":
                     PrintHelp();
                     return true;
                 
                 case ".clear":
-                    Console.Clear();
+                    // Only clear if we're using the actual Console, not for testing
+                    if (_output == Console.Out)
+                    {
+                        Console.Clear();
+                    }
                     PrintBanner();
                     return true;
                 
@@ -148,51 +170,51 @@ namespace FLua.Interpreter
         
         private void PrintHelp()
         {
-            Console.WriteLine();
-            Console.WriteLine("FLua REPL Help:");
-            Console.WriteLine("===============");
-            Console.WriteLine();
-            Console.WriteLine("🔹 Expressions (return values):");
-            Console.WriteLine("   > 1 + 2 * 3");
-            Console.WriteLine("   > \"hello\" .. \" world\"");
-            Console.WriteLine();
-            Console.WriteLine("🔹 Statements (no return):");
-            Console.WriteLine("   > local x = 42");
-            Console.WriteLine("   > print(\"Hello, World!\")");
-            Console.WriteLine("   > x = x + 1");
-            Console.WriteLine();
-            Console.WriteLine("🔹 Multi-line (automatic detection):");
-            Console.WriteLine("   > local function factorial(n)");
-            Console.WriteLine("   >>   if n <= 1 then return 1");
-            Console.WriteLine("   >>   else return n * factorial(n-1) end");
-            Console.WriteLine("   >> end");
-            Console.WriteLine("   >>");
-            Console.WriteLine();
-            Console.WriteLine("🔹 Built-in functions:");
-            Console.WriteLine("   print(), type(), tostring(), tonumber(), pairs(), ipairs()");
-            Console.WriteLine("   pcall(), error(), setmetatable(), getmetatable()");
-            Console.WriteLine();
-            Console.WriteLine("🔹 Module System (✨ NEW):");
-            Console.WriteLine("   📦 require()    - Load modules: require('math'), require('string')");
-            Console.WriteLine("   📚 package.*   - loaded, path, searchers, searchpath()");
-            Console.WriteLine("   📋 Examples:   local math = require('math')");
-            Console.WriteLine("                  local str = require('string')");
-            Console.WriteLine();
-            Console.WriteLine("🔹 Standard Libraries:");
-            Console.WriteLine("   📐 math.*     - sin(), cos(), tan(), sqrt(), floor(), ceil()");
-            Console.WriteLine("                   abs(), max(), min(), pi, huge, random()");
-            Console.WriteLine("   📝 string.*   - len(), sub(), upper(), lower(), find()");
-            Console.WriteLine("                   gsub(), format(), char(), byte()");
-            Console.WriteLine("   📋 table.*    - insert(), remove(), concat(), sort()");
-            Console.WriteLine("                   pack(), unpack(), move()");
-            Console.WriteLine("   📁 io.*       - open(), close(), read(), write(), flush()");
-            Console.WriteLine("                   input(), output(), lines()");
-            Console.WriteLine("   🕐 os.*       - time(), date(), clock(), getenv()");
-            Console.WriteLine("                   exit(), tmpname(), difftime()");
-            Console.WriteLine("   🔤 utf8.*     - len(), char(), codepoint(), offset()");
-            Console.WriteLine("   ⚡ coroutine.* - create(), resume(), yield(), status()");
-            Console.WriteLine("                   running(), wrap(), isyieldable(), close()");
-            Console.WriteLine();
+            _output.WriteLine();
+            _output.WriteLine("FLua REPL Help:");
+            _output.WriteLine("===============");
+            _output.WriteLine();
+            _output.WriteLine("🔹 Expressions (return values):");
+            _output.WriteLine("   > 1 + 2 * 3");
+            _output.WriteLine("   > \"hello\" .. \" world\"");
+            _output.WriteLine();
+            _output.WriteLine("🔹 Statements (no return):");
+            _output.WriteLine("   > local x = 42");
+            _output.WriteLine("   > print(\"Hello, World!\")");
+            _output.WriteLine("   > x = x + 1");
+            _output.WriteLine();
+            _output.WriteLine("🔹 Multi-line (automatic detection):");
+            _output.WriteLine("   > local function factorial(n)");
+            _output.WriteLine("   >>   if n <= 1 then return 1");
+            _output.WriteLine("   >>   else return n * factorial(n-1) end");
+            _output.WriteLine("   >> end");
+            _output.WriteLine("   >>");
+            _output.WriteLine();
+            _output.WriteLine("🔹 Built-in functions:");
+            _output.WriteLine("   print(), type(), tostring(), tonumber(), pairs(), ipairs()");
+            _output.WriteLine("   pcall(), error(), setmetatable(), getmetatable()");
+            _output.WriteLine();
+            _output.WriteLine("🔹 Module System (✨ NEW):");
+            _output.WriteLine("   📦 require()    - Load modules: require('math'), require('string')");
+            _output.WriteLine("   📚 package.*   - loaded, path, searchers, searchpath()");
+            _output.WriteLine("   📋 Examples:   local math = require('math')");
+            _output.WriteLine("                  local str = require('string')");
+            _output.WriteLine();
+            _output.WriteLine("🔹 Standard Libraries:");
+            _output.WriteLine("   📐 math.*     - sin(), cos(), tan(), sqrt(), floor(), ceil()");
+            _output.WriteLine("                   abs(), max(), min(), pi, huge, random()");
+            _output.WriteLine("   📝 string.*   - len(), sub(), upper(), lower(), find()");
+            _output.WriteLine("                   gsub(), format(), char(), byte()");
+            _output.WriteLine("   📋 table.*    - insert(), remove(), concat(), sort()");
+            _output.WriteLine("                   pack(), unpack(), move()");
+            _output.WriteLine("   📁 io.*       - open(), close(), read(), write(), flush()");
+            _output.WriteLine("                   input(), output(), lines()");
+            _output.WriteLine("   🕐 os.*       - time(), date(), clock(), getenv()");
+            _output.WriteLine("                   exit(), tmpname(), difftime()");
+            _output.WriteLine("   🔤 utf8.*     - len(), char(), codepoint(), offset()");
+            _output.WriteLine("   ⚡ coroutine.* - create(), resume(), yield(), status()");
+            _output.WriteLine("                   running(), wrap(), isyieldable(), close()");
+            _output.WriteLine();
         }
         
         /// <summary>
@@ -346,7 +368,7 @@ namespace FLua.Interpreter
                         // Statement returned explicit values (like return statement)
                         foreach (var result in results)
                         {
-                            Console.WriteLine($"=> {result}");
+                            _output.WriteLine($"=> {result}");
                         }
                     }
                     else
@@ -357,13 +379,13 @@ namespace FLua.Interpreter
                         switch (outputBehavior)
                         {
                             case OutputBehavior.ShowNil:
-                                Console.WriteLine("=> nil");
+                                _output.WriteLine("=> nil");
                                 break;
                             case OutputBehavior.EvaluateAsExpression:
                                 try
                                 {
                                     var expressionResult = _interpreter.EvaluateExpression(input);
-                                    Console.WriteLine($"= {expressionResult}");
+                                    _output.WriteLine($"= {expressionResult}");
                                 }
                                 catch
                                 {
@@ -374,11 +396,11 @@ namespace FLua.Interpreter
                                 try
                                 {
                                     var expressionResult = _interpreter.EvaluateExpression(input);
-                                    Console.WriteLine($"=> {expressionResult}");
+                                    _output.WriteLine($"=> {expressionResult}");
                                 }
                                 catch
                                 {
-                                    Console.WriteLine("=> nil");
+                                    _output.WriteLine("=> nil");
                                 }
                                 break;
                             case OutputBehavior.NoOutput:
@@ -392,12 +414,12 @@ namespace FLua.Interpreter
                 {
                     // Cannot parse as statements, try as expression
                     var result = _interpreter.EvaluateExpression(input);
-                    Console.WriteLine($"= {result}");
+                    _output.WriteLine($"= {result}");
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"❌ Error: {ex.Message}");
+                _output.WriteLine($"❌ Error: {ex.Message}");
             }
         }
         
