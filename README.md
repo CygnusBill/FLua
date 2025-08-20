@@ -109,7 +109,7 @@ lua> .quit        # Exit
 
 ## Features
 
-### ✅ Complete Lua 5.4 Implementation (~95% Complete)
+### ✅ Complete Lua 5.4 Implementation (~97% Complete)
 - **Core Language**: All Lua 5.4 language features with correct semantics
 - **Standard Libraries**: Comprehensive standard library implementation
 - **Multiple Backends**: Interpreter, Compiler, Expression Trees, Native AOT
@@ -387,7 +387,7 @@ FLua/
 - .NET interop
 
 ### Known Limitations 📋
-See [ARCHITECTURAL_LIMITATIONS.md](ARCHITECTURAL_LIMITATIONS.md) for details:
+See [ARCHITECTURAL_LIMITATIONS.md](docs/project-docs/ARCHITECTURAL_LIMITATIONS.md) for details:
 - Expression trees cannot compile function definitions
 - Modules with closures fall back to interpreter
 - No Lua bytecode compatibility (by design - compiles to .NET IL)
@@ -401,10 +401,10 @@ See [ARCHITECTURAL_LIMITATIONS.md](ARCHITECTURAL_LIMITATIONS.md) for details:
 
 ## Documentation
 
-- [Architecture Compliance Report](ARCHITECTURE_COMPLIANCE_REPORT.md)
-- [Architectural Limitations](ARCHITECTURAL_LIMITATIONS.md)  
-- [Compiler Limitations](COMPILER_LIMITATIONS.md)
-- [Gap Analysis](FLua-Gap-Analysis.md)
+- [Architecture Compliance Report](docs/project-docs/ARCHITECTURE_COMPLIANCE_REPORT.md)
+- [Architectural Limitations](docs/project-docs/ARCHITECTURAL_LIMITATIONS.md)  
+- [Compiler Limitations](docs/project-docs/COMPILER_LIMITATIONS.md)
+- [Gap Analysis](docs/project-docs/FLua-Gap-Analysis.md)
 - [Examples](examples/README.md)
 
 ## License

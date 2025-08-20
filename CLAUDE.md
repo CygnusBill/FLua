@@ -24,15 +24,15 @@ FLua is designed with a hybrid F#/C# architecture:
 
 ### Core Documentation
 - [README.md](README.md) - Main project documentation
-- [FLua Gap Analysis](FLua-Gap-Analysis.md) - Lua 5.4 compatibility status
-- [Architecture Compliance Report](ARCHITECTURE_COMPLIANCE_REPORT.md) - Architecture review
-- [Lua Test Status Report](lua_test_status_report.md) - Test suite status
+- [FLua Gap Analysis](docs/project-docs/FLua-Gap-Analysis.md) - Lua 5.4 compatibility status
+- [Architecture Compliance Report](docs/project-docs/ARCHITECTURE_COMPLIANCE_REPORT.md) - Architecture review
+- [Lua Test Status Report](docs/project-docs/lua_test_status_report.md) - Test suite status
 
 ### Technical Documentation
-- [Parser Known Issues](PARSER_KNOWN_ISSUES.md) - Current parser limitations
-- [Error System Design](ERROR_SYSTEM_DESIGN.md) - Error handling architecture
-- [Compiler TODO](TODO_COMPILER.md) - Compiler feature roadmap
-- [Compiler Limitations](COMPILER_LIMITATIONS.md) - Known compiler limitations
+- [Parser Known Issues](docs/project-docs/PARSER_KNOWN_ISSUES.md) - Current parser limitations
+- [Error System Design](docs/project-docs/ERROR_SYSTEM_DESIGN.md) - Error handling architecture
+- [Compiler TODO](docs/project-docs/TODO_COMPILER.md) - Compiler feature roadmap
+- [Compiler Limitations](docs/project-docs/COMPILER_LIMITATIONS.md) - Known compiler limitations
 - [Lua 5.4 Grammar](FLua/Lua54-grammar.md) - Language grammar reference
 
 ### Compiler Internals
@@ -57,7 +57,7 @@ FLua is designed with a hybrid F#/C# architecture:
 - [Variable Attributes Tests](FLua.VariableAttributes.Tests/README.md) - Lua 5.4 attribute testing
 
 ### Build and Publishing
-- [Publishing README](README-publish.md) - Build and release process
+- [Publishing README](docs/project-docs/README-publish.md) - Build and release process
 
 ## Getting Started
 
