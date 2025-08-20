@@ -139,7 +139,12 @@ public class MinimalExpressionTreeGenerator
                 // Use the non-generic AsFunction() method - need to filter since there's also a generic one
                 var asFuncMethod = typeof(LuaValue).GetMethods()
                     .Where(m => m.Name == nameof(LuaValue.AsFunction) && !m.IsGenericMethodDefinition && m.GetParameters().Length == 0)
-                    .First();
+                    .FirstOrDefault();
+                
+                if (asFuncMethod == null)
+                {
+                    throw new InvalidOperationException("Could not find non-generic AsFunction() method on LuaValue");
+                }
                 var funcExpr = Expression.Call(func, asFuncMethod);
                 var callExpr = Expression.Call(funcExpr, callMethod, argsArray);
                 // Function calls return arrays, get first element
