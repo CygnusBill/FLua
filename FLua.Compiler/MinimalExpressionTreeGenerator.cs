@@ -197,16 +197,16 @@ public class MinimalExpressionTreeGenerator
     private Expression GenerateBinaryOp(Expression left, BinaryOp op, Expression right)
     {
         if (op.IsAdd)
-            return Expression.Call(null, typeof(LuaValue).GetMethod("op_Addition", new[] { typeof(LuaValue), typeof(LuaValue) })!, left, right);
+            return Expression.Call(typeof(LuaOperations), nameof(LuaOperations.Add), null, left, right);
             
         if (op.IsSubtract)
-            return Expression.Call(null, typeof(LuaValue).GetMethod("op_Subtraction", new[] { typeof(LuaValue), typeof(LuaValue) })!, left, right);
+            return Expression.Call(typeof(LuaOperations), nameof(LuaOperations.Subtract), null, left, right);
             
         if (op.IsMultiply)
-            return Expression.Call(null, typeof(LuaValue).GetMethod("op_Multiply", new[] { typeof(LuaValue), typeof(LuaValue) })!, left, right);
+            return Expression.Call(typeof(LuaOperations), nameof(LuaOperations.Multiply), null, left, right);
             
         if (op.IsFloatDiv)
-            return Expression.Call(null, typeof(LuaValue).GetMethod("op_Division", new[] { typeof(LuaValue), typeof(LuaValue) })!, left, right);
+            return Expression.Call(typeof(LuaOperations), nameof(LuaOperations.FloatDivide), null, left, right);
             
         if (op.IsConcat)
             // String concatenation uses LuaOperations.Concat
