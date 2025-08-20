@@ -207,8 +207,37 @@ public class FilteredEnvironmentProvider : IEnvironmentProvider
             double d => d,
             string s => s,
             LuaValue lv => lv,
-            _ => throw new ArgumentException($"Cannot convert type {value.GetType()} to LuaValue")
+            _ => ConvertObjectToTable(value)
         };
+    }
+
+    
+    private LuaValue ConvertObjectToTable(object obj)
+    {
+        return new ObjectFacadeTable(obj, this);
+    }
+
+    /// <summary>
+    /// A LuaTable facade that presents .NET object properties as table entries.
+    /// This avoids eager reflection-based conversion and maintains object identity.
+    /// </summary>
+    private class ObjectFacadeTable : LuaTable
+    {
+        public ObjectFacadeTable(object obj, FilteredEnvironmentProvider provider)
+        {
+            var type = obj.GetType();
+            
+            // Get all public properties and pre-populate the table
+            var properties = type.GetProperties(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance)
+                .Where(p => p.CanRead);
+                
+            foreach (var property in properties)
+            {
+                var value = property.GetValue(obj);
+                var luaValue = provider.ConvertToLuaValue(value);
+                this.Set(LuaValue.String(property.Name), luaValue);
+            }
+        }
     }
     
     private LuaValue[] ExecuteModule(ModuleResolutionResult result, string moduleName, LuaEnvironment environment, TrustLevel trustLevel)
