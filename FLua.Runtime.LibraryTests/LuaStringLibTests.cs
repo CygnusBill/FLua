@@ -676,6 +676,685 @@ public class LuaStringLibTests
     }
 
     #endregion
+    
+    #region Comprehensive Pack/Unpack Tests - Lee Copeland Methodology
+    
+    /// <summary>
+    /// Comprehensive pack/unpack tests covering all format specifiers.
+    /// Testing Approach: Equivalence Class Partitioning for each format type,
+    /// Boundary Value Analysis for size limits, Error Condition Testing.
+    /// </summary>
+    
+    #region Signed Integer Pack/Unpack Tests
+    
+    [TestMethod]
+    public void Pack_SignedByte_BoundaryValues()
+    {
+        // Testing Approach: Boundary Value Analysis - signed byte limits
+        var result = CallStringFunction("pack", LuaValue.String("b"), LuaValue.Integer(-128));
+        var bytes = Encoding.GetEncoding("ISO-8859-1").GetBytes(result.AsString());
+        Assert.AreEqual(1, bytes.Length);
+        Assert.AreEqual(128, bytes[0]); // -128 as unsigned
+        
+        result = CallStringFunction("pack", LuaValue.String("b"), LuaValue.Integer(127));
+        bytes = Encoding.GetEncoding("ISO-8859-1").GetBytes(result.AsString());
+        Assert.AreEqual(127, bytes[0]);
+    }
+    
+    [TestMethod]
+    public void Pack_SignedShort_ComprehensiveTest()
+    {
+        // Testing Approach: Equivalence Class Partitioning - 16-bit signed values
+        var result = CallStringFunction("pack", LuaValue.String("h"), LuaValue.Integer(0x1234));
+        var bytes = Encoding.GetEncoding("ISO-8859-1").GetBytes(result.AsString());
+        Assert.AreEqual(2, bytes.Length);
+        
+        var unpackResults = CallStringFunctionMultiple("unpack", LuaValue.String("h"), result);
+        Assert.AreEqual(0x1234L, unpackResults[0].AsInteger());
+    }
+    
+    [TestMethod]
+    public void Pack_UnsignedShort_WorksCorrectly()
+    {
+        // Testing Approach: Equivalence Class Partitioning - 16-bit unsigned values
+        var result = CallStringFunction("pack", LuaValue.String("H"), LuaValue.Integer(65535));
+        var bytes = Encoding.GetEncoding("ISO-8859-1").GetBytes(result.AsString());
+        Assert.AreEqual(2, bytes.Length);
+        
+        var unpackResults = CallStringFunctionMultiple("unpack", LuaValue.String("H"), result);
+        Assert.AreEqual(65535L, unpackResults[0].AsInteger());
+    }
+    
+    [TestMethod]
+    public void Pack_SignedLong_WorksCorrectly()
+    {
+        // Testing Approach: Equivalence Class Partitioning - 64-bit signed values
+        var result = CallStringFunction("pack", LuaValue.String("l"), LuaValue.Integer(0x123456789ABCDEF0));
+        var bytes = Encoding.GetEncoding("ISO-8859-1").GetBytes(result.AsString());
+        Assert.AreEqual(8, bytes.Length);
+        
+        var unpackResults = CallStringFunctionMultiple("unpack", LuaValue.String("l"), result);
+        Assert.AreEqual(0x123456789ABCDEF0L, unpackResults[0].AsInteger());
+    }
+    
+    [TestMethod]
+    public void Pack_UnsignedLong_WorksCorrectly()
+    {
+        // Testing Approach: Equivalence Class Partitioning - 64-bit unsigned values
+        var result = CallStringFunction("pack", LuaValue.String("L"), LuaValue.Integer(-1)); // Will be treated as max unsigned
+        var bytes = Encoding.GetEncoding("ISO-8859-1").GetBytes(result.AsString());
+        Assert.AreEqual(8, bytes.Length);
+    }
+    
+    [TestMethod]
+    public void Pack_LuaInteger_WorksCorrectly()
+    {
+        // Testing Approach: Equivalence Class Partitioning - lua_Integer type
+        var result = CallStringFunction("pack", LuaValue.String("j"), LuaValue.Integer(42));
+        var bytes = Encoding.GetEncoding("ISO-8859-1").GetBytes(result.AsString());
+        Assert.AreEqual(8, bytes.Length);
+        
+        var unpackResults = CallStringFunctionMultiple("unpack", LuaValue.String("j"), result);
+        Assert.AreEqual(42L, unpackResults[0].AsInteger());
+    }
+    
+    #endregion
+    
+    #region Variable Size Integer Tests
+    
+    [TestMethod]
+    public void Pack_VariableSizeSignedInteger_1Byte()
+    {
+        // Testing Approach: Boundary Value Analysis - variable size integers
+        var result = CallStringFunction("pack", LuaValue.String("i1"), LuaValue.Integer(127));
+        var bytes = Encoding.GetEncoding("ISO-8859-1").GetBytes(result.AsString());
+        Assert.AreEqual(1, bytes.Length);
+        Assert.AreEqual(127, bytes[0]);
+    }
+    
+    [TestMethod]
+    public void Pack_VariableSizeSignedInteger_4Bytes()
+    {
+        // Testing Approach: Equivalence Class Partitioning - 4-byte signed
+        var result = CallStringFunction("pack", LuaValue.String("i4"), LuaValue.Integer(0x12345678));
+        var bytes = Encoding.GetEncoding("ISO-8859-1").GetBytes(result.AsString());
+        Assert.AreEqual(4, bytes.Length);
+        
+        var unpackResults = CallStringFunctionMultiple("unpack", LuaValue.String("i4"), result);
+        Assert.AreEqual(0x12345678L, unpackResults[0].AsInteger());
+    }
+    
+    [TestMethod]
+    public void Pack_VariableSizeUnsignedInteger_8Bytes()
+    {
+        // Testing Approach: Boundary Value Analysis - maximum size
+        var result = CallStringFunction("pack", LuaValue.String("I8"), LuaValue.Integer(0x123456789ABCDEF0));
+        var bytes = Encoding.GetEncoding("ISO-8859-1").GetBytes(result.AsString());
+        Assert.AreEqual(8, bytes.Length);
+    }
+    
+    [TestMethod]
+    [ExpectedException(typeof(LuaRuntimeException))]
+    public void Pack_VariableSizeInteger_TooLarge_ThrowsException()
+    {
+        // Testing Approach: Error Condition Testing - size limit exceeded
+        CallStringFunction("pack", LuaValue.String("i9"), LuaValue.Integer(42));
+    }
+    
+    #endregion
+    
+    #region Floating Point Pack/Unpack Tests
+    
+    [TestMethod]
+    public void Pack_Float_PrecisionTest()
+    {
+        // Testing Approach: Equivalence Class Partitioning - float precision
+        var result = CallStringFunction("pack", LuaValue.String("f"), LuaValue.Float(3.14159f));
+        var bytes = Encoding.GetEncoding("ISO-8859-1").GetBytes(result.AsString());
+        Assert.AreEqual(4, bytes.Length);
+        
+        var unpackResults = CallStringFunctionMultiple("unpack", LuaValue.String("f"), result);
+        Assert.AreEqual(3.14159f, unpackResults[0].AsFloat(), 0.00001f);
+    }
+    
+    [TestMethod]
+    public void Pack_Double_PrecisionTest()
+    {
+        // Testing Approach: Equivalence Class Partitioning - double precision
+        var result = CallStringFunction("pack", LuaValue.String("d"), LuaValue.Float(Math.PI));
+        var bytes = Encoding.GetEncoding("ISO-8859-1").GetBytes(result.AsString());
+        Assert.AreEqual(8, bytes.Length);
+        
+        var unpackResults = CallStringFunctionMultiple("unpack", LuaValue.String("d"), result);
+        Assert.AreEqual(Math.PI, unpackResults[0].AsDouble(), 1e-15);
+    }
+    
+    [TestMethod]
+    public void Pack_LuaNumber_WorksCorrectly()
+    {
+        // Testing Approach: Equivalence Class Partitioning - lua_Number type
+        var result = CallStringFunction("pack", LuaValue.String("n"), LuaValue.Float(2.71828));
+        var bytes = Encoding.GetEncoding("ISO-8859-1").GetBytes(result.AsString());
+        Assert.AreEqual(8, bytes.Length);
+        
+        var unpackResults = CallStringFunctionMultiple("unpack", LuaValue.String("n"), result);
+        Assert.AreEqual(2.71828, unpackResults[0].AsDouble(), 1e-15);
+    }
+    
+    #endregion
+    
+    #region String Pack/Unpack Tests
+    
+    [TestMethod]
+    public void Pack_FixedString_ExactSize()
+    {
+        // Testing Approach: Equivalence Class Partitioning - exact size match
+        var result = CallStringFunction("pack", LuaValue.String("c5"), LuaValue.String("hello"));
+        var bytes = Encoding.GetEncoding("ISO-8859-1").GetBytes(result.AsString());
+        Assert.AreEqual(5, bytes.Length);
+        Assert.AreEqual("hello", Encoding.GetEncoding("ISO-8859-1").GetString(bytes));
+        
+        var unpackResults = CallStringFunctionMultiple("unpack", LuaValue.String("c5"), result);
+        Assert.AreEqual("hello", unpackResults[0].AsString());
+    }
+    
+    [TestMethod]
+    public void Pack_FixedString_Padding()
+    {
+        // Testing Approach: Boundary Value Analysis - string shorter than size
+        var result = CallStringFunction("pack", LuaValue.String("c10"), LuaValue.String("hi"));
+        var bytes = Encoding.GetEncoding("ISO-8859-1").GetBytes(result.AsString());
+        Assert.AreEqual(10, bytes.Length);
+        Assert.AreEqual((byte)'h', bytes[0]);
+        Assert.AreEqual((byte)'i', bytes[1]);
+        Assert.AreEqual(0, bytes[2]); // zero padding
+        Assert.AreEqual(0, bytes[9]); // zero padding
+    }
+    
+    [TestMethod]
+    public void Pack_FixedString_Truncation()
+    {
+        // Testing Approach: Boundary Value Analysis - string longer than size
+        var result = CallStringFunction("pack", LuaValue.String("c3"), LuaValue.String("hello"));
+        var bytes = Encoding.GetEncoding("ISO-8859-1").GetBytes(result.AsString());
+        Assert.AreEqual(3, bytes.Length);
+        Assert.AreEqual("hel", Encoding.GetEncoding("ISO-8859-1").GetString(bytes));
+    }
+    
+    [TestMethod]
+    public void Pack_ZeroTerminatedString_ComprehensiveTest()
+    {
+        // Testing Approach: Equivalence Class Partitioning - null-terminated strings
+        var result = CallStringFunction("pack", LuaValue.String("z"), LuaValue.String("test"));
+        var bytes = Encoding.GetEncoding("ISO-8859-1").GetBytes(result.AsString());
+        Assert.AreEqual(5, bytes.Length); // 4 chars + null
+        Assert.AreEqual(0, bytes[4]); // null terminator
+        
+        var unpackResults = CallStringFunctionMultiple("unpack", LuaValue.String("z"), result);
+        Assert.AreEqual("test", unpackResults[0].AsString());
+    }
+    
+    [TestMethod]
+    public void Pack_StringWithLength_DefaultSize()
+    {
+        // Testing Approach: Equivalence Class Partitioning - length-prefixed strings
+        var result = CallStringFunction("pack", LuaValue.String("s"), LuaValue.String("hello"));
+        var bytes = Encoding.GetEncoding("ISO-8859-1").GetBytes(result.AsString());
+        Assert.AreEqual(13, bytes.Length); // 8 bytes length + 5 chars
+        
+        var unpackResults = CallStringFunctionMultiple("unpack", LuaValue.String("s"), result);
+        Assert.AreEqual("hello", unpackResults[0].AsString());
+    }
+    
+    [TestMethod]
+    public void Pack_StringWithLength_SpecifiedSize()
+    {
+        // Testing Approach: Equivalence Class Partitioning - custom length size
+        var result = CallStringFunction("pack", LuaValue.String("s2"), LuaValue.String("hi"));
+        var bytes = Encoding.GetEncoding("ISO-8859-1").GetBytes(result.AsString());
+        Assert.AreEqual(4, bytes.Length); // 2 bytes length + 2 chars
+        
+        var unpackResults = CallStringFunctionMultiple("unpack", LuaValue.String("s2"), result);
+        Assert.AreEqual("hi", unpackResults[0].AsString());
+    }
+    
+    [TestMethod]
+    [ExpectedException(typeof(LuaRuntimeException))]
+    public void Pack_StringLength_TooLarge_ThrowsException()
+    {
+        // Testing Approach: Error Condition Testing - length size limit
+        CallStringFunction("pack", LuaValue.String("s9"), LuaValue.String("test"));
+    }
+    
+    #endregion
+    
+    #region Special Format Tests
+    
+    [TestMethod]
+    public void Pack_Padding_WorksCorrectly()
+    {
+        // Testing Approach: Equivalence Class Partitioning - padding bytes
+        var result = CallStringFunction("pack", LuaValue.String("Bx"), LuaValue.Integer(65));
+        var bytes = Encoding.GetEncoding("ISO-8859-1").GetBytes(result.AsString());
+        Assert.AreEqual(2, bytes.Length);
+        Assert.AreEqual(65, bytes[0]); // 'A'
+        Assert.AreEqual(0, bytes[1]);  // padding
+    }
+    
+    [TestMethod]
+    public void Pack_SizeT_WorksCorrectly()
+    {
+        // Testing Approach: Equivalence Class Partitioning - size_t type
+        var result = CallStringFunction("pack", LuaValue.String("T"), LuaValue.Integer(12345));
+        var bytes = Encoding.GetEncoding("ISO-8859-1").GetBytes(result.AsString());
+        Assert.AreEqual(8, bytes.Length);
+        
+        var unpackResults = CallStringFunctionMultiple("unpack", LuaValue.String("T"), result);
+        Assert.AreEqual(12345L, unpackResults[0].AsInteger());
+    }
+    
+    [TestMethod]
+    public void Pack_LuaUnsigned_WorksCorrectly()
+    {
+        // Testing Approach: Equivalence Class Partitioning - lua_Unsigned type
+        var result = CallStringFunction("pack", LuaValue.String("J"), LuaValue.Integer(0xDEADBEEF));
+        var bytes = Encoding.GetEncoding("ISO-8859-1").GetBytes(result.AsString());
+        Assert.AreEqual(8, bytes.Length);
+        
+        var unpackResults = CallStringFunctionMultiple("unpack", LuaValue.String("J"), result);
+        Assert.AreEqual(0xDEADBEEF, unpackResults[0].AsInteger());
+    }
+    
+    #endregion
+    
+    #region Complex Format String Tests
+    
+    [TestMethod]
+    public void Pack_MultipleFormats_WorksCorrectly()
+    {
+        // Testing Approach: Control Flow Testing - multiple format specifiers
+        var result = CallStringFunction("pack", LuaValue.String("BHd"), 
+            LuaValue.Integer(65), LuaValue.Integer(0x1234), LuaValue.Float(Math.PI));
+        var bytes = Encoding.GetEncoding("ISO-8859-1").GetBytes(result.AsString());
+        Assert.AreEqual(11, bytes.Length); // 1 + 2 + 8 bytes
+        
+        var unpackResults = CallStringFunctionMultiple("unpack", LuaValue.String("BHd"), result);
+        Assert.AreEqual(4, unpackResults.Length); // 3 values + position
+        Assert.AreEqual(65L, unpackResults[0].AsInteger());
+        Assert.AreEqual(0x1234L, unpackResults[1].AsInteger());
+        Assert.AreEqual(Math.PI, unpackResults[2].AsDouble(), 1e-15);
+        Assert.AreEqual(12L, unpackResults[3].AsInteger()); // position after read
+    }
+    
+    [TestMethod]
+    public void Pack_WithWhitespace_IgnoresSpaces()
+    {
+        // Testing Approach: Error Condition Testing - format string parsing
+        var result1 = CallStringFunction("pack", LuaValue.String("B H"), 
+            LuaValue.Integer(65), LuaValue.Integer(0x1234));
+        var result2 = CallStringFunction("pack", LuaValue.String("BH"), 
+            LuaValue.Integer(65), LuaValue.Integer(0x1234));
+        
+        Assert.AreEqual(result1.AsString(), result2.AsString());
+    }
+    
+    [TestMethod]
+    public void PackSize_ComplexFormat_CalculatesCorrectly()
+    {
+        // Testing Approach: Equivalence Class Partitioning - size calculation
+        var result = CallStringFunction("packsize", LuaValue.String("bhHL"));
+        Assert.AreEqual(13L, result.AsInteger()); // 1 + 2 + 2 + 8 bytes
+        
+        result = CallStringFunction("packsize", LuaValue.String("i4fd"));
+        Assert.AreEqual(16L, result.AsInteger()); // 4 + 4 + 8 bytes
+    }
+    
+    [TestMethod]
+    [ExpectedException(typeof(LuaRuntimeException))]
+    public void PackSize_VariableLengthString_ThrowsException()
+    {
+        // Testing Approach: Error Condition Testing - variable length formats
+        CallStringFunction("packsize", LuaValue.String("s")); // string with length prefix
+    }
+    
+    #endregion
+    
+    #region Unpack Position Tests
+    
+    [TestMethod]
+    public void Unpack_WithPosition_StartsAtCorrectOffset()
+    {
+        // Testing Approach: Control Flow Testing - position parameter
+        var packedData = CallStringFunction("pack", LuaValue.String("BBB"), 
+            LuaValue.Integer(1), LuaValue.Integer(2), LuaValue.Integer(3));
+        
+        var unpackResults = CallStringFunctionMultiple("unpack", 
+            LuaValue.String("B"), packedData, LuaValue.Integer(2));
+        Assert.AreEqual(2, unpackResults.Length);
+        Assert.AreEqual(2L, unpackResults[0].AsInteger()); // second byte
+        Assert.AreEqual(3L, unpackResults[1].AsInteger()); // new position
+    }
+    
+    [TestMethod]
+    public void Unpack_MultipleValues_ReturnsAllWithPosition()
+    {
+        // Testing Approach: Control Flow Testing - multiple return values
+        var packedData = CallStringFunction("pack", LuaValue.String("Bhd"), 
+            LuaValue.Integer(42), LuaValue.Integer(0x5678), LuaValue.Float(2.718));
+        
+        var unpackResults = CallStringFunctionMultiple("unpack", LuaValue.String("Bhd"), packedData);
+        Assert.AreEqual(4, unpackResults.Length); // 3 values + position
+        Assert.AreEqual(42L, unpackResults[0].AsInteger());
+        Assert.AreEqual(0x5678L, unpackResults[1].AsInteger());
+        Assert.AreEqual(2.718, unpackResults[2].AsDouble(), 1e-15);
+        Assert.AreEqual(12L, unpackResults[3].AsInteger()); // position after read
+    }
+    
+    #endregion
+    
+    #region Error Condition Tests
+    
+    [TestMethod]
+    [ExpectedException(typeof(LuaRuntimeException))]
+    public void Pack_InvalidFormatSpecifier_ThrowsException()
+    {
+        // Testing Approach: Error Condition Testing - invalid format
+        CallStringFunction("pack", LuaValue.String("Q"), LuaValue.Integer(42));
+    }
+    
+    [TestMethod]
+    [ExpectedException(typeof(LuaRuntimeException))]
+    public void Unpack_InsufficientData_ThrowsException()
+    {
+        // Testing Approach: Error Condition Testing - data too short
+        var shortData = LuaValue.String("x"); // 1 byte
+        CallStringFunction("unpack", LuaValue.String("H"), shortData); // needs 2 bytes
+    }
+    
+    [TestMethod]
+    [ExpectedException(typeof(LuaRuntimeException))]
+    public void Pack_InsufficientArguments_ThrowsException()
+    {
+        // Testing Approach: Error Condition Testing - missing arguments
+        CallStringFunction("pack", LuaValue.String("BB"), LuaValue.Integer(42));
+        // Missing second argument for second 'B'
+    }
+    
+    #endregion
+
+    #endregion
+    
+    #region Match Function Tests - Comprehensive Coverage
+    
+    /// <summary>
+    /// Comprehensive tests for string.match function using Lee Copeland methodology.
+    /// The match function returns the matched string(s) instead of positions like find.
+    /// Testing Approach: Equivalence Class Partitioning for pattern types,
+    /// Boundary Value Analysis for edge cases, Error Condition Testing.
+    /// </summary>
+    
+    [TestMethod]
+    public void Match_SimplePattern_ReturnsMatchedString()
+    {
+        // Testing Approach: Basic functionality verification
+        var result = CallStringFunction("match", LuaValue.String("hello world"), LuaValue.String("wor"));
+        Assert.AreEqual("wor", result.AsString());
+    }
+    
+    [TestMethod]
+    public void Match_NoMatch_ReturnsNil()
+    {
+        // Testing Approach: Equivalence Class - no match case
+        var result = CallStringFunction("match", LuaValue.String("hello world"), LuaValue.String("xyz"));
+        Assert.AreEqual(LuaType.Nil, result.Type);
+    }
+    
+    [TestMethod]
+    public void Match_WithStartPosition_SearchesFromPosition()
+    {
+        // Testing Approach: Control Flow Testing - start position parameter
+        var result = CallStringFunction("match", LuaValue.String("hello hello"), LuaValue.String("hello"), LuaValue.Integer(6));
+        Assert.AreEqual("hello", result.AsString()); // Should match second "hello"
+    }
+    
+    [TestMethod]
+    public void Match_NegativeStartPosition_WorksFromEnd()
+    {
+        // Testing Approach: Boundary Value Analysis - negative position
+        var result = CallStringFunction("match", LuaValue.String("hello world"), LuaValue.String("world"), LuaValue.Integer(-5));
+        Assert.AreEqual("world", result.AsString());
+    }
+    
+    [TestMethod]
+    public void Match_StartBeyondString_ReturnsNil()
+    {
+        // Testing Approach: Boundary Value Analysis - out of bounds position
+        var result = CallStringFunction("match", LuaValue.String("hello"), LuaValue.String("hello"), LuaValue.Integer(10));
+        Assert.AreEqual(LuaType.Nil, result.Type);
+    }
+    
+    #region Pattern Matching Tests
+    
+    [TestMethod]
+    public void Match_DotWildcard_MatchesAnyCharacter()
+    {
+        // Testing Approach: Equivalence Class Partitioning - wildcard patterns
+        var result = CallStringFunction("match", LuaValue.String("abc123"), LuaValue.String("a.c"));
+        Assert.AreEqual("abc", result.AsString());
+    }
+    
+    [TestMethod]
+    public void Match_CharacterClass_MatchesSet()
+    {
+        // Testing Approach: Equivalence Class Partitioning - character classes
+        var result = CallStringFunction("match", LuaValue.String("hello123world"), LuaValue.String("[0-9]"));
+        Assert.AreEqual("1", result.AsString()); // First digit
+    }
+    
+    [TestMethod]
+    public void Match_NegatedCharacterClass_MatchesExceptSet()
+    {
+        // Testing Approach: Equivalence Class Partitioning - negated classes
+        var result = CallStringFunction("match", LuaValue.String("123abc456"), LuaValue.String("[^0-9]"));
+        Assert.AreEqual("a", result.AsString()); // First non-digit
+    }
+    
+    [TestMethod]
+    public void Match_EscapeSequences_MatchesCorrectly()
+    {
+        // Testing Approach: Equivalence Class Partitioning - escape sequences
+        var result = CallStringFunction("match", LuaValue.String("hello world 123"), LuaValue.String("%d"));
+        Assert.AreEqual("1", result.AsString()); // First digit
+        
+        result = CallStringFunction("match", LuaValue.String("hello world 123"), LuaValue.String("%a"));
+        Assert.AreEqual("h", result.AsString()); // First letter
+        
+        result = CallStringFunction("match", LuaValue.String("hello world 123"), LuaValue.String("%s"));
+        Assert.AreEqual(" ", result.AsString()); // First whitespace
+    }
+    
+    [TestMethod]
+    public void Match_Anchors_WorkCorrectly()
+    {
+        // Testing Approach: Equivalence Class Partitioning - anchor patterns
+        var result = CallStringFunction("match", LuaValue.String("hello world"), LuaValue.String("^hello"));
+        Assert.AreEqual("hello", result.AsString());
+        
+        result = CallStringFunction("match", LuaValue.String("hello world"), LuaValue.String("world$"));
+        Assert.AreEqual("world", result.AsString());
+        
+        result = CallStringFunction("match", LuaValue.String("hello"), LuaValue.String("^hello$"));
+        Assert.AreEqual("hello", result.AsString()); // Entire string
+    }
+    
+    [TestMethod]
+    public void Match_Quantifiers_WorkCorrectly()
+    {
+        // Testing Approach: Equivalence Class Partitioning - quantifier patterns
+        var result = CallStringFunction("match", LuaValue.String("aabbbaaa"), LuaValue.String("b+"));
+        Assert.AreEqual("bbb", result.AsString());
+        
+        result = CallStringFunction("match", LuaValue.String("color colour"), LuaValue.String("colou?r"));
+        Assert.AreEqual("color", result.AsString()); // First match
+        
+        result = CallStringFunction("match", LuaValue.String("aabbbaaa"), LuaValue.String("ab*"));
+        Assert.AreEqual("a", result.AsString()); // 'a' with zero 'b's
+    }
+    
+    #endregion
+    
+    #region Capture Group Tests
+    
+    [TestMethod]
+    public void Match_SingleCaptureGroup_ReturnsCapture()
+    {
+        // Testing Approach: Control Flow Testing - capture groups
+        var results = CallStringFunctionMultiple("match", LuaValue.String("hello world"), LuaValue.String("h(ell)o"));
+        Assert.AreEqual(1, results.Length);
+        Assert.AreEqual("ell", results[0].AsString()); // Only the captured group
+    }
+    
+    [TestMethod]
+    public void Match_MultipleCaptureGroups_ReturnsAllCaptures()
+    {
+        // Testing Approach: Control Flow Testing - multiple captures
+        var results = CallStringFunctionMultiple("match", LuaValue.String("hello world"), LuaValue.String("(h.ll.) (.o.ld)"));
+        Assert.AreEqual(2, results.Length);
+        Assert.AreEqual("hello", results[0].AsString());
+        Assert.AreEqual("world", results[1].AsString());
+    }
+    
+    [TestMethod]
+    public void Match_NestedCaptureGroups_WorksCorrectly()
+    {
+        // Testing Approach: Control Flow Testing - nested captures
+        var results = CallStringFunctionMultiple("match", LuaValue.String("abc123def"), LuaValue.String("(a(bc)(123)d)ef"));
+        Assert.AreEqual(3, results.Length); 
+        Assert.AreEqual("abc123d", results[0].AsString()); // Outer group
+        Assert.AreEqual("bc", results[1].AsString());      // First inner group
+        Assert.AreEqual("123", results[2].AsString());     // Second inner group
+    }
+    
+    [TestMethod]
+    public void Match_EmptyCaptureGroup_ReturnsEmptyString()
+    {
+        // Testing Approach: Boundary Value Analysis - empty captures
+        var results = CallStringFunctionMultiple("match", LuaValue.String("hello"), LuaValue.String("h()ello"));
+        Assert.AreEqual(1, results.Length);
+        Assert.AreEqual("", results[0].AsString());
+    }
+    
+    [TestMethod]
+    public void Match_OptionalCaptureGroup_HandlesCorrectly()
+    {
+        // Testing Approach: Edge case testing - optional captures
+        var results = CallStringFunctionMultiple("match", LuaValue.String("test"), LuaValue.String("te(st)?"));
+        Assert.AreEqual(1, results.Length);
+        Assert.AreEqual("st", results[0].AsString());
+        
+        results = CallStringFunctionMultiple("match", LuaValue.String("te"), LuaValue.String("te(st)?"));
+        Assert.AreEqual(1, results.Length);
+        Assert.AreEqual("", results[0].AsString()); // Empty capture for optional group
+    }
+    
+    #endregion
+    
+    #region Complex Pattern Tests
+    
+    [TestMethod]
+    public void Match_ComplexPattern_WorksCorrectly()
+    {
+        // Testing Approach: Integration testing - complex real-world patterns
+        // Match email-like pattern (simplified)
+        var result = CallStringFunction("match", LuaValue.String("Contact: user@domain.com for help"), LuaValue.String("[%w%.]+@[%w%.]+"));
+        Assert.AreEqual("user@domain.com", result.AsString());
+    }
+    
+    [TestMethod]
+    public void Match_NumberExtraction_WorksCorrectly()
+    {
+        // Testing Approach: Real-world use case - number extraction
+        var results = CallStringFunctionMultiple("match", LuaValue.String("Temperature: 25.5 degrees"), LuaValue.String("([%d%.]+)"));
+        Assert.AreEqual(1, results.Length);
+        Assert.AreEqual("25.5", results[0].AsString());
+    }
+    
+    [TestMethod]
+    public void Match_WordBoundaries_WorkCorrectly()
+    {
+        // Testing Approach: Pattern complexity testing
+        var result = CallStringFunction("match", LuaValue.String("hello world wonderful"), LuaValue.String("w%w+"));
+        Assert.AreEqual("world", result.AsString()); // First word starting with 'w'
+    }
+    
+    #endregion
+    
+    #region Boundary Value Analysis
+    
+    [TestMethod]
+    public void Match_EmptyString_ReturnsNil()
+    {
+        // Testing Approach: Boundary Value Analysis - empty input
+        var result = CallStringFunction("match", LuaValue.String(""), LuaValue.String("hello"));
+        Assert.AreEqual(LuaType.Nil, result.Type);
+    }
+    
+    [TestMethod]
+    public void Match_EmptyPattern_MatchesEmptyAtStart()
+    {
+        // Testing Approach: Boundary Value Analysis - empty pattern
+        var result = CallStringFunction("match", LuaValue.String("hello"), LuaValue.String(""));
+        Assert.AreEqual("", result.AsString()); // Empty match
+    }
+    
+    [TestMethod]
+    public void Match_SingleCharacter_WorksCorrectly()
+    {
+        // Testing Approach: Boundary Value Analysis - minimal pattern
+        var result = CallStringFunction("match", LuaValue.String("hello"), LuaValue.String("l"));
+        Assert.AreEqual("l", result.AsString());
+    }
+    
+    [TestMethod]
+    public void Match_VeryLongString_HandlesCorrectly()
+    {
+        // Testing Approach: Boundary Value Analysis - large input
+        var longString = new string('a', 1000) + "target" + new string('b', 1000);
+        var result = CallStringFunction("match", LuaValue.String(longString), LuaValue.String("target"));
+        Assert.AreEqual("target", result.AsString());
+    }
+    
+    #endregion
+    
+    #region Error Condition Tests
+    
+    [TestMethod]
+    [ExpectedException(typeof(LuaRuntimeException))]
+    public void Match_NoArguments_ThrowsException()
+    {
+        // Testing Approach: Error Condition Testing - missing arguments
+        CallStringFunction("match");
+    }
+    
+    [TestMethod]
+    [ExpectedException(typeof(LuaRuntimeException))]
+    public void Match_MissingPattern_ThrowsException()
+    {
+        // Testing Approach: Error Condition Testing - missing pattern
+        CallStringFunction("match", LuaValue.String("hello"));
+    }
+    
+    [TestMethod]
+    [ExpectedException(typeof(LuaRuntimeException))]
+    public void Match_InvalidPattern_ThrowsException()
+    {
+        // Testing Approach: Error Condition Testing - malformed pattern
+        CallStringFunction("match", LuaValue.String("hello"), LuaValue.String("[invalid"));
+    }
+    
+    #endregion
+
+    #endregion
 
     #region GSub Function Tests - Basic Coverage
 
