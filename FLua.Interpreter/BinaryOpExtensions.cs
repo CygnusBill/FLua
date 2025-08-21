@@ -11,11 +11,34 @@ namespace FLua.Interpreter
     {
         /// <summary>
         /// Gets the operator kind as a string for deterministic switching
+        /// AOT-safe version using pattern matching instead of ToString()
         /// </summary>
         public static string GetOperatorKind(this BinaryOp op)
         {
-            // F# discriminated unions have an implicit ToString that returns the case name
-            return op.ToString();
+            // Use pattern matching for AOT compatibility
+            if (op.IsAdd) return "Add";
+            if (op.IsSubtract) return "Subtract";
+            if (op.IsMultiply) return "Multiply";
+            if (op.IsFloatDiv) return "FloatDiv";
+            if (op.IsFloorDiv) return "FloorDiv";
+            if (op.IsModulo) return "Modulo";
+            if (op.IsPower) return "Power";
+            if (op.IsConcat) return "Concat";
+            if (op.IsBitAnd) return "BitAnd";
+            if (op.IsBitOr) return "BitOr";
+            if (op.IsBitXor) return "BitXor";
+            if (op.IsShiftLeft) return "ShiftLeft";
+            if (op.IsShiftRight) return "ShiftRight";
+            if (op.IsEqual) return "Equal";
+            if (op.IsNotEqual) return "NotEqual";
+            if (op.IsLess) return "Less";
+            if (op.IsLessEqual) return "LessEqual";
+            if (op.IsGreater) return "Greater";
+            if (op.IsGreaterEqual) return "GreaterEqual";
+            if (op.IsAnd) return "And";
+            if (op.IsOr) return "Or";
+            
+            throw new NotImplementedException($"Unknown binary operator: {op.GetType().Name}");
         }
 
         /// <summary>
@@ -91,11 +114,17 @@ namespace FLua.Interpreter
     {
         /// <summary>
         /// Gets the operator kind as a string for deterministic switching
+        /// AOT-safe version using pattern matching instead of ToString()
         /// </summary>
         public static string GetOperatorKind(this UnaryOp op)
         {
-            // F# discriminated unions have an implicit ToString that returns the case name
-            return op.ToString();
+            // Use pattern matching for AOT compatibility
+            if (op.IsNegate) return "Negate";
+            if (op.IsNot) return "Not";
+            if (op.IsLength) return "Length";
+            if (op.IsBitNot) return "BitNot";
+            
+            throw new NotImplementedException($"Unknown unary operator: {op.GetType().Name}");
         }
 
         /// <summary>
