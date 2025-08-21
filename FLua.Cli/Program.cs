@@ -12,6 +12,8 @@ namespace FLua.Cli;
 [Verb("run", HelpText = "Execute a Lua script file")]
 public class RunOptions
 {
+    public RunOptions() { }
+    
     [Value(0, MetaName = "file", HelpText = "Lua script file to execute", Required = true)]
     public string? File { get; set; }
 
@@ -22,11 +24,14 @@ public class RunOptions
 [Verb("repl", HelpText = "Start interactive REPL mode")]
 public class ReplOptions
 {
+    public ReplOptions() { }
 }
 
 [Verb("compile", HelpText = "Compile Lua script to executable")]
 public class CompileOptions
 {
+    public CompileOptions() { }
+    
     [Value(0, MetaName = "input", HelpText = "Input Lua script file", Required = true)]
     public string? InputFile { get; set; }
 
