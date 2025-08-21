@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System;
+using System.Runtime.InteropServices;
 
 namespace FLua.Compiler;
 
@@ -248,23 +249,30 @@ public class RoslynLuaCompiler : ILuaCompiler
             File.Copy(runtimePath, runtimeDestPath);
             
             // Run dotnet publish to create AOT executable
-            // Ensure output directory exists
+            // Ensure output directory exists and convert to absolute path
             var outputDir = Path.GetDirectoryName(options.OutputPath);
             if (string.IsNullOrEmpty(outputDir))
             {
                 outputDir = Directory.GetCurrentDirectory();
             }
-            else if (!Directory.Exists(outputDir))
+            else if (!Path.IsPathRooted(outputDir))
+            {
+                outputDir = Path.GetFullPath(outputDir);
+            }
+            
+            if (!Directory.Exists(outputDir))
             {
                 Directory.CreateDirectory(outputDir);
             }
             
+            // Publish to a subdirectory within the temp directory, then move to final location
+            var publishDir = Path.Combine(tempDir, "publish");
             var publishProcess = new System.Diagnostics.Process
             {
                 StartInfo = new System.Diagnostics.ProcessStartInfo
                 {
                     FileName = "dotnet",
-                    Arguments = $"publish -c Release -o \"{outputDir}\"",
+                    Arguments = $"publish -c Release -o \"{publishDir}\"",
                     WorkingDirectory = tempDir,
                     RedirectStandardOutput = true,
                     RedirectStandardError = true,
@@ -295,18 +303,18 @@ public class RoslynLuaCompiler : ILuaCompiler
                 );
             }
             
-            // The executable should be in the output directory
+            // The executable should be in the publish directory
             var exeName = Path.GetFileNameWithoutExtension(options.OutputPath);
             if (OperatingSystem.IsWindows())
                 exeName += ".exe";
             
-            var exePath = Path.Combine(outputDir, exeName);
+            var exePath = Path.Combine(publishDir, exeName);
             
             if (!File.Exists(exePath))
             {
                 // Try with assembly name instead
                 var assemblyName = options.AssemblyName ?? "LuaScript";
-                var altExePath = Path.Combine(outputDir, assemblyName);
+                var altExePath = Path.Combine(publishDir, assemblyName);
                 if (OperatingSystem.IsWindows())
                     altExePath += ".exe";
                 

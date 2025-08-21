@@ -36,7 +36,8 @@ module ParserHelper =
     
     /// Parse a string of Lua code with filename and return the AST
     let ParseStringWithFileName (code: string) (fileName: string) =
-        match runParserOnString luaFile () fileName code with
+        let safeFileName = if System.String.IsNullOrEmpty(fileName) then "input" else fileName
+        match runParserOnString luaFile () safeFileName code with
         | Success(result, _, _) -> result
         | Failure(errorMsg, error, _) -> 
             // Extract position information from FParsec error

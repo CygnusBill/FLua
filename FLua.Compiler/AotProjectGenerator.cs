@@ -16,7 +16,7 @@ public static class AotProjectGenerator
             new XAttribute("Sdk", "Microsoft.NET.Sdk"),
             new XElement("PropertyGroup",
                 new XElement("OutputType", isConsoleApp ? "Exe" : "Library"),
-                new XElement("TargetFramework", "net10.0"),
+                new XElement("TargetFramework", "net8.0"),
                 new XElement("ImplicitUsings", "enable"),
                 new XElement("Nullable", "enable"),
                 new XElement("AssemblyName", assemblyName),
@@ -24,7 +24,6 @@ public static class AotProjectGenerator
                 new XElement("InvariantGlobalization", "true"),
                 new XElement("StripSymbols", "true"),
                 new XElement("PublishTrimmed", "true"),
-                new XElement("PublishSingleFile", "true"),
                 new XElement("SelfContained", "true"),
                 new XElement("RuntimeIdentifier", GetRuntimeIdentifier())
             ),
