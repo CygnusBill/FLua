@@ -83,8 +83,12 @@ namespace FLua.Runtime
                 {
                     if (value.Type == LuaType.Nil)
                     {
-                        // Convert to hash part if setting nil in array
                         _array[(int)(index - 1)] = value;
+                        // If we're setting nil at the end of the array, truncate trailing nils
+                        while (_array.Count > 0 && _array[_array.Count - 1].Type == LuaType.Nil)
+                        {
+                            _array.RemoveAt(_array.Count - 1);
+                        }
                     }
                     else
                     {

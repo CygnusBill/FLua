@@ -13,7 +13,7 @@ namespace FLua.Runtime
         /// <summary>
         /// UTF-8 character pattern for pattern matching
         /// </summary>
-        public const string CharPattern = "[\0-\x7F\xC2-\xF4][\x80-\xBF]*";
+        public const string CharPattern = "[\\0-\\x7F\\xC2-\\xF4][\\x80-\\xBF]*";
         
         /// <summary>
         /// Adds the utf8 library to the Lua environment
@@ -44,8 +44,47 @@ namespace FLua.Runtime
             
             var str = args[0].AsString();
             var start = args.Length > 1 && args[1].IsInteger ? (int)args[1].AsInteger() : 1;
-            var end = args.Length > 2 && args[2].IsInteger ? (int)args[2].AsInteger() : str.Length;
+            var end = args.Length > 2 && args[2].IsInteger ? (int)args[2].AsInteger() : -1;
             var lax = args.Length > 3 ? args[3].IsTruthy() : false;
+            
+            // If no end specified, count entire string
+            if (end == -1)
+            {
+                if (start == 1)
+                {
+                    // Count entire string
+                    try
+                    {
+                        var info = new StringInfo(str);
+                        var length = info.LengthInTextElements;
+                        
+                        // Validate UTF-8 if not in lax mode
+                        if (!lax && !IsValidUTF8(str))
+                        {
+                            // Find the position of the first invalid byte
+                            var bytes = Encoding.UTF8.GetBytes(str);
+                            for (int i = 0; i < bytes.Length; i++)
+                            {
+                                if (!IsValidUTF8ByteSequence(bytes, i))
+                                {
+                                    return [LuaValue.Nil, LuaValue.Integer(i + 1)];
+                                }
+                            }
+                        }
+                        
+                        return [LuaValue.Integer(length)];
+                    }
+                    catch (ArgumentException)
+                    {
+                        return [LuaValue.Nil, LuaValue.Integer(1)];
+                    }
+                }
+                else
+                {
+                    var info = new StringInfo(str);
+                    end = info.LengthInTextElements;
+                }
+            }
             
             // Convert to 0-based indexing
             start = Math.Max(0, start - 1);
@@ -122,15 +161,15 @@ namespace FLua.Runtime
             
             var str = args[0].AsString();
             var start = args.Length > 1 && args[1].IsInteger ? (int)args[1].AsInteger() : 1;
-            var end = args.Length > 2 && args[2].IsInteger ? (int)args[2].AsInteger() : start;
+            var end = args.Length > 2 && args[2].IsInteger ? (int)args[2].AsInteger() : -1;
             var lax = args.Length > 3 ? args[3].IsTruthy() : false;
             
-            // Convert to 0-based indexing
-            start = Math.Max(0, start - 1);
-            end = Math.Min(str.Length, end);
-            
-            if (start >= str.Length)
-                return [];
+            // If no end specified, default to entire string for multiple codepoints
+            if (end == -1)
+            {
+                var info = new StringInfo(str);
+                end = info.LengthInTextElements;
+            }
             
             try
             {
@@ -138,23 +177,21 @@ namespace FLua.Runtime
                 var info = new StringInfo(str);
                 var textElements = StringInfo.GetTextElementEnumerator(str);
                 
-                int position = 0;
-                int elementIndex = 0;
+                int elementIndex = 1; // 1-based indexing for Lua
                 
                 while (textElements.MoveNext())
                 {
-                    if (position >= start && position < end)
+                    if (elementIndex >= start && elementIndex <= end)
                     {
                         var element = textElements.GetTextElement();
                         var codepoint = char.ConvertToUtf32(element, 0);
                         results.Add(LuaValue.Integer(codepoint));
-                        
-                        if (position >= end - 1)
-                            break;
                     }
                     
-                    position++;
                     elementIndex++;
+                    
+                    if (elementIndex > end)
+                        break;
                 }
                 
                 return results.ToArray();
@@ -165,9 +202,10 @@ namespace FLua.Runtime
                 {
                     // In lax mode, return individual bytes as codepoints
                     var results = new List<LuaValue>();
-                    for (int i = start; i < end && i < str.Length; i++)
+                    for (int i = start - 1; i < end && i < str.Length; i++)
                     {
-                        results.Add(LuaValue.Integer((byte)str[i]));
+                        if (i >= 0)
+                            results.Add(LuaValue.Integer((byte)str[i]));
                     }
                     return results.ToArray();
                 }
@@ -205,7 +243,7 @@ namespace FLua.Runtime
                     // Find the start of the character at position i
                     var charStart = FindCharacterStart(str, i);
                     var charEnd = FindCharacterEnd(str, charStart);
-                    return [LuaValue.Integer(charStart + 1), LuaValue.Integer(charEnd)];
+                    return [LuaValue.Integer(charStart + 1), LuaValue.Integer(charEnd + 1)];
                 }
                 else
                 {
@@ -223,6 +261,10 @@ namespace FLua.Runtime
                             currentPos += textElements.GetTextElement().Length;
                             count++;
                         }
+                        
+                        // If we couldn't move the requested number of characters, return empty
+                        if (count < offset)
+                            return [];
                     }
                     else
                     {
@@ -238,6 +280,10 @@ namespace FLua.Runtime
                             currentPos -= allElements[j].Length;
                             count--;
                         }
+                        
+                        // If we couldn't move the requested number of characters, return empty
+                        if (count > offset)
+                            return [];
                     }
                     
                     if (currentPos < 0 || currentPos > str.Length)

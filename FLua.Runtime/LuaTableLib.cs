@@ -106,11 +106,14 @@ namespace FLua.Runtime
                 
             var luaTable = table.AsTable<LuaTable>();
             
+            // Find the length of the array part (similar to # operator)
+            int arrayLength = luaTable.Length();
+            
             int position;
             if (args.Length == 1)
             {
                 // table.remove(t) - remove last element
-                position = luaTable.Array.Count;
+                position = arrayLength;
             }
             else
             {
@@ -122,26 +125,20 @@ namespace FLua.Runtime
                 position = (int)pos.AsInteger();
             }
             
-            if (position < 1 || position > luaTable.Array.Count)
+            if (position < 1 || position > arrayLength)
                 return [LuaValue.Nil];
             
             var removedValue = luaTable.Get(LuaValue.Integer(position));
             
             // Shift elements to the left
-            var arrayList = luaTable.Array.ToList();
-            if (position - 1 < arrayList.Count)
+            for (int i = position; i < arrayLength; i++)
             {
-                arrayList.RemoveAt(position - 1);
-                
-                // Rebuild the array part of the table
-                var lastIndex = luaTable.Array.Count;
-                luaTable.Set(LuaValue.Integer(lastIndex), LuaValue.Nil); // Remove last element
-                
-                for (int i = 0; i < arrayList.Count; i++)
-                {
-                    luaTable.Set(LuaValue.Integer(i + 1), arrayList[i]);
-                }
+                var nextValue = luaTable.Get(LuaValue.Integer(i + 1));
+                luaTable.Set(LuaValue.Integer(i), nextValue);
             }
+            
+            // Remove the last element by setting it to nil
+            luaTable.Set(LuaValue.Integer(arrayLength), LuaValue.Nil);
             
             return [removedValue];
         }

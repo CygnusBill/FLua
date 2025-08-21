@@ -174,16 +174,18 @@ namespace FLua.Runtime
             var start = args.Length > 1 && args[1].IsInteger ? args[1].AsInteger() : 1;
             var end = args.Length > 2 && args[2].IsInteger ? args[2].AsInteger() : start;
             
+            // Handle negative indices
             if (start < 0)
                 start = str.Length + start + 1;
             if (end < 0)
                 end = str.Length + end + 1;
             
-            start = Math.Max(1, Math.Min(start, str.Length));
-            end = Math.Max(start, Math.Min(end, str.Length));
+            // Check if start position is out of bounds - return empty if so
+            if (start > str.Length || start < 1)
+                return [];
             
-            if (start > str.Length)
-                return []; // Return no values
+            // Clamp end position but don't clamp start (we already checked bounds)
+            end = Math.Max(start, Math.Min(end, str.Length));
             
             var results = new List<LuaValue>();
             for (long i = start; i <= end && i <= str.Length; i++)

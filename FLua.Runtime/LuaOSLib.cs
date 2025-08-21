@@ -45,7 +45,8 @@ namespace FLua.Runtime
         private static LuaValue[] Clock(LuaValue[] args)
         {
             // Return CPU time used by the program in seconds
-            var ticks = Environment.TickCount;
+            // Use Environment.TickCount64 to avoid wrap-around issues
+            var ticks = Environment.TickCount64;
             var seconds = ticks / 1000.0;
             return [LuaValue.Number(seconds)];
         }
@@ -171,7 +172,10 @@ namespace FLua.Runtime
             if (args.Length == 0)
                 throw new LuaRuntimeException("bad argument #1 to 'getenv' (string expected)");
             
-            var varName = args[0].AsString();
+            // Convert argument to string (Lua behavior)
+            var varName = args[0].IsString ? args[0].AsString() : 
+                         args[0].IsNumber ? (args[0].IsInteger ? args[0].AsInteger().ToString() : args[0].AsDouble().ToString()) : 
+                         args[0].ToString();
             var value = Environment.GetEnvironmentVariable(varName);
             
             return value != null ? [LuaValue.String(value)] : [LuaValue.Nil];
@@ -198,7 +202,27 @@ namespace FLua.Runtime
                 }
                 else
                 {
+                    // Validate that this is a real culture, not a synthetic one
                     culture = CultureInfo.GetCultureInfo(locale);
+                    
+                    // Check if this is a valid culture by seeing if it's in the available cultures
+                    // or if it follows proper locale format
+                    var availableCultures = CultureInfo.GetCultures(CultureTypes.AllCultures);
+                    bool isValidCulture = false;
+                    
+                    foreach (var availableCulture in availableCultures)
+                    {
+                        if (string.Equals(availableCulture.Name, culture.Name, StringComparison.OrdinalIgnoreCase))
+                        {
+                            isValidCulture = true;
+                            break;
+                        }
+                    }
+                    
+                    if (!isValidCulture)
+                    {
+                        return [LuaValue.Nil];
+                    }
                 }
                 
                 // Set the culture based on category

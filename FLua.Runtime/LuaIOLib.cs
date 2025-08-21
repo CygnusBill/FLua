@@ -108,7 +108,14 @@ namespace FLua.Runtime
                     // Skip the first argument (self)
                     for (int i = 1; i < args.Length; i++)
                     {
-                        writer.Write(args[i].AsString());
+                        // Convert to string (Lua automatically converts numbers)
+                        var value = args[i];
+                        if (value.IsString)
+                            writer.Write(value.AsString());
+                        else if (value.IsNumber)
+                            writer.Write(value.IsInteger ? value.AsInteger().ToString() : value.AsDouble().ToString());
+                        else
+                            writer.Write(value.ToString());
                     }
                     
                     writer.Flush();
@@ -165,12 +172,19 @@ namespace FLua.Runtime
                         {
                             // Read specified number of characters
                             var count = (int)format.AsInteger();
-                            var buffer = new char[count];
-                            var actualRead = reader.Read(buffer, 0, count);
-                            if (actualRead > 0)
-                                results.Add(LuaValue.String(new string(buffer, 0, actualRead)));
+                            if (count == 0)
+                            {
+                                results.Add(LuaValue.String(""));
+                            }
                             else
-                                results.Add(LuaValue.Nil);
+                            {
+                                var buffer = new char[count];
+                                var actualRead = reader.Read(buffer, 0, count);
+                                if (actualRead > 0)
+                                    results.Add(LuaValue.String(new string(buffer, 0, actualRead)));
+                                else
+                                    results.Add(LuaValue.Nil);
+                            }
                         }
                         else
                         {
@@ -336,12 +350,19 @@ namespace FLua.Runtime
                     {
                         // Read specified number of characters
                         var count = (int)format.AsInteger();
-                        var buffer = new char[count];
-                        var actualRead = reader2.Read(buffer, 0, count);
-                        if (actualRead > 0)
-                            results.Add(LuaValue.String(new string(buffer, 0, actualRead)));
+                        if (count == 0)
+                        {
+                            results.Add(LuaValue.String(""));
+                        }
                         else
-                            results.Add(LuaValue.Nil);
+                        {
+                            var buffer = new char[count];
+                            var actualRead = reader2.Read(buffer, 0, count);
+                            if (actualRead > 0)
+                                results.Add(LuaValue.String(new string(buffer, 0, actualRead)));
+                            else
+                                results.Add(LuaValue.Nil);
+                        }
                     }
                     else
                     {
@@ -379,7 +400,14 @@ namespace FLua.Runtime
                 
                 for (int i = startIndex; i < args.Length; i++)
                 {
-                    writer.Write(args[i].AsString());
+                    // Convert to string (Lua automatically converts numbers)
+                    var value = args[i];
+                    if (value.IsString)
+                        writer.Write(value.AsString());
+                    else if (value.IsNumber)
+                        writer.Write(value.IsInteger ? value.AsInteger().ToString() : value.AsDouble().ToString());
+                    else
+                        writer.Write(value.ToString());
                 }
                 
                 writer.Flush();
