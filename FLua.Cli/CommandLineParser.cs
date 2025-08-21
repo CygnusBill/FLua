@@ -84,6 +84,11 @@ public static class SimpleCommandLineParser
                     {
                         runOpts.Verbose = true;
                     }
+                    else if (arg == "-")
+                    {
+                        // Special case: "-" means read from stdin
+                        positionalArgs.Add(arg);
+                    }
                     else if (arg.StartsWith('-'))
                     {
                         return ParseResult<T>.FromError($"Unknown option: {arg}");
