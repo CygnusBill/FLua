@@ -1790,8 +1790,7 @@ public class LuaStringLibTests
     /// </summary>
 
     [TestMethod]
-    [Ignore("Known implementation gap: Quantifiers with character classes not fully supported")]
-    public void Find_CharacterClassWithPlusQuantifier_KnownLimitation()
+    public void Find_CharacterClassWithPlusQuantifier_NowWorking()
     {
         // Testing Approach: Implementation Gap Documentation
         // This should work: [0-9]+ should match "123" in "hello123world"

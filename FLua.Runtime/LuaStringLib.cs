@@ -313,26 +313,25 @@ namespace FLua.Runtime
             
             try
             {
-                var regexPattern = ConvertLuaPatternToRegex(pattern);
-                var regex = new Regex(regexPattern);
-                var match = regex.Match(str, start - 1);
+                var match = LuaPatterns.Find(str, pattern, start, false);
                 
-                if (match.Success)
+                if (match != null)
                 {
-                    if (match.Groups.Count > 1)
+                    if (match.Captures.Count > 0)
                     {
                         // Return captured groups
                         var results = new List<LuaValue>();
-                        for (int i = 1; i < match.Groups.Count; i++)
+                        foreach (var capture in match.Captures)
                         {
-                            results.Add(LuaValue.String(match.Groups[i].Value));
+                            results.Add(LuaValue.String(capture));
                         }
                         return results.ToArray();
                     }
                     else
                     {
                         // Return the entire match
-                        return [LuaValue.String(match.Value)];
+                        var matchText = str.Substring(match.Start - 1, match.End - match.Start + 1);
+                        return [LuaValue.String(matchText)];
                     }
                 }
             }
@@ -428,24 +427,183 @@ namespace FLua.Runtime
         }
         
         /// <summary>
-        /// Converts a simplified Lua pattern to a .NET regex pattern
-        /// Note: This is a basic implementation - full Lua patterns are more complex
+        /// Converts a Lua pattern to a .NET regex pattern
+        /// Handles Lua escape sequences, character classes, and quantifiers
         /// </summary>
         private static string ConvertLuaPatternToRegex(string luaPattern)
         {
-            // This is a very simplified conversion
-            // Full Lua pattern implementation would be much more complex
-            return luaPattern
-                .Replace(".", "\\.")  
-                .Replace("*", ".*")
-                .Replace("?", ".?")
-                .Replace("+", ".+")
-                .Replace("^", "^")
-                .Replace("$", "$")
-                .Replace("[", "[")
-                .Replace("]", "]")
-                .Replace("(", "(")
-                .Replace(")", ")");
+            if (string.IsNullOrEmpty(luaPattern))
+                return luaPattern;
+
+            var result = new StringBuilder(luaPattern.Length * 2);
+            var i = 0;
+            
+            while (i < luaPattern.Length)
+            {
+                var c = luaPattern[i];
+                
+                switch (c)
+                {
+                    case '%':
+                        // Handle Lua escape sequences
+                        if (i + 1 < luaPattern.Length)
+                        {
+                            var next = luaPattern[i + 1];
+                            switch (next)
+                            {
+                                case 'd': // digit
+                                    result.Append("\\d");
+                                    i += 2;
+                                    break;
+                                case 'D': // non-digit  
+                                    result.Append("\\D");
+                                    i += 2;
+                                    break;
+                                case 'a': // letter
+                                    result.Append("[a-zA-Z]");
+                                    i += 2;
+                                    break;
+                                case 'A': // non-letter
+                                    result.Append("[^a-zA-Z]");
+                                    i += 2;
+                                    break;
+                                case 'w': // word character (letter, digit, underscore)
+                                    result.Append("\\w");
+                                    i += 2;
+                                    break;
+                                case 'W': // non-word character
+                                    result.Append("\\W");
+                                    i += 2;
+                                    break;
+                                case 's': // whitespace
+                                    result.Append("\\s");
+                                    i += 2;
+                                    break;
+                                case 'S': // non-whitespace
+                                    result.Append("\\S");
+                                    i += 2;
+                                    break;
+                                case 'l': // lowercase letter
+                                    result.Append("[a-z]");
+                                    i += 2;
+                                    break;
+                                case 'L': // non-lowercase letter
+                                    result.Append("[^a-z]");
+                                    i += 2;
+                                    break;
+                                case 'u': // uppercase letter
+                                    result.Append("[A-Z]");
+                                    i += 2;
+                                    break;
+                                case 'U': // non-uppercase letter
+                                    result.Append("[^A-Z]");
+                                    i += 2;
+                                    break;
+                                case 'c': // control character
+                                    result.Append("[\\x00-\\x1F]");
+                                    i += 2;
+                                    break;
+                                case 'C': // non-control character
+                                    result.Append("[^\\x00-\\x1F]");
+                                    i += 2;
+                                    break;
+                                case 'p': // punctuation
+                                    result.Append("\\p{P}");
+                                    i += 2;
+                                    break;
+                                case 'P': // non-punctuation
+                                    result.Append("\\P{P}");
+                                    i += 2;
+                                    break;
+                                case 'x': // hexadecimal digit
+                                    result.Append("[0-9A-Fa-f]");
+                                    i += 2;
+                                    break;
+                                case 'X': // non-hexadecimal digit
+                                    result.Append("[^0-9A-Fa-f]");
+                                    i += 2;
+                                    break;
+                                case 'z': // null character
+                                    result.Append("\\0");
+                                    i += 2;
+                                    break;
+                                case 'Z': // non-null character
+                                    result.Append("[^\\0]");
+                                    i += 2;
+                                    break;
+                                default:
+                                    // Escape the next character literally
+                                    if (IsRegexMetacharacter(next))
+                                        result.Append('\\');
+                                    result.Append(next);
+                                    i += 2;
+                                    break;
+                            }
+                        }
+                        else
+                        {
+                            // Trailing % - escape it
+                            result.Append("\\%");
+                            i++;
+                        }
+                        break;
+                        
+                    case '.':
+                        // Lua . is any character (same as regex)
+                        result.Append('.');
+                        i++;
+                        break;
+                        
+                    case '^':
+                    case '$':
+                    case '*':
+                    case '+':
+                    case '?':
+                    case '(':
+                    case ')':
+                    case '[':
+                    case ']':
+                    case '{':
+                    case '}':
+                    case '|':
+                        // These are the same in Lua and .NET regex
+                        result.Append(c);
+                        i++;
+                        break;
+                        
+                    case '-':
+                        // In Lua, - is non-greedy quantifier, in .NET it's *? or +?
+                        // Handle this contextually - for now treat as literal
+                        if (i > 0 && (luaPattern[i - 1] == ']' || char.IsLetterOrDigit(luaPattern[i - 1]) || luaPattern[i - 1] == ')'))
+                        {
+                            // This looks like a quantifier context
+                            result.Append("??"); // Non-greedy any
+                        }
+                        else
+                        {
+                            result.Append("\\-"); // Literal dash
+                        }
+                        i++;
+                        break;
+                        
+                    default:
+                        // Regular character - escape if it's a regex metacharacter
+                        if (IsRegexMetacharacter(c))
+                            result.Append('\\');
+                        result.Append(c);
+                        i++;
+                        break;
+                }
+            }
+            
+            return result.ToString();
+        }
+        
+        private static bool IsRegexMetacharacter(char c)
+        {
+            return c == '\\' || c == '.' || c == '^' || c == '$' || c == '*' || c == '+' || 
+                   c == '?' || c == '(' || c == ')' || c == '[' || c == ']' || c == '{' || 
+                   c == '}' || c == '|';
         }
         
         #endregion
