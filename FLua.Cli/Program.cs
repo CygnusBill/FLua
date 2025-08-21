@@ -1,7 +1,7 @@
 using System;
 using System.IO;
 using System.Collections.Generic;
-using CommandLine;
+using System.Linq;
 using FLua.Interpreter;
 using FLua.Runtime;
 using FLua.Compiler;
@@ -9,85 +9,14 @@ using FLua.Ast;
 
 namespace FLua.Cli;
 
-[Verb("run", HelpText = "Execute a Lua script file")]
-public class RunOptions
+public class Program
 {
-    public RunOptions() { }
-    
-    [Value(0, MetaName = "file", HelpText = "Lua script file to execute", Required = true)]
-    public string? File { get; set; }
-
-    [Option('v', "verbose", HelpText = "Show verbose output")]
-    public bool Verbose { get; set; }
-}
-
-[Verb("repl", HelpText = "Start interactive REPL mode")]
-public class ReplOptions
-{
-    public ReplOptions() { }
-}
-
-[Verb("compile", HelpText = "Compile Lua script to executable")]
-public class CompileOptions
-{
-    public CompileOptions() { }
-    
-    [Value(0, MetaName = "input", HelpText = "Input Lua script file", Required = true)]
-    public string? InputFile { get; set; }
-
-    [Option('o', "output", HelpText = "Output file path", Required = true)]
-    public string? OutputFile { get; set; }
-
-    [Option('t', "target", HelpText = "Compilation target (library, console, nativeaot)", Default = CompilationTarget.Library)]
-    public CompilationTarget Target { get; set; }
-
-    [Option("optimization", HelpText = "Optimization level (debug, release)", Default = OptimizationLevel.Release)]
-    public OptimizationLevel Optimization { get; set; }
-
-    [Option("debug", HelpText = "Include debug information")]
-    public bool IncludeDebugInfo { get; set; }
-
-    [Option("name", HelpText = "Assembly name")]
-    public string? AssemblyName { get; set; }
-
-    [Option('r', "reference", HelpText = "Additional assembly references")]
-    public IEnumerable<string>? References { get; set; }
-
-}
-
-class Program
-{
-    static int Main(string[] args)
+    public static int Main(string[] args)
     {
-        // Handle legacy behavior: no args = REPL, single file = run
-        if (args.Length == 0)
-        {
-            return RunRepl();
-        }
-
-        // Check for piped input
-        if (Console.IsInputRedirected && args.Length == 0)
-        {
-            return RunStdin();
-        }
-
-        // Handle single file execution (legacy mode)
-        if (args.Length == 1 && !args[0].StartsWith('-') && File.Exists(args[0]))
-        {
-            return RunFile(args[0], verbose: false);
-        }
-
-        // Parse command line with verbs
-        return CommandLine.Parser.Default.ParseArguments<RunOptions, ReplOptions, CompileOptions>(args)
-            .MapResult(
-                (RunOptions opts) => RunFile(opts.File!, opts.Verbose),
-                (ReplOptions opts) => RunRepl(),
-                (CompileOptions opts) => CompileFile(opts),
-                errs => 1
-            );
+        return CommandLineDispatcher.Execute(args);
     }
 
-    static int RunRepl()
+    public static int RunRepl()
     {
         try
         {
@@ -102,7 +31,7 @@ class Program
         }
     }
 
-    static int RunStdin()
+    public static int RunStdin()
     {
         try
         {
@@ -121,7 +50,7 @@ class Program
         }
     }
 
-    static int RunFile(string filename, bool verbose)
+    public static int RunFile(string filename, bool verbose)
     {
         try
         {
@@ -165,7 +94,7 @@ class Program
         }
     }
 
-    static int CompileFile(CompileOptions options)
+    public static int CompileFile(CompileOptions options)
     {
         try
         {

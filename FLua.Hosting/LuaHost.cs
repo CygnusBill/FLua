@@ -169,31 +169,67 @@ public class LuaHost : ILuaHost
         // Check if we got a compiled delegate
         if (result.CompiledDelegate != null)
         {
-            // Wrap the compiled delegate to match the expected signature
-            var executeDelegate = (Func<LuaEnvironment, LuaValue[]>)result.CompiledDelegate;
+            // Detect delegate type - could be regular or varargs
+            var compiledDelegateType = result.CompiledDelegate.GetType();
             
-            // Create a wrapper that matches the requested delegate type
-            if (delegateType == typeof(Func<LuaValue>))
+            // Check if it's a varargs delegate
+            if (compiledDelegateType == typeof(Func<LuaEnvironment, LuaValue[], LuaValue[]>))
             {
-                return new Func<LuaValue>(() =>
+                // This is a varargs delegate
+                var varargsExecuteDelegate = (Func<LuaEnvironment, LuaValue[], LuaValue[]>)result.CompiledDelegate;
+                
+                // Create a wrapper that matches the requested delegate type
+                if (delegateType == typeof(Func<LuaValue>))
                 {
-                    var env = _environmentProvider.CreateEnvironment(options.TrustLevel, options);
-                    var results = executeDelegate(env);
-                    return results.Length > 0 ? results[0] : LuaValue.Nil;
-                });
-            }
-            else if (delegateType.IsGenericType && delegateType.GetGenericTypeDefinition() == typeof(Func<>))
-            {
-                // Handle Func<T> where T is the return type
-                var returnType = delegateType.GetGenericArguments()[0];
-                var wrapperMethod = typeof(LuaHost).GetMethod(nameof(CreateTypedWrapper), BindingFlags.NonPublic | BindingFlags.Instance);
-                var genericMethod = wrapperMethod!.MakeGenericMethod(returnType);
-                return (Delegate)genericMethod.Invoke(this, new object[] { executeDelegate, options })!;
+                    return new Func<LuaValue>(() =>
+                    {
+                        var env = _environmentProvider.CreateEnvironment(options.TrustLevel, options);
+                        var results = varargsExecuteDelegate(env, Array.Empty<LuaValue>());
+                        return results.Length > 0 ? results[0] : LuaValue.Nil;
+                    });
+                }
+                else if (delegateType.IsGenericType && delegateType.GetGenericTypeDefinition() == typeof(Func<>))
+                {
+                    // Handle Func<T> where T is the return type
+                    var returnType = delegateType.GetGenericArguments()[0];
+                    var wrapperMethod = typeof(LuaHost).GetMethod(nameof(CreateTypedVarargsWrapper), BindingFlags.NonPublic | BindingFlags.Instance);
+                    var genericMethod = wrapperMethod!.MakeGenericMethod(returnType);
+                    return (Delegate)genericMethod.Invoke(this, new object[] { varargsExecuteDelegate, options })!;
+                }
+                else
+                {
+                    // For more complex delegate types, we'd need more sophisticated wrapping
+                    throw new NotSupportedException($"Delegate type {delegateType} is not yet supported for varargs lambda compilation");
+                }
             }
             else
             {
-                // For more complex delegate types, we'd need more sophisticated wrapping
-                throw new NotSupportedException($"Delegate type {delegateType} is not yet supported for lambda compilation");
+                // This is a regular delegate (no varargs)
+                var executeDelegate = (Func<LuaEnvironment, LuaValue[]>)result.CompiledDelegate;
+                
+                // Create a wrapper that matches the requested delegate type
+                if (delegateType == typeof(Func<LuaValue>))
+                {
+                    return new Func<LuaValue>(() =>
+                    {
+                        var env = _environmentProvider.CreateEnvironment(options.TrustLevel, options);
+                        var results = executeDelegate(env);
+                        return results.Length > 0 ? results[0] : LuaValue.Nil;
+                    });
+                }
+                else if (delegateType.IsGenericType && delegateType.GetGenericTypeDefinition() == typeof(Func<>))
+                {
+                    // Handle Func<T> where T is the return type
+                    var returnType = delegateType.GetGenericArguments()[0];
+                    var wrapperMethod = typeof(LuaHost).GetMethod(nameof(CreateTypedWrapper), BindingFlags.NonPublic | BindingFlags.Instance);
+                    var genericMethod = wrapperMethod!.MakeGenericMethod(returnType);
+                    return (Delegate)genericMethod.Invoke(this, new object[] { executeDelegate, options })!;
+                }
+                else
+                {
+                    // For more complex delegate types, we'd need more sophisticated wrapping
+                    throw new NotSupportedException($"Delegate type {delegateType} is not yet supported for lambda compilation");
+                }
             }
         }
         
@@ -206,6 +242,30 @@ public class LuaHost : ILuaHost
         {
             var env = _environmentProvider.CreateEnvironment(options.TrustLevel, options);
             var results = executeDelegate(env);
+            var result = results.Length > 0 ? results[0] : LuaValue.Nil;
+            
+            // Convert LuaValue to the requested type
+            if (typeof(T) == typeof(double))
+                return (T)(object)result.AsDouble();
+            else if (typeof(T) == typeof(long))
+                return (T)(object)result.AsInteger();
+            else if (typeof(T) == typeof(string))
+                return (T)(object)result.AsString();
+            else if (typeof(T) == typeof(bool))
+                return (T)(object)result.AsBoolean();
+            else if (typeof(T) == typeof(LuaValue))
+                return (T)(object)result;
+            else
+                throw new InvalidCastException($"Cannot convert LuaValue to type {typeof(T)}");
+        };
+    }
+
+    private Func<T> CreateTypedVarargsWrapper<T>(Func<LuaEnvironment, LuaValue[], LuaValue[]> executeDelegate, LuaHostOptions options)
+    {
+        return () =>
+        {
+            var env = _environmentProvider.CreateEnvironment(options.TrustLevel, options);
+            var results = executeDelegate(env, Array.Empty<LuaValue>());
             var result = results.Length > 0 ? results[0] : LuaValue.Nil;
             
             // Convert LuaValue to the requested type

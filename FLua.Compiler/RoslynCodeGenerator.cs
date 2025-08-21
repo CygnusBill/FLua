@@ -140,18 +140,65 @@ namespace FLua.Compiler
         
         private MethodDeclarationSyntax CreateExecuteMethod(IList<Statement> block)
         {
-            // Create the method signature: public static LuaValue[] Execute(LuaEnvironment env)
-            var method = MethodDeclaration(
-                    ArrayType(IdentifierName("LuaValue"))
-                        .WithRankSpecifiers(SingletonList(ArrayRankSpecifier())),
-                    "Execute")
-                .AddModifiers(Token(SyntaxKind.PublicKeyword), Token(SyntaxKind.StaticKeyword))
-                .AddParameterListParameters(
-                    Parameter(Identifier("env"))
-                        .WithType(IdentifierName("LuaEnvironment")));
+            // Check if the script uses varargs
+            bool needsVarargs = ContainsVarargs(block);
+            
+            // Create the method signature
+            MethodDeclarationSyntax method;
+            if (needsVarargs)
+            {
+                // public static LuaValue[] Execute(LuaEnvironment env, params LuaValue[] args)
+                method = MethodDeclaration(
+                        ArrayType(IdentifierName("LuaValue"))
+                            .WithRankSpecifiers(SingletonList(ArrayRankSpecifier())),
+                        "Execute")
+                    .AddModifiers(Token(SyntaxKind.PublicKeyword), Token(SyntaxKind.StaticKeyword))
+                    .AddParameterListParameters(
+                        Parameter(Identifier("env"))
+                            .WithType(IdentifierName("LuaEnvironment")),
+                        Parameter(Identifier("args"))
+                            .WithType(ArrayType(IdentifierName("LuaValue"))
+                                .WithRankSpecifiers(SingletonList(ArrayRankSpecifier())))
+                            .AddModifiers(Token(SyntaxKind.ParamsKeyword)));
+            }
+            else
+            {
+                // public static LuaValue[] Execute(LuaEnvironment env)
+                method = MethodDeclaration(
+                        ArrayType(IdentifierName("LuaValue"))
+                            .WithRankSpecifiers(SingletonList(ArrayRankSpecifier())),
+                        "Execute")
+                    .AddModifiers(Token(SyntaxKind.PublicKeyword), Token(SyntaxKind.StaticKeyword))
+                    .AddParameterListParameters(
+                        Parameter(Identifier("env"))
+                            .WithType(IdentifierName("LuaEnvironment")));
+            }
             
             // Generate method body
             var statements = new List<StatementSyntax>();
+            
+            // Initialize varargs if needed (temporary simple version)
+            if (needsVarargs)
+            {
+                // Simple implementation: just create an empty ellipsis__ variable
+                var ellipsisVarName = "ellipsis__";
+                
+                // var ellipsis__ = LuaValue.Table(new LuaTable());
+                var storeVarArgStmt = LocalDeclarationStatement(
+                    VariableDeclaration(IdentifierName("var"))
+                        .AddVariables(
+                            VariableDeclarator(Identifier(ellipsisVarName))
+                                .WithInitializer(EqualsValueClause(
+                                    InvocationExpression(
+                                        MemberAccessExpression(
+                                            SyntaxKind.SimpleMemberAccessExpression,
+                                            IdentifierName("LuaValue"),
+                                            IdentifierName("Table")))
+                                        .AddArgumentListArguments(
+                                            Argument(ObjectCreationExpression(IdentifierName("LuaTable"))
+                                                .AddArgumentListArguments()))))));
+                statements.Add(storeVarArgStmt);
+            }
             
             // Add all Lua statements
             foreach (var stmt in block)
@@ -2347,6 +2394,166 @@ namespace FLua.Compiler
             
             return sanitized;
         }
+
+    /// <summary>
+    /// Detects if a statement block contains varargs (...) usage.
+    /// </summary>
+    private bool ContainsVarargs(IList<Statement> statements)
+    {
+        foreach (var stmt in statements)
+        {
+            if (ContainsVarargsInStatement(stmt))
+                return true;
+        }
+        return false;
+    }
+    
+    /// <summary>
+    /// Recursively checks if a statement contains varargs usage.
+    /// </summary>
+    /// <summary>
+    /// Recursively checks if a statement contains varargs usage.
+    /// </summary>
+    /// <summary>
+    /// Recursively checks if a statement contains varargs usage.
+    /// </summary>
+    private bool ContainsVarargsInStatement(Statement stmt)
+    {
+        if (stmt.IsAssignment)
+        {
+            var assignment = (Statement.Assignment)stmt;
+            var expressions = FSharpListToList(assignment.Item2);
+            return expressions.Any(ContainsVarargsInExpression);
+        }
+        else if (stmt.IsLocalAssignment)
+        {
+            var localAssignment = (Statement.LocalAssignment)stmt;
+            if (OptionModule.IsSome(localAssignment.Item2))
+            {
+                var expressions = FSharpListToList(localAssignment.Item2.Value);
+                return expressions.Any(ContainsVarargsInExpression);
+            }
+        }
+        else if (stmt.IsReturn)
+        {
+            var returnStmt = (Statement.Return)stmt;
+            if (OptionModule.IsSome(returnStmt.Item))
+            {
+                var expressions = FSharpListToList(returnStmt.Item.Value);
+                return expressions.Any(ContainsVarargsInExpression);
+            }
+        }
+        else if (stmt.IsFunctionCall)
+        {
+            var funcCall = (Statement.FunctionCall)stmt;
+            return ContainsVarargsInExpression(funcCall.Item);
+        }
+        else if (stmt.IsIf)
+        {
+            var ifStmt = (Statement.If)stmt;
+            var clauses = FSharpListToList(ifStmt.Item1);
+            
+            // Check condition and body of each clause
+            foreach (var clause in clauses)
+            {
+                if (ContainsVarargsInExpression(clause.Item1))
+                    return true;
+                if (clause.Item2.Any(ContainsVarargsInStatement))
+                    return true;
+            }
+            
+            // Check else block if it exists
+            if (OptionModule.IsSome(ifStmt.Item2))
+            {
+                if (FSharpListToList(ifStmt.Item2.Value).Any(ContainsVarargsInStatement))
+                    return true;
+            }
+        }
+        else if (stmt.IsWhile)
+        {
+            var whileStmt = (Statement.While)stmt;
+            if (ContainsVarargsInExpression(whileStmt.Item1))
+                return true;
+            if (FSharpListToList(whileStmt.Item2).Any(ContainsVarargsInStatement))
+                return true;
+        }
+        else if (stmt.IsDoBlock)
+        {
+            var doBlock = (Statement.DoBlock)stmt;
+            if (FSharpListToList(doBlock.Item).Any(ContainsVarargsInStatement))
+                return true;
+        }
+        
+        return false;
+    }
+    
+    /// <summary>
+    /// Recursively checks if an expression contains varargs usage.
+    /// </summary>
+    /// <summary>
+    /// Recursively checks if an expression contains varargs usage.
+    /// </summary>
+    private bool ContainsVarargsInExpression(Expr expr)
+    {
+        if (expr.IsVararg)
+        {
+            return true;
+        }
+        else if (expr.IsBinary)
+        {
+            var binary = (Expr.Binary)expr;
+            return ContainsVarargsInExpression(binary.Item1) || ContainsVarargsInExpression(binary.Item3);
+        }
+        else if (expr.IsUnary)
+        {
+            var unary = (Expr.Unary)expr;
+            return ContainsVarargsInExpression(unary.Item2);
+        }
+        else if (expr.IsFunctionCall)
+        {
+            var funcCall = (Expr.FunctionCall)expr;
+            if (ContainsVarargsInExpression(funcCall.Item1))
+                return true;
+            return FSharpListToList(funcCall.Item2).Any(ContainsVarargsInExpression);
+        }
+        else if (expr.IsMethodCall)
+        {
+            var methodCall = (Expr.MethodCall)expr;
+            if (ContainsVarargsInExpression(methodCall.Item1))
+                return true;
+            return FSharpListToList(methodCall.Item3).Any(ContainsVarargsInExpression);
+        }
+        else if (expr.IsTableConstructor)
+        {
+            var tableConstructor = (Expr.TableConstructor)expr;
+            return FSharpListToList(tableConstructor.Item).Any(field =>
+            {
+                if (field.IsExprField)
+                {
+                    var exprField = (TableField.ExprField)field;
+                    return ContainsVarargsInExpression(exprField.Item);
+                }
+                else if (field.IsNamedField)
+                {
+                    var namedField = (TableField.NamedField)field;
+                    return ContainsVarargsInExpression(namedField.Item2);
+                }
+                else if (field.IsKeyField)
+                {
+                    var keyField = (TableField.KeyField)field;
+                    return ContainsVarargsInExpression(keyField.Item1) || ContainsVarargsInExpression(keyField.Item2);
+                }
+                return false;
+            });
+        }
+        else if (expr.IsTableAccess)
+        {
+            var tableAccess = (Expr.TableAccess)expr;
+            return ContainsVarargsInExpression(tableAccess.Item1) || ContainsVarargsInExpression(tableAccess.Item2);
+        }
+        
+        return false;
+    }
         
         private static IList<T> FSharpListToList<T>(Microsoft.FSharp.Collections.FSharpList<T> fsList)
         {

@@ -437,9 +437,26 @@ public class RoslynLuaCompiler : ILuaCompiler
                 );
             }
             
-            // Create a delegate that wraps the Execute method
-            var delegateType = typeof(Func<LuaEnvironment, LuaValue[]>);
-            var compiledDelegate = Delegate.CreateDelegate(delegateType, executeMethod);
+            // Detect if the Execute method has varargs signature
+            var parameters = executeMethod.GetParameters();
+            Type delegateType;
+            Delegate compiledDelegate;
+            
+            if (parameters.Length == 2 && 
+                parameters[0].ParameterType == typeof(LuaEnvironment) &&
+                parameters[1].ParameterType == typeof(LuaValue[]) &&
+                parameters[1].GetCustomAttribute<ParamArrayAttribute>() != null)
+            {
+                // This is a varargs method: Execute(LuaEnvironment env, params LuaValue[] args)
+                delegateType = typeof(Func<LuaEnvironment, LuaValue[], LuaValue[]>);
+                compiledDelegate = Delegate.CreateDelegate(delegateType, executeMethod);
+            }
+            else
+            {
+                // This is a regular method: Execute(LuaEnvironment env)
+                delegateType = typeof(Func<LuaEnvironment, LuaValue[]>);
+                compiledDelegate = Delegate.CreateDelegate(delegateType, executeMethod);
+            }
 
             return new CompilationResult(
                 Success: true,

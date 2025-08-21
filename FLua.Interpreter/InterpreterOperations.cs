@@ -10,16 +10,16 @@ public static class InterpreterOperations
 {
     /// <summary>
     /// Converts an F# Attribute to a runtime LuaAttribute
+    /// AOT-safe version using pattern matching instead of ToString()
     /// </summary>
     public static LuaAttribute ConvertAttribute(FLua.Ast.Attribute attribute)
     {
-        return attribute.ToString() switch
-        {
-            "NoAttribute" => LuaAttribute.NoAttribute,
-            "Const" => LuaAttribute.Const,
-            "Close" => LuaAttribute.Close,
-            _ => LuaAttribute.NoAttribute
-        };
+        // Use pattern matching for AOT compatibility
+        if (attribute.IsNoAttribute) return LuaAttribute.NoAttribute;
+        if (attribute.IsConst) return LuaAttribute.Const;
+        if (attribute.IsClose) return LuaAttribute.Close;
+        
+        return LuaAttribute.NoAttribute; // Default fallback
     }
     
     /// <summary>

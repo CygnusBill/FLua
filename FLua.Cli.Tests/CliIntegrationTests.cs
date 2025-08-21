@@ -11,7 +11,6 @@ namespace FLua.Cli.Tests
     /// Tests the various execution modes: REPL, file execution, stdin, and compilation.
     /// </summary>
     [TestClass]
-    [Ignore("CLI integration tests disabled due to CommandLineParser compatibility issues with .NET 10.0 preview and AOT compilation")]
     public class CliIntegrationTests
     {
         private const string CliExecutable = "flua";
@@ -230,7 +229,7 @@ print(divide(10, 0))
             int timeoutMs = TimeoutMs)
         {
             // Try to find published executable first, fall back to dotnet run
-            var publishedExe = "/Users/bill/Repos/FLua/FLua.Cli/bin/Release/net10.0/osx-arm64/publish/flua";
+            var publishedExe = "/Users/bill/Repos/FLua/FLua.Cli/bin/Release/net8.0/osx-arm64/publish/flua";
             
             ProcessStartInfo startInfo;
             if (File.Exists(publishedExe))
