@@ -14,6 +14,7 @@
     <PackageReference Include="YoloDev.Expecto.TestSdk" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" />
     <PackageReference Include="FSharp.Core" />
+    <PackageReference Include="coverlet.collector" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\FLua.Ast\FLua.Ast.fsproj" />

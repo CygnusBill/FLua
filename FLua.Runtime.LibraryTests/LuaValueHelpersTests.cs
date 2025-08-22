@@ -23,7 +23,7 @@ namespace FLua.Runtime.LibraryTests
             
             var result = LuaValueHelpers.GetNumber(intValue);
             
-            Assert.AreEqual(42.0, result, 0.0001);
+            Assert.AreEqual(42.0, result);
         }
 
         [TestMethod]
@@ -34,7 +34,7 @@ namespace FLua.Runtime.LibraryTests
             
             var result = LuaValueHelpers.GetNumber(floatValue);
             
-            Assert.AreEqual(3.14, result, 0.0001);
+            Assert.AreEqual(3.14, result);
         }
 
         [TestMethod]
@@ -45,7 +45,7 @@ namespace FLua.Runtime.LibraryTests
             
             var result = LuaValueHelpers.GetNumber(zeroValue);
             
-            Assert.AreEqual(0.0, result, 0.0001);
+            Assert.AreEqual(0.0, result);
         }
 
         [TestMethod]
@@ -56,7 +56,7 @@ namespace FLua.Runtime.LibraryTests
             
             var result = LuaValueHelpers.GetNumber(negativeValue);
             
-            Assert.AreEqual(-2.718, result, 0.0001);
+            Assert.AreEqual(-2.718, result);
         }
 
         [TestMethod]
@@ -343,7 +343,7 @@ namespace FLua.Runtime.LibraryTests
         public void IsFunction_FunctionValue_ReturnsTrue()
         {
             // Testing Approach: Type checking - function detection
-            var function = new LuaFunction(null, "test", null, null);
+            var function = new BuiltinFunction(args => new[] { LuaValue.Nil });
             var functionValue = LuaValue.Function(function);
             
             var result = LuaValueHelpers.IsFunction(functionValue);
@@ -377,8 +377,8 @@ namespace FLua.Runtime.LibraryTests
             Assert.IsTrue(LuaValueHelpers.IsNumber(floatValue));
             
             // GetNumber should return same value for both
-            Assert.AreEqual(42.0, LuaValueHelpers.GetNumber(intValue), 0.0001);
-            Assert.AreEqual(42.0, LuaValueHelpers.GetNumber(floatValue), 0.0001);
+            Assert.AreEqual(42.0, LuaValueHelpers.GetNumber(intValue));
+            Assert.AreEqual(42.0, LuaValueHelpers.GetNumber(floatValue));
         }
 
         [TestMethod]
@@ -397,7 +397,7 @@ namespace FLua.Runtime.LibraryTests
             var extractedDouble = LuaValueHelpers.GetNumber(floatValue);
             
             Assert.AreEqual(originalLong, extractedLong);
-            Assert.AreEqual(originalDouble, extractedDouble, 0.0001);
+            Assert.AreEqual(originalDouble, extractedDouble);
         }
 
         [TestMethod]

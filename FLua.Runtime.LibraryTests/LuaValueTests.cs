@@ -19,7 +19,7 @@ namespace FLua.Runtime.LibraryTests
         public void Nil_CreateNil_ReturnsNilValue()
         {
             // Testing Approach: Basic functionality - nil value creation
-            var nilValue = LuaValue.CreateNil();
+            var nilValue = LuaValue.Nil;
             
             Assert.AreEqual(LuaType.Nil, nilValue.Type);
             Assert.IsTrue(nilValue.IsNil);
@@ -331,7 +331,7 @@ namespace FLua.Runtime.LibraryTests
             var left = LuaValue.Integer(10);
             var right = LuaValue.Integer(20);
             
-            var result = left.Add(right);
+            var result = LuaValue.Add(left, right);
             
             Assert.AreEqual(LuaType.Integer, result.Type);
             Assert.AreEqual(30L, result.AsInteger());
@@ -344,7 +344,7 @@ namespace FLua.Runtime.LibraryTests
             var left = LuaValue.Integer(10);
             var right = LuaValue.Float(3.14);
             
-            var result = left.Add(right);
+            var result = LuaValue.Add(left, right);
             
             Assert.AreEqual(LuaType.Float, result.Type);
             Assert.AreEqual(13.14, result.AsFloat(), 0.0001);
@@ -357,7 +357,7 @@ namespace FLua.Runtime.LibraryTests
             var left = LuaValue.Float(3.14);
             var right = LuaValue.Float(2.86);
             
-            var result = left.Add(right);
+            var result = LuaValue.Add(left, right);
             
             Assert.AreEqual(LuaType.Float, result.Type);
             Assert.AreEqual(6.0, result.AsFloat(), 0.0001);
@@ -383,7 +383,7 @@ namespace FLua.Runtime.LibraryTests
             var left = LuaValue.Integer(50);
             var right = LuaValue.Integer(30);
             
-            var result = left.Subtract(right);
+            var result = LuaValue.Subtract(left, right);
             
             Assert.AreEqual(LuaType.Integer, result.Type);
             Assert.AreEqual(20L, result.AsInteger());
@@ -396,7 +396,7 @@ namespace FLua.Runtime.LibraryTests
             var left = LuaValue.Integer(10);
             var right = LuaValue.Integer(30);
             
-            var result = left.Subtract(right);
+            var result = LuaValue.Subtract(left, right);
             
             Assert.AreEqual(LuaType.Integer, result.Type);
             Assert.AreEqual(-20L, result.AsInteger());
@@ -409,7 +409,7 @@ namespace FLua.Runtime.LibraryTests
             var left = LuaValue.Integer(6);
             var right = LuaValue.Integer(7);
             
-            var result = left.Multiply(right);
+            var result = LuaValue.Multiply(left, right);
             
             Assert.AreEqual(LuaType.Integer, result.Type);
             Assert.AreEqual(42L, result.AsInteger());
@@ -422,7 +422,7 @@ namespace FLua.Runtime.LibraryTests
             var left = LuaValue.Integer(5);
             var right = LuaValue.Float(2.5);
             
-            var result = left.Multiply(right);
+            var result = LuaValue.Multiply(left, right);
             
             Assert.AreEqual(LuaType.Float, result.Type);
             Assert.AreEqual(12.5, result.AsFloat(), 0.0001);
@@ -435,7 +435,7 @@ namespace FLua.Runtime.LibraryTests
             var left = LuaValue.Integer(10);
             var right = LuaValue.Integer(4);
             
-            var result = left.Divide(right);
+            var result = LuaValue.Divide(left, right);
             
             Assert.AreEqual(LuaType.Float, result.Type);
             Assert.AreEqual(2.5, result.AsFloat(), 0.0001);
@@ -448,7 +448,7 @@ namespace FLua.Runtime.LibraryTests
             var left = LuaValue.Float(10.7);
             var right = LuaValue.Float(3.0);
             
-            var result = left.FloorDivide(right);
+            var result = LuaValue.FloorDivide(left, right);
             
             Assert.AreEqual(LuaType.Integer, result.Type);
             Assert.AreEqual(3L, result.AsInteger());
@@ -461,7 +461,7 @@ namespace FLua.Runtime.LibraryTests
             var left = LuaValue.Integer(17);
             var right = LuaValue.Integer(5);
             
-            var result = left.Modulo(right);
+            var result = LuaValue.Modulo(left, right);
             
             Assert.AreEqual(LuaType.Integer, result.Type);
             Assert.AreEqual(2L, result.AsInteger());
@@ -474,7 +474,7 @@ namespace FLua.Runtime.LibraryTests
             var left = LuaValue.Integer(2);
             var right = LuaValue.Integer(3);
             
-            var result = left.Power(right);
+            var result = LuaValue.Power(left, right);
             
             Assert.AreEqual(LuaType.Float, result.Type);
             Assert.AreEqual(8.0, result.AsFloat(), 0.0001);
@@ -486,7 +486,7 @@ namespace FLua.Runtime.LibraryTests
             // Testing Approach: Unary minus operation
             var value = LuaValue.Integer(42);
             
-            var result = value.UnaryMinus();
+            var result = LuaValue.UnaryMinus(value);
             
             Assert.AreEqual(LuaType.Integer, result.Type);
             Assert.AreEqual(-42L, result.AsInteger());
@@ -498,7 +498,7 @@ namespace FLua.Runtime.LibraryTests
             // Testing Approach: Unary minus on negative float
             var value = LuaValue.Float(-3.14);
             
-            var result = value.UnaryMinus();
+            var result = LuaValue.UnaryMinus(value);
             
             Assert.AreEqual(LuaType.Float, result.Type);
             Assert.AreEqual(3.14, result.AsFloat(), 0.0001);
@@ -561,7 +561,7 @@ namespace FLua.Runtime.LibraryTests
         {
             // Testing Approach: Nil equality
             var left = LuaValue.Nil;
-            var right = LuaValue.CreateNil();
+            var right = LuaValue.Nil;
             
             Assert.IsTrue(left.Equals(right));
             Assert.IsTrue(left == right);
@@ -641,7 +641,7 @@ namespace FLua.Runtime.LibraryTests
             // Testing Approach: Type conversion - integer to integer
             var intValue = LuaValue.Integer(42);
             
-            var success = intValue.TryGetInteger(out var result);
+            var success = intValue.TryGetInteger(out long result);
             
             Assert.IsTrue(success);
             Assert.AreEqual(42L, result);
@@ -653,7 +653,7 @@ namespace FLua.Runtime.LibraryTests
             // Testing Approach: Type conversion failure
             var stringValue = LuaValue.String("hello");
             
-            var success = stringValue.TryGetInteger(out var result);
+            var success = stringValue.TryGetInteger(out long result);
             
             Assert.IsFalse(success);
             Assert.AreEqual(0L, result);
@@ -665,7 +665,7 @@ namespace FLua.Runtime.LibraryTests
             // Testing Approach: Float type conversion
             var floatValue = LuaValue.Float(3.14);
             
-            var success = floatValue.TryGetFloat(out var result);
+            var success = floatValue.TryGetFloat(out double result);
             
             Assert.IsTrue(success);
             Assert.AreEqual(3.14, result, 0.0001);
@@ -677,7 +677,7 @@ namespace FLua.Runtime.LibraryTests
             // Testing Approach: Integer to float conversion
             var intValue = LuaValue.Integer(42);
             
-            var success = intValue.TryGetFloat(out var result);
+            var success = intValue.TryGetFloat(out double result);
             
             Assert.IsTrue(success);
             Assert.AreEqual(42.0, result, 0.0001);
@@ -717,11 +717,10 @@ namespace FLua.Runtime.LibraryTests
             // Testing Approach: Lua number conversion - string to integer
             var stringValue = LuaValue.String("42");
             
-            var success = stringValue.TryToNumber(out var result);
+            var success = stringValue.TryToNumber(out double result);
             
             Assert.IsTrue(success);
-            Assert.AreEqual(LuaType.Integer, result.Type);
-            Assert.AreEqual(42L, result.AsInteger());
+            Assert.AreEqual(42.0, result, 0.0001);
         }
 
         [TestMethod]
@@ -730,11 +729,10 @@ namespace FLua.Runtime.LibraryTests
             // Testing Approach: Lua number conversion - string to float
             var stringValue = LuaValue.String("3.14");
             
-            var success = stringValue.TryToNumber(out var result);
+            var success = stringValue.TryToNumber(out double result);
             
             Assert.IsTrue(success);
-            Assert.AreEqual(LuaType.Float, result.Type);
-            Assert.AreEqual(3.14, result.AsFloat(), 0.0001);
+            Assert.AreEqual(3.14, result, 0.0001);
         }
 
         [TestMethod]
@@ -743,11 +741,10 @@ namespace FLua.Runtime.LibraryTests
             // Testing Approach: Lua number conversion with whitespace
             var stringValue = LuaValue.String("  42  ");
             
-            var success = stringValue.TryToNumber(out var result);
+            var success = stringValue.TryToNumber(out double result);
             
             Assert.IsTrue(success);
-            Assert.AreEqual(LuaType.Integer, result.Type);
-            Assert.AreEqual(42L, result.AsInteger());
+            Assert.AreEqual(42.0, result, 0.0001);
         }
 
         [TestMethod]
@@ -756,10 +753,10 @@ namespace FLua.Runtime.LibraryTests
             // Testing Approach: Error condition - invalid number string
             var stringValue = LuaValue.String("not a number");
             
-            var success = stringValue.TryToNumber(out var result);
+            var success = stringValue.TryToNumber(out double result);
             
             Assert.IsFalse(success);
-            Assert.AreEqual(LuaType.Nil, result.Type);
+            Assert.AreEqual(0.0, result, 0.0001);
         }
 
         [TestMethod]

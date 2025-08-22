@@ -23,7 +23,7 @@ namespace FLua.Runtime.LibraryTests
             
             var result = LuaTypeConversion.ToNumber(intValue);
             
-            Assert.AreEqual(42.0, result, 0.0001);
+            Assert.AreEqual(42.0, result);
         }
 
         [TestMethod]
@@ -34,7 +34,7 @@ namespace FLua.Runtime.LibraryTests
             
             var result = LuaTypeConversion.ToNumber(floatValue);
             
-            Assert.AreEqual(3.14, result, 0.0001);
+            Assert.AreEqual(3.14, result);
         }
 
         [TestMethod]
@@ -45,7 +45,7 @@ namespace FLua.Runtime.LibraryTests
             
             var result = LuaTypeConversion.ToNumber(stringValue);
             
-            Assert.AreEqual(123.45, result, 0.0001);
+            Assert.AreEqual(123.45, result);
         }
 
         [TestMethod]
@@ -56,7 +56,7 @@ namespace FLua.Runtime.LibraryTests
             
             var result = LuaTypeConversion.ToNumber(stringValue);
             
-            Assert.AreEqual(789.0, result, 0.0001);
+            Assert.AreEqual(789.0, result);
         }
 
         [TestMethod]
@@ -67,7 +67,7 @@ namespace FLua.Runtime.LibraryTests
             
             var result = LuaTypeConversion.ToNumber(stringValue);
             
-            Assert.AreEqual(42.5, result, 0.0001);
+            Assert.AreEqual(42.5, result);
         }
 
         [TestMethod]
@@ -78,7 +78,7 @@ namespace FLua.Runtime.LibraryTests
             
             var result = LuaTypeConversion.ToNumber(stringValue);
             
-            Assert.AreEqual(-123.45, result, 0.0001);
+            Assert.AreEqual(-123.45, result);
         }
 
         [TestMethod]
@@ -89,7 +89,7 @@ namespace FLua.Runtime.LibraryTests
             
             var result = LuaTypeConversion.ToNumber(stringValue);
             
-            Assert.AreEqual(0.0, result, 0.0001);
+            Assert.AreEqual(0.0, result);
         }
 
         [TestMethod]
@@ -369,7 +369,7 @@ namespace FLua.Runtime.LibraryTests
         public void GetTypeName_FunctionValue_ReturnsFunction()
         {
             // Testing Approach: Type name for function
-            var function = new LuaFunction(null, "test", null, null);
+            var function = new BuiltinFunction(args => new[] { LuaValue.Nil });
             var functionValue = LuaValue.Function(function);
             
             var result = LuaTypeConversion.GetTypeName(functionValue);
@@ -445,8 +445,9 @@ namespace FLua.Runtime.LibraryTests
             // Testing Approach: String parsing - valid integer
             var result = LuaTypeConversion.StringToNumber("42");
             
-            Assert.AreEqual(LuaType.Integer, result.Type);
-            Assert.AreEqual(42L, result.AsInteger());
+            Assert.IsNotNull(result);
+            Assert.AreEqual(LuaType.Integer, result.Value.Type);
+            Assert.AreEqual(42L, result.Value.AsInteger());
         }
 
         [TestMethod]
@@ -455,8 +456,9 @@ namespace FLua.Runtime.LibraryTests
             // Testing Approach: String parsing - valid float
             var result = LuaTypeConversion.StringToNumber("3.14");
             
-            Assert.AreEqual(LuaType.Float, result.Type);
-            Assert.AreEqual(3.14, result.AsFloat(), 0.0001);
+            Assert.IsNotNull(result);
+            Assert.AreEqual(LuaType.Float, result.Value.Type);
+            Assert.AreEqual(3.14, result.Value.AsFloat(), 0.0001);
         }
 
         [TestMethod]
@@ -465,8 +467,9 @@ namespace FLua.Runtime.LibraryTests
             // Testing Approach: Boundary Value Analysis - negative integer
             var result = LuaTypeConversion.StringToNumber("-123");
             
-            Assert.AreEqual(LuaType.Integer, result.Type);
-            Assert.AreEqual(-123L, result.AsInteger());
+            Assert.IsNotNull(result);
+            Assert.AreEqual(LuaType.Integer, result.Value.Type);
+            Assert.AreEqual(-123L, result.Value.AsInteger());
         }
 
         [TestMethod]
@@ -475,8 +478,9 @@ namespace FLua.Runtime.LibraryTests
             // Testing Approach: Boundary Value Analysis - negative float
             var result = LuaTypeConversion.StringToNumber("-2.718");
             
-            Assert.AreEqual(LuaType.Float, result.Type);
-            Assert.AreEqual(-2.718, result.AsFloat(), 0.0001);
+            Assert.IsNotNull(result);
+            Assert.AreEqual(LuaType.Float, result.Value.Type);
+            Assert.AreEqual(-2.718, result.Value.AsFloat(), 0.0001);
         }
 
         [TestMethod]
@@ -485,8 +489,9 @@ namespace FLua.Runtime.LibraryTests
             // Testing Approach: Boundary Value Analysis - zero
             var result = LuaTypeConversion.StringToNumber("0");
             
-            Assert.AreEqual(LuaType.Integer, result.Type);
-            Assert.AreEqual(0L, result.AsInteger());
+            Assert.IsNotNull(result);
+            Assert.AreEqual(LuaType.Integer, result.Value.Type);
+            Assert.AreEqual(0L, result.Value.AsInteger());
         }
 
         [TestMethod]
@@ -495,8 +500,9 @@ namespace FLua.Runtime.LibraryTests
             // Testing Approach: Whitespace handling
             var result = LuaTypeConversion.StringToNumber("  42.5  ");
             
-            Assert.AreEqual(LuaType.Float, result.Type);
-            Assert.AreEqual(42.5, result.AsFloat(), 0.0001);
+            Assert.IsNotNull(result);
+            Assert.AreEqual(LuaType.Float, result.Value.Type);
+            Assert.AreEqual(42.5, result.Value.AsFloat(), 0.0001);
         }
 
         [TestMethod]
@@ -505,8 +511,9 @@ namespace FLua.Runtime.LibraryTests
             // Testing Approach: Hexadecimal number parsing
             var result = LuaTypeConversion.StringToNumber("0xFF");
             
-            Assert.AreEqual(LuaType.Integer, result.Type);
-            Assert.AreEqual(255L, result.AsInteger());
+            Assert.IsNotNull(result);
+            Assert.AreEqual(LuaType.Integer, result.Value.Type);
+            Assert.AreEqual(255L, result.Value.AsInteger());
         }
 
         [TestMethod]
@@ -515,35 +522,36 @@ namespace FLua.Runtime.LibraryTests
             // Testing Approach: Scientific notation parsing
             var result = LuaTypeConversion.StringToNumber("1.23e2");
             
-            Assert.AreEqual(LuaType.Float, result.Type);
-            Assert.AreEqual(123.0, result.AsFloat(), 0.0001);
+            Assert.IsNotNull(result);
+            Assert.AreEqual(LuaType.Float, result.Value.Type);
+            Assert.AreEqual(123.0, result.Value.AsFloat(), 0.0001);
         }
 
         [TestMethod]
-        public void StringToNumber_InvalidString_ReturnsNil()
+        public void StringToNumber_InvalidString_ReturnsNull()
         {
-            // Testing Approach: Error condition - invalid string returns nil
+            // Testing Approach: Error condition - invalid string returns null
             var result = LuaTypeConversion.StringToNumber("not a number");
             
-            Assert.AreEqual(LuaType.Nil, result.Type);
+            Assert.IsNull(result);
         }
 
         [TestMethod]
-        public void StringToNumber_EmptyString_ReturnsNil()
+        public void StringToNumber_EmptyString_ReturnsNull()
         {
             // Testing Approach: Edge case - empty string
             var result = LuaTypeConversion.StringToNumber("");
             
-            Assert.AreEqual(LuaType.Nil, result.Type);
+            Assert.IsNull(result);
         }
 
         [TestMethod]
-        public void StringToNumber_NullString_ReturnsNil()
+        public void StringToNumber_NullString_ReturnsNull()
         {
             // Testing Approach: Edge case - null string
             var result = LuaTypeConversion.StringToNumber(null);
             
-            Assert.AreEqual(LuaType.Nil, result.Type);
+            Assert.IsNull(result);
         }
 
         #endregion
@@ -565,7 +573,7 @@ namespace FLua.Runtime.LibraryTests
             var convertedFloat = LuaTypeConversion.ToNumber(floatValue);
             
             Assert.AreEqual(originalInt, convertedInt);
-            Assert.AreEqual(originalFloat, convertedFloat, 0.0001);
+            Assert.AreEqual(originalFloat, convertedFloat);
         }
 
         [TestMethod]
@@ -579,11 +587,14 @@ namespace FLua.Runtime.LibraryTests
             var intResult = LuaTypeConversion.StringToNumber(intString);
             var floatResult = LuaTypeConversion.StringToNumber(floatString);
             
-            var intNumber = LuaTypeConversion.ToNumber(intResult);
-            var floatNumber = LuaTypeConversion.ToNumber(floatResult);
+            Assert.IsNotNull(intResult);
+            Assert.IsNotNull(floatResult);
             
-            Assert.AreEqual(789.0, intNumber, 0.0001);
-            Assert.AreEqual(12.34, floatNumber, 0.0001);
+            var intNumber = LuaTypeConversion.ToNumber(intResult.Value);
+            var floatNumber = LuaTypeConversion.ToNumber(floatResult.Value);
+            
+            Assert.AreEqual(789.0, intNumber);
+            Assert.AreEqual(12.34, floatNumber);
         }
 
         [TestMethod]
@@ -631,13 +642,13 @@ namespace FLua.Runtime.LibraryTests
                 var stringNum = i.ToString();
                 var luaValue = LuaTypeConversion.StringToNumber(stringNum);
                 
-                if (luaValue.Type == LuaType.Integer)
+                if (luaValue != null && luaValue.Value.Type == LuaType.Integer)
                 {
-                    var backToNumber = LuaTypeConversion.ToNumber(luaValue);
-                    var typeName = LuaTypeConversion.GetTypeName(luaValue);
-                    var boolValue = LuaTypeConversion.ToBoolean(luaValue);
+                    var backToNumber = LuaTypeConversion.ToNumber(luaValue.Value);
+                    var typeName = LuaTypeConversion.GetTypeName(luaValue.Value);
+                    var boolValue = LuaTypeConversion.ToBoolean(luaValue.Value);
                     
-                    Assert.AreEqual(i, backToNumber, 0.0001);
+                    Assert.AreEqual((double)i, backToNumber);
                     Assert.AreEqual("number", typeName);
                     Assert.IsTrue(boolValue); // Numbers are truthy in Lua
                 }
