@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
 using FLua.Ast;
 using FLua.Common;
@@ -131,11 +132,11 @@ namespace FLua.Compiler
                 }
                 
                 // Check for conflicting options
-                if (options.GenerateInMemory && !string.IsNullOrWhiteSpace(options.AssemblyPath))
+                if (options.GenerateInMemory && !string.IsNullOrWhiteSpace(options.OutputPath))
                 {
                     diagnostics.Add(new CompilerDiagnostic(
                         DiagnosticSeverity.Warning,
-                        "AssemblyPath will be ignored when generating in-memory"));
+                        "OutputPath will be ignored when generating in-memory"));
                 }
                 
                 return diagnostics.Any(d => d.Severity == DiagnosticSeverity.Error)

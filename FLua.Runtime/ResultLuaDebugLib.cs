@@ -31,7 +31,7 @@ namespace FLua.Runtime
                 var func = target.AsFunction();
                 
                 // Add function information
-                info.Set(LuaValue.String("name"), LuaValue.String(func.ToString()));
+                info.Set(LuaValue.String("name"), LuaValue.String(func.ToString() ?? "function"));
                 info.Set(LuaValue.String("namewhat"), LuaValue.String("global"));
                 info.Set(LuaValue.String("what"), LuaValue.String("Lua"));
                 info.Set(LuaValue.String("source"), LuaValue.String("=[C]"));
