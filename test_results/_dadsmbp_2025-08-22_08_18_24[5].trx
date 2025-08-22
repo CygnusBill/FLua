@@ -1,0 +1,165 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TestRun id="236a8feb-75fd-41cd-ace6-5ed577c109a7" name="@dadsmbp 2025-08-22 08:18:24" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+  <Times creation="2025-08-22T08:18:24.8896200-04:00" queuing="2025-08-22T08:18:24.8896200-04:00" start="2025-08-22T08:18:24.1359590-04:00" finish="2025-08-22T08:18:25.5326070-04:00" />
+  <TestSettings name="default" id="569b9fc8-1989-40a6-a938-633233c8cd56">
+    <Deployment runDeploymentRoot="_dadsmbp_2025-08-22_08_18_24" />
+  </TestSettings>
+  <Results>
+    <UnitTestResult executionId="78cbf43e-8f58-4b02-a8dc-0ccd7f54a9a0" testId="0c2c5937-ffae-b8a7-0734-53dc5b30902f" testName="Cli_VersionCommand_ShowsVersion" computerName="dadsmbp" duration="00:00:00.8284272" startTime="2025-08-22T08:18:24.6600950-04:00" endTime="2025-08-22T08:18:25.4888990-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="78cbf43e-8f58-4b02-a8dc-0ccd7f54a9a0" />
+    <UnitTestResult executionId="c79d2aad-9143-40ae-b13a-7a4d5274808b" testId="7e48b16c-5f83-417c-9b3f-c46f4b8b2ff7" testName="Cli_ArithmeticScript_ExecutesCorrectly" computerName="dadsmbp" duration="00:00:00.2377884" startTime="2025-08-22T08:18:24.4160320-04:00" endTime="2025-08-22T08:18:24.6873910-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="c79d2aad-9143-40ae-b13a-7a4d5274808b" />
+    <UnitTestResult executionId="46d4551b-42ed-41b1-8b91-c0b16f0cec58" testId="c728dcc7-a046-5cd2-3e98-2d7573b3d875" testName="Cli_FileNotFound_ReturnsError" computerName="dadsmbp" duration="00:00:00.2379792" startTime="2025-08-22T08:18:24.4160150-04:00" endTime="2025-08-22T08:18:24.6873800-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="46d4551b-42ed-41b1-8b91-c0b16f0cec58" />
+    <UnitTestResult executionId="1028dd04-295f-46c8-8c1a-272efdc6676f" testId="9400551e-2ada-acc9-3a94-2036821b468d" testName="Cli_ComplexScript_ExecutesCorrectly" computerName="dadsmbp" duration="00:00:00.3401703" startTime="2025-08-22T08:18:24.4159800-04:00" endTime="2025-08-22T08:18:24.7619800-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="1028dd04-295f-46c8-8c1a-272efdc6676f" />
+    <UnitTestResult executionId="94443c1e-ed1b-4a69-ade1-bd3d724d0ba8" testId="cfc04372-90df-4c3e-678d-c6766a3e84f7" testName="Cli_VerboseMode_ShowsAdditionalOutput" computerName="dadsmbp" duration="00:00:00.2379000" startTime="2025-08-22T08:18:24.4160220-04:00" endTime="2025-08-22T08:18:24.6870580-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="94443c1e-ed1b-4a69-ade1-bd3d724d0ba8" />
+    <UnitTestResult executionId="693701ff-ab10-4f2f-8eb3-28403b2dc4e7" testId="45ea4375-84e3-6893-a90e-861e61bd9f26" testName="Cli_ArithmeticScript_WorksCorrectly" computerName="dadsmbp" duration="00:00:00.8298172" startTime="2025-08-22T08:18:24.6601710-04:00" endTime="2025-08-22T08:18:25.4900310-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="693701ff-ab10-4f2f-8eb3-28403b2dc4e7" />
+    <UnitTestResult executionId="bd029ab2-a7b8-46d3-80a3-45d49b8c6c5f" testId="1a511b54-2ab5-11d2-c40b-19656551c94f" testName="Cli_SyntaxErrorScript_ReturnsError" computerName="dadsmbp" duration="00:00:00.6468318" startTime="2025-08-22T08:18:24.8438780-04:00" endTime="2025-08-22T08:18:25.4908930-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="bd029ab2-a7b8-46d3-80a3-45d49b8c6c5f" />
+    <UnitTestResult executionId="fdc6c3d2-3737-41ea-b72e-6c38ac1f9340" testId="6bae71f3-e3c5-a6ef-db0f-d5d4d3a5ed58" testName="Cli_StdinInput_WorksCorrectly" computerName="dadsmbp" duration="00:00:00.2378395" startTime="2025-08-22T08:18:24.4159940-04:00" endTime="2025-08-22T08:18:24.6870650-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="fdc6c3d2-3737-41ea-b72e-6c38ac1f9340" />
+    <UnitTestResult executionId="a26273a4-0dc4-4aae-85c9-078326687616" testId="507ad8da-17d8-f6e3-5244-eb9a91b9dd21" testName="Cli_RuntimeError_ReturnsError" computerName="dadsmbp" duration="00:00:00.2378240" startTime="2025-08-22T08:18:24.4159970-04:00" endTime="2025-08-22T08:18:24.6873300-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="a26273a4-0dc4-4aae-85c9-078326687616" />
+    <UnitTestResult executionId="65affa7d-987a-4332-8f1b-f3ee411bda08" testId="3e058093-f097-8671-8ae0-d32127421321" testName="Cli_SimpleFileExecution_WorksCorrectly" computerName="dadsmbp" duration="00:00:00.2378465" startTime="2025-08-22T08:18:24.4159690-04:00" endTime="2025-08-22T08:18:24.6874380-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="65affa7d-987a-4332-8f1b-f3ee411bda08" />
+    <UnitTestResult executionId="5600d7e9-1ccb-40bd-8800-32f4787757f3" testId="8ace3406-5ecc-2656-4756-a1fe0db9ace0" testName="Cli_HelpCommand_ShowsUsage" computerName="dadsmbp" duration="00:00:00.1838908" startTime="2025-08-22T08:18:24.6600330-04:00" endTime="2025-08-22T08:18:24.8443150-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="5600d7e9-1ccb-40bd-8800-32f4787757f3" />
+    <UnitTestResult executionId="e211c94c-7898-4e25-a778-6ea253af0f08" testId="4cd1b079-e243-9aaa-4595-60f1db1e6c74" testName="Cli_StringOperations_WorkCorrectly" computerName="dadsmbp" duration="00:00:00.6138439" startTime="2025-08-22T08:18:24.8766590-04:00" endTime="2025-08-22T08:18:25.4905840-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="e211c94c-7898-4e25-a778-6ea253af0f08" />
+    <UnitTestResult executionId="0b4d8d42-fc55-4be3-b2a6-d65cda795842" testId="8718a1e5-d122-40e4-9dd3-edf050bba4b8" testName="Cli_SimpleScript_ExecutesCorrectly" computerName="dadsmbp" duration="00:00:00.8293143" startTime="2025-08-22T08:18:24.6601100-04:00" endTime="2025-08-22T08:18:25.4896920-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="0b4d8d42-fc55-4be3-b2a6-d65cda795842" />
+    <UnitTestResult executionId="582ca6af-9574-4842-a26a-c707c9e24a50" testId="f6e29e2f-bcac-e94b-4f50-ad45aa060de1" testName="Cli_LegacyFileExecution_WorksCorrectly" computerName="dadsmbp" duration="00:00:00.2377538" startTime="2025-08-22T08:18:24.4160280-04:00" endTime="2025-08-22T08:18:24.6874560-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="582ca6af-9574-4842-a26a-c707c9e24a50" />
+    <UnitTestResult executionId="89e90769-2537-47d3-8ae9-eb0643f0ec2f" testId="872adf12-e50a-79e0-9ce7-fb3969a6ea52" testName="Cli_FunctionDefinition_WorksCorrectly" computerName="dadsmbp" duration="00:00:00.6230523" startTime="2025-08-22T08:18:24.8763000-04:00" endTime="2025-08-22T08:18:25.4996690-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="89e90769-2537-47d3-8ae9-eb0643f0ec2f">
+      <Output>
+        <ErrorInfo>
+          <Message>Assert.AreEqual failed. Expected:&lt;0&gt;. Actual:&lt;1&gt;. CLI should succeed. Error: Error: LuaUserFunction.Call must be implemented by the interpreter
+</Message>
+          <StackTrace>   at FLua.Cli.Tests.CliUnitTests.Cli_FunctionDefinition_WorksCorrectly() in /Users/bill/Repos/FLua/FLua.Cli.Tests/CliUnitTests.cs:line 165
+</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="54d4468c-c0f8-4683-bf28-92d31c9f37c8" testId="892f572c-e7d6-f03b-4d86-0b5a31c85d51" testName="Cli_LocalVariables_WorkCorrectly" computerName="dadsmbp" duration="00:00:00.6147377" startTime="2025-08-22T08:18:24.8763020-04:00" endTime="2025-08-22T08:18:25.4911870-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="54d4468c-c0f8-4683-bf28-92d31c9f37c8" />
+    <UnitTestResult executionId="03ff35a1-cb37-4540-bf5f-b1edbbf297a0" testId="b1cecd03-d33a-a228-d6b8-593db3444393" testName="Cli_NoArguments_StartsRepl" computerName="dadsmbp" duration="00:00:00.1839162" startTime="2025-08-22T08:18:24.6600180-04:00" endTime="2025-08-22T08:18:24.8441600-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="03ff35a1-cb37-4540-bf5f-b1edbbf297a0" />
+    <UnitTestResult executionId="c7f8e1d5-f7d8-426f-8c80-2646fe47dcc0" testId="6a5d5870-4cd4-4597-fe00-cbbf3ea78b53" testName="Cli_SyntaxError_ReturnsError" computerName="dadsmbp" duration="00:00:00.2379361" startTime="2025-08-22T08:18:24.4160070-04:00" endTime="2025-08-22T08:18:24.6872740-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="c7f8e1d5-f7d8-426f-8c80-2646fe47dcc0" />
+    <UnitTestResult executionId="a1182ab2-52fc-4616-8e73-ab0171afa6e5" testId="e75f2396-b54a-3cef-477c-e7503164f990" testName="Cli_VerboseMode_ShowsReturnValue" computerName="dadsmbp" duration="00:00:00.6261227" startTime="2025-08-22T08:18:24.8758630-04:00" endTime="2025-08-22T08:18:25.5025440-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="a1182ab2-52fc-4616-8e73-ab0171afa6e5" />
+    <UnitTestResult executionId="ccd81531-4158-4d6f-a190-aea3b0768231" testId="2655c24a-6c95-e5a4-4c89-42df604e0f16" testName="Cli_TableOperations_WorkCorrectly" computerName="dadsmbp" duration="00:00:00.6141979" startTime="2025-08-22T08:18:24.8766610-04:00" endTime="2025-08-22T08:18:25.4909490-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="ccd81531-4158-4d6f-a190-aea3b0768231" />
+    <UnitTestResult executionId="79b87ff1-2dea-43b6-b635-627c0ab01853" testId="cfafb189-a6e5-3146-a735-7271f4697add" testName="Cli_NonExistentFile_ReturnsError" computerName="dadsmbp" duration="00:00:00.8299410" startTime="2025-08-22T08:18:24.6604060-04:00" endTime="2025-08-22T08:18:25.4904190-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="79b87ff1-2dea-43b6-b635-627c0ab01853" />
+    <UnitTestResult executionId="2bb76491-dbeb-4843-84c4-e68818ae4592" testId="ce44f21e-28c1-b361-ebf9-0e02a1d54060" testName="Cli_HelpCommand_ShowsUsage" computerName="dadsmbp" duration="00:00:00.8305679" startTime="2025-08-22T08:18:24.6600670-04:00" endTime="2025-08-22T08:18:25.4907860-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="2bb76491-dbeb-4843-84c4-e68818ae4592" />
+  </Results>
+  <TestDefinitions>
+    <UnitTest name="Cli_NonExistentFile_ReturnsError" storage="/users/bill/repos/flua/flua.cli.tests/bin/debug/net8.0/flua.cli.tests.dll" id="cfafb189-a6e5-3146-a735-7271f4697add">
+      <Execution id="79b87ff1-2dea-43b6-b635-627c0ab01853" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Cli.Tests/bin/Debug/net8.0/FLua.Cli.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Cli.Tests.CliUnitTests" name="Cli_NonExistentFile_ReturnsError" />
+    </UnitTest>
+    <UnitTest name="Cli_VerboseMode_ShowsReturnValue" storage="/users/bill/repos/flua/flua.cli.tests/bin/debug/net8.0/flua.cli.tests.dll" id="e75f2396-b54a-3cef-477c-e7503164f990">
+      <Execution id="a1182ab2-52fc-4616-8e73-ab0171afa6e5" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Cli.Tests/bin/Debug/net8.0/FLua.Cli.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Cli.Tests.CliUnitTests" name="Cli_VerboseMode_ShowsReturnValue" />
+    </UnitTest>
+    <UnitTest name="Cli_HelpCommand_ShowsUsage" storage="/users/bill/repos/flua/flua.cli.tests/bin/debug/net8.0/flua.cli.tests.dll" id="ce44f21e-28c1-b361-ebf9-0e02a1d54060">
+      <Execution id="2bb76491-dbeb-4843-84c4-e68818ae4592" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Cli.Tests/bin/Debug/net8.0/FLua.Cli.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Cli.Tests.CliUnitTests" name="Cli_HelpCommand_ShowsUsage" />
+    </UnitTest>
+    <UnitTest name="Cli_ArithmeticScript_WorksCorrectly" storage="/users/bill/repos/flua/flua.cli.tests/bin/debug/net8.0/flua.cli.tests.dll" id="45ea4375-84e3-6893-a90e-861e61bd9f26">
+      <Execution id="693701ff-ab10-4f2f-8eb3-28403b2dc4e7" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Cli.Tests/bin/Debug/net8.0/FLua.Cli.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Cli.Tests.CliUnitTests" name="Cli_ArithmeticScript_WorksCorrectly" />
+    </UnitTest>
+    <UnitTest name="Cli_NoArguments_StartsRepl" storage="/users/bill/repos/flua/flua.cli.tests/bin/debug/net8.0/flua.cli.tests.dll" id="b1cecd03-d33a-a228-d6b8-593db3444393">
+      <Execution id="03ff35a1-cb37-4540-bf5f-b1edbbf297a0" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Cli.Tests/bin/Debug/net8.0/FLua.Cli.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Cli.Tests.CliIntegrationTests" name="Cli_NoArguments_StartsRepl" />
+    </UnitTest>
+    <UnitTest name="Cli_StdinInput_WorksCorrectly" storage="/users/bill/repos/flua/flua.cli.tests/bin/debug/net8.0/flua.cli.tests.dll" id="6bae71f3-e3c5-a6ef-db0f-d5d4d3a5ed58">
+      <Execution id="fdc6c3d2-3737-41ea-b72e-6c38ac1f9340" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Cli.Tests/bin/Debug/net8.0/FLua.Cli.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Cli.Tests.CliIntegrationTests" name="Cli_StdinInput_WorksCorrectly" />
+    </UnitTest>
+    <UnitTest name="Cli_RuntimeError_ReturnsError" storage="/users/bill/repos/flua/flua.cli.tests/bin/debug/net8.0/flua.cli.tests.dll" id="507ad8da-17d8-f6e3-5244-eb9a91b9dd21">
+      <Execution id="a26273a4-0dc4-4aae-85c9-078326687616" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Cli.Tests/bin/Debug/net8.0/FLua.Cli.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Cli.Tests.CliIntegrationTests" name="Cli_RuntimeError_ReturnsError" />
+    </UnitTest>
+    <UnitTest name="Cli_VersionCommand_ShowsVersion" storage="/users/bill/repos/flua/flua.cli.tests/bin/debug/net8.0/flua.cli.tests.dll" id="0c2c5937-ffae-b8a7-0734-53dc5b30902f">
+      <Execution id="78cbf43e-8f58-4b02-a8dc-0ccd7f54a9a0" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Cli.Tests/bin/Debug/net8.0/FLua.Cli.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Cli.Tests.CliUnitTests" name="Cli_VersionCommand_ShowsVersion" />
+    </UnitTest>
+    <UnitTest name="Cli_ArithmeticScript_ExecutesCorrectly" storage="/users/bill/repos/flua/flua.cli.tests/bin/debug/net8.0/flua.cli.tests.dll" id="7e48b16c-5f83-417c-9b3f-c46f4b8b2ff7">
+      <Execution id="c79d2aad-9143-40ae-b13a-7a4d5274808b" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Cli.Tests/bin/Debug/net8.0/FLua.Cli.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Cli.Tests.CliIntegrationTests" name="Cli_ArithmeticScript_ExecutesCorrectly" />
+    </UnitTest>
+    <UnitTest name="Cli_SyntaxError_ReturnsError" storage="/users/bill/repos/flua/flua.cli.tests/bin/debug/net8.0/flua.cli.tests.dll" id="6a5d5870-4cd4-4597-fe00-cbbf3ea78b53">
+      <Execution id="c7f8e1d5-f7d8-426f-8c80-2646fe47dcc0" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Cli.Tests/bin/Debug/net8.0/FLua.Cli.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Cli.Tests.CliIntegrationTests" name="Cli_SyntaxError_ReturnsError" />
+    </UnitTest>
+    <UnitTest name="Cli_LegacyFileExecution_WorksCorrectly" storage="/users/bill/repos/flua/flua.cli.tests/bin/debug/net8.0/flua.cli.tests.dll" id="f6e29e2f-bcac-e94b-4f50-ad45aa060de1">
+      <Execution id="582ca6af-9574-4842-a26a-c707c9e24a50" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Cli.Tests/bin/Debug/net8.0/FLua.Cli.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Cli.Tests.CliIntegrationTests" name="Cli_LegacyFileExecution_WorksCorrectly" />
+    </UnitTest>
+    <UnitTest name="Cli_StringOperations_WorkCorrectly" storage="/users/bill/repos/flua/flua.cli.tests/bin/debug/net8.0/flua.cli.tests.dll" id="4cd1b079-e243-9aaa-4595-60f1db1e6c74">
+      <Execution id="e211c94c-7898-4e25-a778-6ea253af0f08" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Cli.Tests/bin/Debug/net8.0/FLua.Cli.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Cli.Tests.CliUnitTests" name="Cli_StringOperations_WorkCorrectly" />
+    </UnitTest>
+    <UnitTest name="Cli_ComplexScript_ExecutesCorrectly" storage="/users/bill/repos/flua/flua.cli.tests/bin/debug/net8.0/flua.cli.tests.dll" id="9400551e-2ada-acc9-3a94-2036821b468d">
+      <Execution id="1028dd04-295f-46c8-8c1a-272efdc6676f" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Cli.Tests/bin/Debug/net8.0/FLua.Cli.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Cli.Tests.CliIntegrationTests" name="Cli_ComplexScript_ExecutesCorrectly" />
+    </UnitTest>
+    <UnitTest name="Cli_HelpCommand_ShowsUsage" storage="/users/bill/repos/flua/flua.cli.tests/bin/debug/net8.0/flua.cli.tests.dll" id="8ace3406-5ecc-2656-4756-a1fe0db9ace0">
+      <Execution id="5600d7e9-1ccb-40bd-8800-32f4787757f3" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Cli.Tests/bin/Debug/net8.0/FLua.Cli.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Cli.Tests.CliIntegrationTests" name="Cli_HelpCommand_ShowsUsage" />
+    </UnitTest>
+    <UnitTest name="Cli_VerboseMode_ShowsAdditionalOutput" storage="/users/bill/repos/flua/flua.cli.tests/bin/debug/net8.0/flua.cli.tests.dll" id="cfc04372-90df-4c3e-678d-c6766a3e84f7">
+      <Execution id="94443c1e-ed1b-4a69-ade1-bd3d724d0ba8" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Cli.Tests/bin/Debug/net8.0/FLua.Cli.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Cli.Tests.CliIntegrationTests" name="Cli_VerboseMode_ShowsAdditionalOutput" />
+    </UnitTest>
+    <UnitTest name="Cli_SimpleScript_ExecutesCorrectly" storage="/users/bill/repos/flua/flua.cli.tests/bin/debug/net8.0/flua.cli.tests.dll" id="8718a1e5-d122-40e4-9dd3-edf050bba4b8">
+      <Execution id="0b4d8d42-fc55-4be3-b2a6-d65cda795842" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Cli.Tests/bin/Debug/net8.0/FLua.Cli.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Cli.Tests.CliUnitTests" name="Cli_SimpleScript_ExecutesCorrectly" />
+    </UnitTest>
+    <UnitTest name="Cli_TableOperations_WorkCorrectly" storage="/users/bill/repos/flua/flua.cli.tests/bin/debug/net8.0/flua.cli.tests.dll" id="2655c24a-6c95-e5a4-4c89-42df604e0f16">
+      <Execution id="ccd81531-4158-4d6f-a190-aea3b0768231" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Cli.Tests/bin/Debug/net8.0/FLua.Cli.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Cli.Tests.CliUnitTests" name="Cli_TableOperations_WorkCorrectly" />
+    </UnitTest>
+    <UnitTest name="Cli_SyntaxErrorScript_ReturnsError" storage="/users/bill/repos/flua/flua.cli.tests/bin/debug/net8.0/flua.cli.tests.dll" id="1a511b54-2ab5-11d2-c40b-19656551c94f">
+      <Execution id="bd029ab2-a7b8-46d3-80a3-45d49b8c6c5f" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Cli.Tests/bin/Debug/net8.0/FLua.Cli.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Cli.Tests.CliUnitTests" name="Cli_SyntaxErrorScript_ReturnsError" />
+    </UnitTest>
+    <UnitTest name="Cli_FunctionDefinition_WorksCorrectly" storage="/users/bill/repos/flua/flua.cli.tests/bin/debug/net8.0/flua.cli.tests.dll" id="872adf12-e50a-79e0-9ce7-fb3969a6ea52">
+      <Execution id="89e90769-2537-47d3-8ae9-eb0643f0ec2f" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Cli.Tests/bin/Debug/net8.0/FLua.Cli.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Cli.Tests.CliUnitTests" name="Cli_FunctionDefinition_WorksCorrectly" />
+    </UnitTest>
+    <UnitTest name="Cli_FileNotFound_ReturnsError" storage="/users/bill/repos/flua/flua.cli.tests/bin/debug/net8.0/flua.cli.tests.dll" id="c728dcc7-a046-5cd2-3e98-2d7573b3d875">
+      <Execution id="46d4551b-42ed-41b1-8b91-c0b16f0cec58" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Cli.Tests/bin/Debug/net8.0/FLua.Cli.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Cli.Tests.CliIntegrationTests" name="Cli_FileNotFound_ReturnsError" />
+    </UnitTest>
+    <UnitTest name="Cli_SimpleFileExecution_WorksCorrectly" storage="/users/bill/repos/flua/flua.cli.tests/bin/debug/net8.0/flua.cli.tests.dll" id="3e058093-f097-8671-8ae0-d32127421321">
+      <Execution id="65affa7d-987a-4332-8f1b-f3ee411bda08" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Cli.Tests/bin/Debug/net8.0/FLua.Cli.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Cli.Tests.CliIntegrationTests" name="Cli_SimpleFileExecution_WorksCorrectly" />
+    </UnitTest>
+    <UnitTest name="Cli_LocalVariables_WorkCorrectly" storage="/users/bill/repos/flua/flua.cli.tests/bin/debug/net8.0/flua.cli.tests.dll" id="892f572c-e7d6-f03b-4d86-0b5a31c85d51">
+      <Execution id="54d4468c-c0f8-4683-bf28-92d31c9f37c8" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Cli.Tests/bin/Debug/net8.0/FLua.Cli.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Cli.Tests.CliUnitTests" name="Cli_LocalVariables_WorkCorrectly" />
+    </UnitTest>
+  </TestDefinitions>
+  <TestEntries>
+    <TestEntry testId="0c2c5937-ffae-b8a7-0734-53dc5b30902f" executionId="78cbf43e-8f58-4b02-a8dc-0ccd7f54a9a0" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="7e48b16c-5f83-417c-9b3f-c46f4b8b2ff7" executionId="c79d2aad-9143-40ae-b13a-7a4d5274808b" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="c728dcc7-a046-5cd2-3e98-2d7573b3d875" executionId="46d4551b-42ed-41b1-8b91-c0b16f0cec58" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="9400551e-2ada-acc9-3a94-2036821b468d" executionId="1028dd04-295f-46c8-8c1a-272efdc6676f" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="cfc04372-90df-4c3e-678d-c6766a3e84f7" executionId="94443c1e-ed1b-4a69-ade1-bd3d724d0ba8" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="45ea4375-84e3-6893-a90e-861e61bd9f26" executionId="693701ff-ab10-4f2f-8eb3-28403b2dc4e7" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1a511b54-2ab5-11d2-c40b-19656551c94f" executionId="bd029ab2-a7b8-46d3-80a3-45d49b8c6c5f" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="6bae71f3-e3c5-a6ef-db0f-d5d4d3a5ed58" executionId="fdc6c3d2-3737-41ea-b72e-6c38ac1f9340" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="507ad8da-17d8-f6e3-5244-eb9a91b9dd21" executionId="a26273a4-0dc4-4aae-85c9-078326687616" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="3e058093-f097-8671-8ae0-d32127421321" executionId="65affa7d-987a-4332-8f1b-f3ee411bda08" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="8ace3406-5ecc-2656-4756-a1fe0db9ace0" executionId="5600d7e9-1ccb-40bd-8800-32f4787757f3" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="4cd1b079-e243-9aaa-4595-60f1db1e6c74" executionId="e211c94c-7898-4e25-a778-6ea253af0f08" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="8718a1e5-d122-40e4-9dd3-edf050bba4b8" executionId="0b4d8d42-fc55-4be3-b2a6-d65cda795842" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="f6e29e2f-bcac-e94b-4f50-ad45aa060de1" executionId="582ca6af-9574-4842-a26a-c707c9e24a50" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="872adf12-e50a-79e0-9ce7-fb3969a6ea52" executionId="89e90769-2537-47d3-8ae9-eb0643f0ec2f" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="892f572c-e7d6-f03b-4d86-0b5a31c85d51" executionId="54d4468c-c0f8-4683-bf28-92d31c9f37c8" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="b1cecd03-d33a-a228-d6b8-593db3444393" executionId="03ff35a1-cb37-4540-bf5f-b1edbbf297a0" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="6a5d5870-4cd4-4597-fe00-cbbf3ea78b53" executionId="c7f8e1d5-f7d8-426f-8c80-2646fe47dcc0" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="e75f2396-b54a-3cef-477c-e7503164f990" executionId="a1182ab2-52fc-4616-8e73-ab0171afa6e5" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="2655c24a-6c95-e5a4-4c89-42df604e0f16" executionId="ccd81531-4158-4d6f-a190-aea3b0768231" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="cfafb189-a6e5-3146-a735-7271f4697add" executionId="79b87ff1-2dea-43b6-b635-627c0ab01853" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="ce44f21e-28c1-b361-ebf9-0e02a1d54060" executionId="2bb76491-dbeb-4843-84c4-e68818ae4592" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+  </TestEntries>
+  <TestLists>
+    <TestList name="Results Not in a List" id="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestList name="All Loaded Results" id="19431567-8539-422a-85d7-44ee4e166bda" />
+  </TestLists>
+  <ResultSummary outcome="Failed">
+    <Counters total="22" executed="22" passed="21" failed="1" error="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
+    <Output>
+      <StdOut>MSTest Executor: Test Parallelization enabled for /Users/bill/Repos/FLua/FLua.Cli.Tests/bin/Debug/net8.0/FLua.Cli.Tests.dll (Workers: 16, Scope: MethodLevel).
+</StdOut>
+    </Output>
+  </ResultSummary>
+</TestRun>

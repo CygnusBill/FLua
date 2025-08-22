@@ -14,13 +14,22 @@ namespace FLua.Interpreter
     /// </summary>
     public class StatementExecutor : IStatementVisitor<StatementResult>
     {
-        private readonly LuaEnvironment _environment;
+        private LuaEnvironment _environment;
         private readonly ExpressionEvaluator _expressionEvaluator;
 
         public StatementExecutor(LuaEnvironment environment)
         {
             _environment = environment;
             _expressionEvaluator = new ExpressionEvaluator(environment);
+        }
+
+        /// <summary>
+        /// Updates the environment for both statement and expression evaluation
+        /// </summary>
+        private void SetEnvironment(LuaEnvironment newEnvironment)
+        {
+            _environment = newEnvironment;
+            _expressionEvaluator.SetEnvironment(newEnvironment);
         }
 
         /// <summary>
@@ -171,14 +180,27 @@ namespace FLua.Interpreter
 
         public StatementResult VisitDoBlock(FSharpList<Statement> block)
         {
-            _environment.PushScope();
+            // Create a new child environment for the block
+            var childEnv = _environment.CreateChild();
+            var prevEnv = _environment;
+            SetEnvironment(childEnv);
+            
             try
             {
-                return ExecuteBlock(block);
+                var result = ExecuteBlock(block);
+                
+                // Close to-be-closed variables before exiting the scope
+                _environment.CloseToBeClosedVariables();
+                
+                return result;
             }
             finally
             {
-                _environment.PopScope();
+                // Restore the previous environment
+                SetEnvironment(prevEnv);
+                
+                // Dispose the child environment to ensure cleanup
+                childEnv.Dispose();
             }
         }
 
@@ -187,15 +209,23 @@ namespace FLua.Interpreter
             while (true)
             {
                 var conditionValue = _expressionEvaluator.Evaluate(condition)[0];
-                if (!InterpreterOperations.IsTruthy(conditionValue))
+                if (!conditionValue.IsTruthy())
                 {
                     break;
                 }
                 
-                _environment.PushScope();
+                // Create a new child environment for the loop body
+                var childEnv = _environment.CreateChild();
+                var prevEnv = _environment;
+                _environment = childEnv;
+                
                 try
                 {
                     var result = ExecuteBlock(block);
+                    
+                    // Close to-be-closed variables before exiting the scope
+                    _environment.CloseToBeClosedVariables();
+                    
                     if (result.Break)
                     {
                         break;
@@ -211,7 +241,11 @@ namespace FLua.Interpreter
                 }
                 finally
                 {
-                    _environment.PopScope();
+                    // Restore the previous environment
+                    _environment = prevEnv;
+                    
+                    // Dispose the child environment
+                    childEnv.Dispose();
                 }
             }
             
@@ -222,10 +256,18 @@ namespace FLua.Interpreter
         {
             do
             {
-                _environment.PushScope();
+                // Create a new child environment for the loop body
+                var childEnv = _environment.CreateChild();
+                var prevEnv = _environment;
+                _environment = childEnv;
+                
                 try
                 {
                     var result = ExecuteBlock(block);
+                    
+                    // Close to-be-closed variables before exiting the scope
+                    _environment.CloseToBeClosedVariables();
+                    
                     if (result.Break)
                     {
                         break;
@@ -241,11 +283,15 @@ namespace FLua.Interpreter
                 }
                 finally
                 {
-                    _environment.PopScope();
+                    // Restore the previous environment
+                    _environment = prevEnv;
+                    
+                    // Dispose the child environment
+                    childEnv.Dispose();
                 }
                 
                 var conditionValue = _expressionEvaluator.Evaluate(condition)[0];
-                if (InterpreterOperations.IsTruthy(conditionValue))
+                if (conditionValue.IsTruthy())
                 {
                     break;
                 }
@@ -264,16 +310,29 @@ namespace FLua.Interpreter
                 var condition = clause.Item1;
                 var block = clause.Item2;
                 var conditionValue = _expressionEvaluator.Evaluate(condition)[0];
-                if (InterpreterOperations.IsTruthy(conditionValue))
+                if (conditionValue.IsTruthy())
                 {
-                    _environment.PushScope();
+                    // Create a new child environment for the if block
+                    var childEnv = _environment.CreateChild();
+                    var prevEnv = _environment;
+                    _environment = childEnv;
+                    
                     try
                     {
-                        return ExecuteBlock(block);
+                        var result = ExecuteBlock(block);
+                        
+                        // Close to-be-closed variables before exiting the scope
+                        _environment.CloseToBeClosedVariables();
+                        
+                        return result;
                     }
                     finally
                     {
-                        _environment.PopScope();
+                        // Restore the previous environment
+                        _environment = prevEnv;
+                        
+                        // Dispose the child environment
+                        childEnv.Dispose();
                     }
                 }
             }
@@ -281,14 +340,27 @@ namespace FLua.Interpreter
             // Execute else block if present
             if (FSharpOption<FSharpList<Statement>>.get_IsSome(elseBlock))
             {
-                _environment.PushScope();
+                // Create a new child environment for the else block
+                var childEnv = _environment.CreateChild();
+                var prevEnv = _environment;
+                _environment = childEnv;
+                
                 try
                 {
-                    return ExecuteBlock(elseBlock.Value);
+                    var result = ExecuteBlock(elseBlock.Value);
+                    
+                    // Close to-be-closed variables before exiting the scope
+                    _environment.CloseToBeClosedVariables();
+                    
+                    return result;
                 }
                 finally
                 {
-                    _environment.PopScope();
+                    // Restore the previous environment
+                    _environment = prevEnv;
+                    
+                    // Dispose the child environment
+                    childEnv.Dispose();
                 }
             }
             
@@ -306,16 +378,20 @@ namespace FLua.Interpreter
                 throw new LuaRuntimeException("For loop limits must be numbers");
             }
             
-            var startNum = startValue.AsNumber();
-            var stopNum = stopValue.AsNumber();
-            var stepNum = stepValue.AsNumber();
+            var startNum = startValue.AsDouble();
+            var stopNum = stopValue.AsDouble();
+            var stepNum = stepValue.AsDouble();
             
             if (stepNum == 0)
             {
                 throw new LuaRuntimeException("For loop step cannot be zero");
             }
             
-            _environment.PushScope();
+            // Create a new child environment for the for loop
+            var childEnv = _environment.CreateChild();
+            var prevEnv = _environment;
+            SetEnvironment(childEnv);
+            
             try
             {
                 for (var i = startNum; (stepNum > 0 && i <= stopNum) || (stepNum < 0 && i >= stopNum); i += stepNum)
@@ -336,10 +412,17 @@ namespace FLua.Interpreter
                         return result;
                     }
                 }
+                
+                // Close to-be-closed variables before exiting the scope
+                _environment.CloseToBeClosedVariables();
             }
             finally
             {
-                _environment.PopScope();
+                // Restore the previous environment
+                SetEnvironment(prevEnv);
+                
+                // Dispose the child environment
+                childEnv.Dispose();
             }
             
             return new StatementResult();
@@ -372,7 +455,11 @@ namespace FLua.Interpreter
                 throw new LuaRuntimeException("Generic for iterator must be a function");
             }
             
-            _environment.PushScope();
+            // Create a new child environment for the generic for loop
+            var childEnv = _environment.CreateChild();
+            var prevEnv = _environment;
+            SetEnvironment(childEnv);
+            
             try
             {
                 while (true)
@@ -412,10 +499,17 @@ namespace FLua.Interpreter
                         return result;
                     }
                 }
+                
+                // Close to-be-closed variables before exiting the scope
+                _environment.CloseToBeClosedVariables();
             }
             finally
             {
-                _environment.PopScope();
+                // Restore the previous environment
+                SetEnvironment(prevEnv);
+                
+                // Dispose the child environment
+                childEnv.Dispose();
             }
             
             return new StatementResult();

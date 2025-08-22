@@ -1,0 +1,330 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TestRun id="d320801a-9bd2-46de-b044-1b124f1d23f1" name="@dadsmbp 2025-08-22 08:18:24" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+  <Times creation="2025-08-22T08:18:24.3283100-04:00" queuing="2025-08-22T08:18:24.3283100-04:00" start="2025-08-22T08:18:23.9581190-04:00" finish="2025-08-22T08:18:24.3442660-04:00" />
+  <TestSettings name="default" id="6ad76540-2eda-4ddb-9c88-b6a2440abbc6">
+    <Deployment runDeploymentRoot="_dadsmbp_2025-08-22_08_18_24" />
+  </TestSettings>
+  <Results>
+    <UnitTestResult executionId="d3f6b08e-e2d0-44b5-babe-5f591b65cdbf" testId="22d32648-4dad-6a2a-8aae-2f806b818968" testName="TestCloseFunctionParameter" computerName="dadsmbp" duration="00:00:00.0004898" startTime="2025-08-22T08:18:24.2872450-04:00" endTime="2025-08-22T08:18:24.2877970-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="d3f6b08e-e2d0-44b5-babe-5f591b65cdbf">
+      <Output>
+        <ErrorInfo>
+          <Message>Test method FLua.VariableAttributes.Tests.FunctionParameterAttributeTests.TestCloseFunctionParameter threw exception: &#xD;
+System.NotImplementedException: LuaUserFunction.Call must be implemented by the interpreter</Message>
+          <StackTrace>    at FLua.Runtime.LuaUserFunction.Call(LuaValue[] args) in /Users/bill/Repos/FLua/FLua.Runtime/LuaTypes.cs:line 239
+   at FLua.Interpreter.ExpressionEvaluator.EvaluateFunctionCallInternal(Expr func, FSharpList`1 args) in /Users/bill/Repos/FLua/FLua.Interpreter/ExpressionEvaluator.cs:line 258
+   at FLua.Interpreter.ExpressionEvaluator.VisitFunctionCall(Expr func, FSharpList`1 args) in /Users/bill/Repos/FLua/FLua.Interpreter/ExpressionEvaluator.cs:line 122
+   at FLua.Ast.Visitor.dispatchExpr[T](IExpressionVisitor`1 visitor, Expr expr) in /Users/bill/Repos/FLua/FLua.Ast/AstVisitor.fs:line 52
+   at FLua.Interpreter.ExpressionEvaluator.Evaluate(Expr expr) in /Users/bill/Repos/FLua/FLua.Interpreter/ExpressionEvaluator.cs:line 35
+   at FLua.Interpreter.StatementExecutor.VisitLocalAssignment(FSharpList`1 variables, FSharpOption`1 expressions) in /Users/bill/Repos/FLua/FLua.Interpreter/StatementExecutor.cs:line 139
+   at FLua.Ast.Visitor.dispatchStmt[T](IStatementVisitor`1 visitor, Statement stmt) in /Users/bill/Repos/FLua/FLua.Ast/AstVisitor.fs:line 65
+   at FLua.Interpreter.StatementExecutor.Execute(Statement stmt) in /Users/bill/Repos/FLua/FLua.Interpreter/StatementExecutor.cs:line 40
+   at FLua.Interpreter.LuaInterpreter.ExecuteStatement(Statement stmt) in /Users/bill/Repos/FLua/FLua.Interpreter/LuaInterpreter.cs:line 154
+   at FLua.Interpreter.LuaInterpreter.ExecuteStatementsWithResult(FSharpList`1 statements) in /Users/bill/Repos/FLua/FLua.Interpreter/LuaInterpreter.cs:line 125
+   at FLua.Interpreter.LuaInterpreter.ExecuteString(String code) in /Users/bill/Repos/FLua/FLua.Interpreter/LuaInterpreter.cs:line 86
+   at FLua.Interpreter.LuaInterpreter.ExecuteCode(String code) in /Users/bill/Repos/FLua/FLua.Interpreter/LuaInterpreter.cs:line 95
+   at FLua.VariableAttributes.Tests.FunctionParameterAttributeTests.TestCloseFunctionParameter() in /Users/bill/Repos/FLua/FLua.VariableAttributes.Tests/VariableAttributeTests.cs:line 286
+   at System.RuntimeMethodHandle.InvokeMethod(Object target, Void** arguments, Signature sig, Boolean isConstructor)
+   at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)
+</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="b9099c80-d46b-463f-b6e0-1ce32e71f7e7" testId="06207ab0-db84-1bc6-ed0e-d995cc5a5bf5" testName="TestLuaVariableCloseBehavior" computerName="dadsmbp" duration="00:00:00.0008512" startTime="2025-08-22T08:18:24.2938020-04:00" endTime="2025-08-22T08:18:24.2948380-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="b9099c80-d46b-463f-b6e0-1ce32e71f7e7" />
+    <UnitTestResult executionId="71b91117-769c-4341-9941-0b5ef0308a78" testId="9c87a234-2845-266c-30fc-02afc8e083bd" testName="TestCloseVariableInFunction" computerName="dadsmbp" duration="00:00:00.0005971" startTime="2025-08-22T08:18:24.2685600-04:00" endTime="2025-08-22T08:18:24.2691920-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="71b91117-769c-4341-9941-0b5ef0308a78">
+      <Output>
+        <ErrorInfo>
+          <Message>Test method FLua.VariableAttributes.Tests.CloseVariableTests.TestCloseVariableInFunction threw exception: &#xD;
+System.NotImplementedException: LuaUserFunction.Call must be implemented by the interpreter</Message>
+          <StackTrace>    at FLua.Runtime.LuaUserFunction.Call(LuaValue[] args) in /Users/bill/Repos/FLua/FLua.Runtime/LuaTypes.cs:line 239
+   at FLua.Interpreter.ExpressionEvaluator.EvaluateFunctionCallInternal(Expr func, FSharpList`1 args) in /Users/bill/Repos/FLua/FLua.Interpreter/ExpressionEvaluator.cs:line 258
+   at FLua.Interpreter.ExpressionEvaluator.VisitFunctionCall(Expr func, FSharpList`1 args) in /Users/bill/Repos/FLua/FLua.Interpreter/ExpressionEvaluator.cs:line 122
+   at FLua.Ast.Visitor.dispatchExpr[T](IExpressionVisitor`1 visitor, Expr expr) in /Users/bill/Repos/FLua/FLua.Ast/AstVisitor.fs:line 52
+   at FLua.Interpreter.ExpressionEvaluator.Evaluate(Expr expr) in /Users/bill/Repos/FLua/FLua.Interpreter/ExpressionEvaluator.cs:line 35
+   at FLua.Interpreter.StatementExecutor.VisitLocalAssignment(FSharpList`1 variables, FSharpOption`1 expressions) in /Users/bill/Repos/FLua/FLua.Interpreter/StatementExecutor.cs:line 139
+   at FLua.Ast.Visitor.dispatchStmt[T](IStatementVisitor`1 visitor, Statement stmt) in /Users/bill/Repos/FLua/FLua.Ast/AstVisitor.fs:line 65
+   at FLua.Interpreter.StatementExecutor.Execute(Statement stmt) in /Users/bill/Repos/FLua/FLua.Interpreter/StatementExecutor.cs:line 40
+   at FLua.Interpreter.LuaInterpreter.ExecuteStatement(Statement stmt) in /Users/bill/Repos/FLua/FLua.Interpreter/LuaInterpreter.cs:line 154
+   at FLua.Interpreter.LuaInterpreter.ExecuteStatementsWithResult(FSharpList`1 statements) in /Users/bill/Repos/FLua/FLua.Interpreter/LuaInterpreter.cs:line 125
+   at FLua.Interpreter.LuaInterpreter.ExecuteString(String code) in /Users/bill/Repos/FLua/FLua.Interpreter/LuaInterpreter.cs:line 86
+   at FLua.Interpreter.LuaInterpreter.ExecuteCode(String code) in /Users/bill/Repos/FLua/FLua.Interpreter/LuaInterpreter.cs:line 95
+   at FLua.VariableAttributes.Tests.CloseVariableTests.TestCloseVariableInFunction() in /Users/bill/Repos/FLua/FLua.VariableAttributes.Tests/VariableAttributeTests.cs:line 151
+   at System.RuntimeMethodHandle.InvokeMethod(Object target, Void** arguments, Signature sig, Boolean isConstructor)
+   at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)
+</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="ad2183ef-c4f7-4068-944c-ac5c7909c087" testId="d044a7cd-e8b3-988a-1c4b-60fdc9216cba" testName="TestConstVariableCannotBeModified" computerName="dadsmbp" duration="00:00:00.0014136" startTime="2025-08-22T08:18:24.2629280-04:00" endTime="2025-08-22T08:18:24.2643840-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="ad2183ef-c4f7-4068-944c-ac5c7909c087" />
+    <UnitTestResult executionId="e5e3c2c3-4226-4068-9c21-515205193ce3" testId="68db2203-6021-7768-3293-e02dddaa410c" testName="TestToBeClosedVariableTracking" computerName="dadsmbp" duration="00:00:00.0002049" startTime="2025-08-22T08:18:24.3008560-04:00" endTime="2025-08-22T08:18:24.3020040-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="e5e3c2c3-4226-4068-9c21-515205193ce3" />
+    <UnitTestResult executionId="99c6d05c-520a-422c-af41-dce24495a25f" testId="2b15d61b-e95e-3b74-328f-230b86af2494" testName="DebugArithmeticTypes" computerName="dadsmbp" duration="00:00:00.0583468" startTime="2025-08-22T08:18:24.1935810-04:00" endTime="2025-08-22T08:18:24.2576860-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="99c6d05c-520a-422c-af41-dce24495a25f">
+      <Output>
+        <StdOut>Simple arithmetic: LuaValue = 30
+Const arithmetic: LuaValue = 30</StdOut>
+        <ErrorInfo>
+          <Message>Test method FLua.VariableAttributes.Tests.DebugTests.DebugArithmeticTypes threw exception: &#xD;
+System.NotImplementedException: LuaUserFunction.Call must be implemented by the interpreter</Message>
+          <StackTrace>    at FLua.Runtime.LuaUserFunction.Call(LuaValue[] args) in /Users/bill/Repos/FLua/FLua.Runtime/LuaTypes.cs:line 239
+   at FLua.Interpreter.ExpressionEvaluator.EvaluateFunctionCallInternal(Expr func, FSharpList`1 args) in /Users/bill/Repos/FLua/FLua.Interpreter/ExpressionEvaluator.cs:line 258
+   at FLua.Interpreter.ExpressionEvaluator.VisitFunctionCall(Expr func, FSharpList`1 args) in /Users/bill/Repos/FLua/FLua.Interpreter/ExpressionEvaluator.cs:line 122
+   at FLua.Ast.Visitor.dispatchExpr[T](IExpressionVisitor`1 visitor, Expr expr) in /Users/bill/Repos/FLua/FLua.Ast/AstVisitor.fs:line 52
+   at FLua.Interpreter.ExpressionEvaluator.Evaluate(Expr expr) in /Users/bill/Repos/FLua/FLua.Interpreter/ExpressionEvaluator.cs:line 35
+   at FLua.Interpreter.StatementExecutor.VisitReturn(FSharpOption`1 expressions) in /Users/bill/Repos/FLua/FLua.Interpreter/StatementExecutor.cs:line 597
+   at FLua.Ast.Visitor.dispatchStmt[T](IStatementVisitor`1 visitor, Statement stmt) in /Users/bill/Repos/FLua/FLua.Ast/AstVisitor.fs:line 80
+   at FLua.Interpreter.StatementExecutor.Execute(Statement stmt) in /Users/bill/Repos/FLua/FLua.Interpreter/StatementExecutor.cs:line 40
+   at FLua.Interpreter.LuaInterpreter.ExecuteStatement(Statement stmt) in /Users/bill/Repos/FLua/FLua.Interpreter/LuaInterpreter.cs:line 154
+   at FLua.Interpreter.LuaInterpreter.ExecuteStatementsWithResult(FSharpList`1 statements) in /Users/bill/Repos/FLua/FLua.Interpreter/LuaInterpreter.cs:line 125
+   at FLua.Interpreter.LuaInterpreter.ExecuteString(String code) in /Users/bill/Repos/FLua/FLua.Interpreter/LuaInterpreter.cs:line 86
+   at FLua.Interpreter.LuaInterpreter.ExecuteCode(String code) in /Users/bill/Repos/FLua/FLua.Interpreter/LuaInterpreter.cs:line 95
+   at FLua.VariableAttributes.Tests.DebugTests.DebugArithmeticTypes() in /Users/bill/Repos/FLua/FLua.VariableAttributes.Tests/DebugTests.cs:line 34
+   at System.RuntimeMethodHandle.InvokeMethod(Object target, Void** arguments, Signature sig, Boolean isConstructor)
+   at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)
+</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="21bb9a24-b0f5-4430-bf2e-2e7d56d2168f" testId="d335ff61-edbc-10ff-6197-ede348062aac" testName="TestMixedConstAndRegularVariables" computerName="dadsmbp" duration="00:00:00.0001848" startTime="2025-08-22T08:18:24.2647890-04:00" endTime="2025-08-22T08:18:24.2650010-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="21bb9a24-b0f5-4430-bf2e-2e7d56d2168f" />
+    <UnitTestResult executionId="5e37cfc3-afb1-4236-9a19-2aca1455e596" testId="c9cdcab2-0234-f4a0-1c4f-20c173a9bae2" testName="TestConstVariableErrorMessage" computerName="dadsmbp" duration="00:00:00.0006798" startTime="2025-08-22T08:18:24.2654220-04:00" endTime="2025-08-22T08:18:24.2661350-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="5e37cfc3-afb1-4236-9a19-2aca1455e596" />
+    <UnitTestResult executionId="8a2a5c5e-7d59-41cb-b7bd-79818b904464" testId="28c16609-6820-a592-bb33-115b6523108b" testName="TestConstFunctionParameter" computerName="dadsmbp" duration="00:00:00.0003994" startTime="2025-08-22T08:18:24.2844940-04:00" endTime="2025-08-22T08:18:24.2849660-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="8a2a5c5e-7d59-41cb-b7bd-79818b904464">
+      <Output>
+        <ErrorInfo>
+          <Message>Test method FLua.VariableAttributes.Tests.FunctionParameterAttributeTests.TestConstFunctionParameter threw exception: &#xD;
+System.NotImplementedException: LuaUserFunction.Call must be implemented by the interpreter</Message>
+          <StackTrace>    at FLua.Runtime.LuaUserFunction.Call(LuaValue[] args) in /Users/bill/Repos/FLua/FLua.Runtime/LuaTypes.cs:line 239
+   at FLua.Interpreter.ExpressionEvaluator.EvaluateFunctionCallInternal(Expr func, FSharpList`1 args) in /Users/bill/Repos/FLua/FLua.Interpreter/ExpressionEvaluator.cs:line 258
+   at FLua.Interpreter.ExpressionEvaluator.VisitFunctionCall(Expr func, FSharpList`1 args) in /Users/bill/Repos/FLua/FLua.Interpreter/ExpressionEvaluator.cs:line 122
+   at FLua.Ast.Visitor.dispatchExpr[T](IExpressionVisitor`1 visitor, Expr expr) in /Users/bill/Repos/FLua/FLua.Ast/AstVisitor.fs:line 52
+   at FLua.Interpreter.ExpressionEvaluator.Evaluate(Expr expr) in /Users/bill/Repos/FLua/FLua.Interpreter/ExpressionEvaluator.cs:line 35
+   at FLua.Interpreter.StatementExecutor.VisitReturn(FSharpOption`1 expressions) in /Users/bill/Repos/FLua/FLua.Interpreter/StatementExecutor.cs:line 597
+   at FLua.Ast.Visitor.dispatchStmt[T](IStatementVisitor`1 visitor, Statement stmt) in /Users/bill/Repos/FLua/FLua.Ast/AstVisitor.fs:line 80
+   at FLua.Interpreter.StatementExecutor.Execute(Statement stmt) in /Users/bill/Repos/FLua/FLua.Interpreter/StatementExecutor.cs:line 40
+   at FLua.Interpreter.LuaInterpreter.ExecuteStatement(Statement stmt) in /Users/bill/Repos/FLua/FLua.Interpreter/LuaInterpreter.cs:line 154
+   at FLua.Interpreter.LuaInterpreter.ExecuteStatementsWithResult(FSharpList`1 statements) in /Users/bill/Repos/FLua/FLua.Interpreter/LuaInterpreter.cs:line 125
+   at FLua.Interpreter.LuaInterpreter.ExecuteString(String code) in /Users/bill/Repos/FLua/FLua.Interpreter/LuaInterpreter.cs:line 86
+   at FLua.Interpreter.LuaInterpreter.ExecuteCode(String code) in /Users/bill/Repos/FLua/FLua.Interpreter/LuaInterpreter.cs:line 95
+   at FLua.VariableAttributes.Tests.FunctionParameterAttributeTests.TestConstFunctionParameter() in /Users/bill/Repos/FLua/FLua.VariableAttributes.Tests/VariableAttributeTests.cs:line 249
+   at System.RuntimeMethodHandle.InvokeMethod(Object target, Void** arguments, Signature sig, Boolean isConstructor)
+   at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)
+</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="60d442f9-14e9-4953-b7b1-2d9cba67c8e4" testId="851c84e8-41b7-10f6-f459-8751b680a943" testName="TestLuaVariableConstBehavior" computerName="dadsmbp" duration="00:00:00.0051192" startTime="2025-08-22T08:18:24.2884360-04:00" endTime="2025-08-22T08:18:24.2936950-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="60d442f9-14e9-4953-b7b1-2d9cba67c8e4" />
+    <UnitTestResult executionId="99e42ec0-2678-45a2-8b65-4f411cd86bed" testId="0f76364d-3c5a-7968-41be-e0d6c40882f9" testName="TestMultipleCloseVariables" computerName="dadsmbp" duration="00:00:00.0006285" startTime="2025-08-22T08:18:24.2832230-04:00" endTime="2025-08-22T08:18:24.2839440-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="99e42ec0-2678-45a2-8b65-4f411cd86bed">
+      <Output>
+        <ErrorInfo>
+          <Message>Test method FLua.VariableAttributes.Tests.CloseVariableTests.TestMultipleCloseVariables threw exception: &#xD;
+System.NotImplementedException: LuaUserFunction.Call must be implemented by the interpreter</Message>
+          <StackTrace>    at FLua.Runtime.LuaUserFunction.Call(LuaValue[] args) in /Users/bill/Repos/FLua/FLua.Runtime/LuaTypes.cs:line 239
+   at FLua.Interpreter.ExpressionEvaluator.EvaluateFunctionCallInternal(Expr func, FSharpList`1 args) in /Users/bill/Repos/FLua/FLua.Interpreter/ExpressionEvaluator.cs:line 258
+   at FLua.Interpreter.ExpressionEvaluator.VisitFunctionCall(Expr func, FSharpList`1 args) in /Users/bill/Repos/FLua/FLua.Interpreter/ExpressionEvaluator.cs:line 122
+   at FLua.Ast.Visitor.dispatchExpr[T](IExpressionVisitor`1 visitor, Expr expr) in /Users/bill/Repos/FLua/FLua.Ast/AstVisitor.fs:line 52
+   at FLua.Interpreter.ExpressionEvaluator.Evaluate(Expr expr) in /Users/bill/Repos/FLua/FLua.Interpreter/ExpressionEvaluator.cs:line 35
+   at FLua.Interpreter.StatementExecutor.VisitLocalAssignment(FSharpList`1 variables, FSharpOption`1 expressions) in /Users/bill/Repos/FLua/FLua.Interpreter/StatementExecutor.cs:line 139
+   at FLua.Ast.Visitor.dispatchStmt[T](IStatementVisitor`1 visitor, Statement stmt) in /Users/bill/Repos/FLua/FLua.Ast/AstVisitor.fs:line 65
+   at FLua.Interpreter.StatementExecutor.Execute(Statement stmt) in /Users/bill/Repos/FLua/FLua.Interpreter/StatementExecutor.cs:line 40
+   at FLua.Interpreter.StatementExecutor.ExecuteBlock(FSharpList`1 block) in /Users/bill/Repos/FLua/FLua.Interpreter/StatementExecutor.cs:line 615
+   at FLua.Interpreter.StatementExecutor.VisitDoBlock(FSharpList`1 block) in /Users/bill/Repos/FLua/FLua.Interpreter/StatementExecutor.cs:line 190
+   at FLua.Ast.Visitor.dispatchStmt[T](IStatementVisitor`1 visitor, Statement stmt) in /Users/bill/Repos/FLua/FLua.Ast/AstVisitor.fs:line 70
+   at FLua.Interpreter.StatementExecutor.Execute(Statement stmt) in /Users/bill/Repos/FLua/FLua.Interpreter/StatementExecutor.cs:line 40
+   at FLua.Interpreter.LuaInterpreter.ExecuteStatement(Statement stmt) in /Users/bill/Repos/FLua/FLua.Interpreter/LuaInterpreter.cs:line 154
+   at FLua.Interpreter.LuaInterpreter.ExecuteStatementsWithResult(FSharpList`1 statements) in /Users/bill/Repos/FLua/FLua.Interpreter/LuaInterpreter.cs:line 125
+   at FLua.Interpreter.LuaInterpreter.ExecuteString(String code) in /Users/bill/Repos/FLua/FLua.Interpreter/LuaInterpreter.cs:line 86
+   at FLua.Interpreter.LuaInterpreter.ExecuteCode(String code) in /Users/bill/Repos/FLua/FLua.Interpreter/LuaInterpreter.cs:line 95
+   at FLua.VariableAttributes.Tests.CloseVariableTests.TestMultipleCloseVariables() in /Users/bill/Repos/FLua/FLua.VariableAttributes.Tests/VariableAttributeTests.cs:line 180
+   at System.RuntimeMethodHandle.InvokeMethod(Object target, Void** arguments, Signature sig, Boolean isConstructor)
+   at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)
+</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="794c0aa5-df3d-45db-9a74-5e802328a9b7" testId="ef719e02-5134-e45a-08a4-7a4605186dc3" testName="TestBasicCloseVariable" computerName="dadsmbp" duration="00:00:00.0023191" startTime="2025-08-22T08:18:24.2661480-04:00" endTime="2025-08-22T08:18:24.2685390-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="794c0aa5-df3d-45db-9a74-5e802328a9b7">
+      <Output>
+        <StdOut>Error in __close metamethod: LuaUserFunction.Call must be implemented by the interpreter</StdOut>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="6d1fa36e-cd87-4446-b400-1ae0c0a1fb7f" testId="86a40c0c-2512-e558-023d-72475b98ac41" testName="TestMultipleConstVariables" computerName="dadsmbp" duration="00:00:00.0002447" startTime="2025-08-22T08:18:24.2644890-04:00" endTime="2025-08-22T08:18:24.2647760-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="6d1fa36e-cd87-4446-b400-1ae0c0a1fb7f" />
+    <UnitTestResult executionId="d1325e63-7040-4d87-a073-6af1762024df" testId="dc8ed2bd-50bf-67bd-ebeb-f91e6a1bdb9b" testName="TestBasicConstVariable" computerName="dadsmbp" duration="00:00:00.0011262" startTime="2025-08-22T08:18:24.2615780-04:00" endTime="2025-08-22T08:18:24.2628900-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="d1325e63-7040-4d87-a073-6af1762024df" />
+    <UnitTestResult executionId="64bb0df1-30d7-4212-8e9b-227ce9b1513a" testId="0bf1109f-4c4e-5d36-e26c-9628f441b98f" testName="TestMixedParameterAttributes" computerName="dadsmbp" duration="00:00:00.0005611" startTime="2025-08-22T08:18:24.2878180-04:00" endTime="2025-08-22T08:18:24.2884160-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="64bb0df1-30d7-4212-8e9b-227ce9b1513a">
+      <Output>
+        <ErrorInfo>
+          <Message>Test method FLua.VariableAttributes.Tests.FunctionParameterAttributeTests.TestMixedParameterAttributes threw exception: &#xD;
+System.NotImplementedException: LuaUserFunction.Call must be implemented by the interpreter</Message>
+          <StackTrace>    at FLua.Runtime.LuaUserFunction.Call(LuaValue[] args) in /Users/bill/Repos/FLua/FLua.Runtime/LuaTypes.cs:line 239
+   at FLua.Interpreter.ExpressionEvaluator.EvaluateFunctionCallInternal(Expr func, FSharpList`1 args) in /Users/bill/Repos/FLua/FLua.Interpreter/ExpressionEvaluator.cs:line 258
+   at FLua.Interpreter.ExpressionEvaluator.VisitFunctionCall(Expr func, FSharpList`1 args) in /Users/bill/Repos/FLua/FLua.Interpreter/ExpressionEvaluator.cs:line 122
+   at FLua.Ast.Visitor.dispatchExpr[T](IExpressionVisitor`1 visitor, Expr expr) in /Users/bill/Repos/FLua/FLua.Ast/AstVisitor.fs:line 52
+   at FLua.Interpreter.ExpressionEvaluator.Evaluate(Expr expr) in /Users/bill/Repos/FLua/FLua.Interpreter/ExpressionEvaluator.cs:line 35
+   at FLua.Interpreter.StatementExecutor.VisitLocalAssignment(FSharpList`1 variables, FSharpOption`1 expressions) in /Users/bill/Repos/FLua/FLua.Interpreter/StatementExecutor.cs:line 139
+   at FLua.Ast.Visitor.dispatchStmt[T](IStatementVisitor`1 visitor, Statement stmt) in /Users/bill/Repos/FLua/FLua.Ast/AstVisitor.fs:line 65
+   at FLua.Interpreter.StatementExecutor.Execute(Statement stmt) in /Users/bill/Repos/FLua/FLua.Interpreter/StatementExecutor.cs:line 40
+   at FLua.Interpreter.LuaInterpreter.ExecuteStatement(Statement stmt) in /Users/bill/Repos/FLua/FLua.Interpreter/LuaInterpreter.cs:line 154
+   at FLua.Interpreter.LuaInterpreter.ExecuteStatementsWithResult(FSharpList`1 statements) in /Users/bill/Repos/FLua/FLua.Interpreter/LuaInterpreter.cs:line 125
+   at FLua.Interpreter.LuaInterpreter.ExecuteString(String code) in /Users/bill/Repos/FLua/FLua.Interpreter/LuaInterpreter.cs:line 86
+   at FLua.Interpreter.LuaInterpreter.ExecuteCode(String code) in /Users/bill/Repos/FLua/FLua.Interpreter/LuaInterpreter.cs:line 95
+   at FLua.VariableAttributes.Tests.FunctionParameterAttributeTests.TestMixedParameterAttributes() in /Users/bill/Repos/FLua/FLua.VariableAttributes.Tests/VariableAttributeTests.cs:line 315
+   at System.RuntimeMethodHandle.InvokeMethod(Object target, Void** arguments, Signature sig, Boolean isConstructor)
+   at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)
+</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="3e8da7d7-8ac4-4447-9df8-dcad0c7f9a26" testId="952dea26-2efc-dad8-b924-a723828b5448" testName="TestConstParameterCannotBeModified" computerName="dadsmbp" duration="00:00:00.0021734" startTime="2025-08-22T08:18:24.2849800-04:00" endTime="2025-08-22T08:18:24.2872000-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="3e8da7d7-8ac4-4447-9df8-dcad0c7f9a26">
+      <Output>
+        <ErrorInfo>
+          <Message>Assert.ThrowsException failed. Threw exception NotImplementedException, but exception LuaRuntimeException was expected. &#xD;
+Exception Message: LuaUserFunction.Call must be implemented by the interpreter&#xD;
+Stack Trace:    at FLua.Runtime.LuaUserFunction.Call(LuaValue[] args) in /Users/bill/Repos/FLua/FLua.Runtime/LuaTypes.cs:line 239
+   at FLua.Interpreter.ExpressionEvaluator.EvaluateFunctionCallInternal(Expr func, FSharpList`1 args) in /Users/bill/Repos/FLua/FLua.Interpreter/ExpressionEvaluator.cs:line 258
+   at FLua.Interpreter.ExpressionEvaluator.VisitFunctionCall(Expr func, FSharpList`1 args) in /Users/bill/Repos/FLua/FLua.Interpreter/ExpressionEvaluator.cs:line 122
+   at FLua.Ast.Visitor.dispatchExpr[T](IExpressionVisitor`1 visitor, Expr expr) in /Users/bill/Repos/FLua/FLua.Ast/AstVisitor.fs:line 52
+   at FLua.Interpreter.ExpressionEvaluator.Evaluate(Expr expr) in /Users/bill/Repos/FLua/FLua.Interpreter/ExpressionEvaluator.cs:line 35
+   at FLua.Interpreter.StatementExecutor.VisitFunctionCall(Expr expr) in /Users/bill/Repos/FLua/FLua.Interpreter/StatementExecutor.cs:line 161
+   at FLua.Ast.Visitor.dispatchStmt[T](IStatementVisitor`1 visitor, Statement stmt) in /Users/bill/Repos/FLua/FLua.Ast/AstVisitor.fs:line 66
+   at FLua.Interpreter.StatementExecutor.Execute(Statement stmt) in /Users/bill/Repos/FLua/FLua.Interpreter/StatementExecutor.cs:line 40
+   at FLua.Interpreter.LuaInterpreter.ExecuteStatement(Statement stmt) in /Users/bill/Repos/FLua/FLua.Interpreter/LuaInterpreter.cs:line 154
+   at FLua.Interpreter.LuaInterpreter.ExecuteStatementsWithResult(FSharpList`1 statements) in /Users/bill/Repos/FLua/FLua.Interpreter/LuaInterpreter.cs:line 125
+   at FLua.Interpreter.LuaInterpreter.ExecuteString(String code) in /Users/bill/Repos/FLua/FLua.Interpreter/LuaInterpreter.cs:line 86
+   at FLua.Interpreter.LuaInterpreter.ExecuteCode(String code) in /Users/bill/Repos/FLua/FLua.Interpreter/LuaInterpreter.cs:line 95
+   at FLua.VariableAttributes.Tests.FunctionParameterAttributeTests.&lt;TestConstParameterCannotBeModified&gt;b__3_0() in /Users/bill/Repos/FLua/FLua.VariableAttributes.Tests/VariableAttributeTests.cs:line 269
+   at Microsoft.VisualStudio.TestTools.UnitTesting.Assert.ThrowsException[T](Action action, String message, Object[] parameters) in /_/src/TestFramework/TestFramework/Assertions/Assert.ThrowsException.cs:line 179</Message>
+          <StackTrace>   at FLua.VariableAttributes.Tests.FunctionParameterAttributeTests.TestConstParameterCannotBeModified() in /Users/bill/Repos/FLua/FLua.VariableAttributes.Tests/VariableAttributeTests.cs:line 267
+   at System.RuntimeMethodHandle.InvokeMethod(Object target, Void** arguments, Signature sig, Boolean isConstructor)
+   at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)
+</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="a7855058-b4b1-462b-b104-ddc4f60290c5" testId="eedf41ca-7a82-952b-d6c6-385e8b2130c4" testName="TestLuaEnvironmentAttributeSupport" computerName="dadsmbp" duration="00:00:00.0003756" startTime="2025-08-22T08:18:24.2948730-04:00" endTime="2025-08-22T08:18:24.2953450-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="a7855058-b4b1-462b-b104-ddc4f60290c5" />
+    <UnitTestResult executionId="256151bf-8b09-490b-bc70-142f466a353e" testId="7e060ab5-d0d1-fa6c-677b-ecdd36d1e21c" testName="TestCloseVariableWithEarlyReturn" computerName="dadsmbp" duration="00:00:00.0004534" startTime="2025-08-22T08:18:24.2839860-04:00" endTime="2025-08-22T08:18:24.2844760-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="256151bf-8b09-490b-bc70-142f466a353e">
+      <Output>
+        <ErrorInfo>
+          <Message>Test method FLua.VariableAttributes.Tests.CloseVariableTests.TestCloseVariableWithEarlyReturn threw exception: &#xD;
+System.NotImplementedException: LuaUserFunction.Call must be implemented by the interpreter</Message>
+          <StackTrace>    at FLua.Runtime.LuaUserFunction.Call(LuaValue[] args) in /Users/bill/Repos/FLua/FLua.Runtime/LuaTypes.cs:line 239
+   at FLua.Interpreter.ExpressionEvaluator.EvaluateFunctionCallInternal(Expr func, FSharpList`1 args) in /Users/bill/Repos/FLua/FLua.Interpreter/ExpressionEvaluator.cs:line 258
+   at FLua.Interpreter.ExpressionEvaluator.VisitFunctionCall(Expr func, FSharpList`1 args) in /Users/bill/Repos/FLua/FLua.Interpreter/ExpressionEvaluator.cs:line 122
+   at FLua.Ast.Visitor.dispatchExpr[T](IExpressionVisitor`1 visitor, Expr expr) in /Users/bill/Repos/FLua/FLua.Ast/AstVisitor.fs:line 52
+   at FLua.Interpreter.ExpressionEvaluator.Evaluate(Expr expr) in /Users/bill/Repos/FLua/FLua.Interpreter/ExpressionEvaluator.cs:line 35
+   at FLua.Interpreter.StatementExecutor.VisitReturn(FSharpOption`1 expressions) in /Users/bill/Repos/FLua/FLua.Interpreter/StatementExecutor.cs:line 597
+   at FLua.Ast.Visitor.dispatchStmt[T](IStatementVisitor`1 visitor, Statement stmt) in /Users/bill/Repos/FLua/FLua.Ast/AstVisitor.fs:line 80
+   at FLua.Interpreter.StatementExecutor.Execute(Statement stmt) in /Users/bill/Repos/FLua/FLua.Interpreter/StatementExecutor.cs:line 40
+   at FLua.Interpreter.LuaInterpreter.ExecuteStatement(Statement stmt) in /Users/bill/Repos/FLua/FLua.Interpreter/LuaInterpreter.cs:line 154
+   at FLua.Interpreter.LuaInterpreter.ExecuteStatementsWithResult(FSharpList`1 statements) in /Users/bill/Repos/FLua/FLua.Interpreter/LuaInterpreter.cs:line 125
+   at FLua.Interpreter.LuaInterpreter.ExecuteString(String code) in /Users/bill/Repos/FLua/FLua.Interpreter/LuaInterpreter.cs:line 86
+   at FLua.Interpreter.LuaInterpreter.ExecuteCode(String code) in /Users/bill/Repos/FLua/FLua.Interpreter/LuaInterpreter.cs:line 95
+   at FLua.VariableAttributes.Tests.CloseVariableTests.TestCloseVariableWithEarlyReturn() in /Users/bill/Repos/FLua/FLua.VariableAttributes.Tests/VariableAttributeTests.cs:line 207
+   at System.RuntimeMethodHandle.InvokeMethod(Object target, Void** arguments, Signature sig, Boolean isConstructor)
+   at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)
+</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="14644087-a7d1-4837-870a-508b044b182e" testId="67bf6271-7991-0d7b-a0cd-ad6e9e9c7a79" testName="TestConstVariableInBlock" computerName="dadsmbp" duration="00:00:00.0003716" startTime="2025-08-22T08:18:24.2650130-04:00" endTime="2025-08-22T08:18:24.2654100-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="14644087-a7d1-4837-870a-508b044b182e" />
+  </Results>
+  <TestDefinitions>
+    <UnitTest name="TestConstParameterCannotBeModified" storage="/users/bill/repos/flua/flua.variableattributes.tests/bin/debug/net8.0/flua.variableattributes.tests.dll" id="952dea26-2efc-dad8-b924-a723828b5448">
+      <Execution id="3e8da7d7-8ac4-4447-9df8-dcad0c7f9a26" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.VariableAttributes.Tests/bin/Debug/net8.0/FLua.VariableAttributes.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.VariableAttributes.Tests.FunctionParameterAttributeTests" name="TestConstParameterCannotBeModified" />
+    </UnitTest>
+    <UnitTest name="TestConstVariableErrorMessage" storage="/users/bill/repos/flua/flua.variableattributes.tests/bin/debug/net8.0/flua.variableattributes.tests.dll" id="c9cdcab2-0234-f4a0-1c4f-20c173a9bae2">
+      <Execution id="5e37cfc3-afb1-4236-9a19-2aca1455e596" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.VariableAttributes.Tests/bin/Debug/net8.0/FLua.VariableAttributes.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.VariableAttributes.Tests.ConstVariableTests" name="TestConstVariableErrorMessage" />
+    </UnitTest>
+    <UnitTest name="TestMultipleConstVariables" storage="/users/bill/repos/flua/flua.variableattributes.tests/bin/debug/net8.0/flua.variableattributes.tests.dll" id="86a40c0c-2512-e558-023d-72475b98ac41">
+      <Execution id="6d1fa36e-cd87-4446-b400-1ae0c0a1fb7f" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.VariableAttributes.Tests/bin/Debug/net8.0/FLua.VariableAttributes.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.VariableAttributes.Tests.ConstVariableTests" name="TestMultipleConstVariables" />
+    </UnitTest>
+    <UnitTest name="TestBasicConstVariable" storage="/users/bill/repos/flua/flua.variableattributes.tests/bin/debug/net8.0/flua.variableattributes.tests.dll" id="dc8ed2bd-50bf-67bd-ebeb-f91e6a1bdb9b">
+      <Execution id="d1325e63-7040-4d87-a073-6af1762024df" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.VariableAttributes.Tests/bin/Debug/net8.0/FLua.VariableAttributes.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.VariableAttributes.Tests.ConstVariableTests" name="TestBasicConstVariable" />
+    </UnitTest>
+    <UnitTest name="TestToBeClosedVariableTracking" storage="/users/bill/repos/flua/flua.variableattributes.tests/bin/debug/net8.0/flua.variableattributes.tests.dll" id="68db2203-6021-7768-3293-e02dddaa410c">
+      <Execution id="e5e3c2c3-4226-4068-9c21-515205193ce3" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.VariableAttributes.Tests/bin/Debug/net8.0/FLua.VariableAttributes.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.VariableAttributes.Tests.RuntimeVariableTests" name="TestToBeClosedVariableTracking" />
+    </UnitTest>
+    <UnitTest name="TestLuaVariableConstBehavior" storage="/users/bill/repos/flua/flua.variableattributes.tests/bin/debug/net8.0/flua.variableattributes.tests.dll" id="851c84e8-41b7-10f6-f459-8751b680a943">
+      <Execution id="60d442f9-14e9-4953-b7b1-2d9cba67c8e4" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.VariableAttributes.Tests/bin/Debug/net8.0/FLua.VariableAttributes.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.VariableAttributes.Tests.RuntimeVariableTests" name="TestLuaVariableConstBehavior" />
+    </UnitTest>
+    <UnitTest name="TestBasicCloseVariable" storage="/users/bill/repos/flua/flua.variableattributes.tests/bin/debug/net8.0/flua.variableattributes.tests.dll" id="ef719e02-5134-e45a-08a4-7a4605186dc3">
+      <Execution id="794c0aa5-df3d-45db-9a74-5e802328a9b7" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.VariableAttributes.Tests/bin/Debug/net8.0/FLua.VariableAttributes.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.VariableAttributes.Tests.CloseVariableTests" name="TestBasicCloseVariable" />
+    </UnitTest>
+    <UnitTest name="TestMixedParameterAttributes" storage="/users/bill/repos/flua/flua.variableattributes.tests/bin/debug/net8.0/flua.variableattributes.tests.dll" id="0bf1109f-4c4e-5d36-e26c-9628f441b98f">
+      <Execution id="64bb0df1-30d7-4212-8e9b-227ce9b1513a" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.VariableAttributes.Tests/bin/Debug/net8.0/FLua.VariableAttributes.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.VariableAttributes.Tests.FunctionParameterAttributeTests" name="TestMixedParameterAttributes" />
+    </UnitTest>
+    <UnitTest name="TestMixedConstAndRegularVariables" storage="/users/bill/repos/flua/flua.variableattributes.tests/bin/debug/net8.0/flua.variableattributes.tests.dll" id="d335ff61-edbc-10ff-6197-ede348062aac">
+      <Execution id="21bb9a24-b0f5-4430-bf2e-2e7d56d2168f" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.VariableAttributes.Tests/bin/Debug/net8.0/FLua.VariableAttributes.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.VariableAttributes.Tests.ConstVariableTests" name="TestMixedConstAndRegularVariables" />
+    </UnitTest>
+    <UnitTest name="TestLuaVariableCloseBehavior" storage="/users/bill/repos/flua/flua.variableattributes.tests/bin/debug/net8.0/flua.variableattributes.tests.dll" id="06207ab0-db84-1bc6-ed0e-d995cc5a5bf5">
+      <Execution id="b9099c80-d46b-463f-b6e0-1ce32e71f7e7" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.VariableAttributes.Tests/bin/Debug/net8.0/FLua.VariableAttributes.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.VariableAttributes.Tests.RuntimeVariableTests" name="TestLuaVariableCloseBehavior" />
+    </UnitTest>
+    <UnitTest name="TestCloseVariableInFunction" storage="/users/bill/repos/flua/flua.variableattributes.tests/bin/debug/net8.0/flua.variableattributes.tests.dll" id="9c87a234-2845-266c-30fc-02afc8e083bd">
+      <Execution id="71b91117-769c-4341-9941-0b5ef0308a78" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.VariableAttributes.Tests/bin/Debug/net8.0/FLua.VariableAttributes.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.VariableAttributes.Tests.CloseVariableTests" name="TestCloseVariableInFunction" />
+    </UnitTest>
+    <UnitTest name="TestConstFunctionParameter" storage="/users/bill/repos/flua/flua.variableattributes.tests/bin/debug/net8.0/flua.variableattributes.tests.dll" id="28c16609-6820-a592-bb33-115b6523108b">
+      <Execution id="8a2a5c5e-7d59-41cb-b7bd-79818b904464" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.VariableAttributes.Tests/bin/Debug/net8.0/FLua.VariableAttributes.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.VariableAttributes.Tests.FunctionParameterAttributeTests" name="TestConstFunctionParameter" />
+    </UnitTest>
+    <UnitTest name="TestLuaEnvironmentAttributeSupport" storage="/users/bill/repos/flua/flua.variableattributes.tests/bin/debug/net8.0/flua.variableattributes.tests.dll" id="eedf41ca-7a82-952b-d6c6-385e8b2130c4">
+      <Execution id="a7855058-b4b1-462b-b104-ddc4f60290c5" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.VariableAttributes.Tests/bin/Debug/net8.0/FLua.VariableAttributes.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.VariableAttributes.Tests.RuntimeVariableTests" name="TestLuaEnvironmentAttributeSupport" />
+    </UnitTest>
+    <UnitTest name="TestConstVariableCannotBeModified" storage="/users/bill/repos/flua/flua.variableattributes.tests/bin/debug/net8.0/flua.variableattributes.tests.dll" id="d044a7cd-e8b3-988a-1c4b-60fdc9216cba">
+      <Execution id="ad2183ef-c4f7-4068-944c-ac5c7909c087" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.VariableAttributes.Tests/bin/Debug/net8.0/FLua.VariableAttributes.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.VariableAttributes.Tests.ConstVariableTests" name="TestConstVariableCannotBeModified" />
+    </UnitTest>
+    <UnitTest name="TestConstVariableInBlock" storage="/users/bill/repos/flua/flua.variableattributes.tests/bin/debug/net8.0/flua.variableattributes.tests.dll" id="67bf6271-7991-0d7b-a0cd-ad6e9e9c7a79">
+      <Execution id="14644087-a7d1-4837-870a-508b044b182e" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.VariableAttributes.Tests/bin/Debug/net8.0/FLua.VariableAttributes.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.VariableAttributes.Tests.ConstVariableTests" name="TestConstVariableInBlock" />
+    </UnitTest>
+    <UnitTest name="TestCloseVariableWithEarlyReturn" storage="/users/bill/repos/flua/flua.variableattributes.tests/bin/debug/net8.0/flua.variableattributes.tests.dll" id="7e060ab5-d0d1-fa6c-677b-ecdd36d1e21c">
+      <Execution id="256151bf-8b09-490b-bc70-142f466a353e" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.VariableAttributes.Tests/bin/Debug/net8.0/FLua.VariableAttributes.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.VariableAttributes.Tests.CloseVariableTests" name="TestCloseVariableWithEarlyReturn" />
+    </UnitTest>
+    <UnitTest name="DebugArithmeticTypes" storage="/users/bill/repos/flua/flua.variableattributes.tests/bin/debug/net8.0/flua.variableattributes.tests.dll" id="2b15d61b-e95e-3b74-328f-230b86af2494">
+      <Execution id="99c6d05c-520a-422c-af41-dce24495a25f" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.VariableAttributes.Tests/bin/Debug/net8.0/FLua.VariableAttributes.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.VariableAttributes.Tests.DebugTests" name="DebugArithmeticTypes" />
+    </UnitTest>
+    <UnitTest name="TestCloseFunctionParameter" storage="/users/bill/repos/flua/flua.variableattributes.tests/bin/debug/net8.0/flua.variableattributes.tests.dll" id="22d32648-4dad-6a2a-8aae-2f806b818968">
+      <Execution id="d3f6b08e-e2d0-44b5-babe-5f591b65cdbf" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.VariableAttributes.Tests/bin/Debug/net8.0/FLua.VariableAttributes.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.VariableAttributes.Tests.FunctionParameterAttributeTests" name="TestCloseFunctionParameter" />
+    </UnitTest>
+    <UnitTest name="TestMultipleCloseVariables" storage="/users/bill/repos/flua/flua.variableattributes.tests/bin/debug/net8.0/flua.variableattributes.tests.dll" id="0f76364d-3c5a-7968-41be-e0d6c40882f9">
+      <Execution id="99e42ec0-2678-45a2-8b65-4f411cd86bed" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.VariableAttributes.Tests/bin/Debug/net8.0/FLua.VariableAttributes.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.VariableAttributes.Tests.CloseVariableTests" name="TestMultipleCloseVariables" />
+    </UnitTest>
+  </TestDefinitions>
+  <TestEntries>
+    <TestEntry testId="22d32648-4dad-6a2a-8aae-2f806b818968" executionId="d3f6b08e-e2d0-44b5-babe-5f591b65cdbf" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="06207ab0-db84-1bc6-ed0e-d995cc5a5bf5" executionId="b9099c80-d46b-463f-b6e0-1ce32e71f7e7" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="9c87a234-2845-266c-30fc-02afc8e083bd" executionId="71b91117-769c-4341-9941-0b5ef0308a78" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="d044a7cd-e8b3-988a-1c4b-60fdc9216cba" executionId="ad2183ef-c4f7-4068-944c-ac5c7909c087" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="68db2203-6021-7768-3293-e02dddaa410c" executionId="e5e3c2c3-4226-4068-9c21-515205193ce3" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="2b15d61b-e95e-3b74-328f-230b86af2494" executionId="99c6d05c-520a-422c-af41-dce24495a25f" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="d335ff61-edbc-10ff-6197-ede348062aac" executionId="21bb9a24-b0f5-4430-bf2e-2e7d56d2168f" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="c9cdcab2-0234-f4a0-1c4f-20c173a9bae2" executionId="5e37cfc3-afb1-4236-9a19-2aca1455e596" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="28c16609-6820-a592-bb33-115b6523108b" executionId="8a2a5c5e-7d59-41cb-b7bd-79818b904464" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="851c84e8-41b7-10f6-f459-8751b680a943" executionId="60d442f9-14e9-4953-b7b1-2d9cba67c8e4" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="0f76364d-3c5a-7968-41be-e0d6c40882f9" executionId="99e42ec0-2678-45a2-8b65-4f411cd86bed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="ef719e02-5134-e45a-08a4-7a4605186dc3" executionId="794c0aa5-df3d-45db-9a74-5e802328a9b7" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="86a40c0c-2512-e558-023d-72475b98ac41" executionId="6d1fa36e-cd87-4446-b400-1ae0c0a1fb7f" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="dc8ed2bd-50bf-67bd-ebeb-f91e6a1bdb9b" executionId="d1325e63-7040-4d87-a073-6af1762024df" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="0bf1109f-4c4e-5d36-e26c-9628f441b98f" executionId="64bb0df1-30d7-4212-8e9b-227ce9b1513a" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="952dea26-2efc-dad8-b924-a723828b5448" executionId="3e8da7d7-8ac4-4447-9df8-dcad0c7f9a26" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="eedf41ca-7a82-952b-d6c6-385e8b2130c4" executionId="a7855058-b4b1-462b-b104-ddc4f60290c5" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="7e060ab5-d0d1-fa6c-677b-ecdd36d1e21c" executionId="256151bf-8b09-490b-bc70-142f466a353e" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="67bf6271-7991-0d7b-a0cd-ad6e9e9c7a79" executionId="14644087-a7d1-4837-870a-508b044b182e" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+  </TestEntries>
+  <TestLists>
+    <TestList name="Results Not in a List" id="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestList name="All Loaded Results" id="19431567-8539-422a-85d7-44ee4e166bda" />
+  </TestLists>
+  <ResultSummary outcome="Failed">
+    <Counters total="19" executed="19" passed="11" failed="8" error="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
+  </ResultSummary>
+</TestRun>

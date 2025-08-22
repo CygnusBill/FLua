@@ -88,6 +88,23 @@ namespace FLua.Interpreter
         }
 
         /// <summary>
+        /// Executes Lua code from string (legacy method name)
+        /// </summary>
+        public LuaValue[] ExecuteCode(string code)
+        {
+            return ExecuteString(code);
+        }
+
+        /// <summary>
+        /// Executes a list of statements directly (legacy method)
+        /// </summary>
+        public LuaValue[] ExecuteStatements(FSharpList<Statement> statements)
+        {
+            var result = ExecuteStatementsWithResult(statements);
+            return result.ReturnValues ?? [LuaValue.Nil];
+        }
+
+        /// <summary>
         /// Evaluates a Lua expression from string
         /// </summary>
         public LuaValue EvaluateExpression(string expressionText)

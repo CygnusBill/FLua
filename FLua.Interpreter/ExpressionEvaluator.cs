@@ -12,9 +12,17 @@ namespace FLua.Interpreter
     /// </summary>
     public class ExpressionEvaluator : IExpressionVisitor<LuaValue[]>
     {
-        private readonly LuaEnvironment _environment;
+        private LuaEnvironment _environment;
 
         public ExpressionEvaluator(LuaEnvironment environment)
+        {
+            _environment = environment;
+        }
+
+        /// <summary>
+        /// Updates the current environment
+        /// </summary>
+        public void SetEnvironment(LuaEnvironment environment)
         {
             _environment = environment;
         }

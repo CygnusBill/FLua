@@ -1,0 +1,992 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TestRun id="d1a4c86c-2ddd-4766-99c3-0a99753eb607" name="@dadsmbp 2025-08-22 08:18:24" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+  <Times creation="2025-08-22T08:18:24.6543530-04:00" queuing="2025-08-22T08:18:24.6543530-04:00" start="2025-08-22T08:18:24.1507090-04:00" finish="2025-08-22T08:18:25.6213240-04:00" />
+  <TestSettings name="default" id="9769a27b-95c3-4d6c-b581-9ad676aa024a">
+    <Deployment runDeploymentRoot="_dadsmbp_2025-08-22_08_18_24" />
+  </TestSettings>
+  <Results>
+    <UnitTestResult executionId="5777367d-ecf7-43f8-bba6-d63dc3902256" testId="c36280af-d7fe-eec5-f116-3b1ad609bbbc" testName="ResolveModule_SimpleModuleName_ResolvesCorrectly" computerName="dadsmbp" duration="00:00:00.0031734" startTime="2025-08-22T08:18:25.5609930-04:00" endTime="2025-08-22T08:18:25.5642640-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="5777367d-ecf7-43f8-bba6-d63dc3902256" />
+    <UnitTestResult executionId="bfd0f10e-8a3d-43b9-8bc6-9bfb9c1258f6" testId="768f7953-0575-941c-e65f-2f3772ef2c8c" testName="IsAllowedLibrary_VariousTrustLevelsAndLibraries_ReturnsExpectedResult (Trusted,debug,False)" computerName="dadsmbp" duration="00:00:00.0000032" startTime="2025-08-22T08:18:25.5903550-04:00" endTime="2025-08-22T08:18:25.5903820-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="bfd0f10e-8a3d-43b9-8bc6-9bfb9c1258f6" />
+    <UnitTestResult executionId="35495556-4612-444e-8879-7b87117d8f3f" testId="255bd218-2c51-440a-52fe-25f9213af985" testName="ResolveModule_DottedModuleName_ResolvesToPath" computerName="dadsmbp" duration="00:00:00.0019763" startTime="2025-08-22T08:18:25.5642910-04:00" endTime="2025-08-22T08:18:25.5663260-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="35495556-4612-444e-8879-7b87117d8f3f" />
+    <UnitTestResult executionId="64acd7f4-abb0-45a4-8664-549764efd756" testId="5577d03e-e950-03de-56c5-905857228a6b" testName="LuaHostOptions_EmptySearchPaths_AllowsEmptyList" computerName="dadsmbp" duration="00:00:00.0000567" startTime="2025-08-22T08:18:25.5475320-04:00" endTime="2025-08-22T08:18:25.5476100-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="64acd7f4-abb0-45a4-8664-549764efd756" />
+    <UnitTestResult executionId="837e572b-f720-46f8-8a43-c990dbe172df" testId="f4eede23-f9fd-0edb-445e-cbb2f4a67052" testName="CompileToFunction_MultipleReturns_ReturnsFirstValue" computerName="dadsmbp" duration="00:00:00.0110641" startTime="2025-08-22T08:18:25.5161690-04:00" endTime="2025-08-22T08:18:25.5273170-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="837e572b-f720-46f8-8a43-c990dbe172df" />
+    <UnitTestResult executionId="d56562d3-289a-4e6c-a364-5d5514cefa28" testId="97f8cd9d-afb7-28d6-a7d6-82b132b2c013" testName="SecurityPolicy_UntrustedToSandbox_FunctionAvailabilityChanges" computerName="dadsmbp" duration="00:00:00.0003467" startTime="2025-08-22T08:18:25.5878660-04:00" endTime="2025-08-22T08:18:25.5882340-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="d56562d3-289a-4e6c-a364-5d5514cefa28" />
+    <UnitTestResult executionId="73084958-df9b-49e4-a25c-f5bf1c8de6f2" testId="8735133a-043c-bc32-2328-95d44b8b2518" testName="CompileToExpression_MultipleReturns_ReturnsFirstValue" computerName="dadsmbp" duration="00:00:00.0033902" startTime="2025-08-22T08:18:24.6195170-04:00" endTime="2025-08-22T08:18:24.6230080-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="73084958-df9b-49e4-a25c-f5bf1c8de6f2" />
+    <UnitTestResult executionId="ee7ec7b1-6f25-4563-b1c5-16f88f9b4d49" testId="5834f25c-48e3-b126-e238-2ea60972e52d" testName="LuaHostOptions_CompilationConfiguration_SetsCorrectly" computerName="dadsmbp" duration="00:00:00.0003039" startTime="2025-08-22T08:18:25.5471930-04:00" endTime="2025-08-22T08:18:25.5475200-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="ee7ec7b1-6f25-4563-b1c5-16f88f9b4d49" />
+    <UnitTestResult executionId="3ecf1a47-ed9c-4008-9f1b-54d0dee2bf8d" testId="a697d127-617c-0aba-9c94-7d03608c12ae" testName="CompileToExpression_StringConcatenation_ReturnsString" computerName="dadsmbp" duration="00:00:00.0050179" startTime="2025-08-22T08:18:24.5609870-04:00" endTime="2025-08-22T08:18:24.5661210-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="3ecf1a47-ed9c-4008-9f1b-54d0dee2bf8d" />
+    <UnitTestResult executionId="fe38c50b-42b5-4039-9559-f307c6a9cd27" testId="7a106f3e-5aee-5f77-09f7-064ca3f6ef3f" testName="CompileToFunction_InvalidSyntax_ThrowsException" computerName="dadsmbp" duration="00:00:00.0003712" startTime="2025-08-22T08:18:25.4862370-04:00" endTime="2025-08-22T08:18:25.4866920-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="fe38c50b-42b5-4039-9559-f307c6a9cd27" />
+    <UnitTestResult executionId="6d4e2d52-d779-4965-993b-ae70091e006e" testId="9bd8c8fe-c58a-906b-e18c-614fe5de1a3d" testName="Host_DataTransformationScenario_ProcessesData" computerName="dadsmbp" duration="00:00:00.0025806" startTime="2025-08-22T08:18:25.2548210-04:00" endTime="2025-08-22T08:18:25.2574560-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="6d4e2d52-d779-4965-993b-ae70091e006e">
+      <Output>
+        <ErrorInfo>
+          <Message>Test method FLua.Hosting.Tests.HostingIntegrationTests.Host_DataTransformationScenario_ProcessesData threw exception: &#xD;
+FLua.Runtime.LuaRuntimeException: Generic for requires iterator function, state, and control variable</Message>
+          <StackTrace>    at FLua.Interpreter.StatementExecutor.VisitGenericFor(FSharpList`1 variables, FSharpList`1 expressions, FSharpList`1 block) in /Users/bill/Repos/FLua/FLua.Interpreter/StatementExecutor.cs:line 446
+   at FLua.Ast.Visitor.dispatchStmt[T](IStatementVisitor`1 visitor, Statement stmt) in /Users/bill/Repos/FLua/FLua.Ast/AstVisitor.fs:line 77
+   at FLua.Interpreter.StatementExecutor.Execute(Statement stmt) in /Users/bill/Repos/FLua/FLua.Interpreter/StatementExecutor.cs:line 40
+   at FLua.Interpreter.LuaInterpreter.ExecuteStatement(Statement stmt) in /Users/bill/Repos/FLua/FLua.Interpreter/LuaInterpreter.cs:line 154
+   at FLua.Interpreter.LuaInterpreter.ExecuteStatementsWithResult(FSharpList`1 statements) in /Users/bill/Repos/FLua/FLua.Interpreter/LuaInterpreter.cs:line 125
+   at FLua.Interpreter.LuaInterpreter.ExecuteStatements(FSharpList`1 statements) in /Users/bill/Repos/FLua/FLua.Interpreter/LuaInterpreter.cs:line 103
+   at FLua.Hosting.LuaHost.ExecuteInternal(FSharpList`1 statements, LuaEnvironment env) in /Users/bill/Repos/FLua/FLua.Hosting/LuaHost.cs:line 105
+   at FLua.Hosting.LuaHost.Execute(String luaCode, LuaHostOptions options) in /Users/bill/Repos/FLua/FLua.Hosting/LuaHost.cs:line 88
+   at FLua.Hosting.Tests.HostingIntegrationTests.Host_DataTransformationScenario_ProcessesData() in /Users/bill/Repos/FLua/FLua.Hosting.Tests/HostingIntegrationTests.cs:line 201
+   at System.RuntimeMethodHandle.InvokeMethod(Object target, Void** arguments, Signature sig, Boolean isConstructor)
+   at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)
+</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="f05f87b5-833b-4856-b975-a80088efad15" testId="06b02bd5-2973-b411-0284-c1994a47f07f" testName="ModuleResolutionResult_CreateSuccess_PropertiesSetCorrectly" computerName="dadsmbp" duration="00:00:00.0004025" startTime="2025-08-22T08:18:25.5854810-04:00" endTime="2025-08-22T08:18:25.5859100-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="f05f87b5-833b-4856-b975-a80088efad15" />
+    <UnitTestResult executionId="6157341e-d730-42be-9bb0-1c34d7c5ee7c" testId="df02a017-b650-63dd-4edf-d8be76bf1d81" testName="IsAllowedLibrary_VariousTrustLevelsAndLibraries_ReturnsExpectedResult (Untrusted,io,False)" computerName="dadsmbp" duration="00:00:00.0000749" startTime="2025-08-22T08:18:25.5896280-04:00" endTime="2025-08-22T08:18:25.5897340-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="6157341e-d730-42be-9bb0-1c34d7c5ee7c" />
+    <UnitTestResult executionId="f90d8f5c-f422-498a-aa25-753368db7f90" testId="0ed08b61-6124-e5b6-65ec-82344e210eae" testName="LuaHostOptions_DevelopmentConfiguration_HasDebugSettings" computerName="dadsmbp" duration="00:00:00.0000760" startTime="2025-08-22T08:18:25.5502620-04:00" endTime="2025-08-22T08:18:25.5503570-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="f90d8f5c-f422-498a-aa25-753368db7f90" />
+    <UnitTestResult executionId="b8cce58a-bcae-4d5c-9ead-6336a03f451a" testId="bf9ef259-1b28-3922-0b6c-b0470646c5d4" testName="EnvironmentProvider_InjectHostContext_VariablesAccessible" computerName="dadsmbp" duration="00:00:00.0001917" startTime="2025-08-22T08:18:25.5916380-04:00" endTime="2025-08-22T08:18:25.5921840-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="b8cce58a-bcae-4d5c-9ead-6336a03f451a" />
+    <UnitTestResult executionId="25648d63-fcba-4010-a6d6-af7270c05185" testId="1ba5374c-5db1-6ca8-e09b-8859edf71d84" testName="CreateEnvironment_RestrictedLevel_CannotAccessDebugLibrary" computerName="dadsmbp" duration="00:00:00.0001342" startTime="2025-08-22T08:18:25.5904220-04:00" endTime="2025-08-22T08:18:25.5905770-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="25648d63-fcba-4010-a6d6-af7270c05185" />
+    <UnitTestResult executionId="b3462bc2-6442-45d0-90c6-c68e7dab6415" testId="67cd635e-6a71-fb03-75c2-e8aa1f543906" testName="LuaHostOptions_ZeroTimeout_AcceptsZeroValue" computerName="dadsmbp" duration="00:00:00.0000466" startTime="2025-08-22T08:18:25.5480030-04:00" endTime="2025-08-22T08:18:25.5480700-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="b3462bc2-6442-45d0-90c6-c68e7dab6415" />
+    <UnitTestResult executionId="f31fdf7c-b767-4184-a55b-0e5239791ac3" testId="bd2ae68e-84b1-b260-4e73-e3c9f76a349d" testName="LuaHostOptions_RecordEquality_WorksCorrectly" computerName="dadsmbp" duration="00:00:00.0002976" startTime="2025-08-22T08:18:25.5493950-04:00" endTime="2025-08-22T08:18:25.5497130-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="f31fdf7c-b767-4184-a55b-0e5239791ac3" />
+    <UnitTestResult executionId="d296bb8f-3f1e-42b0-aae7-6b447b09132a" testId="b7008846-817f-22d0-0a6e-ab5d9675c9b0" testName="IsAllowedLibrary_VariousTrustLevelsAndLibraries_ReturnsExpectedResult (Sandbox,coroutine,True)" computerName="dadsmbp" duration="00:00:00.0000047" startTime="2025-08-22T08:18:25.5901610-04:00" endTime="2025-08-22T08:18:25.5902040-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="d296bb8f-3f1e-42b0-aae7-6b447b09132a" />
+    <UnitTestResult executionId="05605e4e-ba33-4ce2-84e2-5e24a2c5a4ea" testId="0aac1178-2ff9-a4e6-fe64-fe20321c6b0b" testName="ResolveModule_CacheCleared_ReloadsModule" computerName="dadsmbp" duration="00:00:00.0011315" startTime="2025-08-22T08:18:25.5776200-04:00" endTime="2025-08-22T08:18:25.5787920-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="05605e4e-ba33-4ce2-84e2-5e24a2c5a4ea" />
+    <UnitTestResult executionId="4aef3365-af22-4e67-8d9a-c945eb171ce5" testId="ebb5e080-5a3b-709a-925f-f52d50f6a2cc" testName="IsAllowedFunction_VariousTrustLevelsAndFunctions_ReturnsExpectedResult (Trusted,pcall,True)" computerName="dadsmbp" duration="00:00:00.0000033" startTime="2025-08-22T08:18:25.5893800-04:00" endTime="2025-08-22T08:18:25.5894070-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="4aef3365-af22-4e67-8d9a-c945eb171ce5" />
+    <UnitTestResult executionId="dbcb0242-ed70-46b5-93bd-16a5f27c1a9a" testId="4ecbf54f-d06d-7e67-3f12-c373de2c1e8e" testName="CompileToExpression_ComplexCalculation_EvaluatesCorrectly" computerName="dadsmbp" startTime="2025-08-22T08:18:24.6278670-04:00" endTime="2025-08-22T08:18:24.6280260-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="NotExecuted" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="dbcb0242-ed70-46b5-93bd-16a5f27c1a9a">
+      <Output>
+        <ErrorInfo>
+          <Message>Local function definitions are not supported in expression trees - limitation of MinimalExpressionTreeGenerator</Message>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="82c386a0-f088-498a-b3ad-e6667057af3e" testId="399322ed-8341-dd58-28d9-4ce8c5dadc3a" testName="IsAllowedLibrary_VariousTrustLevelsAndLibraries_ReturnsExpectedResult (Sandbox,io,False)" computerName="dadsmbp" duration="00:00:00.0000040" startTime="2025-08-22T08:18:25.5902170-04:00" endTime="2025-08-22T08:18:25.5902480-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="82c386a0-f088-498a-b3ad-e6667057af3e" />
+    <UnitTestResult executionId="dad3e003-99cd-4921-8ad9-cadc1f82359b" testId="859b4c7f-df44-6ff9-ecf9-8a3c1714a301" testName="LuaHostOptions_DefaultConfiguration_HasExpectedValues" computerName="dadsmbp" duration="00:00:00.0007376" startTime="2025-08-22T08:18:25.5460610-04:00" endTime="2025-08-22T08:18:25.5469080-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="dad3e003-99cd-4921-8ad9-cadc1f82359b" />
+    <UnitTestResult executionId="75c546f8-3c5e-4e82-95e6-40b639373d6c" testId="2998b0d6-2ecf-aead-fc90-6be329f1cd41" testName="LuaHostOptions_SecurityAndModuleOptions_CombineCorrectly" computerName="dadsmbp" duration="00:00:00.0003569" startTime="2025-08-22T08:18:25.5490080-04:00" endTime="2025-08-22T08:18:25.5493850-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="75c546f8-3c5e-4e82-95e6-40b639373d6c" />
+    <UnitTestResult executionId="17afaddb-646f-4cba-befa-ce0ab5227e35" testId="f2a20d40-089b-b493-ced4-6e2431988e39" testName="CompileToExpression_WithLocalVariables_CreatesProperScope" computerName="dadsmbp" duration="00:00:00.0035324" startTime="2025-08-22T08:18:24.5799850-04:00" endTime="2025-08-22T08:18:24.5835610-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="17afaddb-646f-4cba-befa-ce0ab5227e35" />
+    <UnitTestResult executionId="77d49b93-5977-44b4-adc5-446b45b43bda" testId="a42981ac-bb30-8688-5740-fe66c7242e7b" testName="LuaHostOptions_MaxMemoryUsage_AcceptsLargeValues" computerName="dadsmbp" duration="00:00:00.0002656" startTime="2025-08-22T08:18:25.5480780-04:00" endTime="2025-08-22T08:18:25.5483620-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="77d49b93-5977-44b4-adc5-446b45b43bda" />
+    <UnitTestResult executionId="bc88473f-2685-448d-b9a0-5bc49bba18db" testId="3b40f0cd-dfbf-6229-6d33-e09ad9e36295" testName="CompileToExpression_MathLibraryCall_UsesStandardLibrary" computerName="dadsmbp" duration="00:00:00.0104569" startTime="2025-08-22T08:18:24.5682970-04:00" endTime="2025-08-22T08:18:24.5788180-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="bc88473f-2685-448d-b9a0-5bc49bba18db" />
+    <UnitTestResult executionId="70e7584a-ecc4-4d4e-ad84-74b2421ac80a" testId="433c1f90-0729-9caf-eb3a-efe2a02e9069" testName="CompileToFunction_TypeMismatch_ThrowsException" computerName="dadsmbp" duration="00:00:00.0173385" startTime="2025-08-22T08:18:25.4867080-04:00" endTime="2025-08-22T08:18:25.5041200-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="70e7584a-ecc4-4d4e-ad84-74b2421ac80a" />
+    <UnitTestResult executionId="874616d4-cb48-4511-8b54-69df4caa9303" testId="56973521-ea14-3bd9-eab0-0df35dafced9" testName="Host_ConfigurationScriptScenario_LoadsSettings" computerName="dadsmbp" duration="00:00:00.0012415" startTime="2025-08-22T08:18:25.2534650-04:00" endTime="2025-08-22T08:18:25.2547920-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="874616d4-cb48-4511-8b54-69df4caa9303" />
+    <UnitTestResult executionId="2b253ba9-33b0-4507-ad10-946f746b0ff1" testId="281e160e-81f7-8dbe-517c-e9665940a73b" testName="ResolveModule_WithCaching_SecondCallUsesCache" computerName="dadsmbp" duration="00:00:00.0008795" startTime="2025-08-22T08:18:25.5766870-04:00" endTime="2025-08-22T08:18:25.5776050-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="2b253ba9-33b0-4507-ad10-946f746b0ff1" />
+    <UnitTestResult executionId="0afb378c-e35f-4475-8c84-41ab194cd767" testId="dbfc50fa-8e7a-d40d-3ff9-331cf9868f1e" testName="CompileToExpression_InvalidSyntax_ThrowsException" computerName="dadsmbp" duration="00:00:00.0131090" startTime="2025-08-22T08:18:24.5835910-04:00" endTime="2025-08-22T08:18:24.5968210-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="0afb378c-e35f-4475-8c84-41ab194cd767" />
+    <UnitTestResult executionId="b31bc9fd-b637-4200-9beb-ff3bd2183869" testId="9e62b864-9438-89e1-76ba-d710356a0d06" testName="CreateEnvironment_UntrustedLevel_MinimalFunctionsOnly" computerName="dadsmbp" duration="00:00:00.0003176" startTime="2025-08-22T08:18:25.5868160-04:00" endTime="2025-08-22T08:18:25.5872590-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="b31bc9fd-b637-4200-9beb-ff3bd2183869" />
+    <UnitTestResult executionId="538baff1-f49c-4c8c-9786-563f1be1d1e4" testId="ee599aed-6bfd-453c-74e1-d81d8b78981e" testName="CompileToExpression_UntrustedWithDangerousFunction_ThrowsWhenExecuted" computerName="dadsmbp" duration="00:00:00.0018322" startTime="2025-08-22T08:18:24.6259040-04:00" endTime="2025-08-22T08:18:24.6278320-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="538baff1-f49c-4c8c-9786-563f1be1d1e4" />
+    <UnitTestResult executionId="b9a303f4-55de-4c8b-8e2b-a3897e9b7d7e" testId="7d4b95e4-46a7-5bed-1440-dce161997dde" testName="IsAllowedFunction_VariousTrustLevelsAndFunctions_ReturnsExpectedResult (Sandbox,load,False)" computerName="dadsmbp" duration="00:00:00.0000036" startTime="2025-08-22T08:18:25.5893090-04:00" endTime="2025-08-22T08:18:25.5893390-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="b9a303f4-55de-4c8b-8e2b-a3897e9b7d7e" />
+    <UnitTestResult executionId="924a6767-d760-40b4-be1b-5f22b4abb6f4" testId="a093420f-cc96-62ba-f2e6-0a732cb51e21" testName="ModuleResolutionResult_CreateFailure_PropertiesSetCorrectly" computerName="dadsmbp" duration="00:00:00.0003836" startTime="2025-08-22T08:18:25.5859200-04:00" endTime="2025-08-22T08:18:25.5863250-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="924a6767-d760-40b4-be1b-5f22b4abb6f4" />
+    <UnitTestResult executionId="44f8eeb6-3987-43a9-bfa3-47b548ec294d" testId="56a0fbb4-6ac1-e41b-ae0f-306fc184529f" testName="Host_ExecuteAsync_SupportsCancellation" computerName="dadsmbp" startTime="2025-08-22T08:18:25.2444150-04:00" endTime="2025-08-22T08:18:25.2444770-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="NotExecuted" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="44f8eeb6-3987-43a9-bfa3-47b548ec294d">
+      <Output>
+        <ErrorInfo>
+          <Message>Cancellation support needs improved implementation</Message>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="21b50237-2ce1-4dd6-92a7-cf45b9661730" testId="4b2eae64-a09b-19a3-0248-923179e14593" testName="IsModuleAllowed_VariousModulesAndTrustLevels_ReturnsExpectedResult (custom.module,Restricted,True)" computerName="dadsmbp" duration="00:00:00.0003662" startTime="2025-08-22T08:18:25.5850780-04:00" endTime="2025-08-22T08:18:25.5854730-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="21b50237-2ce1-4dd6-92a7-cf45b9661730" />
+    <UnitTestResult executionId="c33c66cd-449f-4e22-87cd-eeb38f804206" testId="e39bfef0-812d-928f-a1d5-d594f8d96fc1" testName="TestModuleCompilation_CircularDependency_ThrowsError" computerName="dadsmbp" duration="00:00:00.0007963" startTime="2025-08-22T08:18:25.5601600-04:00" endTime="2025-08-22T08:18:25.5609820-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="c33c66cd-449f-4e22-87cd-eeb38f804206">
+      <Output>
+        <ErrorInfo>
+          <Message>Test method FLua.Hosting.Tests.ModuleCompilationTests.TestModuleCompilation_CircularDependency_ThrowsError threw exception: &#xD;
+FLua.Runtime.LuaRuntimeException: module 'moduleX' not found:
+no field package.preload['moduleX']
+no file 'moduleX' in package.path</Message>
+          <StackTrace>    at FLua.Runtime.LuaPackageLib.Require(LuaValue[] args, LuaEnvironment env, LuaTable packageTable) in /Users/bill/Repos/FLua/FLua.Runtime/LuaPackageLib.cs:line 133
+   at FLua.Runtime.LuaPackageLib.&lt;&gt;c__DisplayClass0_0.&lt;AddPackageLibrary&gt;b__3(LuaValue[] args) in /Users/bill/Repos/FLua/FLua.Runtime/LuaPackageLib.cs:line 54
+   at FLua.Runtime.BuiltinFunction.Call(LuaValue[] args) in /Users/bill/Repos/FLua/FLua.Runtime/LuaTypes.cs:line 212
+   at FLua.Interpreter.ExpressionEvaluator.EvaluateFunctionCallInternal(Expr func, FSharpList`1 args) in /Users/bill/Repos/FLua/FLua.Interpreter/ExpressionEvaluator.cs:line 258
+   at FLua.Interpreter.ExpressionEvaluator.VisitFunctionCall(Expr func, FSharpList`1 args) in /Users/bill/Repos/FLua/FLua.Interpreter/ExpressionEvaluator.cs:line 122
+   at FLua.Ast.Visitor.dispatchExpr[T](IExpressionVisitor`1 visitor, Expr expr) in /Users/bill/Repos/FLua/FLua.Ast/AstVisitor.fs:line 52
+   at FLua.Interpreter.ExpressionEvaluator.Evaluate(Expr expr) in /Users/bill/Repos/FLua/FLua.Interpreter/ExpressionEvaluator.cs:line 35
+   at FLua.Interpreter.StatementExecutor.VisitLocalAssignment(FSharpList`1 variables, FSharpOption`1 expressions) in /Users/bill/Repos/FLua/FLua.Interpreter/StatementExecutor.cs:line 139
+   at FLua.Ast.Visitor.dispatchStmt[T](IStatementVisitor`1 visitor, Statement stmt) in /Users/bill/Repos/FLua/FLua.Ast/AstVisitor.fs:line 65
+   at FLua.Interpreter.StatementExecutor.Execute(Statement stmt) in /Users/bill/Repos/FLua/FLua.Interpreter/StatementExecutor.cs:line 40
+   at FLua.Interpreter.LuaInterpreter.ExecuteStatement(Statement stmt) in /Users/bill/Repos/FLua/FLua.Interpreter/LuaInterpreter.cs:line 154
+   at FLua.Interpreter.LuaInterpreter.ExecuteStatementsWithResult(FSharpList`1 statements) in /Users/bill/Repos/FLua/FLua.Interpreter/LuaInterpreter.cs:line 125
+   at FLua.Interpreter.LuaInterpreter.ExecuteStatements(FSharpList`1 statements) in /Users/bill/Repos/FLua/FLua.Interpreter/LuaInterpreter.cs:line 103
+   at FLua.Hosting.LuaHost.ExecuteInternal(FSharpList`1 statements, LuaEnvironment env) in /Users/bill/Repos/FLua/FLua.Hosting/LuaHost.cs:line 105
+   at FLua.Hosting.LuaHost.Execute(String luaCode, LuaHostOptions options) in /Users/bill/Repos/FLua/FLua.Hosting/LuaHost.cs:line 88
+   at FLua.Hosting.Tests.ModuleCompilationTests.TestModuleCompilation_CircularDependency_ThrowsError() in /Users/bill/Repos/FLua/FLua.Hosting.Tests/ModuleCompilationTests.cs:line 329
+   at System.RuntimeMethodHandle.InvokeMethod(Object target, Void** arguments, Signature sig, Boolean isConstructor)
+   at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)
+</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="768aa84f-3518-477f-877c-ad59e91498f9" testId="b517e6d0-d3f9-bceb-5ff2-1ba28a74d05b" testName="CreateEnvironment_UntrustedLevel_CannotUseDangerousFunctions" computerName="dadsmbp" duration="00:00:00.0001214" startTime="2025-08-22T08:18:25.5905860-04:00" endTime="2025-08-22T08:18:25.5907280-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="768aa84f-3518-477f-877c-ad59e91498f9" />
+    <UnitTestResult executionId="1400fabc-900e-4047-9cf7-d738264fb109" testId="1a2b6914-fea5-fe47-8f87-e3bcdc223f26" testName="Host_ExecutionTimeout_EnforcedCorrectly" computerName="dadsmbp" startTime="2025-08-22T08:18:25.2638650-04:00" endTime="2025-08-22T08:18:25.2639110-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="NotExecuted" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="1400fabc-900e-4047-9cf7-d738264fb109">
+      <Output>
+        <ErrorInfo>
+          <Message>Execution timeout enforcement needs implementation</Message>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="8d992cec-b4d0-4a1c-91d9-1556e0f6425a" testId="a2542ed1-9fc9-d50e-3426-33d0114b0751" testName="Host_GameScriptingScenario_WorksCorrectly" computerName="dadsmbp" duration="00:00:00.0078603" startTime="2025-08-22T08:18:25.2444890-04:00" endTime="2025-08-22T08:18:25.2525610-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="8d992cec-b4d0-4a1c-91d9-1556e0f6425a">
+      <Output>
+        <ErrorInfo>
+          <Message>Test method FLua.Hosting.Tests.HostingIntegrationTests.Host_GameScriptingScenario_WorksCorrectly threw exception: &#xD;
+FLua.Runtime.LuaRuntimeException: Attempt to index non-table</Message>
+          <StackTrace>    at FLua.Interpreter.ExpressionEvaluator.VisitTableAccess(Expr table, Expr key) in /Users/bill/Repos/FLua/FLua.Interpreter/ExpressionEvaluator.cs:line 75
+   at FLua.Ast.Visitor.dispatchExpr[T](IExpressionVisitor`1 visitor, Expr expr) in /Users/bill/Repos/FLua/FLua.Ast/AstVisitor.fs:line 49
+   at FLua.Interpreter.ExpressionEvaluator.Evaluate(Expr expr) in /Users/bill/Repos/FLua/FLua.Interpreter/ExpressionEvaluator.cs:line 35
+   at FLua.Interpreter.ExpressionEvaluator.&lt;EvaluateFunctionCallInternal&gt;b__17_0(Expr arg) in /Users/bill/Repos/FLua/FLua.Interpreter/ExpressionEvaluator.cs:line 254
+   at System.Linq.Enumerable.SelectArrayIterator`2.Fill(ReadOnlySpan`1 source, Span`1 destination, Func`2 func)
+   at System.Linq.Enumerable.SelectArrayIterator`2.ToArray()
+   at System.Linq.Enumerable.ToArray[TSource](IEnumerable`1 source)
+   at FLua.Interpreter.ExpressionEvaluator.EvaluateFunctionCallInternal(Expr func, FSharpList`1 args) in /Users/bill/Repos/FLua/FLua.Interpreter/ExpressionEvaluator.cs:line 254
+   at FLua.Interpreter.ExpressionEvaluator.VisitFunctionCall(Expr func, FSharpList`1 args) in /Users/bill/Repos/FLua/FLua.Interpreter/ExpressionEvaluator.cs:line 122
+   at FLua.Ast.Visitor.dispatchExpr[T](IExpressionVisitor`1 visitor, Expr expr) in /Users/bill/Repos/FLua/FLua.Ast/AstVisitor.fs:line 52
+   at FLua.Interpreter.ExpressionEvaluator.Evaluate(Expr expr) in /Users/bill/Repos/FLua/FLua.Interpreter/ExpressionEvaluator.cs:line 35
+   at FLua.Interpreter.StatementExecutor.VisitLocalAssignment(FSharpList`1 variables, FSharpOption`1 expressions) in /Users/bill/Repos/FLua/FLua.Interpreter/StatementExecutor.cs:line 139
+   at FLua.Ast.Visitor.dispatchStmt[T](IStatementVisitor`1 visitor, Statement stmt) in /Users/bill/Repos/FLua/FLua.Ast/AstVisitor.fs:line 65
+   at FLua.Interpreter.StatementExecutor.Execute(Statement stmt) in /Users/bill/Repos/FLua/FLua.Interpreter/StatementExecutor.cs:line 40
+   at FLua.Interpreter.LuaInterpreter.ExecuteStatement(Statement stmt) in /Users/bill/Repos/FLua/FLua.Interpreter/LuaInterpreter.cs:line 154
+   at FLua.Interpreter.LuaInterpreter.ExecuteStatementsWithResult(FSharpList`1 statements) in /Users/bill/Repos/FLua/FLua.Interpreter/LuaInterpreter.cs:line 125
+   at FLua.Interpreter.LuaInterpreter.ExecuteStatements(FSharpList`1 statements) in /Users/bill/Repos/FLua/FLua.Interpreter/LuaInterpreter.cs:line 103
+   at FLua.Hosting.LuaHost.ExecuteInternal(FSharpList`1 statements, LuaEnvironment env) in /Users/bill/Repos/FLua/FLua.Hosting/LuaHost.cs:line 105
+   at FLua.Hosting.LuaHost.Execute(String luaCode, LuaHostOptions options) in /Users/bill/Repos/FLua/FLua.Hosting/LuaHost.cs:line 88
+   at FLua.Hosting.Tests.HostingIntegrationTests.Host_GameScriptingScenario_WorksCorrectly() in /Users/bill/Repos/FLua/FLua.Hosting.Tests/HostingIntegrationTests.cs:line 130
+   at System.RuntimeMethodHandle.InvokeMethod(Object target, Void** arguments, Signature sig, Boolean isConstructor)
+   at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)
+</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="1e507ff7-3ebe-4243-8af0-1cc5ddbe6be8" testId="10236504-2a67-fe74-a4f9-88b00270520f" testName="IsAllowedFunction_VariousTrustLevelsAndFunctions_ReturnsExpectedResult (Sandbox,print,True)" computerName="dadsmbp" duration="00:00:00.0000050" startTime="2025-08-22T08:18:25.5892090-04:00" endTime="2025-08-22T08:18:25.5892530-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="1e507ff7-3ebe-4243-8af0-1cc5ddbe6be8" />
+    <UnitTestResult executionId="3f64a34f-a126-4531-af03-ace109436ef0" testId="0e7f4dc5-6dd9-a985-44d6-2dbf1ad70202" testName="IsAllowedFunction_VariousTrustLevelsAndFunctions_ReturnsExpectedResult (Trusted,print,True)" computerName="dadsmbp" duration="00:00:00.0000028" startTime="2025-08-22T08:18:25.5893460-04:00" endTime="2025-08-22T08:18:25.5893730-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="3f64a34f-a126-4531-af03-ace109436ef0" />
+    <UnitTestResult executionId="d6ce90d3-2e5c-426f-bc2c-452791a67f82" testId="3a3da1ad-1bc9-ea8e-7ab2-044cdf412979" testName="LuaHostOptions_ProductionConfiguration_HasAppropriateSettings" computerName="dadsmbp" duration="00:00:00.0003277" startTime="2025-08-22T08:18:25.5499070-04:00" endTime="2025-08-22T08:18:25.5502530-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="d6ce90d3-2e5c-426f-bc2c-452791a67f82" />
+    <UnitTestResult executionId="a756742b-0aac-4c82-bfab-939603ddb1e1" testId="b5e9da62-e23c-1860-bfcb-a743a698fc85" testName="ResolveModule_UntrustedLevel_NoModuleAccess" computerName="dadsmbp" duration="00:00:00.0010437" startTime="2025-08-22T08:18:25.5741530-04:00" endTime="2025-08-22T08:18:25.5752520-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="a756742b-0aac-4c82-bfab-939603ddb1e1" />
+    <UnitTestResult executionId="3c07ef46-17e1-48ce-b480-b29207030748" testId="380a8bc3-5783-ca0a-a2d9-7fa574fa81d6" testName="Host_CompileToAssembly_CreatesLoadableAssembly" computerName="dadsmbp" duration="00:00:00.1343947" startTime="2025-08-22T08:18:25.2811070-04:00" endTime="2025-08-22T08:18:25.4156180-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="3c07ef46-17e1-48ce-b480-b29207030748" />
+    <UnitTestResult executionId="57e9cff1-fc07-40ec-9c17-2530cc93872f" testId="409facdd-c606-5f88-5ea8-65c14816134e" testName="CompileToFunction_WithMathLibrary_UsesStandardLibrary" computerName="dadsmbp" duration="00:00:00.0143694" startTime="2025-08-22T08:18:25.4717310-04:00" endTime="2025-08-22T08:18:25.4861850-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="57e9cff1-fc07-40ec-9c17-2530cc93872f" />
+    <UnitTestResult executionId="4912052e-cc59-46c9-bdc2-e261c81bcd01" testId="01e8e958-1925-8e5b-3890-6ddbfae023a0" testName="TestModuleCompilation_WithCompilationError_FallsBackToInterpreter" computerName="dadsmbp" duration="00:00:00.0010103" startTime="2025-08-22T08:18:25.5574270-04:00" endTime="2025-08-22T08:18:25.5584880-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="4912052e-cc59-46c9-bdc2-e261c81bcd01">
+      <Output>
+        <ErrorInfo>
+          <Message>Test method FLua.Hosting.Tests.ModuleCompilationTests.TestModuleCompilation_WithCompilationError_FallsBackToInterpreter threw exception: &#xD;
+FLua.Runtime.LuaRuntimeException: module 'dynamic' not found:
+no field package.preload['dynamic']
+no file 'dynamic' in package.path</Message>
+          <StackTrace>    at FLua.Runtime.LuaPackageLib.Require(LuaValue[] args, LuaEnvironment env, LuaTable packageTable) in /Users/bill/Repos/FLua/FLua.Runtime/LuaPackageLib.cs:line 133
+   at FLua.Runtime.LuaPackageLib.&lt;&gt;c__DisplayClass0_0.&lt;AddPackageLibrary&gt;b__3(LuaValue[] args) in /Users/bill/Repos/FLua/FLua.Runtime/LuaPackageLib.cs:line 54
+   at FLua.Runtime.BuiltinFunction.Call(LuaValue[] args) in /Users/bill/Repos/FLua/FLua.Runtime/LuaTypes.cs:line 212
+   at FLua.Interpreter.ExpressionEvaluator.EvaluateFunctionCallInternal(Expr func, FSharpList`1 args) in /Users/bill/Repos/FLua/FLua.Interpreter/ExpressionEvaluator.cs:line 258
+   at FLua.Interpreter.ExpressionEvaluator.VisitFunctionCall(Expr func, FSharpList`1 args) in /Users/bill/Repos/FLua/FLua.Interpreter/ExpressionEvaluator.cs:line 122
+   at FLua.Ast.Visitor.dispatchExpr[T](IExpressionVisitor`1 visitor, Expr expr) in /Users/bill/Repos/FLua/FLua.Ast/AstVisitor.fs:line 52
+   at FLua.Interpreter.ExpressionEvaluator.Evaluate(Expr expr) in /Users/bill/Repos/FLua/FLua.Interpreter/ExpressionEvaluator.cs:line 35
+   at FLua.Interpreter.StatementExecutor.VisitLocalAssignment(FSharpList`1 variables, FSharpOption`1 expressions) in /Users/bill/Repos/FLua/FLua.Interpreter/StatementExecutor.cs:line 139
+   at FLua.Ast.Visitor.dispatchStmt[T](IStatementVisitor`1 visitor, Statement stmt) in /Users/bill/Repos/FLua/FLua.Ast/AstVisitor.fs:line 65
+   at FLua.Interpreter.StatementExecutor.Execute(Statement stmt) in /Users/bill/Repos/FLua/FLua.Interpreter/StatementExecutor.cs:line 40
+   at FLua.Interpreter.LuaInterpreter.ExecuteStatement(Statement stmt) in /Users/bill/Repos/FLua/FLua.Interpreter/LuaInterpreter.cs:line 154
+   at FLua.Interpreter.LuaInterpreter.ExecuteStatementsWithResult(FSharpList`1 statements) in /Users/bill/Repos/FLua/FLua.Interpreter/LuaInterpreter.cs:line 125
+   at FLua.Interpreter.LuaInterpreter.ExecuteStatements(FSharpList`1 statements) in /Users/bill/Repos/FLua/FLua.Interpreter/LuaInterpreter.cs:line 103
+   at FLua.Hosting.LuaHost.ExecuteInternal(FSharpList`1 statements, LuaEnvironment env) in /Users/bill/Repos/FLua/FLua.Hosting/LuaHost.cs:line 105
+   at FLua.Hosting.LuaHost.Execute(String luaCode, LuaHostOptions options) in /Users/bill/Repos/FLua/FLua.Hosting/LuaHost.cs:line 88
+   at FLua.Hosting.Tests.ModuleCompilationTests.TestModuleCompilation_WithCompilationError_FallsBackToInterpreter() in /Users/bill/Repos/FLua/FLua.Hosting.Tests/ModuleCompilationTests.cs:line 202
+   at System.RuntimeMethodHandle.InvokeMethod(Object target, Void** arguments, Signature sig, Boolean isConstructor)
+   at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)
+</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="65eacd0a-bb3b-4ff1-8eaa-ca2a68bec10f" testId="86436ca2-5c24-130c-e1ee-32f0375f06ff" testName="CompileToFunction_WithRestrictedTrustLevel_LimitsAvailableFunctions" computerName="dadsmbp" duration="00:00:00.0164726" startTime="2025-08-22T08:18:25.5278200-04:00" endTime="2025-08-22T08:18:25.5443800-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="65eacd0a-bb3b-4ff1-8eaa-ca2a68bec10f" />
+    <UnitTestResult executionId="7a8aafac-e210-4a0a-8e17-f79f816f143a" testId="a7e601de-f0f7-e427-15c9-2176b991a38b" testName="Host_UntrustedScript_CannotAccessFileSystem" computerName="dadsmbp" duration="00:00:00.0024891" startTime="2025-08-22T08:18:25.2574920-04:00" endTime="2025-08-22T08:18:25.2600450-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="7a8aafac-e210-4a0a-8e17-f79f816f143a">
+      <Output>
+        <ErrorInfo>
+          <Message>Assert.ThrowsException failed. No exception thrown. LuaRuntimeException exception was expected. </Message>
+          <StackTrace>   at FLua.Hosting.Tests.HostingIntegrationTests.Host_UntrustedScript_CannotAccessFileSystem() in /Users/bill/Repos/FLua/FLua.Hosting.Tests/HostingIntegrationTests.cs:line 231
+   at System.RuntimeMethodHandle.InvokeMethod(Object target, Void** arguments, Signature sig, Boolean isConstructor)
+   at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)
+</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="1e9e65b1-af1e-45f6-900e-2832b5dbb160" testId="b53c146c-5aa3-02e0-0769-75560a6d8075" testName="CompileToExpression_EmptyReturn_ReturnsDefaultValue" computerName="dadsmbp" duration="00:00:00.0020843" startTime="2025-08-22T08:18:24.6003790-04:00" endTime="2025-08-22T08:18:24.6026340-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="1e9e65b1-af1e-45f6-900e-2832b5dbb160" />
+    <UnitTestResult executionId="76e41263-0b10-4e08-8e74-4dc0ee81c794" testId="76e63985-ea05-726c-e6b3-42affd0f43a9" testName="CompileToExpression_TableOperations_WorksWithTables" computerName="dadsmbp" duration="00:00:00.0066189" startTime="2025-08-22T08:18:24.6280390-04:00" endTime="2025-08-22T08:18:24.6348070-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="76e41263-0b10-4e08-8e74-4dc0ee81c794" />
+    <UnitTestResult executionId="fdcd9d64-6f51-488f-a2b8-8c8c954b949d" testId="c981e812-0c2c-d15c-fd5c-729e8e48daee" testName="SecurityPolicy_SandboxToRestricted_LibraryAvailabilityChanges" computerName="dadsmbp" duration="00:00:00.0000914" startTime="2025-08-22T08:18:25.5882460-04:00" endTime="2025-08-22T08:18:25.5883600-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="fdcd9d64-6f51-488f-a2b8-8c8c954b949d" />
+    <UnitTestResult executionId="42223075-4aa8-44f0-9202-527f22d8da59" testId="b793adab-f79f-3d90-ee70-de87088d884b" testName="ResolveModule_FileReadError_HandlesGracefully" computerName="dadsmbp" duration="00:00:00.0008900" startTime="2025-08-22T08:18:25.5757460-04:00" endTime="2025-08-22T08:18:25.5766700-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="42223075-4aa8-44f0-9202-527f22d8da59" />
+    <UnitTestResult executionId="e001deb5-125c-4da8-b750-05a29f9350ae" testId="02b89d5c-1c84-fd2c-2f25-d935196ed474" testName="IsModuleAllowed_VariousModulesAndTrustLevels_ReturnsExpectedResult (io,Sandbox,False)" computerName="dadsmbp" duration="00:00:00.0004776" startTime="2025-08-22T08:18:25.5819010-04:00" endTime="2025-08-22T08:18:25.5824430-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="e001deb5-125c-4da8-b750-05a29f9350ae" />
+    <UnitTestResult executionId="9c5ed665-c2be-4152-9759-186d96a3ab3d" testId="0528b300-b5a3-147c-59ba-9d3f39034eb7" testName="Host_MemoryLimit_EnforcedCorrectly" computerName="dadsmbp" startTime="2025-08-22T08:18:25.2639200-04:00" endTime="2025-08-22T08:18:25.2639350-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="NotExecuted" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="9c5ed665-c2be-4152-9759-186d96a3ab3d">
+      <Output>
+        <ErrorInfo>
+          <Message>Memory limit enforcement not yet implemented</Message>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="88162eec-4a58-4182-8557-c68f80c93459" testId="962c8546-f7a0-c4d1-5b62-b42a71287bd2" testName="LuaHostOptions_WithModification_CreatesNewInstance" computerName="dadsmbp" duration="00:00:00.0001591" startTime="2025-08-22T08:18:25.5497220-04:00" endTime="2025-08-22T08:18:25.5499000-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="88162eec-4a58-4182-8557-c68f80c93459" />
+    <UnitTestResult executionId="f6ddf6f4-c660-4852-9aad-6e059a46c7e1" testId="08fb7057-f9d2-d080-0117-1e0c23ed3e12" testName="CreateEnvironment_SandboxLevel_SafeFunctionsAndLibraries" computerName="dadsmbp" duration="00:00:00.0002753" startTime="2025-08-22T08:18:25.5872840-04:00" endTime="2025-08-22T08:18:25.5875980-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="f6ddf6f4-c660-4852-9aad-6e059a46c7e1" />
+    <UnitTestResult executionId="687682ca-5ec6-438f-8731-147cb6fdb8fe" testId="d7bfff46-8a7f-c380-dd26-996ddb9e0e41" testName="Host_RestrictedScript_HasLimitedOSAccess" computerName="dadsmbp" duration="00:00:00.0015604" startTime="2025-08-22T08:18:25.2622050-04:00" endTime="2025-08-22T08:18:25.2638330-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="687682ca-5ec6-438f-8731-147cb6fdb8fe" />
+    <UnitTestResult executionId="8b8f91b2-ec4a-4546-a9e6-36d8c09ffa23" testId="ef7a192a-548e-b065-9799-a674148e6e52" testName="Host_ExecuteSimpleScript_ReturnsCorrectResult" computerName="dadsmbp" duration="00:00:00.0030911" startTime="2025-08-22T08:18:24.6348580-04:00" endTime="2025-08-22T08:18:24.6380950-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="8b8f91b2-ec4a-4546-a9e6-36d8c09ffa23" />
+    <UnitTestResult executionId="8bcc9f6a-c6b1-4f90-85d7-7b41c6d16414" testId="47495992-3558-171a-3622-70f7f507b6b7" testName="CompileToExpression_BooleanLogic_ReturnsBoolean" computerName="dadsmbp" duration="00:00:00.0019582" startTime="2025-08-22T08:18:24.5662620-04:00" endTime="2025-08-22T08:18:24.5682730-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="8bcc9f6a-c6b1-4f90-85d7-7b41c6d16414" />
+    <UnitTestResult executionId="f06e842d-98c3-46b1-9436-ec9b5c933a47" testId="e8742ac7-4bda-350a-dc56-9a5599366332" testName="ResolveModule_EmptyModuleName_ReturnsError" computerName="dadsmbp" duration="00:00:00.0005843" startTime="2025-08-22T08:18:25.5673890-04:00" endTime="2025-08-22T08:18:25.5680160-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="f06e842d-98c3-46b1-9436-ec9b5c933a47" />
+    <UnitTestResult executionId="2fe956e8-cc05-4934-ad9a-6f5fb607100f" testId="d849481c-1dfe-ba4e-8a30-21b6ba0cbbbb" testName="IsModuleAllowed_VariousModulesAndTrustLevels_ReturnsExpectedResult (io,Untrusted,False)" computerName="dadsmbp" duration="00:00:00.0004472" startTime="2025-08-22T08:18:25.5794920-04:00" endTime="2025-08-22T08:18:25.5818820-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="2fe956e8-cc05-4934-ad9a-6f5fb607100f" />
+    <UnitTestResult executionId="8adae6c6-36cd-4850-ae4a-713001d9e5d4" testId="3f755e33-8e88-78a4-f6b6-e882617259c7" testName="CreateEnvironment_TrustedLevel_MostFunctionsAvailable" computerName="dadsmbp" duration="00:00:00.0001044" startTime="2025-08-22T08:18:25.5876120-04:00" endTime="2025-08-22T08:18:25.5877420-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="8adae6c6-36cd-4850-ae4a-713001d9e5d4" />
+    <UnitTestResult executionId="45e9fea9-b9fb-4521-8fb4-ba6f096e9f1b" testId="7499cc5c-72e5-561a-c389-03d76c343bd0" testName="EnvironmentProvider_AddHostFunctions_FunctionsAccessible" computerName="dadsmbp" duration="00:00:00.0004609" startTime="2025-08-22T08:18:25.5911390-04:00" endTime="2025-08-22T08:18:25.5916270-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="45e9fea9-b9fb-4521-8fb4-ba6f096e9f1b" />
+    <UnitTestResult executionId="aa467588-68c1-4be1-9de2-78689c9955ce" testId="229e5b11-e011-f6dd-2329-22d7fd593f77" testName="TestModuleCompilation_ModuleReturningNonTable_Works" computerName="dadsmbp" duration="00:00:00.0007717" startTime="2025-08-22T08:18:25.5585090-04:00" endTime="2025-08-22T08:18:25.5593090-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="aa467588-68c1-4be1-9de2-78689c9955ce">
+      <Output>
+        <ErrorInfo>
+          <Message>Test method FLua.Hosting.Tests.ModuleCompilationTests.TestModuleCompilation_ModuleReturningNonTable_Works threw exception: &#xD;
+FLua.Runtime.LuaRuntimeException: module 'doubler' not found:
+no field package.preload['doubler']
+no file 'doubler' in package.path</Message>
+          <StackTrace>    at FLua.Runtime.LuaPackageLib.Require(LuaValue[] args, LuaEnvironment env, LuaTable packageTable) in /Users/bill/Repos/FLua/FLua.Runtime/LuaPackageLib.cs:line 133
+   at FLua.Runtime.LuaPackageLib.&lt;&gt;c__DisplayClass0_0.&lt;AddPackageLibrary&gt;b__3(LuaValue[] args) in /Users/bill/Repos/FLua/FLua.Runtime/LuaPackageLib.cs:line 54
+   at FLua.Runtime.BuiltinFunction.Call(LuaValue[] args) in /Users/bill/Repos/FLua/FLua.Runtime/LuaTypes.cs:line 212
+   at FLua.Interpreter.ExpressionEvaluator.EvaluateFunctionCallInternal(Expr func, FSharpList`1 args) in /Users/bill/Repos/FLua/FLua.Interpreter/ExpressionEvaluator.cs:line 258
+   at FLua.Interpreter.ExpressionEvaluator.VisitFunctionCall(Expr func, FSharpList`1 args) in /Users/bill/Repos/FLua/FLua.Interpreter/ExpressionEvaluator.cs:line 122
+   at FLua.Ast.Visitor.dispatchExpr[T](IExpressionVisitor`1 visitor, Expr expr) in /Users/bill/Repos/FLua/FLua.Ast/AstVisitor.fs:line 52
+   at FLua.Interpreter.ExpressionEvaluator.Evaluate(Expr expr) in /Users/bill/Repos/FLua/FLua.Interpreter/ExpressionEvaluator.cs:line 35
+   at FLua.Interpreter.StatementExecutor.VisitLocalAssignment(FSharpList`1 variables, FSharpOption`1 expressions) in /Users/bill/Repos/FLua/FLua.Interpreter/StatementExecutor.cs:line 139
+   at FLua.Ast.Visitor.dispatchStmt[T](IStatementVisitor`1 visitor, Statement stmt) in /Users/bill/Repos/FLua/FLua.Ast/AstVisitor.fs:line 65
+   at FLua.Interpreter.StatementExecutor.Execute(Statement stmt) in /Users/bill/Repos/FLua/FLua.Interpreter/StatementExecutor.cs:line 40
+   at FLua.Interpreter.LuaInterpreter.ExecuteStatement(Statement stmt) in /Users/bill/Repos/FLua/FLua.Interpreter/LuaInterpreter.cs:line 154
+   at FLua.Interpreter.LuaInterpreter.ExecuteStatementsWithResult(FSharpList`1 statements) in /Users/bill/Repos/FLua/FLua.Interpreter/LuaInterpreter.cs:line 125
+   at FLua.Interpreter.LuaInterpreter.ExecuteStatements(FSharpList`1 statements) in /Users/bill/Repos/FLua/FLua.Interpreter/LuaInterpreter.cs:line 103
+   at FLua.Hosting.LuaHost.ExecuteInternal(FSharpList`1 statements, LuaEnvironment env) in /Users/bill/Repos/FLua/FLua.Hosting/LuaHost.cs:line 105
+   at FLua.Hosting.LuaHost.Execute(String luaCode, LuaHostOptions options) in /Users/bill/Repos/FLua/FLua.Hosting/LuaHost.cs:line 88
+   at FLua.Hosting.Tests.ModuleCompilationTests.TestModuleCompilation_ModuleReturningNonTable_Works() in /Users/bill/Repos/FLua/FLua.Hosting.Tests/ModuleCompilationTests.cs:line 238
+   at System.RuntimeMethodHandle.InvokeMethod(Object target, Void** arguments, Signature sig, Boolean isConstructor)
+   at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)
+</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="54c560ae-0665-4f09-bf47-b53bd3794e51" testId="73520bf6-c134-d906-65a2-236d5a390f2f" testName="ResolveModule_MultipleSearchPaths_FindsInSecondPath" computerName="dadsmbp" duration="00:00:00.0009503" startTime="2025-08-22T08:18:25.5689900-04:00" endTime="2025-08-22T08:18:25.5741200-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="54c560ae-0665-4f09-bf47-b53bd3794e51" />
+    <UnitTestResult executionId="1b7468b1-65a6-472f-b508-b2b4a6431f7e" testId="deb9c0cc-6243-f4b1-d32a-867ffd8fc15b" testName="AddSearchPath_NewPath_FindsModulesInNewPath" computerName="dadsmbp" duration="00:00:00.0006243" startTime="2025-08-22T08:18:25.5788120-04:00" endTime="2025-08-22T08:18:25.5794780-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="1b7468b1-65a6-472f-b508-b2b4a6431f7e" />
+    <UnitTestResult executionId="49d78512-0cfb-4ba3-a508-76d52db24383" testId="f745ee35-fae7-acc5-38f7-e017a26a9c2a" testName="TestModuleCompilation_WithUntrustedLevel_UsesInterpreter" computerName="dadsmbp" duration="00:00:00.0007833" startTime="2025-08-22T08:18:25.5528020-04:00" endTime="2025-08-22T08:18:25.5536200-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="49d78512-0cfb-4ba3-a508-76d52db24383">
+      <Output>
+        <ErrorInfo>
+          <Message>Test method FLua.Hosting.Tests.ModuleCompilationTests.TestModuleCompilation_WithUntrustedLevel_UsesInterpreter threw exception: &#xD;
+FLua.Runtime.LuaRuntimeException: module 'simple' not found:
+no field package.preload['simple']
+no file 'simple' in package.path</Message>
+          <StackTrace>    at FLua.Runtime.LuaPackageLib.Require(LuaValue[] args, LuaEnvironment env, LuaTable packageTable) in /Users/bill/Repos/FLua/FLua.Runtime/LuaPackageLib.cs:line 133
+   at FLua.Runtime.LuaPackageLib.&lt;&gt;c__DisplayClass0_0.&lt;AddPackageLibrary&gt;b__3(LuaValue[] args) in /Users/bill/Repos/FLua/FLua.Runtime/LuaPackageLib.cs:line 54
+   at FLua.Runtime.BuiltinFunction.Call(LuaValue[] args) in /Users/bill/Repos/FLua/FLua.Runtime/LuaTypes.cs:line 212
+   at FLua.Interpreter.ExpressionEvaluator.EvaluateFunctionCallInternal(Expr func, FSharpList`1 args) in /Users/bill/Repos/FLua/FLua.Interpreter/ExpressionEvaluator.cs:line 258
+   at FLua.Interpreter.ExpressionEvaluator.VisitFunctionCall(Expr func, FSharpList`1 args) in /Users/bill/Repos/FLua/FLua.Interpreter/ExpressionEvaluator.cs:line 122
+   at FLua.Ast.Visitor.dispatchExpr[T](IExpressionVisitor`1 visitor, Expr expr) in /Users/bill/Repos/FLua/FLua.Ast/AstVisitor.fs:line 52
+   at FLua.Interpreter.ExpressionEvaluator.Evaluate(Expr expr) in /Users/bill/Repos/FLua/FLua.Interpreter/ExpressionEvaluator.cs:line 35
+   at FLua.Interpreter.StatementExecutor.VisitLocalAssignment(FSharpList`1 variables, FSharpOption`1 expressions) in /Users/bill/Repos/FLua/FLua.Interpreter/StatementExecutor.cs:line 139
+   at FLua.Ast.Visitor.dispatchStmt[T](IStatementVisitor`1 visitor, Statement stmt) in /Users/bill/Repos/FLua/FLua.Ast/AstVisitor.fs:line 65
+   at FLua.Interpreter.StatementExecutor.Execute(Statement stmt) in /Users/bill/Repos/FLua/FLua.Interpreter/StatementExecutor.cs:line 40
+   at FLua.Interpreter.LuaInterpreter.ExecuteStatement(Statement stmt) in /Users/bill/Repos/FLua/FLua.Interpreter/LuaInterpreter.cs:line 154
+   at FLua.Interpreter.LuaInterpreter.ExecuteStatementsWithResult(FSharpList`1 statements) in /Users/bill/Repos/FLua/FLua.Interpreter/LuaInterpreter.cs:line 125
+   at FLua.Interpreter.LuaInterpreter.ExecuteStatements(FSharpList`1 statements) in /Users/bill/Repos/FLua/FLua.Interpreter/LuaInterpreter.cs:line 103
+   at FLua.Hosting.LuaHost.ExecuteInternal(FSharpList`1 statements, LuaEnvironment env) in /Users/bill/Repos/FLua/FLua.Hosting/LuaHost.cs:line 105
+   at FLua.Hosting.LuaHost.Execute(String luaCode, LuaHostOptions options) in /Users/bill/Repos/FLua/FLua.Hosting/LuaHost.cs:line 88
+   at FLua.Hosting.Tests.ModuleCompilationTests.TestModuleCompilation_WithUntrustedLevel_UsesInterpreter() in /Users/bill/Repos/FLua/FLua.Hosting.Tests/ModuleCompilationTests.cs:line 157
+   at System.RuntimeMethodHandle.InvokeMethod(Object target, Void** arguments, Signature sig, Boolean isConstructor)
+   at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)
+</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="599e83ac-9e2a-4799-be4f-f7116802682e" testId="9225c991-7138-21a1-7df4-09d05c0c771f" testName="CompileToExpression_SimpleExpression_CanBeAnalyzed" computerName="dadsmbp" duration="00:00:00.0010257" startTime="2025-08-22T08:18:24.5788710-04:00" endTime="2025-08-22T08:18:24.5799640-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="599e83ac-9e2a-4799-be4f-f7116802682e" />
+    <UnitTestResult executionId="d8d7cf5c-c506-423c-9ae3-4a1ed2d6d3b2" testId="8baa443d-aac8-ef88-e63a-c4043636e451" testName="CompileToFunction_StringResult_ReturnsString" computerName="dadsmbp" duration="00:00:00.0119072" startTime="2025-08-22T08:18:25.4479040-04:00" endTime="2025-08-22T08:18:25.4598910-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="d8d7cf5c-c506-423c-9ae3-4a1ed2d6d3b2" />
+    <UnitTestResult executionId="ebe2a9ea-a0b7-437f-9c25-4601512eb0df" testId="412d308c-a31a-e44b-8022-65bc77fb456a" testName="LuaHostOptions_MaximumTimeout_AcceptsMaxValue" computerName="dadsmbp" duration="00:00:00.0003547" startTime="2025-08-22T08:18:25.5476190-04:00" endTime="2025-08-22T08:18:25.5479930-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="ebe2a9ea-a0b7-437f-9c25-4601512eb0df" />
+    <UnitTestResult executionId="b287a9ec-3e79-4143-97f7-29103fb2b663" testId="011a2147-45ba-a783-0d26-5c0548d48778" testName="IsAllowedFunction_VariousTrustLevelsAndFunctions_ReturnsExpectedResult (Untrusted,print,True)" computerName="dadsmbp" duration="00:00:00.0001207" startTime="2025-08-22T08:18:25.5883690-04:00" endTime="2025-08-22T08:18:25.5885570-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="b287a9ec-3e79-4143-97f7-29103fb2b663" />
+    <UnitTestResult executionId="a6c7366c-df5c-4f91-a899-b498d16a79d7" testId="7f9ceca5-31ed-9c58-a6f6-5d13a446e3ec" testName="ResolveModule_InitLuaInDirectory_ResolvesCorrectly" computerName="dadsmbp" duration="00:00:00.0009719" startTime="2025-08-22T08:18:25.5663470-04:00" endTime="2025-08-22T08:18:25.5673690-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="a6c7366c-df5c-4f91-a899-b498d16a79d7" />
+    <UnitTestResult executionId="bedfde7f-a9c6-4dea-bf0d-d6e1d5e2655e" testId="4a48ca06-550f-c348-922e-acfbbdc73cdf" testName="IsModuleAllowed_VariousModulesAndTrustLevels_ReturnsExpectedResult (io,Restricted,False)" computerName="dadsmbp" duration="00:00:00.0004185" startTime="2025-08-22T08:18:25.5828900-04:00" endTime="2025-08-22T08:18:25.5833650-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="bedfde7f-a9c6-4dea-bf0d-d6e1d5e2655e" />
+    <UnitTestResult executionId="85e127ee-fbb0-4364-a26c-fbf781b90d23" testId="a42902df-5410-8ffc-f12c-2939c59a375b" testName="IsModuleAllowed_VariousModulesAndTrustLevels_ReturnsExpectedResult (io,Trusted,True)" computerName="dadsmbp" duration="00:00:00.0003415" startTime="2025-08-22T08:18:25.5833810-04:00" endTime="2025-08-22T08:18:25.5837780-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="85e127ee-fbb0-4364-a26c-fbf781b90d23" />
+    <UnitTestResult executionId="ea537c71-6316-49e1-9dba-6ffc2c5f3e5b" testId="64534738-ca2c-a976-0ea7-534540aebd88" testName="CompileToFunction_SimpleExpression_ReturnsCorrectValue" computerName="dadsmbp" duration="00:00:00.0320229" startTime="2025-08-22T08:18:25.4156710-04:00" endTime="2025-08-22T08:18:25.4478550-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="ea537c71-6316-49e1-9dba-6ffc2c5f3e5b" />
+    <UnitTestResult executionId="b78452f8-2055-4024-920a-681779ab3889" testId="885a9ffa-1643-d0af-14ce-6fcf41c16691" testName="CompileToFunction_EmptyReturn_ReturnsDefaultValue" computerName="dadsmbp" duration="00:00:00.0118687" startTime="2025-08-22T08:18:25.5041720-04:00" endTime="2025-08-22T08:18:25.5161250-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="b78452f8-2055-4024-920a-681779ab3889" />
+    <UnitTestResult executionId="fc2b96e8-f90a-45db-93cf-aae96a8dea22" testId="9e844a28-dc32-5562-5390-502686bdb22b" testName="IsAllowedFunction_VariousTrustLevelsAndFunctions_ReturnsExpectedResult (Untrusted,pcall,False)" computerName="dadsmbp" duration="00:00:00.0001133" startTime="2025-08-22T08:18:25.5885660-04:00" endTime="2025-08-22T08:18:25.5887160-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="fc2b96e8-f90a-45db-93cf-aae96a8dea22" />
+    <UnitTestResult executionId="23515ff6-3973-432a-ae9e-e1129ba93597" testId="71f387b7-8a02-1301-66ef-0eed4f54453f" testName="CompileToFunction_UntrustedWithDangerousFunction_ThrowsException" computerName="dadsmbp" duration="00:00:00.0015171" startTime="2025-08-22T08:18:25.5444280-04:00" endTime="2025-08-22T08:18:25.5460310-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="23515ff6-3973-432a-ae9e-e1129ba93597" />
+    <UnitTestResult executionId="f0a2c49e-656d-4f61-a008-0c3815270003" testId="3a17432e-f071-763d-e219-8c17d5ba5ec5" testName="LuaHostOptions_SecurityConfiguration_SetsCorrectly" computerName="dadsmbp" duration="00:00:00.0002233" startTime="2025-08-22T08:18:25.5469290-04:00" endTime="2025-08-22T08:18:25.5471820-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="f0a2c49e-656d-4f61-a008-0c3815270003" />
+    <UnitTestResult executionId="8758c613-d25c-442d-8814-5e9146e3e28f" testId="4d23e8f8-e2dd-112f-a705-5865bc3f874f" testName="CompileToExpression_WithTrustLevel_RespectsSecurityRestrictions" computerName="dadsmbp" duration="00:00:00.0025301" startTime="2025-08-22T08:18:24.6232120-04:00" endTime="2025-08-22T08:18:24.6258540-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="8758c613-d25c-442d-8814-5e9146e3e28f" />
+    <UnitTestResult executionId="cc5b4b8a-0e58-4792-974f-7fb115a7e7ff" testId="849423f5-591e-7deb-2909-d2d170ab18f9" testName="IsAllowedFunction_VariousTrustLevelsAndFunctions_ReturnsExpectedResult (Sandbox,pcall,True)" computerName="dadsmbp" duration="00:00:00.0000039" startTime="2025-08-22T08:18:25.5892640-04:00" endTime="2025-08-22T08:18:25.5893010-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="cc5b4b8a-0e58-4792-974f-7fb115a7e7ff" />
+    <UnitTestResult executionId="dfbc6bb5-bf8b-4153-9e62-46b59fb5f2bf" testId="60d5f55d-275a-ef8c-4cfd-04507138caf0" testName="CreateEnvironment_FullTrustLevel_AllFunctionsAvailable" computerName="dadsmbp" duration="00:00:00.0000830" startTime="2025-08-22T08:18:25.5877520-04:00" endTime="2025-08-22T08:18:25.5878560-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="dfbc6bb5-bf8b-4153-9e62-46b59fb5f2bf" />
+    <UnitTestResult executionId="edd49c94-9187-48a8-8ad7-dd0f3a18dfb6" testId="22b59976-04f3-a056-1b21-c3367766a116" testName="IsAllowedLibrary_VariousTrustLevelsAndLibraries_ReturnsExpectedResult (Untrusted,math,True)" computerName="dadsmbp" duration="00:00:00.0001103" startTime="2025-08-22T08:18:25.5894830-04:00" endTime="2025-08-22T08:18:25.5896180-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="edd49c94-9187-48a8-8ad7-dd0f3a18dfb6" />
+    <UnitTestResult executionId="0f08baec-1bc7-4526-9750-303380d43a34" testId="3f732c5c-0702-d139-8a69-4c87b21877a3" testName="LuaHostOptions_HostFunctionsAndContext_WorkTogether" computerName="dadsmbp" duration="00:00:00.0001640" startTime="2025-08-22T08:18:25.5488060-04:00" endTime="2025-08-22T08:18:25.5489960-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="0f08baec-1bc7-4526-9750-303380d43a34" />
+    <UnitTestResult executionId="dc8810aa-438d-4c61-aa04-8ed236e69dd8" testId="50f216d0-1c9f-b9db-f739-b7b81d59d2c1" testName="IsAllowedFunction_VariousTrustLevelsAndFunctions_ReturnsExpectedResult (Trusted,load,True)" computerName="dadsmbp" duration="00:00:00.0000031" startTime="2025-08-22T08:18:25.5894140-04:00" endTime="2025-08-22T08:18:25.5894400-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="dc8810aa-438d-4c61-aa04-8ed236e69dd8" />
+    <UnitTestResult executionId="ac07fced-2efe-41e4-9cde-0d79527cf084" testId="eb5361b3-05c2-84f1-bb14-6618de4a1c97" testName="IsModuleAllowed_VariousModulesAndTrustLevels_ReturnsExpectedResult (math,Sandbox,True)" computerName="dadsmbp" duration="00:00:00.0002881" startTime="2025-08-22T08:18:25.5837890-04:00" endTime="2025-08-22T08:18:25.5841150-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="ac07fced-2efe-41e4-9cde-0d79527cf084" />
+    <UnitTestResult executionId="4598464a-331c-426d-877a-37a5c8130d3d" testId="50384e8d-36ba-0e51-2bb0-ad1f92a373b1" testName="Host_CompileToFunction_CreatesCallableDelegate" computerName="dadsmbp" duration="00:00:00.6061592" startTime="2025-08-22T08:18:24.6381290-04:00" endTime="2025-08-22T08:18:25.2443630-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="4598464a-331c-426d-877a-37a5c8130d3d" />
+    <UnitTestResult executionId="6681aa91-be5b-4e16-b72c-61f319e1a651" testId="a680da2b-809a-8245-20f2-29f685499ac0" testName="Host_SandboxedScript_CannotLoadDynamicCode" computerName="dadsmbp" duration="00:00:00.0019620" startTime="2025-08-22T08:18:25.2600860-04:00" endTime="2025-08-22T08:18:25.2621650-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="6681aa91-be5b-4e16-b72c-61f319e1a651" />
+    <UnitTestResult executionId="f5583183-96f8-4aba-ba3c-6c30436cfae0" testId="f1819b85-ff8a-8993-1daa-b31a4ae452d2" testName="CompileToFunction_BooleanResult_ReturnsBoolean" computerName="dadsmbp" duration="00:00:00.0116701" startTime="2025-08-22T08:18:25.4599400-04:00" endTime="2025-08-22T08:18:25.4716880-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="f5583183-96f8-4aba-ba3c-6c30436cfae0" />
+    <UnitTestResult executionId="301ab504-5edb-4cb7-8ca1-ce162ed4d892" testId="79e6fc5c-a9bc-1760-071d-9dcfb7fc41f6" testName="IsModuleAllowed_VariousModulesAndTrustLevels_ReturnsExpectedResult (custom.module,Untrusted,False)" computerName="dadsmbp" duration="00:00:00.0002745" startTime="2025-08-22T08:18:25.5847660-04:00" endTime="2025-08-22T08:18:25.5850710-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="301ab504-5edb-4cb7-8ca1-ce162ed4d892" />
+    <UnitTestResult executionId="85dc411e-c959-40ea-b95b-249ad2ccc023" testId="aa18db62-bf06-0fcf-532b-8c12531ac837" testName="IsAllowedLibrary_VariousTrustLevelsAndLibraries_ReturnsExpectedResult (FullTrust,debug,True)" computerName="dadsmbp" duration="00:00:00.0000029" startTime="2025-08-22T08:18:25.5903900-04:00" endTime="2025-08-22T08:18:25.5904150-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="85dc411e-c959-40ea-b95b-249ad2ccc023" />
+    <UnitTestResult executionId="a5d3acbe-6d8c-4dc7-a515-a8e26e205bfb" testId="5e33cdfe-2c89-0ec6-5b25-379a845162d1" testName="TestModuleCompilation_WithTrustedLevel_CompilesModule" computerName="dadsmbp" duration="00:00:00.0014062" startTime="2025-08-22T08:18:25.5503650-04:00" endTime="2025-08-22T08:18:25.5518370-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="a5d3acbe-6d8c-4dc7-a515-a8e26e205bfb">
+      <Output>
+        <ErrorInfo>
+          <Message>Test method FLua.Hosting.Tests.ModuleCompilationTests.TestModuleCompilation_WithTrustedLevel_CompilesModule threw exception: &#xD;
+FLua.Runtime.LuaRuntimeException: module 'math_utils' not found:
+no field package.preload['math_utils']
+no file 'math_utils' in package.path</Message>
+          <StackTrace>    at FLua.Runtime.LuaPackageLib.Require(LuaValue[] args, LuaEnvironment env, LuaTable packageTable) in /Users/bill/Repos/FLua/FLua.Runtime/LuaPackageLib.cs:line 133
+   at FLua.Runtime.LuaPackageLib.&lt;&gt;c__DisplayClass0_0.&lt;AddPackageLibrary&gt;b__3(LuaValue[] args) in /Users/bill/Repos/FLua/FLua.Runtime/LuaPackageLib.cs:line 54
+   at FLua.Runtime.BuiltinFunction.Call(LuaValue[] args) in /Users/bill/Repos/FLua/FLua.Runtime/LuaTypes.cs:line 212
+   at FLua.Interpreter.ExpressionEvaluator.EvaluateFunctionCallInternal(Expr func, FSharpList`1 args) in /Users/bill/Repos/FLua/FLua.Interpreter/ExpressionEvaluator.cs:line 258
+   at FLua.Interpreter.ExpressionEvaluator.VisitFunctionCall(Expr func, FSharpList`1 args) in /Users/bill/Repos/FLua/FLua.Interpreter/ExpressionEvaluator.cs:line 122
+   at FLua.Ast.Visitor.dispatchExpr[T](IExpressionVisitor`1 visitor, Expr expr) in /Users/bill/Repos/FLua/FLua.Ast/AstVisitor.fs:line 52
+   at FLua.Interpreter.ExpressionEvaluator.Evaluate(Expr expr) in /Users/bill/Repos/FLua/FLua.Interpreter/ExpressionEvaluator.cs:line 35
+   at FLua.Interpreter.StatementExecutor.VisitLocalAssignment(FSharpList`1 variables, FSharpOption`1 expressions) in /Users/bill/Repos/FLua/FLua.Interpreter/StatementExecutor.cs:line 139
+   at FLua.Ast.Visitor.dispatchStmt[T](IStatementVisitor`1 visitor, Statement stmt) in /Users/bill/Repos/FLua/FLua.Ast/AstVisitor.fs:line 65
+   at FLua.Interpreter.StatementExecutor.Execute(Statement stmt) in /Users/bill/Repos/FLua/FLua.Interpreter/StatementExecutor.cs:line 40
+   at FLua.Interpreter.LuaInterpreter.ExecuteStatement(Statement stmt) in /Users/bill/Repos/FLua/FLua.Interpreter/LuaInterpreter.cs:line 154
+   at FLua.Interpreter.LuaInterpreter.ExecuteStatementsWithResult(FSharpList`1 statements) in /Users/bill/Repos/FLua/FLua.Interpreter/LuaInterpreter.cs:line 125
+   at FLua.Interpreter.LuaInterpreter.ExecuteStatements(FSharpList`1 statements) in /Users/bill/Repos/FLua/FLua.Interpreter/LuaInterpreter.cs:line 103
+   at FLua.Hosting.LuaHost.ExecuteInternal(FSharpList`1 statements, LuaEnvironment env) in /Users/bill/Repos/FLua/FLua.Hosting/LuaHost.cs:line 105
+   at FLua.Hosting.LuaHost.Execute(String luaCode, LuaHostOptions options) in /Users/bill/Repos/FLua/FLua.Hosting/LuaHost.cs:line 88
+   at FLua.Hosting.Tests.ModuleCompilationTests.TestModuleCompilation_WithTrustedLevel_CompilesModule() in /Users/bill/Repos/FLua/FLua.Hosting.Tests/ModuleCompilationTests.cs:line 69
+   at System.RuntimeMethodHandle.InvokeMethod(Object target, Void** arguments, Signature sig, Boolean isConstructor)
+   at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)
+</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="5e221247-c9dc-4e6b-98bc-9678c1c0e009" testId="c24b363c-fd25-36f3-2c43-81e4b82ff93e" testName="CompileToExpression_SimpleArithmetic_CreatesValidExpressionTree" computerName="dadsmbp" duration="00:00:00.1112941" startTime="2025-08-22T08:18:24.4421830-04:00" endTime="2025-08-22T08:18:24.5589510-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="5e221247-c9dc-4e6b-98bc-9678c1c0e009" />
+    <UnitTestResult executionId="4050fd40-e2d6-4e8e-aea9-3b9903b2cef5" testId="996419f6-2b87-20f2-92ac-2fb8de90e21d" testName="IsAllowedFunction_VariousTrustLevelsAndFunctions_ReturnsExpectedResult (FullTrust,load,True)" computerName="dadsmbp" duration="00:00:00.0000028" startTime="2025-08-22T08:18:25.5894470-04:00" endTime="2025-08-22T08:18:25.5894760-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="4050fd40-e2d6-4e8e-aea9-3b9903b2cef5" />
+    <UnitTestResult executionId="935615e9-1cfe-445a-904a-187c5f1bca33" testId="6978b3c2-004b-dc18-27cf-34561b134623" testName="TestModuleCompilation_WithCaching_ReusesCompiledModule" computerName="dadsmbp" duration="00:00:00.0009118" startTime="2025-08-22T08:18:25.5518500-04:00" endTime="2025-08-22T08:18:25.5527890-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="935615e9-1cfe-445a-904a-187c5f1bca33">
+      <Output>
+        <ErrorInfo>
+          <Message>Test method FLua.Hosting.Tests.ModuleCompilationTests.TestModuleCompilation_WithCaching_ReusesCompiledModule threw exception: &#xD;
+FLua.Runtime.LuaRuntimeException: module 'counter' not found:
+no field package.preload['counter']
+no file 'counter' in package.path</Message>
+          <StackTrace>    at FLua.Runtime.LuaPackageLib.Require(LuaValue[] args, LuaEnvironment env, LuaTable packageTable) in /Users/bill/Repos/FLua/FLua.Runtime/LuaPackageLib.cs:line 133
+   at FLua.Runtime.LuaPackageLib.&lt;&gt;c__DisplayClass0_0.&lt;AddPackageLibrary&gt;b__3(LuaValue[] args) in /Users/bill/Repos/FLua/FLua.Runtime/LuaPackageLib.cs:line 54
+   at FLua.Runtime.BuiltinFunction.Call(LuaValue[] args) in /Users/bill/Repos/FLua/FLua.Runtime/LuaTypes.cs:line 212
+   at FLua.Interpreter.ExpressionEvaluator.EvaluateFunctionCallInternal(Expr func, FSharpList`1 args) in /Users/bill/Repos/FLua/FLua.Interpreter/ExpressionEvaluator.cs:line 258
+   at FLua.Interpreter.ExpressionEvaluator.VisitFunctionCall(Expr func, FSharpList`1 args) in /Users/bill/Repos/FLua/FLua.Interpreter/ExpressionEvaluator.cs:line 122
+   at FLua.Ast.Visitor.dispatchExpr[T](IExpressionVisitor`1 visitor, Expr expr) in /Users/bill/Repos/FLua/FLua.Ast/AstVisitor.fs:line 52
+   at FLua.Interpreter.ExpressionEvaluator.Evaluate(Expr expr) in /Users/bill/Repos/FLua/FLua.Interpreter/ExpressionEvaluator.cs:line 35
+   at FLua.Interpreter.StatementExecutor.VisitLocalAssignment(FSharpList`1 variables, FSharpOption`1 expressions) in /Users/bill/Repos/FLua/FLua.Interpreter/StatementExecutor.cs:line 139
+   at FLua.Ast.Visitor.dispatchStmt[T](IStatementVisitor`1 visitor, Statement stmt) in /Users/bill/Repos/FLua/FLua.Ast/AstVisitor.fs:line 65
+   at FLua.Interpreter.StatementExecutor.Execute(Statement stmt) in /Users/bill/Repos/FLua/FLua.Interpreter/StatementExecutor.cs:line 40
+   at FLua.Interpreter.LuaInterpreter.ExecuteStatement(Statement stmt) in /Users/bill/Repos/FLua/FLua.Interpreter/LuaInterpreter.cs:line 154
+   at FLua.Interpreter.LuaInterpreter.ExecuteStatementsWithResult(FSharpList`1 statements) in /Users/bill/Repos/FLua/FLua.Interpreter/LuaInterpreter.cs:line 125
+   at FLua.Interpreter.LuaInterpreter.ExecuteStatements(FSharpList`1 statements) in /Users/bill/Repos/FLua/FLua.Interpreter/LuaInterpreter.cs:line 103
+   at FLua.Hosting.LuaHost.ExecuteInternal(FSharpList`1 statements, LuaEnvironment env) in /Users/bill/Repos/FLua/FLua.Hosting/LuaHost.cs:line 105
+   at FLua.Hosting.LuaHost.Execute(String luaCode, LuaHostOptions options) in /Users/bill/Repos/FLua/FLua.Hosting/LuaHost.cs:line 88
+   at FLua.Hosting.Tests.ModuleCompilationTests.TestModuleCompilation_WithCaching_ReusesCompiledModule() in /Users/bill/Repos/FLua/FLua.Hosting.Tests/ModuleCompilationTests.cs:line 110
+   at System.RuntimeMethodHandle.InvokeMethod(Object target, Void** arguments, Signature sig, Boolean isConstructor)
+   at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)
+</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="f06d8d7d-1e16-4f15-8757-8c06566209b2" testId="70a7a985-19e5-7a9b-0d4d-1e9353b56cb6" testName="TestModuleCompilation_NestedRequires_Work" computerName="dadsmbp" duration="00:00:00.0008008" startTime="2025-08-22T08:18:25.5593220-04:00" endTime="2025-08-22T08:18:25.5601480-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="f06d8d7d-1e16-4f15-8757-8c06566209b2">
+      <Output>
+        <ErrorInfo>
+          <Message>Test method FLua.Hosting.Tests.ModuleCompilationTests.TestModuleCompilation_NestedRequires_Work threw exception: &#xD;
+FLua.Runtime.LuaRuntimeException: module 'moduleA' not found:
+no field package.preload['moduleA']
+no file 'moduleA' in package.path</Message>
+          <StackTrace>    at FLua.Runtime.LuaPackageLib.Require(LuaValue[] args, LuaEnvironment env, LuaTable packageTable) in /Users/bill/Repos/FLua/FLua.Runtime/LuaPackageLib.cs:line 133
+   at FLua.Runtime.LuaPackageLib.&lt;&gt;c__DisplayClass0_0.&lt;AddPackageLibrary&gt;b__3(LuaValue[] args) in /Users/bill/Repos/FLua/FLua.Runtime/LuaPackageLib.cs:line 54
+   at FLua.Runtime.BuiltinFunction.Call(LuaValue[] args) in /Users/bill/Repos/FLua/FLua.Runtime/LuaTypes.cs:line 212
+   at FLua.Interpreter.ExpressionEvaluator.EvaluateFunctionCallInternal(Expr func, FSharpList`1 args) in /Users/bill/Repos/FLua/FLua.Interpreter/ExpressionEvaluator.cs:line 258
+   at FLua.Interpreter.ExpressionEvaluator.VisitFunctionCall(Expr func, FSharpList`1 args) in /Users/bill/Repos/FLua/FLua.Interpreter/ExpressionEvaluator.cs:line 122
+   at FLua.Ast.Visitor.dispatchExpr[T](IExpressionVisitor`1 visitor, Expr expr) in /Users/bill/Repos/FLua/FLua.Ast/AstVisitor.fs:line 52
+   at FLua.Interpreter.ExpressionEvaluator.Evaluate(Expr expr) in /Users/bill/Repos/FLua/FLua.Interpreter/ExpressionEvaluator.cs:line 35
+   at FLua.Interpreter.StatementExecutor.VisitLocalAssignment(FSharpList`1 variables, FSharpOption`1 expressions) in /Users/bill/Repos/FLua/FLua.Interpreter/StatementExecutor.cs:line 139
+   at FLua.Ast.Visitor.dispatchStmt[T](IStatementVisitor`1 visitor, Statement stmt) in /Users/bill/Repos/FLua/FLua.Ast/AstVisitor.fs:line 65
+   at FLua.Interpreter.StatementExecutor.Execute(Statement stmt) in /Users/bill/Repos/FLua/FLua.Interpreter/StatementExecutor.cs:line 40
+   at FLua.Interpreter.LuaInterpreter.ExecuteStatement(Statement stmt) in /Users/bill/Repos/FLua/FLua.Interpreter/LuaInterpreter.cs:line 154
+   at FLua.Interpreter.LuaInterpreter.ExecuteStatementsWithResult(FSharpList`1 statements) in /Users/bill/Repos/FLua/FLua.Interpreter/LuaInterpreter.cs:line 125
+   at FLua.Interpreter.LuaInterpreter.ExecuteStatements(FSharpList`1 statements) in /Users/bill/Repos/FLua/FLua.Interpreter/LuaInterpreter.cs:line 103
+   at FLua.Hosting.LuaHost.ExecuteInternal(FSharpList`1 statements, LuaEnvironment env) in /Users/bill/Repos/FLua/FLua.Hosting/LuaHost.cs:line 105
+   at FLua.Hosting.LuaHost.Execute(String luaCode, LuaHostOptions options) in /Users/bill/Repos/FLua/FLua.Hosting/LuaHost.cs:line 88
+   at FLua.Hosting.Tests.ModuleCompilationTests.TestModuleCompilation_NestedRequires_Work() in /Users/bill/Repos/FLua/FLua.Hosting.Tests/ModuleCompilationTests.cs:line 289
+   at System.RuntimeMethodHandle.InvokeMethod(Object target, Void** arguments, Signature sig, Boolean isConstructor)
+   at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)
+</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="9e4d8314-7684-4d34-afae-dd4fa2b425bd" testId="f99403db-748f-b989-55c1-a81bee0ed6db" testName="IsAllowedLibrary_VariousTrustLevelsAndLibraries_ReturnsExpectedResult (Trusted,io,True)" computerName="dadsmbp" duration="00:00:00.0000030" startTime="2025-08-22T08:18:25.5903240-04:00" endTime="2025-08-22T08:18:25.5903490-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="9e4d8314-7684-4d34-afae-dd4fa2b425bd" />
+    <UnitTestResult executionId="8330e4b4-b63d-4db7-adc2-f4e6826e77af" testId="c6267507-bced-30f6-ff9d-0ca6add282a2" testName="IsAllowedLibrary_VariousTrustLevelsAndLibraries_ReturnsExpectedResult (Restricted,os,True)" computerName="dadsmbp" duration="00:00:00.0000033" startTime="2025-08-22T08:18:25.5902570-04:00" endTime="2025-08-22T08:18:25.5902850-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="8330e4b4-b63d-4db7-adc2-f4e6826e77af" />
+    <UnitTestResult executionId="6c998bf4-ca51-453e-a8f6-19fcb65b3d40" testId="46bc9909-52d1-f84f-fe0b-c988b927942a" testName="Host_ModuleResolution_LoadsCustomModules" computerName="dadsmbp" duration="00:00:00.0073477" startTime="2025-08-22T08:18:25.2639440-04:00" endTime="2025-08-22T08:18:25.2713530-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="6c998bf4-ca51-453e-a8f6-19fcb65b3d40">
+      <Output>
+        <ErrorInfo>
+          <Message>Test method FLua.Hosting.Tests.HostingIntegrationTests.Host_ModuleResolution_LoadsCustomModules threw exception: &#xD;
+FLua.Runtime.LuaRuntimeException: module 'mylib' not found:
+no field package.preload['mylib']
+no file 'mylib' in package.path</Message>
+          <StackTrace>    at FLua.Runtime.LuaPackageLib.Require(LuaValue[] args, LuaEnvironment env, LuaTable packageTable) in /Users/bill/Repos/FLua/FLua.Runtime/LuaPackageLib.cs:line 133
+   at FLua.Runtime.LuaPackageLib.&lt;&gt;c__DisplayClass0_0.&lt;AddPackageLibrary&gt;b__3(LuaValue[] args) in /Users/bill/Repos/FLua/FLua.Runtime/LuaPackageLib.cs:line 54
+   at FLua.Runtime.BuiltinFunction.Call(LuaValue[] args) in /Users/bill/Repos/FLua/FLua.Runtime/LuaTypes.cs:line 212
+   at FLua.Interpreter.ExpressionEvaluator.EvaluateFunctionCallInternal(Expr func, FSharpList`1 args) in /Users/bill/Repos/FLua/FLua.Interpreter/ExpressionEvaluator.cs:line 258
+   at FLua.Interpreter.ExpressionEvaluator.VisitFunctionCall(Expr func, FSharpList`1 args) in /Users/bill/Repos/FLua/FLua.Interpreter/ExpressionEvaluator.cs:line 122
+   at FLua.Ast.Visitor.dispatchExpr[T](IExpressionVisitor`1 visitor, Expr expr) in /Users/bill/Repos/FLua/FLua.Ast/AstVisitor.fs:line 52
+   at FLua.Interpreter.ExpressionEvaluator.Evaluate(Expr expr) in /Users/bill/Repos/FLua/FLua.Interpreter/ExpressionEvaluator.cs:line 35
+   at FLua.Interpreter.StatementExecutor.VisitLocalAssignment(FSharpList`1 variables, FSharpOption`1 expressions) in /Users/bill/Repos/FLua/FLua.Interpreter/StatementExecutor.cs:line 139
+   at FLua.Ast.Visitor.dispatchStmt[T](IStatementVisitor`1 visitor, Statement stmt) in /Users/bill/Repos/FLua/FLua.Ast/AstVisitor.fs:line 65
+   at FLua.Interpreter.StatementExecutor.Execute(Statement stmt) in /Users/bill/Repos/FLua/FLua.Interpreter/StatementExecutor.cs:line 40
+   at FLua.Interpreter.LuaInterpreter.ExecuteStatement(Statement stmt) in /Users/bill/Repos/FLua/FLua.Interpreter/LuaInterpreter.cs:line 154
+   at FLua.Interpreter.LuaInterpreter.ExecuteStatementsWithResult(FSharpList`1 statements) in /Users/bill/Repos/FLua/FLua.Interpreter/LuaInterpreter.cs:line 125
+   at FLua.Interpreter.LuaInterpreter.ExecuteStatements(FSharpList`1 statements) in /Users/bill/Repos/FLua/FLua.Interpreter/LuaInterpreter.cs:line 103
+   at FLua.Hosting.LuaHost.ExecuteInternal(FSharpList`1 statements, LuaEnvironment env) in /Users/bill/Repos/FLua/FLua.Hosting/LuaHost.cs:line 105
+   at FLua.Hosting.LuaHost.Execute(String luaCode, LuaHostOptions options) in /Users/bill/Repos/FLua/FLua.Hosting/LuaHost.cs:line 88
+   at FLua.Hosting.Tests.HostingIntegrationTests.Host_ModuleResolution_LoadsCustomModules() in /Users/bill/Repos/FLua/FLua.Hosting.Tests/HostingIntegrationTests.cs:line 356
+</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="ca2bdfe3-741b-432a-bb61-f70388865f95" testId="b63305d1-fa03-7c01-d6a0-d6170ab42183" testName="ResolveModule_SandboxLevel_OnlyStandardModules" computerName="dadsmbp" duration="00:00:00.0004417" startTime="2025-08-22T08:18:25.5752660-04:00" endTime="2025-08-22T08:18:25.5757340-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="ca2bdfe3-741b-432a-bb61-f70388865f95" />
+    <UnitTestResult executionId="ccb2f1bf-0e55-414e-b864-d8e65bccd564" testId="dc715ec0-f97d-86dd-7c4d-da072edde900" testName="IsAllowedFunction_VariousTrustLevelsAndFunctions_ReturnsExpectedResult (Untrusted,load,False)" computerName="dadsmbp" duration="00:00:00.0000047" startTime="2025-08-22T08:18:25.5887270-04:00" endTime="2025-08-22T08:18:25.5887690-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="ccb2f1bf-0e55-414e-b864-d8e65bccd564" />
+    <UnitTestResult executionId="b15ac48c-3fba-4a91-90e6-9efd9078cff6" testId="4c16b500-6dce-a141-f677-2f61fb603b3e" testName="ResolveModule_NonExistentModule_ReturnsNotFound" computerName="dadsmbp" duration="00:00:00.0004437" startTime="2025-08-22T08:18:25.5680300-04:00" endTime="2025-08-22T08:18:25.5685030-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="b15ac48c-3fba-4a91-90e6-9efd9078cff6" />
+    <UnitTestResult executionId="338e4dff-04ee-4e54-be3d-05286149dfe8" testId="75294cbb-6f12-f8df-a470-615417042501" testName="IsModuleAllowed_VariousModulesAndTrustLevels_ReturnsExpectedResult (debug,FullTrust,True)" computerName="dadsmbp" duration="00:00:00.0002801" startTime="2025-08-22T08:18:25.5844480-04:00" endTime="2025-08-22T08:18:25.5847570-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="338e4dff-04ee-4e54-be3d-05286149dfe8" />
+    <UnitTestResult executionId="6d8eaf32-0f1d-41f7-9acd-85787dcc09bc" testId="4f8a75b3-10d3-2ede-9f87-2988531e4a81" testName="Host_CompileToExpression_GeneratesExpressionTree" computerName="dadsmbp" duration="00:00:00.0090832" startTime="2025-08-22T08:18:25.2713980-04:00" endTime="2025-08-22T08:18:25.2805640-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="6d8eaf32-0f1d-41f7-9acd-85787dcc09bc" />
+    <UnitTestResult executionId="1b974144-d641-4bec-a4a4-43677931ec6f" testId="187090d6-720d-08f9-7910-709e789e60fa" testName="CompileToExpression_TypeMismatch_ThrowsWhenExecuted" computerName="dadsmbp" duration="00:00:00.0033225" startTime="2025-08-22T08:18:24.5968820-04:00" endTime="2025-08-22T08:18:24.6003360-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="1b974144-d641-4bec-a4a4-43677931ec6f" />
+    <UnitTestResult executionId="ca8c2e23-9ac1-4a9b-9135-83e598b4b7d9" testId="e56899c1-e09f-76f6-3864-a0a8e9fcce7b" testName="IsModuleAllowed_VariousModulesAndTrustLevels_ReturnsExpectedResult (debug,Trusted,False)" computerName="dadsmbp" duration="00:00:00.0002851" startTime="2025-08-22T08:18:25.5841240-04:00" endTime="2025-08-22T08:18:25.5844400-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="ca8c2e23-9ac1-4a9b-9135-83e598b4b7d9" />
+    <UnitTestResult executionId="f071ab19-c4a7-4c9b-9065-8a8771e997b9" testId="b06682bc-6f2a-75a3-6173-90be35784348" testName="IsAllowedLibrary_VariousTrustLevelsAndLibraries_ReturnsExpectedResult (Restricted,debug,False)" computerName="dadsmbp" duration="00:00:00.0000029" startTime="2025-08-22T08:18:25.5902920-04:00" endTime="2025-08-22T08:18:25.5903170-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="f071ab19-c4a7-4c9b-9065-8a8771e997b9" />
+  </Results>
+  <TestDefinitions>
+    <UnitTest name="IsAllowedLibrary_VariousTrustLevelsAndLibraries_ReturnsExpectedResult (Restricted,os,True)" storage="/users/bill/repos/flua/flua.hosting.tests/bin/debug/net8.0/flua.hosting.tests.dll" id="c6267507-bced-30f6-ff9d-0ca6add282a2">
+      <Execution id="8330e4b4-b63d-4db7-adc2-f4e6826e77af" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Hosting.Tests/bin/Debug/net8.0/FLua.Hosting.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Hosting.Tests.TrustLevelSecurityTests" name="IsAllowedLibrary_VariousTrustLevelsAndLibraries_ReturnsExpectedResult" />
+    </UnitTest>
+    <UnitTest name="IsAllowedLibrary_VariousTrustLevelsAndLibraries_ReturnsExpectedResult (Trusted,io,True)" storage="/users/bill/repos/flua/flua.hosting.tests/bin/debug/net8.0/flua.hosting.tests.dll" id="f99403db-748f-b989-55c1-a81bee0ed6db">
+      <Execution id="9e4d8314-7684-4d34-afae-dd4fa2b425bd" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Hosting.Tests/bin/Debug/net8.0/FLua.Hosting.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Hosting.Tests.TrustLevelSecurityTests" name="IsAllowedLibrary_VariousTrustLevelsAndLibraries_ReturnsExpectedResult" />
+    </UnitTest>
+    <UnitTest name="CompileToFunction_InvalidSyntax_ThrowsException" storage="/users/bill/repos/flua/flua.hosting.tests/bin/debug/net8.0/flua.hosting.tests.dll" id="7a106f3e-5aee-5f77-09f7-064ca3f6ef3f">
+      <Execution id="fe38c50b-42b5-4039-9559-f307c6a9cd27" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Hosting.Tests/bin/Debug/net8.0/FLua.Hosting.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Hosting.Tests.LambdaCompilationTests" name="CompileToFunction_InvalidSyntax_ThrowsException" />
+    </UnitTest>
+    <UnitTest name="LuaHostOptions_ProductionConfiguration_HasAppropriateSettings" storage="/users/bill/repos/flua/flua.hosting.tests/bin/debug/net8.0/flua.hosting.tests.dll" id="3a3da1ad-1bc9-ea8e-7ab2-044cdf412979">
+      <Execution id="d6ce90d3-2e5c-426f-bc2c-452791a67f82" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Hosting.Tests/bin/Debug/net8.0/FLua.Hosting.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Hosting.Tests.LuaHostOptionsTests" name="LuaHostOptions_ProductionConfiguration_HasAppropriateSettings" />
+    </UnitTest>
+    <UnitTest name="IsAllowedFunction_VariousTrustLevelsAndFunctions_ReturnsExpectedResult (Untrusted,print,True)" storage="/users/bill/repos/flua/flua.hosting.tests/bin/debug/net8.0/flua.hosting.tests.dll" id="011a2147-45ba-a783-0d26-5c0548d48778">
+      <Execution id="b287a9ec-3e79-4143-97f7-29103fb2b663" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Hosting.Tests/bin/Debug/net8.0/FLua.Hosting.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Hosting.Tests.TrustLevelSecurityTests" name="IsAllowedFunction_VariousTrustLevelsAndFunctions_ReturnsExpectedResult" />
+    </UnitTest>
+    <UnitTest name="CompileToExpression_ComplexCalculation_EvaluatesCorrectly" storage="/users/bill/repos/flua/flua.hosting.tests/bin/debug/net8.0/flua.hosting.tests.dll" id="4ecbf54f-d06d-7e67-3f12-c373de2c1e8e">
+      <Execution id="dbcb0242-ed70-46b5-93bd-16a5f27c1a9a" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Hosting.Tests/bin/Debug/net8.0/FLua.Hosting.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Hosting.Tests.ExpressionTreeCompilationTests" name="CompileToExpression_ComplexCalculation_EvaluatesCorrectly" />
+    </UnitTest>
+    <UnitTest name="CompileToExpression_StringConcatenation_ReturnsString" storage="/users/bill/repos/flua/flua.hosting.tests/bin/debug/net8.0/flua.hosting.tests.dll" id="a697d127-617c-0aba-9c94-7d03608c12ae">
+      <Execution id="3ecf1a47-ed9c-4008-9f1b-54d0dee2bf8d" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Hosting.Tests/bin/Debug/net8.0/FLua.Hosting.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Hosting.Tests.ExpressionTreeCompilationTests" name="CompileToExpression_StringConcatenation_ReturnsString" />
+    </UnitTest>
+    <UnitTest name="ResolveModule_CacheCleared_ReloadsModule" storage="/users/bill/repos/flua/flua.hosting.tests/bin/debug/net8.0/flua.hosting.tests.dll" id="0aac1178-2ff9-a4e6-fe64-fe20321c6b0b">
+      <Execution id="05605e4e-ba33-4ce2-84e2-5e24a2c5a4ea" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Hosting.Tests/bin/Debug/net8.0/FLua.Hosting.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Hosting.Tests.ModuleResolutionTests" name="ResolveModule_CacheCleared_ReloadsModule" />
+    </UnitTest>
+    <UnitTest name="IsAllowedFunction_VariousTrustLevelsAndFunctions_ReturnsExpectedResult (Sandbox,pcall,True)" storage="/users/bill/repos/flua/flua.hosting.tests/bin/debug/net8.0/flua.hosting.tests.dll" id="849423f5-591e-7deb-2909-d2d170ab18f9">
+      <Execution id="cc5b4b8a-0e58-4792-974f-7fb115a7e7ff" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Hosting.Tests/bin/Debug/net8.0/FLua.Hosting.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Hosting.Tests.TrustLevelSecurityTests" name="IsAllowedFunction_VariousTrustLevelsAndFunctions_ReturnsExpectedResult" />
+    </UnitTest>
+    <UnitTest name="Host_ExecutionTimeout_EnforcedCorrectly" storage="/users/bill/repos/flua/flua.hosting.tests/bin/debug/net8.0/flua.hosting.tests.dll" id="1a2b6914-fea5-fe47-8f87-e3bcdc223f26">
+      <Execution id="1400fabc-900e-4047-9cf7-d738264fb109" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Hosting.Tests/bin/Debug/net8.0/FLua.Hosting.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Hosting.Tests.HostingIntegrationTests" name="Host_ExecutionTimeout_EnforcedCorrectly" />
+    </UnitTest>
+    <UnitTest name="CreateEnvironment_FullTrustLevel_AllFunctionsAvailable" storage="/users/bill/repos/flua/flua.hosting.tests/bin/debug/net8.0/flua.hosting.tests.dll" id="60d5f55d-275a-ef8c-4cfd-04507138caf0">
+      <Execution id="dfbc6bb5-bf8b-4153-9e62-46b59fb5f2bf" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Hosting.Tests/bin/Debug/net8.0/FLua.Hosting.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Hosting.Tests.TrustLevelSecurityTests" name="CreateEnvironment_FullTrustLevel_AllFunctionsAvailable" />
+    </UnitTest>
+    <UnitTest name="CreateEnvironment_UntrustedLevel_CannotUseDangerousFunctions" storage="/users/bill/repos/flua/flua.hosting.tests/bin/debug/net8.0/flua.hosting.tests.dll" id="b517e6d0-d3f9-bceb-5ff2-1ba28a74d05b">
+      <Execution id="768aa84f-3518-477f-877c-ad59e91498f9" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Hosting.Tests/bin/Debug/net8.0/FLua.Hosting.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Hosting.Tests.TrustLevelSecurityTests" name="CreateEnvironment_UntrustedLevel_CannotUseDangerousFunctions" />
+    </UnitTest>
+    <UnitTest name="IsAllowedLibrary_VariousTrustLevelsAndLibraries_ReturnsExpectedResult (Sandbox,io,False)" storage="/users/bill/repos/flua/flua.hosting.tests/bin/debug/net8.0/flua.hosting.tests.dll" id="399322ed-8341-dd58-28d9-4ce8c5dadc3a">
+      <Execution id="82c386a0-f088-498a-b3ad-e6667057af3e" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Hosting.Tests/bin/Debug/net8.0/FLua.Hosting.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Hosting.Tests.TrustLevelSecurityTests" name="IsAllowedLibrary_VariousTrustLevelsAndLibraries_ReturnsExpectedResult" />
+    </UnitTest>
+    <UnitTest name="LuaHostOptions_MaxMemoryUsage_AcceptsLargeValues" storage="/users/bill/repos/flua/flua.hosting.tests/bin/debug/net8.0/flua.hosting.tests.dll" id="a42981ac-bb30-8688-5740-fe66c7242e7b">
+      <Execution id="77d49b93-5977-44b4-adc5-446b45b43bda" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Hosting.Tests/bin/Debug/net8.0/FLua.Hosting.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Hosting.Tests.LuaHostOptionsTests" name="LuaHostOptions_MaxMemoryUsage_AcceptsLargeValues" />
+    </UnitTest>
+    <UnitTest name="TestModuleCompilation_NestedRequires_Work" storage="/users/bill/repos/flua/flua.hosting.tests/bin/debug/net8.0/flua.hosting.tests.dll" id="70a7a985-19e5-7a9b-0d4d-1e9353b56cb6">
+      <Execution id="f06d8d7d-1e16-4f15-8757-8c06566209b2" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Hosting.Tests/bin/Debug/net8.0/FLua.Hosting.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Hosting.Tests.ModuleCompilationTests" name="TestModuleCompilation_NestedRequires_Work" />
+    </UnitTest>
+    <UnitTest name="IsAllowedFunction_VariousTrustLevelsAndFunctions_ReturnsExpectedResult (Trusted,print,True)" storage="/users/bill/repos/flua/flua.hosting.tests/bin/debug/net8.0/flua.hosting.tests.dll" id="0e7f4dc5-6dd9-a985-44d6-2dbf1ad70202">
+      <Execution id="3f64a34f-a126-4531-af03-ace109436ef0" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Hosting.Tests/bin/Debug/net8.0/FLua.Hosting.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Hosting.Tests.TrustLevelSecurityTests" name="IsAllowedFunction_VariousTrustLevelsAndFunctions_ReturnsExpectedResult" />
+    </UnitTest>
+    <UnitTest name="CompileToFunction_MultipleReturns_ReturnsFirstValue" storage="/users/bill/repos/flua/flua.hosting.tests/bin/debug/net8.0/flua.hosting.tests.dll" id="f4eede23-f9fd-0edb-445e-cbb2f4a67052">
+      <Execution id="837e572b-f720-46f8-8a43-c990dbe172df" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Hosting.Tests/bin/Debug/net8.0/FLua.Hosting.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Hosting.Tests.LambdaCompilationTests" name="CompileToFunction_MultipleReturns_ReturnsFirstValue" />
+    </UnitTest>
+    <UnitTest name="IsAllowedLibrary_VariousTrustLevelsAndLibraries_ReturnsExpectedResult (Untrusted,io,False)" storage="/users/bill/repos/flua/flua.hosting.tests/bin/debug/net8.0/flua.hosting.tests.dll" id="df02a017-b650-63dd-4edf-d8be76bf1d81">
+      <Execution id="6157341e-d730-42be-9bb0-1c34d7c5ee7c" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Hosting.Tests/bin/Debug/net8.0/FLua.Hosting.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Hosting.Tests.TrustLevelSecurityTests" name="IsAllowedLibrary_VariousTrustLevelsAndLibraries_ReturnsExpectedResult" />
+    </UnitTest>
+    <UnitTest name="CompileToExpression_UntrustedWithDangerousFunction_ThrowsWhenExecuted" storage="/users/bill/repos/flua/flua.hosting.tests/bin/debug/net8.0/flua.hosting.tests.dll" id="ee599aed-6bfd-453c-74e1-d81d8b78981e">
+      <Execution id="538baff1-f49c-4c8c-9786-563f1be1d1e4" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Hosting.Tests/bin/Debug/net8.0/FLua.Hosting.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Hosting.Tests.ExpressionTreeCompilationTests" name="CompileToExpression_UntrustedWithDangerousFunction_ThrowsWhenExecuted" />
+    </UnitTest>
+    <UnitTest name="CompileToFunction_TypeMismatch_ThrowsException" storage="/users/bill/repos/flua/flua.hosting.tests/bin/debug/net8.0/flua.hosting.tests.dll" id="433c1f90-0729-9caf-eb3a-efe2a02e9069">
+      <Execution id="70e7584a-ecc4-4d4e-ad84-74b2421ac80a" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Hosting.Tests/bin/Debug/net8.0/FLua.Hosting.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Hosting.Tests.LambdaCompilationTests" name="CompileToFunction_TypeMismatch_ThrowsException" />
+    </UnitTest>
+    <UnitTest name="ResolveModule_FileReadError_HandlesGracefully" storage="/users/bill/repos/flua/flua.hosting.tests/bin/debug/net8.0/flua.hosting.tests.dll" id="b793adab-f79f-3d90-ee70-de87088d884b">
+      <Execution id="42223075-4aa8-44f0-9202-527f22d8da59" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Hosting.Tests/bin/Debug/net8.0/FLua.Hosting.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Hosting.Tests.ModuleResolutionTests" name="ResolveModule_FileReadError_HandlesGracefully" />
+    </UnitTest>
+    <UnitTest name="LuaHostOptions_DevelopmentConfiguration_HasDebugSettings" storage="/users/bill/repos/flua/flua.hosting.tests/bin/debug/net8.0/flua.hosting.tests.dll" id="0ed08b61-6124-e5b6-65ec-82344e210eae">
+      <Execution id="f90d8f5c-f422-498a-aa25-753368db7f90" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Hosting.Tests/bin/Debug/net8.0/FLua.Hosting.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Hosting.Tests.LuaHostOptionsTests" name="LuaHostOptions_DevelopmentConfiguration_HasDebugSettings" />
+    </UnitTest>
+    <UnitTest name="CreateEnvironment_SandboxLevel_SafeFunctionsAndLibraries" storage="/users/bill/repos/flua/flua.hosting.tests/bin/debug/net8.0/flua.hosting.tests.dll" id="08fb7057-f9d2-d080-0117-1e0c23ed3e12">
+      <Execution id="f6ddf6f4-c660-4852-9aad-6e059a46c7e1" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Hosting.Tests/bin/Debug/net8.0/FLua.Hosting.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Hosting.Tests.TrustLevelSecurityTests" name="CreateEnvironment_SandboxLevel_SafeFunctionsAndLibraries" />
+    </UnitTest>
+    <UnitTest name="IsAllowedLibrary_VariousTrustLevelsAndLibraries_ReturnsExpectedResult (Restricted,debug,False)" storage="/users/bill/repos/flua/flua.hosting.tests/bin/debug/net8.0/flua.hosting.tests.dll" id="b06682bc-6f2a-75a3-6173-90be35784348">
+      <Execution id="f071ab19-c4a7-4c9b-9065-8a8771e997b9" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Hosting.Tests/bin/Debug/net8.0/FLua.Hosting.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Hosting.Tests.TrustLevelSecurityTests" name="IsAllowedLibrary_VariousTrustLevelsAndLibraries_ReturnsExpectedResult" />
+    </UnitTest>
+    <UnitTest name="CompileToExpression_WithLocalVariables_CreatesProperScope" storage="/users/bill/repos/flua/flua.hosting.tests/bin/debug/net8.0/flua.hosting.tests.dll" id="f2a20d40-089b-b493-ced4-6e2431988e39">
+      <Execution id="17afaddb-646f-4cba-befa-ce0ab5227e35" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Hosting.Tests/bin/Debug/net8.0/FLua.Hosting.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Hosting.Tests.ExpressionTreeCompilationTests" name="CompileToExpression_WithLocalVariables_CreatesProperScope" />
+    </UnitTest>
+    <UnitTest name="IsAllowedFunction_VariousTrustLevelsAndFunctions_ReturnsExpectedResult (Untrusted,pcall,False)" storage="/users/bill/repos/flua/flua.hosting.tests/bin/debug/net8.0/flua.hosting.tests.dll" id="9e844a28-dc32-5562-5390-502686bdb22b">
+      <Execution id="fc2b96e8-f90a-45db-93cf-aae96a8dea22" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Hosting.Tests/bin/Debug/net8.0/FLua.Hosting.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Hosting.Tests.TrustLevelSecurityTests" name="IsAllowedFunction_VariousTrustLevelsAndFunctions_ReturnsExpectedResult" />
+    </UnitTest>
+    <UnitTest name="IsAllowedLibrary_VariousTrustLevelsAndLibraries_ReturnsExpectedResult (Trusted,debug,False)" storage="/users/bill/repos/flua/flua.hosting.tests/bin/debug/net8.0/flua.hosting.tests.dll" id="768f7953-0575-941c-e65f-2f3772ef2c8c">
+      <Execution id="bfd0f10e-8a3d-43b9-8bc6-9bfb9c1258f6" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Hosting.Tests/bin/Debug/net8.0/FLua.Hosting.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Hosting.Tests.TrustLevelSecurityTests" name="IsAllowedLibrary_VariousTrustLevelsAndLibraries_ReturnsExpectedResult" />
+    </UnitTest>
+    <UnitTest name="IsModuleAllowed_VariousModulesAndTrustLevels_ReturnsExpectedResult (custom.module,Untrusted,False)" storage="/users/bill/repos/flua/flua.hosting.tests/bin/debug/net8.0/flua.hosting.tests.dll" id="79e6fc5c-a9bc-1760-071d-9dcfb7fc41f6">
+      <Execution id="301ab504-5edb-4cb7-8ca1-ce162ed4d892" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Hosting.Tests/bin/Debug/net8.0/FLua.Hosting.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Hosting.Tests.ModuleResolutionTests" name="IsModuleAllowed_VariousModulesAndTrustLevels_ReturnsExpectedResult" />
+    </UnitTest>
+    <UnitTest name="Host_ConfigurationScriptScenario_LoadsSettings" storage="/users/bill/repos/flua/flua.hosting.tests/bin/debug/net8.0/flua.hosting.tests.dll" id="56973521-ea14-3bd9-eab0-0df35dafced9">
+      <Execution id="874616d4-cb48-4511-8b54-69df4caa9303" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Hosting.Tests/bin/Debug/net8.0/FLua.Hosting.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Hosting.Tests.HostingIntegrationTests" name="Host_ConfigurationScriptScenario_LoadsSettings" />
+    </UnitTest>
+    <UnitTest name="IsAllowedFunction_VariousTrustLevelsAndFunctions_ReturnsExpectedResult (Trusted,load,True)" storage="/users/bill/repos/flua/flua.hosting.tests/bin/debug/net8.0/flua.hosting.tests.dll" id="50f216d0-1c9f-b9db-f739-b7b81d59d2c1">
+      <Execution id="dc8810aa-438d-4c61-aa04-8ed236e69dd8" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Hosting.Tests/bin/Debug/net8.0/FLua.Hosting.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Hosting.Tests.TrustLevelSecurityTests" name="IsAllowedFunction_VariousTrustLevelsAndFunctions_ReturnsExpectedResult" />
+    </UnitTest>
+    <UnitTest name="Host_CompileToFunction_CreatesCallableDelegate" storage="/users/bill/repos/flua/flua.hosting.tests/bin/debug/net8.0/flua.hosting.tests.dll" id="50384e8d-36ba-0e51-2bb0-ad1f92a373b1">
+      <Execution id="4598464a-331c-426d-877a-37a5c8130d3d" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Hosting.Tests/bin/Debug/net8.0/FLua.Hosting.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Hosting.Tests.HostingIntegrationTests" name="Host_CompileToFunction_CreatesCallableDelegate" />
+    </UnitTest>
+    <UnitTest name="LuaHostOptions_DefaultConfiguration_HasExpectedValues" storage="/users/bill/repos/flua/flua.hosting.tests/bin/debug/net8.0/flua.hosting.tests.dll" id="859b4c7f-df44-6ff9-ecf9-8a3c1714a301">
+      <Execution id="dad3e003-99cd-4921-8ad9-cadc1f82359b" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Hosting.Tests/bin/Debug/net8.0/FLua.Hosting.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Hosting.Tests.LuaHostOptionsTests" name="LuaHostOptions_DefaultConfiguration_HasExpectedValues" />
+    </UnitTest>
+    <UnitTest name="LuaHostOptions_RecordEquality_WorksCorrectly" storage="/users/bill/repos/flua/flua.hosting.tests/bin/debug/net8.0/flua.hosting.tests.dll" id="bd2ae68e-84b1-b260-4e73-e3c9f76a349d">
+      <Execution id="f31fdf7c-b767-4184-a55b-0e5239791ac3" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Hosting.Tests/bin/Debug/net8.0/FLua.Hosting.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Hosting.Tests.LuaHostOptionsTests" name="LuaHostOptions_RecordEquality_WorksCorrectly" />
+    </UnitTest>
+    <UnitTest name="IsModuleAllowed_VariousModulesAndTrustLevels_ReturnsExpectedResult (io,Restricted,False)" storage="/users/bill/repos/flua/flua.hosting.tests/bin/debug/net8.0/flua.hosting.tests.dll" id="4a48ca06-550f-c348-922e-acfbbdc73cdf">
+      <Execution id="bedfde7f-a9c6-4dea-bf0d-d6e1d5e2655e" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Hosting.Tests/bin/Debug/net8.0/FLua.Hosting.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Hosting.Tests.ModuleResolutionTests" name="IsModuleAllowed_VariousModulesAndTrustLevels_ReturnsExpectedResult" />
+    </UnitTest>
+    <UnitTest name="TestModuleCompilation_WithCaching_ReusesCompiledModule" storage="/users/bill/repos/flua/flua.hosting.tests/bin/debug/net8.0/flua.hosting.tests.dll" id="6978b3c2-004b-dc18-27cf-34561b134623">
+      <Execution id="935615e9-1cfe-445a-904a-187c5f1bca33" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Hosting.Tests/bin/Debug/net8.0/FLua.Hosting.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Hosting.Tests.ModuleCompilationTests" name="TestModuleCompilation_WithCaching_ReusesCompiledModule" />
+    </UnitTest>
+    <UnitTest name="IsAllowedFunction_VariousTrustLevelsAndFunctions_ReturnsExpectedResult (Trusted,pcall,True)" storage="/users/bill/repos/flua/flua.hosting.tests/bin/debug/net8.0/flua.hosting.tests.dll" id="ebb5e080-5a3b-709a-925f-f52d50f6a2cc">
+      <Execution id="4aef3365-af22-4e67-8d9a-c945eb171ce5" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Hosting.Tests/bin/Debug/net8.0/FLua.Hosting.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Hosting.Tests.TrustLevelSecurityTests" name="IsAllowedFunction_VariousTrustLevelsAndFunctions_ReturnsExpectedResult" />
+    </UnitTest>
+    <UnitTest name="CompileToExpression_InvalidSyntax_ThrowsException" storage="/users/bill/repos/flua/flua.hosting.tests/bin/debug/net8.0/flua.hosting.tests.dll" id="dbfc50fa-8e7a-d40d-3ff9-331cf9868f1e">
+      <Execution id="0afb378c-e35f-4475-8c84-41ab194cd767" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Hosting.Tests/bin/Debug/net8.0/FLua.Hosting.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Hosting.Tests.ExpressionTreeCompilationTests" name="CompileToExpression_InvalidSyntax_ThrowsException" />
+    </UnitTest>
+    <UnitTest name="CompileToExpression_MultipleReturns_ReturnsFirstValue" storage="/users/bill/repos/flua/flua.hosting.tests/bin/debug/net8.0/flua.hosting.tests.dll" id="8735133a-043c-bc32-2328-95d44b8b2518">
+      <Execution id="73084958-df9b-49e4-a25c-f5bf1c8de6f2" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Hosting.Tests/bin/Debug/net8.0/FLua.Hosting.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Hosting.Tests.ExpressionTreeCompilationTests" name="CompileToExpression_MultipleReturns_ReturnsFirstValue" />
+    </UnitTest>
+    <UnitTest name="Host_ExecuteSimpleScript_ReturnsCorrectResult" storage="/users/bill/repos/flua/flua.hosting.tests/bin/debug/net8.0/flua.hosting.tests.dll" id="ef7a192a-548e-b065-9799-a674148e6e52">
+      <Execution id="8b8f91b2-ec4a-4546-a9e6-36d8c09ffa23" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Hosting.Tests/bin/Debug/net8.0/FLua.Hosting.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Hosting.Tests.HostingIntegrationTests" name="Host_ExecuteSimpleScript_ReturnsCorrectResult" />
+    </UnitTest>
+    <UnitTest name="Host_ModuleResolution_LoadsCustomModules" storage="/users/bill/repos/flua/flua.hosting.tests/bin/debug/net8.0/flua.hosting.tests.dll" id="46bc9909-52d1-f84f-fe0b-c988b927942a">
+      <Execution id="6c998bf4-ca51-453e-a8f6-19fcb65b3d40" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Hosting.Tests/bin/Debug/net8.0/FLua.Hosting.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Hosting.Tests.HostingIntegrationTests" name="Host_ModuleResolution_LoadsCustomModules" />
+    </UnitTest>
+    <UnitTest name="SecurityPolicy_UntrustedToSandbox_FunctionAvailabilityChanges" storage="/users/bill/repos/flua/flua.hosting.tests/bin/debug/net8.0/flua.hosting.tests.dll" id="97f8cd9d-afb7-28d6-a7d6-82b132b2c013">
+      <Execution id="d56562d3-289a-4e6c-a364-5d5514cefa28" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Hosting.Tests/bin/Debug/net8.0/FLua.Hosting.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Hosting.Tests.TrustLevelSecurityTests" name="SecurityPolicy_UntrustedToSandbox_FunctionAvailabilityChanges" />
+    </UnitTest>
+    <UnitTest name="LuaHostOptions_MaximumTimeout_AcceptsMaxValue" storage="/users/bill/repos/flua/flua.hosting.tests/bin/debug/net8.0/flua.hosting.tests.dll" id="412d308c-a31a-e44b-8022-65bc77fb456a">
+      <Execution id="ebe2a9ea-a0b7-437f-9c25-4601512eb0df" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Hosting.Tests/bin/Debug/net8.0/FLua.Hosting.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Hosting.Tests.LuaHostOptionsTests" name="LuaHostOptions_MaximumTimeout_AcceptsMaxValue" />
+    </UnitTest>
+    <UnitTest name="Host_ExecuteAsync_SupportsCancellation" storage="/users/bill/repos/flua/flua.hosting.tests/bin/debug/net8.0/flua.hosting.tests.dll" id="56a0fbb4-6ac1-e41b-ae0f-306fc184529f">
+      <Execution id="44f8eeb6-3987-43a9-bfa3-47b548ec294d" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Hosting.Tests/bin/Debug/net8.0/FLua.Hosting.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Hosting.Tests.HostingIntegrationTests" name="Host_ExecuteAsync_SupportsCancellation" />
+    </UnitTest>
+    <UnitTest name="CompileToExpression_EmptyReturn_ReturnsDefaultValue" storage="/users/bill/repos/flua/flua.hosting.tests/bin/debug/net8.0/flua.hosting.tests.dll" id="b53c146c-5aa3-02e0-0769-75560a6d8075">
+      <Execution id="1e9e65b1-af1e-45f6-900e-2832b5dbb160" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Hosting.Tests/bin/Debug/net8.0/FLua.Hosting.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Hosting.Tests.ExpressionTreeCompilationTests" name="CompileToExpression_EmptyReturn_ReturnsDefaultValue" />
+    </UnitTest>
+    <UnitTest name="Host_MemoryLimit_EnforcedCorrectly" storage="/users/bill/repos/flua/flua.hosting.tests/bin/debug/net8.0/flua.hosting.tests.dll" id="0528b300-b5a3-147c-59ba-9d3f39034eb7">
+      <Execution id="9c5ed665-c2be-4152-9759-186d96a3ab3d" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Hosting.Tests/bin/Debug/net8.0/FLua.Hosting.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Hosting.Tests.HostingIntegrationTests" name="Host_MemoryLimit_EnforcedCorrectly" />
+    </UnitTest>
+    <UnitTest name="TestModuleCompilation_CircularDependency_ThrowsError" storage="/users/bill/repos/flua/flua.hosting.tests/bin/debug/net8.0/flua.hosting.tests.dll" id="e39bfef0-812d-928f-a1d5-d594f8d96fc1">
+      <Execution id="c33c66cd-449f-4e22-87cd-eeb38f804206" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Hosting.Tests/bin/Debug/net8.0/FLua.Hosting.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Hosting.Tests.ModuleCompilationTests" name="TestModuleCompilation_CircularDependency_ThrowsError" />
+    </UnitTest>
+    <UnitTest name="AddSearchPath_NewPath_FindsModulesInNewPath" storage="/users/bill/repos/flua/flua.hosting.tests/bin/debug/net8.0/flua.hosting.tests.dll" id="deb9c0cc-6243-f4b1-d32a-867ffd8fc15b">
+      <Execution id="1b7468b1-65a6-472f-b508-b2b4a6431f7e" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Hosting.Tests/bin/Debug/net8.0/FLua.Hosting.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Hosting.Tests.ModuleResolutionTests" name="AddSearchPath_NewPath_FindsModulesInNewPath" />
+    </UnitTest>
+    <UnitTest name="CompileToExpression_WithTrustLevel_RespectsSecurityRestrictions" storage="/users/bill/repos/flua/flua.hosting.tests/bin/debug/net8.0/flua.hosting.tests.dll" id="4d23e8f8-e2dd-112f-a705-5865bc3f874f">
+      <Execution id="8758c613-d25c-442d-8814-5e9146e3e28f" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Hosting.Tests/bin/Debug/net8.0/FLua.Hosting.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Hosting.Tests.ExpressionTreeCompilationTests" name="CompileToExpression_WithTrustLevel_RespectsSecurityRestrictions" />
+    </UnitTest>
+    <UnitTest name="LuaHostOptions_HostFunctionsAndContext_WorkTogether" storage="/users/bill/repos/flua/flua.hosting.tests/bin/debug/net8.0/flua.hosting.tests.dll" id="3f732c5c-0702-d139-8a69-4c87b21877a3">
+      <Execution id="0f08baec-1bc7-4526-9750-303380d43a34" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Hosting.Tests/bin/Debug/net8.0/FLua.Hosting.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Hosting.Tests.LuaHostOptionsTests" name="LuaHostOptions_HostFunctionsAndContext_WorkTogether" />
+    </UnitTest>
+    <UnitTest name="CompileToExpression_TableOperations_WorksWithTables" storage="/users/bill/repos/flua/flua.hosting.tests/bin/debug/net8.0/flua.hosting.tests.dll" id="76e63985-ea05-726c-e6b3-42affd0f43a9">
+      <Execution id="76e41263-0b10-4e08-8e74-4dc0ee81c794" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Hosting.Tests/bin/Debug/net8.0/FLua.Hosting.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Hosting.Tests.ExpressionTreeCompilationTests" name="CompileToExpression_TableOperations_WorksWithTables" />
+    </UnitTest>
+    <UnitTest name="IsModuleAllowed_VariousModulesAndTrustLevels_ReturnsExpectedResult (io,Sandbox,False)" storage="/users/bill/repos/flua/flua.hosting.tests/bin/debug/net8.0/flua.hosting.tests.dll" id="02b89d5c-1c84-fd2c-2f25-d935196ed474">
+      <Execution id="e001deb5-125c-4da8-b750-05a29f9350ae" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Hosting.Tests/bin/Debug/net8.0/FLua.Hosting.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Hosting.Tests.ModuleResolutionTests" name="IsModuleAllowed_VariousModulesAndTrustLevels_ReturnsExpectedResult" />
+    </UnitTest>
+    <UnitTest name="CompileToFunction_WithMathLibrary_UsesStandardLibrary" storage="/users/bill/repos/flua/flua.hosting.tests/bin/debug/net8.0/flua.hosting.tests.dll" id="409facdd-c606-5f88-5ea8-65c14816134e">
+      <Execution id="57e9cff1-fc07-40ec-9c17-2530cc93872f" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Hosting.Tests/bin/Debug/net8.0/FLua.Hosting.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Hosting.Tests.LambdaCompilationTests" name="CompileToFunction_WithMathLibrary_UsesStandardLibrary" />
+    </UnitTest>
+    <UnitTest name="IsAllowedLibrary_VariousTrustLevelsAndLibraries_ReturnsExpectedResult (Untrusted,math,True)" storage="/users/bill/repos/flua/flua.hosting.tests/bin/debug/net8.0/flua.hosting.tests.dll" id="22b59976-04f3-a056-1b21-c3367766a116">
+      <Execution id="edd49c94-9187-48a8-8ad7-dd0f3a18dfb6" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Hosting.Tests/bin/Debug/net8.0/FLua.Hosting.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Hosting.Tests.TrustLevelSecurityTests" name="IsAllowedLibrary_VariousTrustLevelsAndLibraries_ReturnsExpectedResult" />
+    </UnitTest>
+    <UnitTest name="Host_RestrictedScript_HasLimitedOSAccess" storage="/users/bill/repos/flua/flua.hosting.tests/bin/debug/net8.0/flua.hosting.tests.dll" id="d7bfff46-8a7f-c380-dd26-996ddb9e0e41">
+      <Execution id="687682ca-5ec6-438f-8731-147cb6fdb8fe" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Hosting.Tests/bin/Debug/net8.0/FLua.Hosting.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Hosting.Tests.HostingIntegrationTests" name="Host_RestrictedScript_HasLimitedOSAccess" />
+    </UnitTest>
+    <UnitTest name="ResolveModule_NonExistentModule_ReturnsNotFound" storage="/users/bill/repos/flua/flua.hosting.tests/bin/debug/net8.0/flua.hosting.tests.dll" id="4c16b500-6dce-a141-f677-2f61fb603b3e">
+      <Execution id="b15ac48c-3fba-4a91-90e6-9efd9078cff6" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Hosting.Tests/bin/Debug/net8.0/FLua.Hosting.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Hosting.Tests.ModuleResolutionTests" name="ResolveModule_NonExistentModule_ReturnsNotFound" />
+    </UnitTest>
+    <UnitTest name="LuaHostOptions_SecurityAndModuleOptions_CombineCorrectly" storage="/users/bill/repos/flua/flua.hosting.tests/bin/debug/net8.0/flua.hosting.tests.dll" id="2998b0d6-2ecf-aead-fc90-6be329f1cd41">
+      <Execution id="75c546f8-3c5e-4e82-95e6-40b639373d6c" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Hosting.Tests/bin/Debug/net8.0/FLua.Hosting.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Hosting.Tests.LuaHostOptionsTests" name="LuaHostOptions_SecurityAndModuleOptions_CombineCorrectly" />
+    </UnitTest>
+    <UnitTest name="IsModuleAllowed_VariousModulesAndTrustLevels_ReturnsExpectedResult (io,Trusted,True)" storage="/users/bill/repos/flua/flua.hosting.tests/bin/debug/net8.0/flua.hosting.tests.dll" id="a42902df-5410-8ffc-f12c-2939c59a375b">
+      <Execution id="85e127ee-fbb0-4364-a26c-fbf781b90d23" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Hosting.Tests/bin/Debug/net8.0/FLua.Hosting.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Hosting.Tests.ModuleResolutionTests" name="IsModuleAllowed_VariousModulesAndTrustLevels_ReturnsExpectedResult" />
+    </UnitTest>
+    <UnitTest name="IsAllowedLibrary_VariousTrustLevelsAndLibraries_ReturnsExpectedResult (FullTrust,debug,True)" storage="/users/bill/repos/flua/flua.hosting.tests/bin/debug/net8.0/flua.hosting.tests.dll" id="aa18db62-bf06-0fcf-532b-8c12531ac837">
+      <Execution id="85dc411e-c959-40ea-b95b-249ad2ccc023" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Hosting.Tests/bin/Debug/net8.0/FLua.Hosting.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Hosting.Tests.TrustLevelSecurityTests" name="IsAllowedLibrary_VariousTrustLevelsAndLibraries_ReturnsExpectedResult" />
+    </UnitTest>
+    <UnitTest name="ResolveModule_SandboxLevel_OnlyStandardModules" storage="/users/bill/repos/flua/flua.hosting.tests/bin/debug/net8.0/flua.hosting.tests.dll" id="b63305d1-fa03-7c01-d6a0-d6170ab42183">
+      <Execution id="ca2bdfe3-741b-432a-bb61-f70388865f95" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Hosting.Tests/bin/Debug/net8.0/FLua.Hosting.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Hosting.Tests.ModuleResolutionTests" name="ResolveModule_SandboxLevel_OnlyStandardModules" />
+    </UnitTest>
+    <UnitTest name="LuaHostOptions_ZeroTimeout_AcceptsZeroValue" storage="/users/bill/repos/flua/flua.hosting.tests/bin/debug/net8.0/flua.hosting.tests.dll" id="67cd635e-6a71-fb03-75c2-e8aa1f543906">
+      <Execution id="b3462bc2-6442-45d0-90c6-c68e7dab6415" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Hosting.Tests/bin/Debug/net8.0/FLua.Hosting.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Hosting.Tests.LuaHostOptionsTests" name="LuaHostOptions_ZeroTimeout_AcceptsZeroValue" />
+    </UnitTest>
+    <UnitTest name="ModuleResolutionResult_CreateFailure_PropertiesSetCorrectly" storage="/users/bill/repos/flua/flua.hosting.tests/bin/debug/net8.0/flua.hosting.tests.dll" id="a093420f-cc96-62ba-f2e6-0a732cb51e21">
+      <Execution id="924a6767-d760-40b4-be1b-5f22b4abb6f4" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Hosting.Tests/bin/Debug/net8.0/FLua.Hosting.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Hosting.Tests.ModuleResolutionTests" name="ModuleResolutionResult_CreateFailure_PropertiesSetCorrectly" />
+    </UnitTest>
+    <UnitTest name="IsAllowedFunction_VariousTrustLevelsAndFunctions_ReturnsExpectedResult (Sandbox,print,True)" storage="/users/bill/repos/flua/flua.hosting.tests/bin/debug/net8.0/flua.hosting.tests.dll" id="10236504-2a67-fe74-a4f9-88b00270520f">
+      <Execution id="1e507ff7-3ebe-4243-8af0-1cc5ddbe6be8" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Hosting.Tests/bin/Debug/net8.0/FLua.Hosting.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Hosting.Tests.TrustLevelSecurityTests" name="IsAllowedFunction_VariousTrustLevelsAndFunctions_ReturnsExpectedResult" />
+    </UnitTest>
+    <UnitTest name="ResolveModule_MultipleSearchPaths_FindsInSecondPath" storage="/users/bill/repos/flua/flua.hosting.tests/bin/debug/net8.0/flua.hosting.tests.dll" id="73520bf6-c134-d906-65a2-236d5a390f2f">
+      <Execution id="54c560ae-0665-4f09-bf47-b53bd3794e51" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Hosting.Tests/bin/Debug/net8.0/FLua.Hosting.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Hosting.Tests.ModuleResolutionTests" name="ResolveModule_MultipleSearchPaths_FindsInSecondPath" />
+    </UnitTest>
+    <UnitTest name="CompileToFunction_BooleanResult_ReturnsBoolean" storage="/users/bill/repos/flua/flua.hosting.tests/bin/debug/net8.0/flua.hosting.tests.dll" id="f1819b85-ff8a-8993-1daa-b31a4ae452d2">
+      <Execution id="f5583183-96f8-4aba-ba3c-6c30436cfae0" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Hosting.Tests/bin/Debug/net8.0/FLua.Hosting.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Hosting.Tests.LambdaCompilationTests" name="CompileToFunction_BooleanResult_ReturnsBoolean" />
+    </UnitTest>
+    <UnitTest name="TestModuleCompilation_WithUntrustedLevel_UsesInterpreter" storage="/users/bill/repos/flua/flua.hosting.tests/bin/debug/net8.0/flua.hosting.tests.dll" id="f745ee35-fae7-acc5-38f7-e017a26a9c2a">
+      <Execution id="49d78512-0cfb-4ba3-a508-76d52db24383" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Hosting.Tests/bin/Debug/net8.0/FLua.Hosting.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Hosting.Tests.ModuleCompilationTests" name="TestModuleCompilation_WithUntrustedLevel_UsesInterpreter" />
+    </UnitTest>
+    <UnitTest name="IsAllowedLibrary_VariousTrustLevelsAndLibraries_ReturnsExpectedResult (Sandbox,coroutine,True)" storage="/users/bill/repos/flua/flua.hosting.tests/bin/debug/net8.0/flua.hosting.tests.dll" id="b7008846-817f-22d0-0a6e-ab5d9675c9b0">
+      <Execution id="d296bb8f-3f1e-42b0-aae7-6b447b09132a" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Hosting.Tests/bin/Debug/net8.0/FLua.Hosting.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Hosting.Tests.TrustLevelSecurityTests" name="IsAllowedLibrary_VariousTrustLevelsAndLibraries_ReturnsExpectedResult" />
+    </UnitTest>
+    <UnitTest name="ModuleResolutionResult_CreateSuccess_PropertiesSetCorrectly" storage="/users/bill/repos/flua/flua.hosting.tests/bin/debug/net8.0/flua.hosting.tests.dll" id="06b02bd5-2973-b411-0284-c1994a47f07f">
+      <Execution id="f05f87b5-833b-4856-b975-a80088efad15" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Hosting.Tests/bin/Debug/net8.0/FLua.Hosting.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Hosting.Tests.ModuleResolutionTests" name="ModuleResolutionResult_CreateSuccess_PropertiesSetCorrectly" />
+    </UnitTest>
+    <UnitTest name="EnvironmentProvider_InjectHostContext_VariablesAccessible" storage="/users/bill/repos/flua/flua.hosting.tests/bin/debug/net8.0/flua.hosting.tests.dll" id="bf9ef259-1b28-3922-0b6c-b0470646c5d4">
+      <Execution id="b8cce58a-bcae-4d5c-9ead-6336a03f451a" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Hosting.Tests/bin/Debug/net8.0/FLua.Hosting.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Hosting.Tests.TrustLevelSecurityTests" name="EnvironmentProvider_InjectHostContext_VariablesAccessible" />
+    </UnitTest>
+    <UnitTest name="IsAllowedFunction_VariousTrustLevelsAndFunctions_ReturnsExpectedResult (FullTrust,load,True)" storage="/users/bill/repos/flua/flua.hosting.tests/bin/debug/net8.0/flua.hosting.tests.dll" id="996419f6-2b87-20f2-92ac-2fb8de90e21d">
+      <Execution id="4050fd40-e2d6-4e8e-aea9-3b9903b2cef5" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Hosting.Tests/bin/Debug/net8.0/FLua.Hosting.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Hosting.Tests.TrustLevelSecurityTests" name="IsAllowedFunction_VariousTrustLevelsAndFunctions_ReturnsExpectedResult" />
+    </UnitTest>
+    <UnitTest name="IsModuleAllowed_VariousModulesAndTrustLevels_ReturnsExpectedResult (debug,Trusted,False)" storage="/users/bill/repos/flua/flua.hosting.tests/bin/debug/net8.0/flua.hosting.tests.dll" id="e56899c1-e09f-76f6-3864-a0a8e9fcce7b">
+      <Execution id="ca8c2e23-9ac1-4a9b-9135-83e598b4b7d9" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Hosting.Tests/bin/Debug/net8.0/FLua.Hosting.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Hosting.Tests.ModuleResolutionTests" name="IsModuleAllowed_VariousModulesAndTrustLevels_ReturnsExpectedResult" />
+    </UnitTest>
+    <UnitTest name="ResolveModule_WithCaching_SecondCallUsesCache" storage="/users/bill/repos/flua/flua.hosting.tests/bin/debug/net8.0/flua.hosting.tests.dll" id="281e160e-81f7-8dbe-517c-e9665940a73b">
+      <Execution id="2b253ba9-33b0-4507-ad10-946f746b0ff1" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Hosting.Tests/bin/Debug/net8.0/FLua.Hosting.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Hosting.Tests.ModuleResolutionTests" name="ResolveModule_WithCaching_SecondCallUsesCache" />
+    </UnitTest>
+    <UnitTest name="Host_CompileToExpression_GeneratesExpressionTree" storage="/users/bill/repos/flua/flua.hosting.tests/bin/debug/net8.0/flua.hosting.tests.dll" id="4f8a75b3-10d3-2ede-9f87-2988531e4a81">
+      <Execution id="6d8eaf32-0f1d-41f7-9acd-85787dcc09bc" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Hosting.Tests/bin/Debug/net8.0/FLua.Hosting.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Hosting.Tests.HostingIntegrationTests" name="Host_CompileToExpression_GeneratesExpressionTree" />
+    </UnitTest>
+    <UnitTest name="CompileToFunction_UntrustedWithDangerousFunction_ThrowsException" storage="/users/bill/repos/flua/flua.hosting.tests/bin/debug/net8.0/flua.hosting.tests.dll" id="71f387b7-8a02-1301-66ef-0eed4f54453f">
+      <Execution id="23515ff6-3973-432a-ae9e-e1129ba93597" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Hosting.Tests/bin/Debug/net8.0/FLua.Hosting.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Hosting.Tests.LambdaCompilationTests" name="CompileToFunction_UntrustedWithDangerousFunction_ThrowsException" />
+    </UnitTest>
+    <UnitTest name="ResolveModule_SimpleModuleName_ResolvesCorrectly" storage="/users/bill/repos/flua/flua.hosting.tests/bin/debug/net8.0/flua.hosting.tests.dll" id="c36280af-d7fe-eec5-f116-3b1ad609bbbc">
+      <Execution id="5777367d-ecf7-43f8-bba6-d63dc3902256" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Hosting.Tests/bin/Debug/net8.0/FLua.Hosting.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Hosting.Tests.ModuleResolutionTests" name="ResolveModule_SimpleModuleName_ResolvesCorrectly" />
+    </UnitTest>
+    <UnitTest name="EnvironmentProvider_AddHostFunctions_FunctionsAccessible" storage="/users/bill/repos/flua/flua.hosting.tests/bin/debug/net8.0/flua.hosting.tests.dll" id="7499cc5c-72e5-561a-c389-03d76c343bd0">
+      <Execution id="45e9fea9-b9fb-4521-8fb4-ba6f096e9f1b" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Hosting.Tests/bin/Debug/net8.0/FLua.Hosting.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Hosting.Tests.TrustLevelSecurityTests" name="EnvironmentProvider_AddHostFunctions_FunctionsAccessible" />
+    </UnitTest>
+    <UnitTest name="TestModuleCompilation_WithTrustedLevel_CompilesModule" storage="/users/bill/repos/flua/flua.hosting.tests/bin/debug/net8.0/flua.hosting.tests.dll" id="5e33cdfe-2c89-0ec6-5b25-379a845162d1">
+      <Execution id="a5d3acbe-6d8c-4dc7-a515-a8e26e205bfb" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Hosting.Tests/bin/Debug/net8.0/FLua.Hosting.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Hosting.Tests.ModuleCompilationTests" name="TestModuleCompilation_WithTrustedLevel_CompilesModule" />
+    </UnitTest>
+    <UnitTest name="IsModuleAllowed_VariousModulesAndTrustLevels_ReturnsExpectedResult (math,Sandbox,True)" storage="/users/bill/repos/flua/flua.hosting.tests/bin/debug/net8.0/flua.hosting.tests.dll" id="eb5361b3-05c2-84f1-bb14-6618de4a1c97">
+      <Execution id="ac07fced-2efe-41e4-9cde-0d79527cf084" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Hosting.Tests/bin/Debug/net8.0/FLua.Hosting.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Hosting.Tests.ModuleResolutionTests" name="IsModuleAllowed_VariousModulesAndTrustLevels_ReturnsExpectedResult" />
+    </UnitTest>
+    <UnitTest name="CompileToFunction_EmptyReturn_ReturnsDefaultValue" storage="/users/bill/repos/flua/flua.hosting.tests/bin/debug/net8.0/flua.hosting.tests.dll" id="885a9ffa-1643-d0af-14ce-6fcf41c16691">
+      <Execution id="b78452f8-2055-4024-920a-681779ab3889" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Hosting.Tests/bin/Debug/net8.0/FLua.Hosting.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Hosting.Tests.LambdaCompilationTests" name="CompileToFunction_EmptyReturn_ReturnsDefaultValue" />
+    </UnitTest>
+    <UnitTest name="Host_DataTransformationScenario_ProcessesData" storage="/users/bill/repos/flua/flua.hosting.tests/bin/debug/net8.0/flua.hosting.tests.dll" id="9bd8c8fe-c58a-906b-e18c-614fe5de1a3d">
+      <Execution id="6d4e2d52-d779-4965-993b-ae70091e006e" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Hosting.Tests/bin/Debug/net8.0/FLua.Hosting.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Hosting.Tests.HostingIntegrationTests" name="Host_DataTransformationScenario_ProcessesData" />
+    </UnitTest>
+    <UnitTest name="ResolveModule_UntrustedLevel_NoModuleAccess" storage="/users/bill/repos/flua/flua.hosting.tests/bin/debug/net8.0/flua.hosting.tests.dll" id="b5e9da62-e23c-1860-bfcb-a743a698fc85">
+      <Execution id="a756742b-0aac-4c82-bfab-939603ddb1e1" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Hosting.Tests/bin/Debug/net8.0/FLua.Hosting.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Hosting.Tests.ModuleResolutionTests" name="ResolveModule_UntrustedLevel_NoModuleAccess" />
+    </UnitTest>
+    <UnitTest name="Host_GameScriptingScenario_WorksCorrectly" storage="/users/bill/repos/flua/flua.hosting.tests/bin/debug/net8.0/flua.hosting.tests.dll" id="a2542ed1-9fc9-d50e-3426-33d0114b0751">
+      <Execution id="8d992cec-b4d0-4a1c-91d9-1556e0f6425a" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Hosting.Tests/bin/Debug/net8.0/FLua.Hosting.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Hosting.Tests.HostingIntegrationTests" name="Host_GameScriptingScenario_WorksCorrectly" />
+    </UnitTest>
+    <UnitTest name="CompileToExpression_BooleanLogic_ReturnsBoolean" storage="/users/bill/repos/flua/flua.hosting.tests/bin/debug/net8.0/flua.hosting.tests.dll" id="47495992-3558-171a-3622-70f7f507b6b7">
+      <Execution id="8bcc9f6a-c6b1-4f90-85d7-7b41c6d16414" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Hosting.Tests/bin/Debug/net8.0/FLua.Hosting.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Hosting.Tests.ExpressionTreeCompilationTests" name="CompileToExpression_BooleanLogic_ReturnsBoolean" />
+    </UnitTest>
+    <UnitTest name="IsModuleAllowed_VariousModulesAndTrustLevels_ReturnsExpectedResult (custom.module,Restricted,True)" storage="/users/bill/repos/flua/flua.hosting.tests/bin/debug/net8.0/flua.hosting.tests.dll" id="4b2eae64-a09b-19a3-0248-923179e14593">
+      <Execution id="21b50237-2ce1-4dd6-92a7-cf45b9661730" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Hosting.Tests/bin/Debug/net8.0/FLua.Hosting.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Hosting.Tests.ModuleResolutionTests" name="IsModuleAllowed_VariousModulesAndTrustLevels_ReturnsExpectedResult" />
+    </UnitTest>
+    <UnitTest name="IsModuleAllowed_VariousModulesAndTrustLevels_ReturnsExpectedResult (debug,FullTrust,True)" storage="/users/bill/repos/flua/flua.hosting.tests/bin/debug/net8.0/flua.hosting.tests.dll" id="75294cbb-6f12-f8df-a470-615417042501">
+      <Execution id="338e4dff-04ee-4e54-be3d-05286149dfe8" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Hosting.Tests/bin/Debug/net8.0/FLua.Hosting.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Hosting.Tests.ModuleResolutionTests" name="IsModuleAllowed_VariousModulesAndTrustLevels_ReturnsExpectedResult" />
+    </UnitTest>
+    <UnitTest name="CompileToExpression_TypeMismatch_ThrowsWhenExecuted" storage="/users/bill/repos/flua/flua.hosting.tests/bin/debug/net8.0/flua.hosting.tests.dll" id="187090d6-720d-08f9-7910-709e789e60fa">
+      <Execution id="1b974144-d641-4bec-a4a4-43677931ec6f" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Hosting.Tests/bin/Debug/net8.0/FLua.Hosting.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Hosting.Tests.ExpressionTreeCompilationTests" name="CompileToExpression_TypeMismatch_ThrowsWhenExecuted" />
+    </UnitTest>
+    <UnitTest name="ResolveModule_EmptyModuleName_ReturnsError" storage="/users/bill/repos/flua/flua.hosting.tests/bin/debug/net8.0/flua.hosting.tests.dll" id="e8742ac7-4bda-350a-dc56-9a5599366332">
+      <Execution id="f06e842d-98c3-46b1-9436-ec9b5c933a47" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Hosting.Tests/bin/Debug/net8.0/FLua.Hosting.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Hosting.Tests.ModuleResolutionTests" name="ResolveModule_EmptyModuleName_ReturnsError" />
+    </UnitTest>
+    <UnitTest name="SecurityPolicy_SandboxToRestricted_LibraryAvailabilityChanges" storage="/users/bill/repos/flua/flua.hosting.tests/bin/debug/net8.0/flua.hosting.tests.dll" id="c981e812-0c2c-d15c-fd5c-729e8e48daee">
+      <Execution id="fdcd9d64-6f51-488f-a2b8-8c8c954b949d" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Hosting.Tests/bin/Debug/net8.0/FLua.Hosting.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Hosting.Tests.TrustLevelSecurityTests" name="SecurityPolicy_SandboxToRestricted_LibraryAvailabilityChanges" />
+    </UnitTest>
+    <UnitTest name="IsAllowedFunction_VariousTrustLevelsAndFunctions_ReturnsExpectedResult (Untrusted,load,False)" storage="/users/bill/repos/flua/flua.hosting.tests/bin/debug/net8.0/flua.hosting.tests.dll" id="dc715ec0-f97d-86dd-7c4d-da072edde900">
+      <Execution id="ccb2f1bf-0e55-414e-b864-d8e65bccd564" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Hosting.Tests/bin/Debug/net8.0/FLua.Hosting.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Hosting.Tests.TrustLevelSecurityTests" name="IsAllowedFunction_VariousTrustLevelsAndFunctions_ReturnsExpectedResult" />
+    </UnitTest>
+    <UnitTest name="TestModuleCompilation_WithCompilationError_FallsBackToInterpreter" storage="/users/bill/repos/flua/flua.hosting.tests/bin/debug/net8.0/flua.hosting.tests.dll" id="01e8e958-1925-8e5b-3890-6ddbfae023a0">
+      <Execution id="4912052e-cc59-46c9-bdc2-e261c81bcd01" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Hosting.Tests/bin/Debug/net8.0/FLua.Hosting.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Hosting.Tests.ModuleCompilationTests" name="TestModuleCompilation_WithCompilationError_FallsBackToInterpreter" />
+    </UnitTest>
+    <UnitTest name="IsAllowedFunction_VariousTrustLevelsAndFunctions_ReturnsExpectedResult (Sandbox,load,False)" storage="/users/bill/repos/flua/flua.hosting.tests/bin/debug/net8.0/flua.hosting.tests.dll" id="7d4b95e4-46a7-5bed-1440-dce161997dde">
+      <Execution id="b9a303f4-55de-4c8b-8e2b-a3897e9b7d7e" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Hosting.Tests/bin/Debug/net8.0/FLua.Hosting.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Hosting.Tests.TrustLevelSecurityTests" name="IsAllowedFunction_VariousTrustLevelsAndFunctions_ReturnsExpectedResult" />
+    </UnitTest>
+    <UnitTest name="CreateEnvironment_TrustedLevel_MostFunctionsAvailable" storage="/users/bill/repos/flua/flua.hosting.tests/bin/debug/net8.0/flua.hosting.tests.dll" id="3f755e33-8e88-78a4-f6b6-e882617259c7">
+      <Execution id="8adae6c6-36cd-4850-ae4a-713001d9e5d4" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Hosting.Tests/bin/Debug/net8.0/FLua.Hosting.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Hosting.Tests.TrustLevelSecurityTests" name="CreateEnvironment_TrustedLevel_MostFunctionsAvailable" />
+    </UnitTest>
+    <UnitTest name="ResolveModule_DottedModuleName_ResolvesToPath" storage="/users/bill/repos/flua/flua.hosting.tests/bin/debug/net8.0/flua.hosting.tests.dll" id="255bd218-2c51-440a-52fe-25f9213af985">
+      <Execution id="35495556-4612-444e-8879-7b87117d8f3f" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Hosting.Tests/bin/Debug/net8.0/FLua.Hosting.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Hosting.Tests.ModuleResolutionTests" name="ResolveModule_DottedModuleName_ResolvesToPath" />
+    </UnitTest>
+    <UnitTest name="LuaHostOptions_CompilationConfiguration_SetsCorrectly" storage="/users/bill/repos/flua/flua.hosting.tests/bin/debug/net8.0/flua.hosting.tests.dll" id="5834f25c-48e3-b126-e238-2ea60972e52d">
+      <Execution id="ee7ec7b1-6f25-4563-b1c5-16f88f9b4d49" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Hosting.Tests/bin/Debug/net8.0/FLua.Hosting.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Hosting.Tests.LuaHostOptionsTests" name="LuaHostOptions_CompilationConfiguration_SetsCorrectly" />
+    </UnitTest>
+    <UnitTest name="ResolveModule_InitLuaInDirectory_ResolvesCorrectly" storage="/users/bill/repos/flua/flua.hosting.tests/bin/debug/net8.0/flua.hosting.tests.dll" id="7f9ceca5-31ed-9c58-a6f6-5d13a446e3ec">
+      <Execution id="a6c7366c-df5c-4f91-a899-b498d16a79d7" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Hosting.Tests/bin/Debug/net8.0/FLua.Hosting.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Hosting.Tests.ModuleResolutionTests" name="ResolveModule_InitLuaInDirectory_ResolvesCorrectly" />
+    </UnitTest>
+    <UnitTest name="Host_SandboxedScript_CannotLoadDynamicCode" storage="/users/bill/repos/flua/flua.hosting.tests/bin/debug/net8.0/flua.hosting.tests.dll" id="a680da2b-809a-8245-20f2-29f685499ac0">
+      <Execution id="6681aa91-be5b-4e16-b72c-61f319e1a651" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Hosting.Tests/bin/Debug/net8.0/FLua.Hosting.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Hosting.Tests.HostingIntegrationTests" name="Host_SandboxedScript_CannotLoadDynamicCode" />
+    </UnitTest>
+    <UnitTest name="LuaHostOptions_EmptySearchPaths_AllowsEmptyList" storage="/users/bill/repos/flua/flua.hosting.tests/bin/debug/net8.0/flua.hosting.tests.dll" id="5577d03e-e950-03de-56c5-905857228a6b">
+      <Execution id="64acd7f4-abb0-45a4-8664-549764efd756" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Hosting.Tests/bin/Debug/net8.0/FLua.Hosting.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Hosting.Tests.LuaHostOptionsTests" name="LuaHostOptions_EmptySearchPaths_AllowsEmptyList" />
+    </UnitTest>
+    <UnitTest name="Host_CompileToAssembly_CreatesLoadableAssembly" storage="/users/bill/repos/flua/flua.hosting.tests/bin/debug/net8.0/flua.hosting.tests.dll" id="380a8bc3-5783-ca0a-a2d9-7fa574fa81d6">
+      <Execution id="3c07ef46-17e1-48ce-b480-b29207030748" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Hosting.Tests/bin/Debug/net8.0/FLua.Hosting.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Hosting.Tests.HostingIntegrationTests" name="Host_CompileToAssembly_CreatesLoadableAssembly" />
+    </UnitTest>
+    <UnitTest name="LuaHostOptions_SecurityConfiguration_SetsCorrectly" storage="/users/bill/repos/flua/flua.hosting.tests/bin/debug/net8.0/flua.hosting.tests.dll" id="3a17432e-f071-763d-e219-8c17d5ba5ec5">
+      <Execution id="f0a2c49e-656d-4f61-a008-0c3815270003" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Hosting.Tests/bin/Debug/net8.0/FLua.Hosting.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Hosting.Tests.LuaHostOptionsTests" name="LuaHostOptions_SecurityConfiguration_SetsCorrectly" />
+    </UnitTest>
+    <UnitTest name="CompileToExpression_SimpleExpression_CanBeAnalyzed" storage="/users/bill/repos/flua/flua.hosting.tests/bin/debug/net8.0/flua.hosting.tests.dll" id="9225c991-7138-21a1-7df4-09d05c0c771f">
+      <Execution id="599e83ac-9e2a-4799-be4f-f7116802682e" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Hosting.Tests/bin/Debug/net8.0/FLua.Hosting.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Hosting.Tests.ExpressionTreeCompilationTests" name="CompileToExpression_SimpleExpression_CanBeAnalyzed" />
+    </UnitTest>
+    <UnitTest name="LuaHostOptions_WithModification_CreatesNewInstance" storage="/users/bill/repos/flua/flua.hosting.tests/bin/debug/net8.0/flua.hosting.tests.dll" id="962c8546-f7a0-c4d1-5b62-b42a71287bd2">
+      <Execution id="88162eec-4a58-4182-8557-c68f80c93459" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Hosting.Tests/bin/Debug/net8.0/FLua.Hosting.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Hosting.Tests.LuaHostOptionsTests" name="LuaHostOptions_WithModification_CreatesNewInstance" />
+    </UnitTest>
+    <UnitTest name="Host_UntrustedScript_CannotAccessFileSystem" storage="/users/bill/repos/flua/flua.hosting.tests/bin/debug/net8.0/flua.hosting.tests.dll" id="a7e601de-f0f7-e427-15c9-2176b991a38b">
+      <Execution id="7a8aafac-e210-4a0a-8e17-f79f816f143a" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Hosting.Tests/bin/Debug/net8.0/FLua.Hosting.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Hosting.Tests.HostingIntegrationTests" name="Host_UntrustedScript_CannotAccessFileSystem" />
+    </UnitTest>
+    <UnitTest name="CompileToFunction_SimpleExpression_ReturnsCorrectValue" storage="/users/bill/repos/flua/flua.hosting.tests/bin/debug/net8.0/flua.hosting.tests.dll" id="64534738-ca2c-a976-0ea7-534540aebd88">
+      <Execution id="ea537c71-6316-49e1-9dba-6ffc2c5f3e5b" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Hosting.Tests/bin/Debug/net8.0/FLua.Hosting.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Hosting.Tests.LambdaCompilationTests" name="CompileToFunction_SimpleExpression_ReturnsCorrectValue" />
+    </UnitTest>
+    <UnitTest name="IsModuleAllowed_VariousModulesAndTrustLevels_ReturnsExpectedResult (io,Untrusted,False)" storage="/users/bill/repos/flua/flua.hosting.tests/bin/debug/net8.0/flua.hosting.tests.dll" id="d849481c-1dfe-ba4e-8a30-21b6ba0cbbbb">
+      <Execution id="2fe956e8-cc05-4934-ad9a-6f5fb607100f" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Hosting.Tests/bin/Debug/net8.0/FLua.Hosting.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Hosting.Tests.ModuleResolutionTests" name="IsModuleAllowed_VariousModulesAndTrustLevels_ReturnsExpectedResult" />
+    </UnitTest>
+    <UnitTest name="TestModuleCompilation_ModuleReturningNonTable_Works" storage="/users/bill/repos/flua/flua.hosting.tests/bin/debug/net8.0/flua.hosting.tests.dll" id="229e5b11-e011-f6dd-2329-22d7fd593f77">
+      <Execution id="aa467588-68c1-4be1-9de2-78689c9955ce" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Hosting.Tests/bin/Debug/net8.0/FLua.Hosting.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Hosting.Tests.ModuleCompilationTests" name="TestModuleCompilation_ModuleReturningNonTable_Works" />
+    </UnitTest>
+    <UnitTest name="CompileToFunction_StringResult_ReturnsString" storage="/users/bill/repos/flua/flua.hosting.tests/bin/debug/net8.0/flua.hosting.tests.dll" id="8baa443d-aac8-ef88-e63a-c4043636e451">
+      <Execution id="d8d7cf5c-c506-423c-9ae3-4a1ed2d6d3b2" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Hosting.Tests/bin/Debug/net8.0/FLua.Hosting.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Hosting.Tests.LambdaCompilationTests" name="CompileToFunction_StringResult_ReturnsString" />
+    </UnitTest>
+    <UnitTest name="CompileToExpression_SimpleArithmetic_CreatesValidExpressionTree" storage="/users/bill/repos/flua/flua.hosting.tests/bin/debug/net8.0/flua.hosting.tests.dll" id="c24b363c-fd25-36f3-2c43-81e4b82ff93e">
+      <Execution id="5e221247-c9dc-4e6b-98bc-9678c1c0e009" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Hosting.Tests/bin/Debug/net8.0/FLua.Hosting.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Hosting.Tests.ExpressionTreeCompilationTests" name="CompileToExpression_SimpleArithmetic_CreatesValidExpressionTree" />
+    </UnitTest>
+    <UnitTest name="CompileToExpression_MathLibraryCall_UsesStandardLibrary" storage="/users/bill/repos/flua/flua.hosting.tests/bin/debug/net8.0/flua.hosting.tests.dll" id="3b40f0cd-dfbf-6229-6d33-e09ad9e36295">
+      <Execution id="bc88473f-2685-448d-b9a0-5bc49bba18db" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Hosting.Tests/bin/Debug/net8.0/FLua.Hosting.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Hosting.Tests.ExpressionTreeCompilationTests" name="CompileToExpression_MathLibraryCall_UsesStandardLibrary" />
+    </UnitTest>
+    <UnitTest name="CompileToFunction_WithRestrictedTrustLevel_LimitsAvailableFunctions" storage="/users/bill/repos/flua/flua.hosting.tests/bin/debug/net8.0/flua.hosting.tests.dll" id="86436ca2-5c24-130c-e1ee-32f0375f06ff">
+      <Execution id="65eacd0a-bb3b-4ff1-8eaa-ca2a68bec10f" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Hosting.Tests/bin/Debug/net8.0/FLua.Hosting.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Hosting.Tests.LambdaCompilationTests" name="CompileToFunction_WithRestrictedTrustLevel_LimitsAvailableFunctions" />
+    </UnitTest>
+    <UnitTest name="CreateEnvironment_UntrustedLevel_MinimalFunctionsOnly" storage="/users/bill/repos/flua/flua.hosting.tests/bin/debug/net8.0/flua.hosting.tests.dll" id="9e62b864-9438-89e1-76ba-d710356a0d06">
+      <Execution id="b31bc9fd-b637-4200-9beb-ff3bd2183869" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Hosting.Tests/bin/Debug/net8.0/FLua.Hosting.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Hosting.Tests.TrustLevelSecurityTests" name="CreateEnvironment_UntrustedLevel_MinimalFunctionsOnly" />
+    </UnitTest>
+    <UnitTest name="CreateEnvironment_RestrictedLevel_CannotAccessDebugLibrary" storage="/users/bill/repos/flua/flua.hosting.tests/bin/debug/net8.0/flua.hosting.tests.dll" id="1ba5374c-5db1-6ca8-e09b-8859edf71d84">
+      <Execution id="25648d63-fcba-4010-a6d6-af7270c05185" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Hosting.Tests/bin/Debug/net8.0/FLua.Hosting.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Hosting.Tests.TrustLevelSecurityTests" name="CreateEnvironment_RestrictedLevel_CannotAccessDebugLibrary" />
+    </UnitTest>
+  </TestDefinitions>
+  <TestEntries>
+    <TestEntry testId="c36280af-d7fe-eec5-f116-3b1ad609bbbc" executionId="5777367d-ecf7-43f8-bba6-d63dc3902256" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="768f7953-0575-941c-e65f-2f3772ef2c8c" executionId="bfd0f10e-8a3d-43b9-8bc6-9bfb9c1258f6" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="255bd218-2c51-440a-52fe-25f9213af985" executionId="35495556-4612-444e-8879-7b87117d8f3f" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="5577d03e-e950-03de-56c5-905857228a6b" executionId="64acd7f4-abb0-45a4-8664-549764efd756" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="f4eede23-f9fd-0edb-445e-cbb2f4a67052" executionId="837e572b-f720-46f8-8a43-c990dbe172df" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="97f8cd9d-afb7-28d6-a7d6-82b132b2c013" executionId="d56562d3-289a-4e6c-a364-5d5514cefa28" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="8735133a-043c-bc32-2328-95d44b8b2518" executionId="73084958-df9b-49e4-a25c-f5bf1c8de6f2" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="5834f25c-48e3-b126-e238-2ea60972e52d" executionId="ee7ec7b1-6f25-4563-b1c5-16f88f9b4d49" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="a697d127-617c-0aba-9c94-7d03608c12ae" executionId="3ecf1a47-ed9c-4008-9f1b-54d0dee2bf8d" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="7a106f3e-5aee-5f77-09f7-064ca3f6ef3f" executionId="fe38c50b-42b5-4039-9559-f307c6a9cd27" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="9bd8c8fe-c58a-906b-e18c-614fe5de1a3d" executionId="6d4e2d52-d779-4965-993b-ae70091e006e" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="06b02bd5-2973-b411-0284-c1994a47f07f" executionId="f05f87b5-833b-4856-b975-a80088efad15" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="df02a017-b650-63dd-4edf-d8be76bf1d81" executionId="6157341e-d730-42be-9bb0-1c34d7c5ee7c" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="0ed08b61-6124-e5b6-65ec-82344e210eae" executionId="f90d8f5c-f422-498a-aa25-753368db7f90" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="bf9ef259-1b28-3922-0b6c-b0470646c5d4" executionId="b8cce58a-bcae-4d5c-9ead-6336a03f451a" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1ba5374c-5db1-6ca8-e09b-8859edf71d84" executionId="25648d63-fcba-4010-a6d6-af7270c05185" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="67cd635e-6a71-fb03-75c2-e8aa1f543906" executionId="b3462bc2-6442-45d0-90c6-c68e7dab6415" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="bd2ae68e-84b1-b260-4e73-e3c9f76a349d" executionId="f31fdf7c-b767-4184-a55b-0e5239791ac3" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="b7008846-817f-22d0-0a6e-ab5d9675c9b0" executionId="d296bb8f-3f1e-42b0-aae7-6b447b09132a" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="0aac1178-2ff9-a4e6-fe64-fe20321c6b0b" executionId="05605e4e-ba33-4ce2-84e2-5e24a2c5a4ea" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="ebb5e080-5a3b-709a-925f-f52d50f6a2cc" executionId="4aef3365-af22-4e67-8d9a-c945eb171ce5" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="4ecbf54f-d06d-7e67-3f12-c373de2c1e8e" executionId="dbcb0242-ed70-46b5-93bd-16a5f27c1a9a" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="399322ed-8341-dd58-28d9-4ce8c5dadc3a" executionId="82c386a0-f088-498a-b3ad-e6667057af3e" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="859b4c7f-df44-6ff9-ecf9-8a3c1714a301" executionId="dad3e003-99cd-4921-8ad9-cadc1f82359b" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="2998b0d6-2ecf-aead-fc90-6be329f1cd41" executionId="75c546f8-3c5e-4e82-95e6-40b639373d6c" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="f2a20d40-089b-b493-ced4-6e2431988e39" executionId="17afaddb-646f-4cba-befa-ce0ab5227e35" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="a42981ac-bb30-8688-5740-fe66c7242e7b" executionId="77d49b93-5977-44b4-adc5-446b45b43bda" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="3b40f0cd-dfbf-6229-6d33-e09ad9e36295" executionId="bc88473f-2685-448d-b9a0-5bc49bba18db" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="433c1f90-0729-9caf-eb3a-efe2a02e9069" executionId="70e7584a-ecc4-4d4e-ad84-74b2421ac80a" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="56973521-ea14-3bd9-eab0-0df35dafced9" executionId="874616d4-cb48-4511-8b54-69df4caa9303" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="281e160e-81f7-8dbe-517c-e9665940a73b" executionId="2b253ba9-33b0-4507-ad10-946f746b0ff1" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="dbfc50fa-8e7a-d40d-3ff9-331cf9868f1e" executionId="0afb378c-e35f-4475-8c84-41ab194cd767" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="9e62b864-9438-89e1-76ba-d710356a0d06" executionId="b31bc9fd-b637-4200-9beb-ff3bd2183869" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="ee599aed-6bfd-453c-74e1-d81d8b78981e" executionId="538baff1-f49c-4c8c-9786-563f1be1d1e4" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="7d4b95e4-46a7-5bed-1440-dce161997dde" executionId="b9a303f4-55de-4c8b-8e2b-a3897e9b7d7e" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="a093420f-cc96-62ba-f2e6-0a732cb51e21" executionId="924a6767-d760-40b4-be1b-5f22b4abb6f4" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="56a0fbb4-6ac1-e41b-ae0f-306fc184529f" executionId="44f8eeb6-3987-43a9-bfa3-47b548ec294d" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="4b2eae64-a09b-19a3-0248-923179e14593" executionId="21b50237-2ce1-4dd6-92a7-cf45b9661730" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="e39bfef0-812d-928f-a1d5-d594f8d96fc1" executionId="c33c66cd-449f-4e22-87cd-eeb38f804206" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="b517e6d0-d3f9-bceb-5ff2-1ba28a74d05b" executionId="768aa84f-3518-477f-877c-ad59e91498f9" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1a2b6914-fea5-fe47-8f87-e3bcdc223f26" executionId="1400fabc-900e-4047-9cf7-d738264fb109" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="a2542ed1-9fc9-d50e-3426-33d0114b0751" executionId="8d992cec-b4d0-4a1c-91d9-1556e0f6425a" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="10236504-2a67-fe74-a4f9-88b00270520f" executionId="1e507ff7-3ebe-4243-8af0-1cc5ddbe6be8" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="0e7f4dc5-6dd9-a985-44d6-2dbf1ad70202" executionId="3f64a34f-a126-4531-af03-ace109436ef0" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="3a3da1ad-1bc9-ea8e-7ab2-044cdf412979" executionId="d6ce90d3-2e5c-426f-bc2c-452791a67f82" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="b5e9da62-e23c-1860-bfcb-a743a698fc85" executionId="a756742b-0aac-4c82-bfab-939603ddb1e1" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="380a8bc3-5783-ca0a-a2d9-7fa574fa81d6" executionId="3c07ef46-17e1-48ce-b480-b29207030748" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="409facdd-c606-5f88-5ea8-65c14816134e" executionId="57e9cff1-fc07-40ec-9c17-2530cc93872f" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="01e8e958-1925-8e5b-3890-6ddbfae023a0" executionId="4912052e-cc59-46c9-bdc2-e261c81bcd01" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="86436ca2-5c24-130c-e1ee-32f0375f06ff" executionId="65eacd0a-bb3b-4ff1-8eaa-ca2a68bec10f" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="a7e601de-f0f7-e427-15c9-2176b991a38b" executionId="7a8aafac-e210-4a0a-8e17-f79f816f143a" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="b53c146c-5aa3-02e0-0769-75560a6d8075" executionId="1e9e65b1-af1e-45f6-900e-2832b5dbb160" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="76e63985-ea05-726c-e6b3-42affd0f43a9" executionId="76e41263-0b10-4e08-8e74-4dc0ee81c794" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="c981e812-0c2c-d15c-fd5c-729e8e48daee" executionId="fdcd9d64-6f51-488f-a2b8-8c8c954b949d" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="b793adab-f79f-3d90-ee70-de87088d884b" executionId="42223075-4aa8-44f0-9202-527f22d8da59" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="02b89d5c-1c84-fd2c-2f25-d935196ed474" executionId="e001deb5-125c-4da8-b750-05a29f9350ae" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="0528b300-b5a3-147c-59ba-9d3f39034eb7" executionId="9c5ed665-c2be-4152-9759-186d96a3ab3d" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="962c8546-f7a0-c4d1-5b62-b42a71287bd2" executionId="88162eec-4a58-4182-8557-c68f80c93459" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="08fb7057-f9d2-d080-0117-1e0c23ed3e12" executionId="f6ddf6f4-c660-4852-9aad-6e059a46c7e1" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="d7bfff46-8a7f-c380-dd26-996ddb9e0e41" executionId="687682ca-5ec6-438f-8731-147cb6fdb8fe" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="ef7a192a-548e-b065-9799-a674148e6e52" executionId="8b8f91b2-ec4a-4546-a9e6-36d8c09ffa23" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="47495992-3558-171a-3622-70f7f507b6b7" executionId="8bcc9f6a-c6b1-4f90-85d7-7b41c6d16414" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="e8742ac7-4bda-350a-dc56-9a5599366332" executionId="f06e842d-98c3-46b1-9436-ec9b5c933a47" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="d849481c-1dfe-ba4e-8a30-21b6ba0cbbbb" executionId="2fe956e8-cc05-4934-ad9a-6f5fb607100f" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="3f755e33-8e88-78a4-f6b6-e882617259c7" executionId="8adae6c6-36cd-4850-ae4a-713001d9e5d4" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="7499cc5c-72e5-561a-c389-03d76c343bd0" executionId="45e9fea9-b9fb-4521-8fb4-ba6f096e9f1b" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="229e5b11-e011-f6dd-2329-22d7fd593f77" executionId="aa467588-68c1-4be1-9de2-78689c9955ce" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="73520bf6-c134-d906-65a2-236d5a390f2f" executionId="54c560ae-0665-4f09-bf47-b53bd3794e51" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="deb9c0cc-6243-f4b1-d32a-867ffd8fc15b" executionId="1b7468b1-65a6-472f-b508-b2b4a6431f7e" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="f745ee35-fae7-acc5-38f7-e017a26a9c2a" executionId="49d78512-0cfb-4ba3-a508-76d52db24383" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="9225c991-7138-21a1-7df4-09d05c0c771f" executionId="599e83ac-9e2a-4799-be4f-f7116802682e" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="8baa443d-aac8-ef88-e63a-c4043636e451" executionId="d8d7cf5c-c506-423c-9ae3-4a1ed2d6d3b2" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="412d308c-a31a-e44b-8022-65bc77fb456a" executionId="ebe2a9ea-a0b7-437f-9c25-4601512eb0df" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="011a2147-45ba-a783-0d26-5c0548d48778" executionId="b287a9ec-3e79-4143-97f7-29103fb2b663" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="7f9ceca5-31ed-9c58-a6f6-5d13a446e3ec" executionId="a6c7366c-df5c-4f91-a899-b498d16a79d7" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="4a48ca06-550f-c348-922e-acfbbdc73cdf" executionId="bedfde7f-a9c6-4dea-bf0d-d6e1d5e2655e" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="a42902df-5410-8ffc-f12c-2939c59a375b" executionId="85e127ee-fbb0-4364-a26c-fbf781b90d23" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="64534738-ca2c-a976-0ea7-534540aebd88" executionId="ea537c71-6316-49e1-9dba-6ffc2c5f3e5b" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="885a9ffa-1643-d0af-14ce-6fcf41c16691" executionId="b78452f8-2055-4024-920a-681779ab3889" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="9e844a28-dc32-5562-5390-502686bdb22b" executionId="fc2b96e8-f90a-45db-93cf-aae96a8dea22" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="71f387b7-8a02-1301-66ef-0eed4f54453f" executionId="23515ff6-3973-432a-ae9e-e1129ba93597" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="3a17432e-f071-763d-e219-8c17d5ba5ec5" executionId="f0a2c49e-656d-4f61-a008-0c3815270003" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="4d23e8f8-e2dd-112f-a705-5865bc3f874f" executionId="8758c613-d25c-442d-8814-5e9146e3e28f" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="849423f5-591e-7deb-2909-d2d170ab18f9" executionId="cc5b4b8a-0e58-4792-974f-7fb115a7e7ff" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="60d5f55d-275a-ef8c-4cfd-04507138caf0" executionId="dfbc6bb5-bf8b-4153-9e62-46b59fb5f2bf" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="22b59976-04f3-a056-1b21-c3367766a116" executionId="edd49c94-9187-48a8-8ad7-dd0f3a18dfb6" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="3f732c5c-0702-d139-8a69-4c87b21877a3" executionId="0f08baec-1bc7-4526-9750-303380d43a34" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="50f216d0-1c9f-b9db-f739-b7b81d59d2c1" executionId="dc8810aa-438d-4c61-aa04-8ed236e69dd8" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="eb5361b3-05c2-84f1-bb14-6618de4a1c97" executionId="ac07fced-2efe-41e4-9cde-0d79527cf084" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="50384e8d-36ba-0e51-2bb0-ad1f92a373b1" executionId="4598464a-331c-426d-877a-37a5c8130d3d" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="a680da2b-809a-8245-20f2-29f685499ac0" executionId="6681aa91-be5b-4e16-b72c-61f319e1a651" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="f1819b85-ff8a-8993-1daa-b31a4ae452d2" executionId="f5583183-96f8-4aba-ba3c-6c30436cfae0" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="79e6fc5c-a9bc-1760-071d-9dcfb7fc41f6" executionId="301ab504-5edb-4cb7-8ca1-ce162ed4d892" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="aa18db62-bf06-0fcf-532b-8c12531ac837" executionId="85dc411e-c959-40ea-b95b-249ad2ccc023" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="5e33cdfe-2c89-0ec6-5b25-379a845162d1" executionId="a5d3acbe-6d8c-4dc7-a515-a8e26e205bfb" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="c24b363c-fd25-36f3-2c43-81e4b82ff93e" executionId="5e221247-c9dc-4e6b-98bc-9678c1c0e009" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="996419f6-2b87-20f2-92ac-2fb8de90e21d" executionId="4050fd40-e2d6-4e8e-aea9-3b9903b2cef5" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="6978b3c2-004b-dc18-27cf-34561b134623" executionId="935615e9-1cfe-445a-904a-187c5f1bca33" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="70a7a985-19e5-7a9b-0d4d-1e9353b56cb6" executionId="f06d8d7d-1e16-4f15-8757-8c06566209b2" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="f99403db-748f-b989-55c1-a81bee0ed6db" executionId="9e4d8314-7684-4d34-afae-dd4fa2b425bd" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="c6267507-bced-30f6-ff9d-0ca6add282a2" executionId="8330e4b4-b63d-4db7-adc2-f4e6826e77af" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="46bc9909-52d1-f84f-fe0b-c988b927942a" executionId="6c998bf4-ca51-453e-a8f6-19fcb65b3d40" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="b63305d1-fa03-7c01-d6a0-d6170ab42183" executionId="ca2bdfe3-741b-432a-bb61-f70388865f95" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="dc715ec0-f97d-86dd-7c4d-da072edde900" executionId="ccb2f1bf-0e55-414e-b864-d8e65bccd564" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="4c16b500-6dce-a141-f677-2f61fb603b3e" executionId="b15ac48c-3fba-4a91-90e6-9efd9078cff6" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="75294cbb-6f12-f8df-a470-615417042501" executionId="338e4dff-04ee-4e54-be3d-05286149dfe8" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="4f8a75b3-10d3-2ede-9f87-2988531e4a81" executionId="6d8eaf32-0f1d-41f7-9acd-85787dcc09bc" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="187090d6-720d-08f9-7910-709e789e60fa" executionId="1b974144-d641-4bec-a4a4-43677931ec6f" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="e56899c1-e09f-76f6-3864-a0a8e9fcce7b" executionId="ca8c2e23-9ac1-4a9b-9135-83e598b4b7d9" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="b06682bc-6f2a-75a3-6173-90be35784348" executionId="f071ab19-c4a7-4c9b-9065-8a8771e997b9" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+  </TestEntries>
+  <TestLists>
+    <TestList name="Results Not in a List" id="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestList name="All Loaded Results" id="19431567-8539-422a-85d7-44ee4e166bda" />
+  </TestLists>
+  <ResultSummary outcome="Failed">
+    <Counters total="110" executed="106" passed="95" failed="11" error="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
+    <Output>
+      <StdOut>Test 'CompileToExpression_ComplexCalculation_EvaluatesCorrectly' was skipped in the test run.
+Test 'Host_ExecuteAsync_SupportsCancellation' was skipped in the test run.
+Test 'Host_ExecutionTimeout_EnforcedCorrectly' was skipped in the test run.
+Test 'Host_MemoryLimit_EnforcedCorrectly' was skipped in the test run.
+</StdOut>
+    </Output>
+  </ResultSummary>
+</TestRun>

@@ -1,0 +1,806 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TestRun id="554bf18e-566c-4827-ad1b-d243edad3d90" name="@dadsmbp 2025-08-22 08:18:23" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+  <Times creation="2025-08-22T08:18:23.9089910-04:00" queuing="2025-08-22T08:18:23.9089910-04:00" start="2025-08-22T08:18:23.6087940-04:00" finish="2025-08-22T08:18:23.9449950-04:00" />
+  <TestSettings name="default" id="e2539fe7-13d5-4222-b8f9-60c8ca9994a1">
+    <Deployment runDeploymentRoot="_dadsmbp_2025-08-22_08_18_23" />
+  </TestSettings>
+  <Results>
+    <UnitTestResult executionId="409dca22-a49a-4043-b1a0-b424659f4f40" testId="2dc6f229-d372-7044-88ff-fedcb4d98019" testName="StringReverse_SingleCharacter_ShouldReturnSameCharacter" computerName="dadsmbp" duration="00:00:00.0000705" startTime="2025-08-22T08:18:23.8962360-04:00" endTime="2025-08-22T08:18:23.8963230-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="409dca22-a49a-4043-b1a0-b424659f4f40" />
+    <UnitTestResult executionId="d741d781-afbd-4bc9-ae49-fb1637fb2304" testId="6bc27b3d-7609-d58b-b156-3fff4e4456bf" testName="TableRemove_LastElement_ShouldRemoveAndReturn" computerName="dadsmbp" duration="00:00:00.0003235" startTime="2025-08-22T08:18:23.9078770-04:00" endTime="2025-08-22T08:18:23.9082210-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="d741d781-afbd-4bc9-ae49-fb1637fb2304" />
+    <UnitTestResult executionId="1357365a-5ad8-400f-9a27-a94a72836c8f" testId="eb3531da-5b80-6ac2-748b-0f7f81f9d611" testName="LuaRuntimeException_MessageProperty_ShouldStoreMessage" computerName="dadsmbp" duration="00:00:00.0000260" startTime="2025-08-22T08:18:23.8887180-04:00" endTime="2025-08-22T08:18:23.8887620-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="1357365a-5ad8-400f-9a27-a94a72836c8f" />
+    <UnitTestResult executionId="1232f19b-53e6-46bb-8a58-35ec539c3dc8" testId="ba07ddbe-541e-d177-c381-fb4de2772b36" testName="TableRemove_EmptyTable_ShouldReturnNil" computerName="dadsmbp" duration="00:00:00.0000776" startTime="2025-08-22T08:18:23.9084540-04:00" endTime="2025-08-22T08:18:23.9085490-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="1232f19b-53e6-46bb-8a58-35ec539c3dc8" />
+    <UnitTestResult executionId="af1c532e-5cc4-42aa-b494-cbf92aef5da0" testId="2e8debc2-1301-c7b3-e67a-745d1c688b80" testName="MathMaxInteger_ShouldBeLongMaxValue" computerName="dadsmbp" duration="00:00:00.0001474" startTime="2025-08-22T08:18:23.8625880-04:00" endTime="2025-08-22T08:18:23.8627870-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="af1c532e-5cc4-42aa-b494-cbf92aef5da0" />
+    <UnitTestResult executionId="9f4d07fe-7d91-40ff-96b4-7f06466fe38d" testId="2e48a0c4-385c-de34-3908-a16504f1c59c" testName="MathPow_AnyNumberToZero_ShouldReturnOne" computerName="dadsmbp" duration="00:00:00.0000868" startTime="2025-08-22T08:18:23.8847930-04:00" endTime="2025-08-22T08:18:23.8849030-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="9f4d07fe-7d91-40ff-96b4-7f06466fe38d" />
+    <UnitTestResult executionId="6d7fd023-722d-4b48-ad84-ecbdae800e1a" testId="1974c8a7-98a3-e803-8a78-09a2c5239cfb" testName="MathExp_Zero_ShouldReturnOne" computerName="dadsmbp" duration="00:00:00.0001357" startTime="2025-08-22T08:18:23.8834700-04:00" endTime="2025-08-22T08:18:23.8836270-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="6d7fd023-722d-4b48-ad84-ecbdae800e1a" />
+    <UnitTestResult executionId="86ea33e6-012d-480e-bd90-cffd700bfbb5" testId="b5a43c8e-8970-ccab-5808-6f35f27ce821" testName="MathRandomSeed_SameSeed_ShouldProduceSameSequence" computerName="dadsmbp" duration="00:00:00.0002871" startTime="2025-08-22T08:18:23.8870760-04:00" endTime="2025-08-22T08:18:23.8873930-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="86ea33e6-012d-480e-bd90-cffd700bfbb5" />
+    <UnitTestResult executionId="bb0502f1-905d-47e4-bd16-2311a360e2ab" testId="f6e45950-1179-cbeb-37b1-3e30087606ef" testName="FromObject_Null_ShouldReturnNil" computerName="dadsmbp" duration="00:00:00.0003053" startTime="2025-08-22T08:18:23.9141630-04:00" endTime="2025-08-22T08:18:23.9144870-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="bb0502f1-905d-47e4-bd16-2311a360e2ab" />
+    <UnitTestResult executionId="d4db0e50-fa7c-4671-9a4a-93f373593ca0" testId="cf1e46f4-da14-d056-26c6-814ac908354d" testName="StringLen_LongString_ShouldReturnCorrectLength" computerName="dadsmbp" duration="00:00:00.0000924" startTime="2025-08-22T08:18:23.8937810-04:00" endTime="2025-08-22T08:18:23.8939030-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="d4db0e50-fa7c-4671-9a4a-93f373593ca0" />
+    <UnitTestResult executionId="67fc4072-8517-4a21-aa78-a4e26dd66a2c" testId="3b1d5a46-1f73-1bbc-8562-7f53faa0bbab" testName="LuaTable_NewTable_ShouldBeEmpty" computerName="dadsmbp" duration="00:00:00.0001377" startTime="2025-08-22T08:18:23.9057010-04:00" endTime="2025-08-22T08:18:23.9059300-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="67fc4072-8517-4a21-aa78-a4e26dd66a2c" />
+    <UnitTestResult executionId="e3ccdf78-0e8c-47a2-b76c-2553fe4f5493" testId="c7410bc4-a8c8-3d24-2477-beefc474c4ff" testName="IsValueTruthy_Integer_ShouldReturnTrue" computerName="dadsmbp" duration="00:00:00.0000484" startTime="2025-08-22T08:18:23.9157450-04:00" endTime="2025-08-22T08:18:23.9158110-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="e3ccdf78-0e8c-47a2-b76c-2553fe4f5493" />
+    <UnitTestResult executionId="78e2a0da-6621-471c-89c6-6d38e1c2abcc" testId="63c99c0d-58f6-0fbc-6054-e3bc3141b24d" testName="StringLower_EmptyString_ShouldReturnEmptyString" computerName="dadsmbp" duration="00:00:00.0000777" startTime="2025-08-22T08:18:23.8957950-04:00" endTime="2025-08-22T08:18:23.8958960-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="78e2a0da-6621-471c-89c6-6d38e1c2abcc" />
+    <UnitTestResult executionId="763aca41-9155-45b3-8aac-1e62846d37b3" testId="59e8433c-fa31-02c3-9a44-25332417b295" testName="LuaTable_StringKey_ShouldStoreCorrectly" computerName="dadsmbp" duration="00:00:00.0000618" startTime="2025-08-22T08:18:23.9061150-04:00" endTime="2025-08-22T08:18:23.9061950-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="763aca41-9155-45b3-8aac-1e62846d37b3" />
+    <UnitTestResult executionId="af7361b9-b4c9-492d-bb1e-d37f3f691458" testId="5a309692-c730-5896-5fec-f394cd0b5d5d" testName="MathSin_Zero_ShouldReturnZero" computerName="dadsmbp" duration="00:00:00.0001358" startTime="2025-08-22T08:18:23.8813200-04:00" endTime="2025-08-22T08:18:23.8814750-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="af7361b9-b4c9-492d-bb1e-d37f3f691458" />
+    <UnitTestResult executionId="6837a4d3-20a0-4d1b-bcc4-9463355e177b" testId="ca2e7646-1b80-c529-10e3-6cedcfbd596f" testName="StringChar_SingleCode_ShouldReturnCharacter" computerName="dadsmbp" duration="00:00:00.0002061" startTime="2025-08-22T08:18:23.8975130-04:00" endTime="2025-08-22T08:18:23.8977430-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="6837a4d3-20a0-4d1b-bcc4-9463355e177b" />
+    <UnitTestResult executionId="31511f08-8375-492d-ab1e-cc6f16066238" testId="3523a27b-a699-46a0-e3f4-865722483c74" testName="MathFloor_NegativeDecimal_ShouldRoundDown" computerName="dadsmbp" duration="00:00:00.0000917" startTime="2025-08-22T08:18:23.8808960-04:00" endTime="2025-08-22T08:18:23.8810110-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="31511f08-8375-492d-ab1e-cc6f16066238" />
+    <UnitTestResult executionId="1af427c0-bfe7-4408-9e30-3eded305d336" testId="ed5bf168-a534-ed0d-28f7-4f4622383f90" testName="LuaBoolean_TrueValue_ShouldBeTruthy" computerName="dadsmbp" duration="00:00:00.0000487" startTime="2025-08-22T08:18:23.9126790-04:00" endTime="2025-08-22T08:18:23.9127480-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="1af427c0-bfe7-4408-9e30-3eded305d336" />
+    <UnitTestResult executionId="92cd9ec4-d4f7-486f-9ca3-71af4e2c926c" testId="016724cf-ff3a-7b18-41c0-220348d67f77" testName="StringReverse_EmptyString_ShouldReturnEmptyString" computerName="dadsmbp" duration="00:00:00.0000818" startTime="2025-08-22T08:18:23.8963300-04:00" endTime="2025-08-22T08:18:23.8964280-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="92cd9ec4-d4f7-486f-9ca3-71af4e2c926c" />
+    <UnitTestResult executionId="2fb1457a-6046-4f85-9b03-818d9c7ff035" testId="b27e435c-9699-31c3-d68f-00ef96bca045" testName="MathDeg_Pi_ShouldReturn180" computerName="dadsmbp" duration="00:00:00.0001432" startTime="2025-08-22T08:18:23.8831240-04:00" endTime="2025-08-22T08:18:23.8832900-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="2fb1457a-6046-4f85-9b03-818d9c7ff035" />
+    <UnitTestResult executionId="f7e53360-f7a3-4be6-a724-0f274e44588b" testId="3cf43540-a72a-2f20-e075-9da6a899c39c" testName="MathHuge_ShouldBePositiveInfinity" computerName="dadsmbp" duration="00:00:00.0011015" startTime="2025-08-22T08:18:23.8609210-04:00" endTime="2025-08-22T08:18:23.8620790-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="f7e53360-f7a3-4be6-a724-0f274e44588b" />
+    <UnitTestResult executionId="4c743e8e-a5e8-47f2-8da9-0c1f74488ad4" testId="4cd663fc-0e79-c759-c440-657cd580b06f" testName="StringLen_NumberInput_ShouldReturnStringLength" computerName="dadsmbp" duration="00:00:00.0003207" startTime="2025-08-22T08:18:23.8939150-04:00" endTime="2025-08-22T08:18:23.8942580-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="4c743e8e-a5e8-47f2-8da9-0c1f74488ad4" />
+    <UnitTestResult executionId="b578781a-f9b2-4d50-9014-3e6933339725" testId="9428cdc8-3fc0-5040-944e-19ca2a3ed0c6" testName="MathSin_PiOverTwo_ShouldReturnOne" computerName="dadsmbp" duration="00:00:00.0001435" startTime="2025-08-22T08:18:23.8824120-04:00" endTime="2025-08-22T08:18:23.8826480-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="b578781a-f9b2-4d50-9014-3e6933339725" />
+    <UnitTestResult executionId="820f755c-c049-4f2a-81fe-ae70b3782ae9" testId="7301f02a-4dc7-8dc7-1f6d-9aa851e3c6a2" testName="MathAbs_PositiveNumber_ShouldReturnSameValue" computerName="dadsmbp" duration="00:00:00.0004051" startTime="2025-08-22T08:18:23.8628260-04:00" endTime="2025-08-22T08:18:23.8632860-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="820f755c-c049-4f2a-81fe-ae70b3782ae9" />
+    <UnitTestResult executionId="9e3ba97e-9500-4e54-a46d-ce5754279c2c" testId="b22a4a57-1deb-d974-df69-cbe533b6b400" testName="TableInsert_AtPosition_ShouldInsertCorrectly" computerName="dadsmbp" duration="00:00:00.0004078" startTime="2025-08-22T08:18:23.9072220-04:00" endTime="2025-08-22T08:18:23.9076520-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="9e3ba97e-9500-4e54-a46d-ce5754279c2c" />
+    <UnitTestResult executionId="b03432d3-c23e-48e4-af6b-2c94f3aee006" testId="a8e9dda0-73b1-26d3-83d9-9bb3827af4a0" testName="StringSub_NegativeIndices_ShouldReturnCorrectSubstring" computerName="dadsmbp" duration="00:00:00.0001038" startTime="2025-08-22T08:18:23.8946940-04:00" endTime="2025-08-22T08:18:23.8948180-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="b03432d3-c23e-48e4-af6b-2c94f3aee006" />
+    <UnitTestResult executionId="65f21e49-fd84-47c8-adea-5bf7bf00ab6c" testId="9c597b82-8afc-f7d6-2d23-5d7af92c9181" testName="TestCoroutineYieldPattern" computerName="dadsmbp" duration="00:00:00.0093551" startTime="2025-08-22T08:18:23.8428430-04:00" endTime="2025-08-22T08:18:23.8575650-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="65f21e49-fd84-47c8-adea-5bf7bf00ab6c" />
+    <UnitTestResult executionId="d14fa904-5199-43cf-9036-f9c6c77085f2" testId="5d1a374a-f2eb-eafa-737e-d0c4874d2ce7" testName="StringRep_LargeCount_ShouldHandleCorrectly" computerName="dadsmbp" duration="00:00:00.0002017" startTime="2025-08-22T08:18:23.8969270-04:00" endTime="2025-08-22T08:18:23.8971450-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="d14fa904-5199-43cf-9036-f9c6c77085f2" />
+    <UnitTestResult executionId="292d99a7-b3df-42d0-a677-a8161cae66a2" testId="42fd50f5-818d-6851-86b9-842c5b923988" testName="MathCeil_NegativeDecimal_ShouldRoundUp" computerName="dadsmbp" duration="00:00:00.0000791" startTime="2025-08-22T08:18:23.8812140-04:00" endTime="2025-08-22T08:18:23.8813130-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="292d99a7-b3df-42d0-a677-a8161cae66a2" />
+    <UnitTestResult executionId="23a70f51-c809-4a90-8d99-9721c5810be8" testId="b75ca15c-7313-05b8-454f-f4fb35a59048" testName="StringByte_MultipleCharacters_ShouldReturnMultipleCodes" computerName="dadsmbp" duration="00:00:00.0001623" startTime="2025-08-22T08:18:23.8982910-04:00" endTime="2025-08-22T08:18:23.8985160-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="23a70f51-c809-4a90-8d99-9721c5810be8" />
+    <UnitTestResult executionId="b2a608ab-f473-4ed8-ae33-bf15151a4f78" testId="3b1cd047-c229-82c7-44fa-2b2f45a5f566" testName="IsValueTruthy_Nil_ShouldReturnFalse" computerName="dadsmbp" duration="00:00:00.0000531" startTime="2025-08-22T08:18:23.9155210-04:00" endTime="2025-08-22T08:18:23.9156100-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="b2a608ab-f473-4ed8-ae33-bf15151a4f78" />
+    <UnitTestResult executionId="6b321743-ad9e-4169-bd9e-09b9ddbb440f" testId="a1134371-e672-5484-c1de-31798068ccce" testName="TestCoroutineStatusTransitions" computerName="dadsmbp" duration="00:00:00.0004171" startTime="2025-08-22T08:18:23.8597170-04:00" endTime="2025-08-22T08:18:23.8603240-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="6b321743-ad9e-4169-bd9e-09b9ddbb440f" />
+    <UnitTestResult executionId="5ffac340-4921-45bf-8036-50c2028a02f3" testId="69ebf2f0-946b-5178-e1dd-a773c05cb781" testName="MathAbs_Zero_ShouldReturnZero" computerName="dadsmbp" duration="00:00:00.0002847" startTime="2025-08-22T08:18:23.8635120-04:00" endTime="2025-08-22T08:18:23.8638390-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="5ffac340-4921-45bf-8036-50c2028a02f3" />
+    <UnitTestResult executionId="260ef02c-0bff-4134-a83e-b514b1fe0998" testId="d44a8b90-cc67-18e3-0319-2edcc8c51e34" testName="StringUpper_WithNumbers_ShouldKeepNumbersUnchanged" computerName="dadsmbp" duration="00:00:00.0000710" startTime="2025-08-22T08:18:23.8953310-04:00" endTime="2025-08-22T08:18:23.8954180-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="260ef02c-0bff-4134-a83e-b514b1fe0998" />
+    <UnitTestResult executionId="7a823943-2317-4dd8-9299-43ba0dabfc52" testId="7f0fa864-2ea2-18d3-30a0-7aae0a604600" testName="LuaNumber_NaN_ShouldHandleCorrectly" computerName="dadsmbp" duration="00:00:00.0000493" startTime="2025-08-22T08:18:23.9140250-04:00" endTime="2025-08-22T08:18:23.9140920-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="7a823943-2317-4dd8-9299-43ba0dabfc52" />
+    <UnitTestResult executionId="4fa650fa-c0d4-47bd-90f5-d4afe9add13f" testId="0dec1832-226a-9285-f8a3-b62cbc426ef7" testName="ThrowLuaRuntimeException_ShouldBeCatchable" computerName="dadsmbp" duration="00:00:00.0003924" startTime="2025-08-22T08:18:23.8887700-04:00" endTime="2025-08-22T08:18:23.8892050-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="4fa650fa-c0d4-47bd-90f5-d4afe9add13f" />
+    <UnitTestResult executionId="1064fc0c-9c08-496c-a3d8-8c522059e907" testId="bedb6522-f7cf-6504-4d1b-987167c88cd4" testName="MathMin_TwoArguments_ShouldReturnSmaller" computerName="dadsmbp" duration="00:00:00.0002241" startTime="2025-08-22T08:18:23.8800410-04:00" endTime="2025-08-22T08:18:23.8802970-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="1064fc0c-9c08-496c-a3d8-8c522059e907" />
+    <UnitTestResult executionId="786ade7f-729e-4d4d-836b-5a058c0b89aa" testId="60341286-ebb9-fc46-49e3-4a8cab0e2e00" testName="StringLib_InvalidArgument_ShouldThrowLuaRuntimeException" computerName="dadsmbp" duration="00:00:00.0001920" startTime="2025-08-22T08:18:23.8892150-04:00" endTime="2025-08-22T08:18:23.8894340-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="786ade7f-729e-4d4d-836b-5a058c0b89aa" />
+    <UnitTestResult executionId="b87e4f13-76de-463d-b356-8d2c26744249" testId="a28d44a3-4d54-06a7-0116-b16cc7b2a249" testName="MathFloor_PositiveDecimal_ShouldRoundDown" computerName="dadsmbp" duration="00:00:00.0001927" startTime="2025-08-22T08:18:23.8806730-04:00" endTime="2025-08-22T08:18:23.8808860-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="b87e4f13-76de-463d-b356-8d2c26744249" />
+    <UnitTestResult executionId="477ae5be-656c-4e03-96b1-3657785fc469" testId="5ab7e53d-1b1e-f284-da9d-ecf8bcf0931a" testName="FromObject_Double_ShouldReturnLuaNumber" computerName="dadsmbp" duration="00:00:00.0000322" startTime="2025-08-22T08:18:23.9146770-04:00" endTime="2025-08-22T08:18:23.9147250-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="477ae5be-656c-4e03-96b1-3657785fc469" />
+    <UnitTestResult executionId="50172aa0-0f4d-430d-b584-43eda98e7b59" testId="12b23b8c-3355-3c7e-a505-6dc45671db21" testName="MathCeil_PositiveDecimal_ShouldRoundUp" computerName="dadsmbp" duration="00:00:00.0001695" startTime="2025-08-22T08:18:23.8810190-04:00" endTime="2025-08-22T08:18:23.8812060-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="50172aa0-0f4d-430d-b584-43eda98e7b59" />
+    <UnitTestResult executionId="55e8c77c-d0a2-4c73-860e-a93b58380152" testId="5fdd3722-21fa-5c2e-7b6b-68abefe0ae62" testName="StringFormat_MultipleSpecifiers_ShouldFormatCorrectly" computerName="dadsmbp" duration="00:00:00.0001893" startTime="2025-08-22T08:18:23.9037020-04:00" endTime="2025-08-22T08:18:23.9039240-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="55e8c77c-d0a2-4c73-860e-a93b58380152" />
+    <UnitTestResult executionId="b4fe862c-b55d-407e-a8e3-234a9cb4fa65" testId="b56740e1-1693-0b10-babe-b809629c19af" testName="StringRep_ZeroCount_ShouldReturnEmptyString" computerName="dadsmbp" duration="00:00:00.0000787" startTime="2025-08-22T08:18:23.8967230-04:00" endTime="2025-08-22T08:18:23.8968190-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="b4fe862c-b55d-407e-a8e3-234a9cb4fa65" />
+    <UnitTestResult executionId="c011f2ad-d0e8-497a-afe4-8dae998df2f5" testId="65c5d66a-b273-5bb3-3605-39ce886f15b4" testName="TableConcat_WithRange_ShouldConcatenateSubset" computerName="dadsmbp" duration="00:00:00.0001900" startTime="2025-08-22T08:18:23.9109400-04:00" endTime="2025-08-22T08:18:23.9111490-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="c011f2ad-d0e8-497a-afe4-8dae998df2f5" />
+    <UnitTestResult executionId="0df02135-4dbe-443e-ad39-183b6fcc6e38" testId="96e27d57-d3a2-01e7-7b5b-2519dccd8926" testName="MathRandom_WithUpperBound_ShouldReturnInRange" computerName="dadsmbp" duration="00:00:00.0004130" startTime="2025-08-22T08:18:23.8863550-04:00" endTime="2025-08-22T08:18:23.8868630-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="0df02135-4dbe-443e-ad39-183b6fcc6e38" />
+    <UnitTestResult executionId="6438adea-c904-4907-953f-8a211601e4cf" testId="3c1ede49-f254-eed4-afa7-8793d7bbadf5" testName="MathAbs_MaxInteger_ShouldHandleCorrectly" computerName="dadsmbp" duration="00:00:00.0001693" startTime="2025-08-22T08:18:23.8797100-04:00" endTime="2025-08-22T08:18:23.8799910-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="6438adea-c904-4907-953f-8a211601e4cf" />
+    <UnitTestResult executionId="6f37e8d7-27f0-4c57-83d1-8d2b7e7010f9" testId="b04b042e-c608-14d5-40cb-ccb56ffecb60" testName="MathMinInteger_ShouldBeLongMinValue" computerName="dadsmbp" duration="00:00:00.0003710" startTime="2025-08-22T08:18:23.8621270-04:00" endTime="2025-08-22T08:18:23.8625710-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="6f37e8d7-27f0-4c57-83d1-8d2b7e7010f9" />
+    <UnitTestResult executionId="f7df6179-d1d1-41b5-a010-3484a57bbcbd" testId="ade95837-ddb4-9ccc-6360-ef92356b3b28" testName="StringRep_PositiveCount_ShouldRepeatString" computerName="dadsmbp" duration="00:00:00.0002618" startTime="2025-08-22T08:18:23.8964350-04:00" endTime="2025-08-22T08:18:23.8967140-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="f7df6179-d1d1-41b5-a010-3484a57bbcbd" />
+    <UnitTestResult executionId="726f6b13-97bf-48af-a097-b2ecfff510dd" testId="7e24132e-f5f0-8f56-ff45-cbde824a656f" testName="StringFormat_FloatSpecifier_ShouldFormatCorrectly" computerName="dadsmbp" duration="00:00:00.0005546" startTime="2025-08-22T08:18:23.9024550-04:00" endTime="2025-08-22T08:18:23.9030580-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="726f6b13-97bf-48af-a097-b2ecfff510dd" />
+    <UnitTestResult executionId="3fd6cc1f-5401-4192-b73b-68ba9a78dbe0" testId="1a932349-fbde-ee16-657d-2693b0c5e42d" testName="FromObject_String_ShouldReturnLuaString" computerName="dadsmbp" duration="00:00:00.0000356" startTime="2025-08-22T08:18:23.9152070-04:00" endTime="2025-08-22T08:18:23.9152600-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="3fd6cc1f-5401-4192-b73b-68ba9a78dbe0" />
+    <UnitTestResult executionId="6c178746-a321-4f3d-81ab-7ef7dd6075cb" testId="742e227d-4a26-9d54-9c88-3d120a108ef2" testName="LuaTable_NonExistentKey_ShouldReturnNil" computerName="dadsmbp" duration="00:00:00.0000377" startTime="2025-08-22T08:18:23.9063300-04:00" endTime="2025-08-22T08:18:23.9063840-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="6c178746-a321-4f3d-81ab-7ef7dd6075cb" />
+    <UnitTestResult executionId="d5870429-e687-4c4a-9f9e-a389413ac102" testId="eb0191eb-c1e7-dc96-6b32-d3b6309defea" testName="FromObject_Int_ShouldReturnLuaInteger" computerName="dadsmbp" duration="00:00:00.0000403" startTime="2025-08-22T08:18:23.9145600-04:00" endTime="2025-08-22T08:18:23.9146150-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="d5870429-e687-4c4a-9f9e-a389413ac102" />
+    <UnitTestResult executionId="0e116234-9390-4cd6-a8f8-b6a0f6577bc9" testId="12cef88d-3e23-9a0c-ecda-a639ec8ecb68" testName="TestCoroutineResume" computerName="dadsmbp" duration="00:00:00.0007776" startTime="2025-08-22T08:18:23.9166230-04:00" endTime="2025-08-22T08:18:23.9174490-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="0e116234-9390-4cd6-a8f8-b6a0f6577bc9" />
+    <UnitTestResult executionId="35a4f767-70aa-4c28-8034-386902e6288c" testId="e2659f0e-296c-bea7-b861-cd100c36486d" testName="IsValueTruthy_TrueBoolean_ShouldReturnTrue" computerName="dadsmbp" duration="00:00:00.0000271" startTime="2025-08-22T08:18:23.9156910-04:00" endTime="2025-08-22T08:18:23.9157370-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="35a4f767-70aa-4c28-8034-386902e6288c" />
+    <UnitTestResult executionId="10f8c2e0-c70d-46ff-b356-1d48689cc730" testId="aeb36a03-ba7f-aaa2-24a8-84a09f2488be" testName="LuaNil_ToString_ShouldReturnNil" computerName="dadsmbp" duration="00:00:00.0000382" startTime="2025-08-22T08:18:23.9126040-04:00" endTime="2025-08-22T08:18:23.9126690-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="10f8c2e0-c70d-46ff-b356-1d48689cc730" />
+    <UnitTestResult executionId="91385274-bee6-4d5f-96f8-f8999ecc6c0f" testId="c791235f-5f91-3386-b42c-9204c9e27135" testName="TableSort_EmptyTable_ShouldNotFail" computerName="dadsmbp" duration="00:00:00.0000905" startTime="2025-08-22T08:18:23.9097010-04:00" endTime="2025-08-22T08:18:23.9098110-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="91385274-bee6-4d5f-96f8-f8999ecc6c0f" />
+    <UnitTestResult executionId="675bf2ac-65b9-4f81-890e-8a4f13ba8031" testId="e9158b92-dc87-237a-859e-dfe676b3134e" testName="StringChar_NullCharacter_ShouldReturnNullChar" computerName="dadsmbp" duration="00:00:00.0000963" startTime="2025-08-22T08:18:23.8985320-04:00" endTime="2025-08-22T08:18:23.8986570-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="675bf2ac-65b9-4f81-890e-8a4f13ba8031" />
+    <UnitTestResult executionId="32a3088d-d4b9-490d-8149-ccc568f33e58" testId="52c6cbb3-0fb5-64c2-41c9-b33943da9d95" testName="MathAbs_NegativeNumber_ShouldReturnPositiveValue" computerName="dadsmbp" duration="00:00:00.0001400" startTime="2025-08-22T08:18:23.8633050-04:00" endTime="2025-08-22T08:18:23.8634890-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="32a3088d-d4b9-490d-8149-ccc568f33e58" />
+    <UnitTestResult executionId="5445865b-b567-40d9-a40e-5d1d34501905" testId="e70a47f2-b673-3f81-e51f-fba6bbc56ff9" testName="MathPow_OneToAnyPower_ShouldReturnOne" computerName="dadsmbp" duration="00:00:00.0000825" startTime="2025-08-22T08:18:23.8849110-04:00" endTime="2025-08-22T08:18:23.8850130-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="5445865b-b567-40d9-a40e-5d1d34501905" />
+    <UnitTestResult executionId="cb500790-3bfc-4d28-a939-5dc95e8a5890" testId="07815920-769b-4b1d-f50d-155b51a2a33c" testName="LuaRuntimeException_WithMessage_ShouldCreateException" computerName="dadsmbp" duration="00:00:00.0001837" startTime="2025-08-22T08:18:23.8883310-04:00" endTime="2025-08-22T08:18:23.8885980-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="cb500790-3bfc-4d28-a939-5dc95e8a5890" />
+    <UnitTestResult executionId="bb061168-410c-4f78-92cd-e53f7bd5e63d" testId="345334d1-c69b-7394-899b-16c504f7f7e8" testName="MathPi_ShouldBePiConstant" computerName="dadsmbp" duration="00:00:00.0003244" startTime="2025-08-22T08:18:23.8604500-04:00" endTime="2025-08-22T08:18:23.8609040-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="bb061168-410c-4f78-92cd-e53f7bd5e63d" />
+    <UnitTestResult executionId="594d0523-a3b4-4b6e-98b1-a7bfb7dbd90b" testId="881b22b1-3c31-ab2a-03f3-284114d3bf9d" testName="LuaTable_SetAndGet_ShouldMaintainState" computerName="dadsmbp" duration="00:00:00.0001475" startTime="2025-08-22T08:18:23.9059400-04:00" endTime="2025-08-22T08:18:23.9061070-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="594d0523-a3b4-4b6e-98b1-a7bfb7dbd90b" />
+    <UnitTestResult executionId="5a2f6bea-2d08-4936-80d5-a10f68281a23" testId="2c87ba23-c6e5-b44a-e9be-9c2a3f8517fd" testName="MathRandom_NoArgs_ShouldReturnBetweenZeroAndOne" computerName="dadsmbp" duration="00:00:00.0012977" startTime="2025-08-22T08:18:23.8850220-04:00" endTime="2025-08-22T08:18:23.8863410-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="5a2f6bea-2d08-4936-80d5-a10f68281a23" />
+    <UnitTestResult executionId="b5052511-3f0a-44d6-a00b-f8b897e5034b" testId="baee95fe-2868-eb7e-cfeb-6d15afc4b93a" testName="FromObject_UnsupportedType_ShouldThrowException" computerName="dadsmbp" duration="00:00:00.0001758" startTime="2025-08-22T08:18:23.9152680-04:00" endTime="2025-08-22T08:18:23.9154990-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="b5052511-3f0a-44d6-a00b-f8b897e5034b" />
+    <UnitTestResult executionId="bcfae1b9-a15b-455b-8e15-2e51eb7f7149" testId="9d05fbf7-3b9b-3c24-e646-4edabac676ae" testName="MathCos_Zero_ShouldReturnOne" computerName="dadsmbp" duration="00:00:00.0002095" startTime="2025-08-22T08:18:23.8826850-04:00" endTime="2025-08-22T08:18:23.8829220-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="bcfae1b9-a15b-455b-8e15-2e51eb7f7149" />
+    <UnitTestResult executionId="9ea309e1-a76d-4e81-8c80-d50c4a8ebe91" testId="233c87d0-b101-4681-5417-55a74c578e1e" testName="TestBasicCoroutineCreation" computerName="dadsmbp" duration="00:00:00.0002533" startTime="2025-08-22T08:18:23.9159020-04:00" endTime="2025-08-22T08:18:23.9162130-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="9ea309e1-a76d-4e81-8c80-d50c4a8ebe91" />
+    <UnitTestResult executionId="96a41fef-ab90-44c8-ac6a-93d80a8dee34" testId="ac415bd2-f04f-008e-041c-c381ec18e66e" testName="StringReverse_Palindrome_ShouldReturnSameString" computerName="dadsmbp" duration="00:00:00.0000722" startTime="2025-08-22T08:18:23.8961390-04:00" endTime="2025-08-22T08:18:23.8962290-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="96a41fef-ab90-44c8-ac6a-93d80a8dee34" />
+    <UnitTestResult executionId="6d549a7c-de9b-4e20-90ca-9b6ea9c57f7e" testId="6310c7ea-b13f-26b1-d8e6-a774c20691e2" testName="IsValueTruthy_Number_ShouldReturnTrue" computerName="dadsmbp" duration="00:00:00.0000570" startTime="2025-08-22T08:18:23.9158190-04:00" endTime="2025-08-22T08:18:23.9158950-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="6d549a7c-de9b-4e20-90ca-9b6ea9c57f7e" />
+    <UnitTestResult executionId="61b57873-8b57-4264-a570-5fba450ec913" testId="9b8d4a77-e9ee-bfc6-d5e9-f9e426d88ca8" testName="TableInsert_AtBeginning_ShouldShiftElements" computerName="dadsmbp" duration="00:00:00.0001840" startTime="2025-08-22T08:18:23.9076630-04:00" endTime="2025-08-22T08:18:23.9078680-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="61b57873-8b57-4264-a570-5fba450ec913" />
+    <UnitTestResult executionId="96945c09-b991-42a9-bb4c-fdc8cd2bba52" testId="673155f4-965a-c76e-d309-fb8225108a24" testName="TableConcat_WithSeparator_ShouldUseSeparator" computerName="dadsmbp" duration="00:00:00.0001618" startTime="2025-08-22T08:18:23.9107510-04:00" endTime="2025-08-22T08:18:23.9109320-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="96945c09-b991-42a9-bb4c-fdc8cd2bba52" />
+    <UnitTestResult executionId="f01dd22d-6e54-41c2-bc89-dd89d6e2eadb" testId="7f02c353-6c51-74fd-4336-87884ce5b093" testName="StringReverse_RegularString_ShouldReturnReversed" computerName="dadsmbp" duration="00:00:00.0002043" startTime="2025-08-22T08:18:23.8959060-04:00" endTime="2025-08-22T08:18:23.8961300-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="f01dd22d-6e54-41c2-bc89-dd89d6e2eadb" />
+    <UnitTestResult executionId="a804bac6-af47-4ddc-9a22-6b94db321d9f" testId="a7245264-48e2-ef1d-bf8e-da544214f3e5" testName="LuaTable_IntegerKey_ShouldStoreInArray" computerName="dadsmbp" duration="00:00:00.0001036" startTime="2025-08-22T08:18:23.9062030-04:00" endTime="2025-08-22T08:18:23.9063230-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="a804bac6-af47-4ddc-9a22-6b94db321d9f" />
+    <UnitTestResult executionId="fe7ef18a-bbcf-4d7b-be05-05a351b88f65" testId="9635de5e-365d-f90e-5cbb-e3014d694243" testName="LuaInteger_MinValue_ShouldHandleCorrectly" computerName="dadsmbp" duration="00:00:00.0000520" startTime="2025-08-22T08:18:23.9128230-04:00" endTime="2025-08-22T08:18:23.9128930-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="fe7ef18a-bbcf-4d7b-be05-05a351b88f65" />
+    <UnitTestResult executionId="4b6fcce1-f50a-4cab-8864-b0b15c288bed" testId="cf8f5e76-b112-943e-fa01-a93e316dd773" testName="LuaTable_SetMetatable_ShouldStoreMetatable" computerName="dadsmbp" duration="00:00:00.0001471" startTime="2025-08-22T08:18:23.9112630-04:00" endTime="2025-08-22T08:18:23.9114280-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="4b6fcce1-f50a-4cab-8864-b0b15c288bed" />
+    <UnitTestResult executionId="4fc3c5b4-e01e-40ac-8843-4d66b163648a" testId="0b45db31-7169-e23f-42e9-87ea0497da14" testName="StringLower_MixedCase_ShouldReturnLowercase" computerName="dadsmbp" duration="00:00:00.0001200" startTime="2025-08-22T08:18:23.8951870-04:00" endTime="2025-08-22T08:18:23.8953230-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="4fc3c5b4-e01e-40ac-8843-4d66b163648a" />
+    <UnitTestResult executionId="9381d645-11fb-4f95-a414-b736c987d865" testId="df37e904-2cd9-ba72-831c-29c2ae60a626" testName="LuaBoolean_FalseValue_ShouldBeFalsy" computerName="dadsmbp" duration="00:00:00.0000405" startTime="2025-08-22T08:18:23.9127570-04:00" endTime="2025-08-22T08:18:23.9128150-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="9381d645-11fb-4f95-a414-b736c987d865" />
+    <UnitTestResult executionId="2c5995e9-b955-4f19-bed6-00aad4ecd8f7" testId="60de9ef1-6049-dbbf-39ad-87efa4570624" testName="LuaTable_MetatableIndexAccess_ShouldCallMetamethod" computerName="dadsmbp" duration="00:00:00.0000779" startTime="2025-08-22T08:18:23.9114360-04:00" endTime="2025-08-22T08:18:23.9115340-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="2c5995e9-b955-4f19-bed6-00aad4ecd8f7" />
+    <UnitTestResult executionId="b8664edd-66b3-45d6-a1ea-0b4f58da2315" testId="7eb5702b-70b1-d4b2-3996-5192ebac76c5" testName="StringByte_SingleCharacter_ShouldReturnCode" computerName="dadsmbp" duration="00:00:00.0003257" startTime="2025-08-22T08:18:23.8978720-04:00" endTime="2025-08-22T08:18:23.8982470-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="b8664edd-66b3-45d6-a1ea-0b4f58da2315" />
+    <UnitTestResult executionId="ef7142c7-ba31-41f9-8ce4-0a3de9373774" testId="9b25d867-22e7-abd9-0d91-7d89575a0527" testName="LuaInteger_NegativeValue_ShouldHandleCorrectly" computerName="dadsmbp" duration="00:00:00.0000457" startTime="2025-08-22T08:18:23.9132350-04:00" endTime="2025-08-22T08:18:23.9133010-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="ef7142c7-ba31-41f9-8ce4-0a3de9373774" />
+    <UnitTestResult executionId="77334de0-8515-45d8-b3cc-aaf420333b6d" testId="82ca22b8-e310-00c1-f827-41250c84f625" testName="TestCoroutineRunning" computerName="dadsmbp" duration="00:00:00.0001692" startTime="2025-08-22T08:18:23.9182320-04:00" endTime="2025-08-22T08:18:23.9184260-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="77334de0-8515-45d8-b3cc-aaf420333b6d" />
+    <UnitTestResult executionId="99e2584b-c7c4-4386-88ab-cc60ebd4fa03" testId="b60bdbca-7010-0c39-f967-8cb5070510e8" testName="LuaRuntimeException_RandomMessages_ShouldHandleCorrectly" computerName="dadsmbp" duration="00:00:00.0001028" startTime="2025-08-22T08:18:23.8895080-04:00" endTime="2025-08-22T08:18:23.8896300-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="99e2584b-c7c4-4386-88ab-cc60ebd4fa03" />
+    <UnitTestResult executionId="a95b8fbf-d613-45ce-a4c4-78897a9937df" testId="428c733f-08bd-ceb4-6728-a196de5d1055" testName="StringSub_StartIndexOnly_ShouldReturnRestOfString" computerName="dadsmbp" duration="00:00:00.0000812" startTime="2025-08-22T08:18:23.8948270-04:00" endTime="2025-08-22T08:18:23.8949270-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="a95b8fbf-d613-45ce-a4c4-78897a9937df" />
+    <UnitTestResult executionId="f8309a15-5203-499c-8c61-bf8f2c495201" testId="fff4b68e-ee39-0454-e5c9-f6983bdbccd9" testName="StringChar_MaxASCII_ShouldReturnCharacter" computerName="dadsmbp" duration="00:00:00.0000979" startTime="2025-08-22T08:18:23.8986680-04:00" endTime="2025-08-22T08:18:23.8987890-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="f8309a15-5203-499c-8c61-bf8f2c495201" />
+    <UnitTestResult executionId="ac9ec957-0588-4a22-b400-2ed8dadb0e79" testId="daa8c60f-c482-0934-3473-271577cb9df9" testName="TableSort_SingleElement_ShouldRemainUnchanged" computerName="dadsmbp" duration="00:00:00.0001233" startTime="2025-08-22T08:18:23.9102320-04:00" endTime="2025-08-22T08:18:23.9103790-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="ac9ec957-0588-4a22-b400-2ed8dadb0e79" />
+    <UnitTestResult executionId="1967ae0d-8b91-4a88-a8ea-d12eeac872f1" testId="77a18cf0-1d44-4ea9-aba6-a2a090a3c96f" testName="MathFMod_NegativeNumbers_ShouldHandleCorrectly" computerName="dadsmbp" duration="00:00:00.0000981" startTime="2025-08-22T08:18:23.8877450-04:00" endTime="2025-08-22T08:18:23.8878930-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="1967ae0d-8b91-4a88-a8ea-d12eeac872f1" />
+    <UnitTestResult executionId="fe655a85-8940-4353-b9be-2425d55ac940" testId="3516af4b-f8a4-1d2e-6e21-30f165f554ad" testName="MathRad_180_ShouldReturnPi" computerName="dadsmbp" duration="00:00:00.0001380" startTime="2025-08-22T08:18:23.8832990-04:00" endTime="2025-08-22T08:18:23.8834580-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="fe655a85-8940-4353-b9be-2425d55ac940" />
+    <UnitTestResult executionId="edc82651-4cea-4b38-8e4e-dfc515078865" testId="a4bd4216-16d2-a804-490c-fa270d0a3bdc" testName="LuaInteger_PositiveValue_ShouldHandleCorrectly" computerName="dadsmbp" duration="00:00:00.0000588" startTime="2025-08-22T08:18:23.9130340-04:00" endTime="2025-08-22T08:18:23.9132250-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="edc82651-4cea-4b38-8e4e-dfc515078865" />
+    <UnitTestResult executionId="1a29bae8-0082-4a7e-ba0f-c8658b57e505" testId="3119913a-eb5d-deca-9cff-55dde9d7ea60" testName="StringLen_RegularString_ShouldReturnCorrectLength" computerName="dadsmbp" duration="00:00:00.0001740" startTime="2025-08-22T08:18:23.8896420-04:00" endTime="2025-08-22T08:18:23.8931080-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="1a29bae8-0082-4a7e-ba0f-c8658b57e505" />
+    <UnitTestResult executionId="8705b1d5-a8cf-4138-ba7d-4591654092f1" testId="d9310133-9ac5-aaf3-d288-12dda2339a22" testName="LuaInteger_Zero_ShouldHandleCorrectly" computerName="dadsmbp" duration="00:00:00.0000472" startTime="2025-08-22T08:18:23.9129620-04:00" endTime="2025-08-22T08:18:23.9130260-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="8705b1d5-a8cf-4138-ba7d-4591654092f1" />
+    <UnitTestResult executionId="eeae3db0-5d77-450a-bbb8-4660ee94764f" testId="a9fe0582-1c7c-45a8-0d84-876052fc7d0f" testName="StringChar_MultipleCodes_ShouldReturnString" computerName="dadsmbp" duration="00:00:00.0000890" startTime="2025-08-22T08:18:23.8977530-04:00" endTime="2025-08-22T08:18:23.8978630-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="eeae3db0-5d77-450a-bbb8-4660ee94764f" />
+    <UnitTestResult executionId="398d7032-d204-4d2a-990c-4ee7bd898395" testId="f57b7888-6324-b1f2-9843-ef45851f7bfb" testName="FromObject_Float_ShouldReturnLuaNumber" computerName="dadsmbp" duration="00:00:00.0000504" startTime="2025-08-22T08:18:23.9151260-04:00" endTime="2025-08-22T08:18:23.9151980-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="398d7032-d204-4d2a-990c-4ee7bd898395" />
+    <UnitTestResult executionId="a47663ef-ae28-4dc7-ab3f-f38b38712516" testId="23b7caf5-5cf0-5742-ce43-064db73934c4" testName="LuaNil_IsTruthy_ShouldBeFalse" computerName="dadsmbp" duration="00:00:00.0001495" startTime="2025-08-22T08:18:23.9124000-04:00" endTime="2025-08-22T08:18:23.9125880-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="a47663ef-ae28-4dc7-ab3f-f38b38712516" />
+    <UnitTestResult executionId="0b5685da-762c-4164-917a-b1f0836566e6" testId="db1370d8-1de2-82f8-aadc-4c35fd7d5caa" testName="StringFormat_IntegerSpecifier_ShouldFormatCorrectly" computerName="dadsmbp" duration="00:00:00.0035865" startTime="2025-08-22T08:18:23.8988000-04:00" endTime="2025-08-22T08:18:23.9024240-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="0b5685da-762c-4164-917a-b1f0836566e6" />
+    <UnitTestResult executionId="238c1aa5-dd6d-42e2-97c3-d3e1584c36b5" testId="8954ffed-29fd-1bfb-09fb-58b7fbd7b91c" testName="LuaInteger_MaxValue_ShouldHandleCorrectly" computerName="dadsmbp" duration="00:00:00.0000367" startTime="2025-08-22T08:18:23.9129010-04:00" endTime="2025-08-22T08:18:23.9129550-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="238c1aa5-dd6d-42e2-97c3-d3e1584c36b5" />
+    <UnitTestResult executionId="3a271b6a-3aad-44d3-9fec-60d419eb8953" testId="be9e83a5-2d56-6d2e-399e-00e64031ff7c" testName="MathPow_TwoToThree_ShouldReturnEight" computerName="dadsmbp" duration="00:00:00.0001763" startTime="2025-08-22T08:18:23.8845790-04:00" endTime="2025-08-22T08:18:23.8847810-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="3a271b6a-3aad-44d3-9fec-60d419eb8953" />
+    <UnitTestResult executionId="4089ce54-7376-4582-acf6-52281d06d69a" testId="83cf361e-bdcf-2c39-c69b-b4d97d1acb77" testName="LuaNumber_RegularValue_ShouldHandleCorrectly" computerName="dadsmbp" duration="00:00:00.0000402" startTime="2025-08-22T08:18:23.9141000-04:00" endTime="2025-08-22T08:18:23.9141560-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="4089ce54-7376-4582-acf6-52281d06d69a" />
+    <UnitTestResult executionId="560026d5-8e29-494e-9a94-21718c134606" testId="1e6eddb1-4896-29a5-eba9-12e46a956c74" testName="IsValueTruthy_FalseBoolean_ShouldReturnFalse" computerName="dadsmbp" duration="00:00:00.0000359" startTime="2025-08-22T08:18:23.9156220-04:00" endTime="2025-08-22T08:18:23.9156810-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="560026d5-8e29-494e-9a94-21718c134606" />
+    <UnitTestResult executionId="1984c892-4c24-42f8-841d-50d8d14e9f7c" testId="2106053b-d07c-6568-30e2-8bf9806cf31e" testName="StringFind_PatternNotFound_ShouldReturnNil" computerName="dadsmbp" duration="00:00:00.0001015" startTime="2025-08-22T08:18:23.9054330-04:00" endTime="2025-08-22T08:18:23.9055650-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="1984c892-4c24-42f8-841d-50d8d14e9f7c" />
+    <UnitTestResult executionId="9796b67a-5e2d-4763-bf30-6e742d89168c" testId="5cfe0b97-280b-cbb1-2ee7-0f4bf5dca240" testName="MathMin_SingleArgument_ShouldReturnSameValue" computerName="dadsmbp" duration="00:00:00.0000855" startTime="2025-08-22T08:18:23.8805550-04:00" endTime="2025-08-22T08:18:23.8806630-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="9796b67a-5e2d-4763-bf30-6e742d89168c" />
+    <UnitTestResult executionId="4f5a8cd7-2bd5-46b9-9025-fc979d96eb04" testId="17377364-953b-2c7c-0107-e712e10a64ff" testName="LuaRuntimeException_CustomMessage_ShouldContainMessage" computerName="dadsmbp" duration="00:00:00.0000357" startTime="2025-08-22T08:18:23.8894460-04:00" endTime="2025-08-22T08:18:23.8895000-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="4f5a8cd7-2bd5-46b9-9025-fc979d96eb04" />
+    <UnitTestResult executionId="b78044f7-b29a-435d-9b22-083b656c4a43" testId="7ec8e7ca-3b29-29a7-3695-42d7e5110b59" testName="StringRep_OneCount_ShouldReturnOriginalString" computerName="dadsmbp" duration="00:00:00.0000757" startTime="2025-08-22T08:18:23.8968270-04:00" endTime="2025-08-22T08:18:23.8969190-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="b78044f7-b29a-435d-9b22-083b656c4a43" />
+    <UnitTestResult executionId="d6d76eff-c133-4e41-a7a3-2c3357316fe2" testId="2f32e0f8-b691-f71d-4d18-6a4a93955887" testName="FromObject_Bool_ShouldReturnLuaBoolean" computerName="dadsmbp" duration="00:00:00.0000376" startTime="2025-08-22T08:18:23.9144960-04:00" endTime="2025-08-22T08:18:23.9145530-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="d6d76eff-c133-4e41-a7a3-2c3357316fe2" />
+    <UnitTestResult executionId="d4501b4c-c99b-44da-81cd-c438f33db9c8" testId="3738ff02-850b-c742-f6f9-3da9154afe6b" testName="StringSub_OutOfBounds_ShouldReturnEmptyString" computerName="dadsmbp" duration="00:00:00.0000818" startTime="2025-08-22T08:18:23.8949350-04:00" endTime="2025-08-22T08:18:23.8950330-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="d4501b4c-c99b-44da-81cd-c438f33db9c8" />
+    <UnitTestResult executionId="f4d4d53b-2f91-42c5-957e-4b654a3d6f86" testId="447c4433-4393-9bee-e3d5-5ecc3b6cc661" testName="StringFind_PatternExists_ShouldReturnPosition" computerName="dadsmbp" duration="00:00:00.0014477" startTime="2025-08-22T08:18:23.9039370-04:00" endTime="2025-08-22T08:18:23.9054150-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="f4d4d53b-2f91-42c5-957e-4b654a3d6f86" />
+    <UnitTestResult executionId="8379a7c4-fe0c-4761-ba6f-5aeace87fa9e" testId="89f7b719-0632-7d2b-b049-a1a94bffa9fb" testName="TableInsert_AtEnd_ShouldAppendToArray" computerName="dadsmbp" duration="00:00:00.0003887" startTime="2025-08-22T08:18:23.9067950-04:00" endTime="2025-08-22T08:18:23.9072080-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="8379a7c4-fe0c-4761-ba6f-5aeace87fa9e" />
+    <UnitTestResult executionId="3fef8c8e-17ea-42b3-bee0-4d763607dca6" testId="79fc91a0-094e-4d9c-cde7-a0e550c86f48" testName="LuaRuntimeException_WithMessage_ShouldStoreMessage" computerName="dadsmbp" duration="00:00:00.0000751" startTime="2025-08-22T08:18:23.8886110-04:00" endTime="2025-08-22T08:18:23.8887090-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="3fef8c8e-17ea-42b3-bee0-4d763607dca6" />
+    <UnitTestResult executionId="fdc9f291-40c3-4a7b-b655-83bb0b354ae1" testId="0ed505a3-9c55-3b78-612d-75b0fd3d3410" testName="MathRandom_WithBounds_ShouldReturnInRange" computerName="dadsmbp" duration="00:00:00.0001373" startTime="2025-08-22T08:18:23.8868860-04:00" endTime="2025-08-22T08:18:23.8870640-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="fdc9f291-40c3-4a7b-b655-83bb0b354ae1" />
+    <UnitTestResult executionId="8f15726c-7a16-4b94-9709-e992a061d1b4" testId="a1183947-ecd5-7c88-1e94-1b329ed24ff1" testName="MathLog_E_ShouldReturnOne" computerName="dadsmbp" duration="00:00:00.0001776" startTime="2025-08-22T08:18:23.8836350-04:00" endTime="2025-08-22T08:18:23.8838340-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="8f15726c-7a16-4b94-9709-e992a061d1b4" />
+    <UnitTestResult executionId="41b88a88-393c-417d-b8e5-8a7a8abff0ed" testId="f499cfc5-18d0-b1c2-029c-8015b53339eb" testName="MathMax_MultipleArguments_ShouldReturnLargest" computerName="dadsmbp" duration="00:00:00.0002067" startTime="2025-08-22T08:18:23.8803130-04:00" endTime="2025-08-22T08:18:23.8805440-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="41b88a88-393c-417d-b8e5-8a7a8abff0ed" />
+    <UnitTestResult executionId="8d0bfce0-34d8-4583-8fad-ae684ce4f251" testId="a4a2d165-f500-7f8b-b3bb-2d17b22e1b74" testName="TestCoroutineIsYieldable" computerName="dadsmbp" duration="00:00:00.0001295" startTime="2025-08-22T08:18:23.9184360-04:00" endTime="2025-08-22T08:18:23.9189030-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="8d0bfce0-34d8-4583-8fad-ae684ce4f251" />
+    <UnitTestResult executionId="6da1be5e-3a14-408e-8a9a-0cf6e4c3f6e4" testId="409f7739-cf11-22b5-1758-0b50a6d4d309" testName="FromObject_Long_ShouldReturnLuaInteger" computerName="dadsmbp" duration="00:00:00.0000331" startTime="2025-08-22T08:18:23.9146220-04:00" endTime="2025-08-22T08:18:23.9146710-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="6da1be5e-3a14-408e-8a9a-0cf6e4c3f6e4" />
+    <UnitTestResult executionId="12977af7-77be-45fa-a43d-f49d7084e557" testId="30be04e6-3d23-02b9-f432-979cee6bd744" testName="TestCoroutineWrap" computerName="dadsmbp" duration="00:00:00.0004322" startTime="2025-08-22T08:18:23.9177570-04:00" endTime="2025-08-22T08:18:23.9182170-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="12977af7-77be-45fa-a43d-f49d7084e557" />
+    <UnitTestResult executionId="47e4b422-ed07-4c6a-9759-1e39cde9d755" testId="190f3eea-803d-3d7e-7d7d-8040c99a92c3" testName="StringFind_EmptyPattern_ShouldFindAtBeginning" computerName="dadsmbp" duration="00:00:00.0000942" startTime="2025-08-22T08:18:23.9055760-04:00" endTime="2025-08-22T08:18:23.9056930-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="47e4b422-ed07-4c6a-9759-1e39cde9d755" />
+    <UnitTestResult executionId="ad5a514a-85bd-4186-90f5-dea88b1d804a" testId="bd1e53dd-be4e-115b-80fa-a9099016266a" testName="TableSort_Strings_ShouldSortAlphabetically" computerName="dadsmbp" duration="00:00:00.0001987" startTime="2025-08-22T08:18:23.9094690-04:00" endTime="2025-08-22T08:18:23.9096920-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="ad5a514a-85bd-4186-90f5-dea88b1d804a" />
+    <UnitTestResult executionId="018b8fb3-1cf7-4e85-aca8-b967d0337733" testId="5c1ced93-47a4-2f59-545d-710a5ee3f396" testName="MathFMod_PositiveNumbers_ShouldReturnCorrectRemainder" computerName="dadsmbp" duration="00:00:00.0002683" startTime="2025-08-22T08:18:23.8874050-04:00" endTime="2025-08-22T08:18:23.8877200-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="018b8fb3-1cf7-4e85-aca8-b967d0337733" />
+    <UnitTestResult executionId="72c53c7e-d920-4ca1-922e-229a045bfb78" testId="270edca5-493a-6569-7b23-0371fc1bbebc" testName="LuaNumber_PositiveInfinity_ShouldHandleCorrectly" computerName="dadsmbp" duration="00:00:00.0000550" startTime="2025-08-22T08:18:23.9138450-04:00" endTime="2025-08-22T08:18:23.9139310-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="72c53c7e-d920-4ca1-922e-229a045bfb78" />
+    <UnitTestResult executionId="7d1b5170-9282-4367-9243-3da7f1de7eb0" testId="6c9547d4-0a2b-5c52-ecf8-7294e550ba4c" testName="TestCoroutineStatus" computerName="dadsmbp" duration="00:00:00.0002078" startTime="2025-08-22T08:18:23.9174830-04:00" endTime="2025-08-22T08:18:23.9177410-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="7d1b5170-9282-4367-9243-3da7f1de7eb0" />
+    <UnitTestResult executionId="896c2d91-6dc9-4d41-b9b9-1aaf0eeb26eb" testId="439a2d2d-24e2-fb0c-8644-fc96a7afe81b" testName="TableConcat_WithoutSeparator_ShouldConcatenateDirectly" computerName="dadsmbp" duration="00:00:00.0003315" startTime="2025-08-22T08:18:23.9103900-04:00" endTime="2025-08-22T08:18:23.9107410-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="896c2d91-6dc9-4d41-b9b9-1aaf0eeb26eb" />
+    <UnitTestResult executionId="16a11d4b-d3a2-4d24-95c8-e06fb6378aff" testId="adfffce4-9a54-412c-78d4-175d2b7e6ed0" testName="LuaTable_NoMetatable_ShouldReturnNilForMissingKeys" computerName="dadsmbp" duration="00:00:00.0000864" startTime="2025-08-22T08:18:23.9115420-04:00" endTime="2025-08-22T08:18:23.9116830-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="16a11d4b-d3a2-4d24-95c8-e06fb6378aff" />
+    <UnitTestResult executionId="2338dd38-4f84-4d3f-8213-96186c8d91e6" testId="12235a19-e292-278e-b670-b7aedaf1b281" testName="TableSort_Numbers_ShouldSortAscending" computerName="dadsmbp" duration="00:00:00.0008795" startTime="2025-08-22T08:18:23.9085560-04:00" endTime="2025-08-22T08:18:23.9094560-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="2338dd38-4f84-4d3f-8213-96186c8d91e6" />
+    <UnitTestResult executionId="fbf62d94-136b-46c4-9c77-0627d516d062" testId="2d9db9db-0852-50de-4702-f3ba004fe02a" testName="StringFormat_StringSpecifier_ShouldFormatCorrectly" computerName="dadsmbp" duration="00:00:00.0001541" startTime="2025-08-22T08:18:23.9030720-04:00" endTime="2025-08-22T08:18:23.9032560-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="fbf62d94-136b-46c4-9c77-0627d516d062" />
+    <UnitTestResult executionId="bd261ff0-8e10-403f-aece-d09737bce24e" testId="0bf1f1d6-beae-34ea-7044-93492e91ce33" testName="LuaNumber_NegativeInfinity_ShouldHandleCorrectly" computerName="dadsmbp" duration="00:00:00.0000505" startTime="2025-08-22T08:18:23.9139460-04:00" endTime="2025-08-22T08:18:23.9140160-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="bd261ff0-8e10-403f-aece-d09737bce24e" />
+    <UnitTestResult executionId="85948a11-c7b2-458f-bcf5-0e1527d2be9b" testId="62a6695a-3ba4-c7b6-79e2-47071a47fcec" testName="MathTan_PiOverFour_ShouldReturnOne" computerName="dadsmbp" duration="00:00:00.0001530" startTime="2025-08-22T08:18:23.8829360-04:00" endTime="2025-08-22T08:18:23.8831130-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="85948a11-c7b2-458f-bcf5-0e1527d2be9b" />
+    <UnitTestResult executionId="72986731-e915-4a32-a566-8a81958348c3" testId="b6fff122-a8d7-249a-f08c-c1303bf89970" testName="TableRemove_AtPosition_ShouldRemoveAndShift" computerName="dadsmbp" duration="00:00:00.0001959" startTime="2025-08-22T08:18:23.9082300-04:00" endTime="2025-08-22T08:18:23.9084450-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="72986731-e915-4a32-a566-8a81958348c3" />
+    <UnitTestResult executionId="1c48412e-e1b5-47bf-b75d-8c596a327b80" testId="e37e0405-4441-40cb-0aad-6bce6ee46d04" testName="TableConcat_EmptyTable_ShouldReturnEmptyString" computerName="dadsmbp" duration="00:00:00.0000814" startTime="2025-08-22T08:18:23.9111570-04:00" endTime="2025-08-22T08:18:23.9112560-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="1c48412e-e1b5-47bf-b75d-8c596a327b80" />
+    <UnitTestResult executionId="3c78c179-243f-423b-927e-b9640b12d6aa" testId="d112ffc6-9ab0-06b7-4693-ba4331db0456" testName="LuaNil_Instance_ShouldBeSingleton" computerName="dadsmbp" duration="00:00:00.0000846" startTime="2025-08-22T08:18:23.9117250-04:00" endTime="2025-08-22T08:18:23.9119540-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="3c78c179-243f-423b-927e-b9640b12d6aa" />
+    <UnitTestResult executionId="c74ff0be-52bb-4564-81cb-b62367caf6d4" testId="40802bca-7604-ea47-82b8-dde4ff38bdcb" testName="MathSqrt_Four_ShouldReturnTwo" computerName="dadsmbp" duration="00:00:00.0001425" startTime="2025-08-22T08:18:23.8838430-04:00" endTime="2025-08-22T08:18:23.8840060-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="c74ff0be-52bb-4564-81cb-b62367caf6d4" />
+    <UnitTestResult executionId="4fdeb645-ac79-4265-be83-eb278bab333b" testId="9948571a-a40e-827f-8cf6-88064c91e843" testName="MathSqrt_NegativeNumber_ShouldReturnNaN" computerName="dadsmbp" duration="00:00:00.0000924" startTime="2025-08-22T08:18:23.8840140-04:00" endTime="2025-08-22T08:18:23.8841290-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="4fdeb645-ac79-4265-be83-eb278bab333b" />
+    <UnitTestResult executionId="fb049cce-2c76-44f1-a115-16fd335f367c" testId="cce500c0-b6c2-8a88-0540-42df7487c4cb" testName="StringUpper_MixedCase_ShouldReturnUppercase" computerName="dadsmbp" duration="00:00:00.0001215" startTime="2025-08-22T08:18:23.8950410-04:00" endTime="2025-08-22T08:18:23.8951790-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="fb049cce-2c76-44f1-a115-16fd335f367c" />
+    <UnitTestResult executionId="143ea2a3-9cbb-4caa-99b0-47264b423cc4" testId="ece2fee8-4c35-153c-62d3-943f472b7715" testName="StringLen_EmptyString_ShouldReturnZero" computerName="dadsmbp" duration="00:00:00.0001649" startTime="2025-08-22T08:18:23.8931460-04:00" endTime="2025-08-22T08:18:23.8933380-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="143ea2a3-9cbb-4caa-99b0-47264b423cc4" />
+    <UnitTestResult executionId="fdd493ba-da6b-425d-81c8-383f070eb311" testId="af60203c-9c72-573a-1e94-68b389d07824" testName="StringSub_PositiveIndices_ShouldReturnCorrectSubstring" computerName="dadsmbp" duration="00:00:00.0003917" startTime="2025-08-22T08:18:23.8942700-04:00" endTime="2025-08-22T08:18:23.8946830-04:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="fdd493ba-da6b-425d-81c8-383f070eb311" />
+  </Results>
+  <TestDefinitions>
+    <UnitTest name="StringByte_SingleCharacter_ShouldReturnCode" storage="/users/bill/repos/flua/flua.runtime.tests/bin/debug/net8.0/flua.runtime.tests.dll" id="7eb5702b-70b1-d4b2-3996-5192ebac76c5">
+      <Execution id="b8664edd-66b3-45d6-a1ea-0b4f58da2315" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Runtime.Tests/bin/Debug/net8.0/FLua.Runtime.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Runtime.Tests.LuaStringLibTests" name="StringByte_SingleCharacter_ShouldReturnCode" />
+    </UnitTest>
+    <UnitTest name="TestCoroutineStatusTransitions" storage="/users/bill/repos/flua/flua.runtime.tests/bin/debug/net8.0/flua.runtime.tests.dll" id="a1134371-e672-5484-c1de-31798068ccce">
+      <Execution id="6b321743-ad9e-4169-bd9e-09b9ddbb440f" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Runtime.Tests/bin/Debug/net8.0/FLua.Runtime.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Runtime.Tests.BasicCoroutineTest" name="TestCoroutineStatusTransitions" />
+    </UnitTest>
+    <UnitTest name="StringChar_NullCharacter_ShouldReturnNullChar" storage="/users/bill/repos/flua/flua.runtime.tests/bin/debug/net8.0/flua.runtime.tests.dll" id="e9158b92-dc87-237a-859e-dfe676b3134e">
+      <Execution id="675bf2ac-65b9-4f81-890e-8a4f13ba8031" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Runtime.Tests/bin/Debug/net8.0/FLua.Runtime.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Runtime.Tests.LuaStringLibTests" name="StringChar_NullCharacter_ShouldReturnNullChar" />
+    </UnitTest>
+    <UnitTest name="StringFormat_StringSpecifier_ShouldFormatCorrectly" storage="/users/bill/repos/flua/flua.runtime.tests/bin/debug/net8.0/flua.runtime.tests.dll" id="2d9db9db-0852-50de-4702-f3ba004fe02a">
+      <Execution id="fbf62d94-136b-46c4-9c77-0627d516d062" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Runtime.Tests/bin/Debug/net8.0/FLua.Runtime.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Runtime.Tests.LuaStringLibTests" name="StringFormat_StringSpecifier_ShouldFormatCorrectly" />
+    </UnitTest>
+    <UnitTest name="MathAbs_MaxInteger_ShouldHandleCorrectly" storage="/users/bill/repos/flua/flua.runtime.tests/bin/debug/net8.0/flua.runtime.tests.dll" id="3c1ede49-f254-eed4-afa7-8793d7bbadf5">
+      <Execution id="6438adea-c904-4907-953f-8a211601e4cf" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Runtime.Tests/bin/Debug/net8.0/FLua.Runtime.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Runtime.Tests.LuaMathLibTests" name="MathAbs_MaxInteger_ShouldHandleCorrectly" />
+    </UnitTest>
+    <UnitTest name="TableConcat_WithoutSeparator_ShouldConcatenateDirectly" storage="/users/bill/repos/flua/flua.runtime.tests/bin/debug/net8.0/flua.runtime.tests.dll" id="439a2d2d-24e2-fb0c-8644-fc96a7afe81b">
+      <Execution id="896c2d91-6dc9-4d41-b9b9-1aaf0eeb26eb" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Runtime.Tests/bin/Debug/net8.0/FLua.Runtime.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Runtime.Tests.LuaTableLibTests" name="TableConcat_WithoutSeparator_ShouldConcatenateDirectly" />
+    </UnitTest>
+    <UnitTest name="IsValueTruthy_FalseBoolean_ShouldReturnFalse" storage="/users/bill/repos/flua/flua.runtime.tests/bin/debug/net8.0/flua.runtime.tests.dll" id="1e6eddb1-4896-29a5-eba9-12e46a956c74">
+      <Execution id="560026d5-8e29-494e-9a94-21718c134606" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Runtime.Tests/bin/Debug/net8.0/FLua.Runtime.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Runtime.Tests.LuaValueTests" name="IsValueTruthy_FalseBoolean_ShouldReturnFalse" />
+    </UnitTest>
+    <UnitTest name="StringLower_MixedCase_ShouldReturnLowercase" storage="/users/bill/repos/flua/flua.runtime.tests/bin/debug/net8.0/flua.runtime.tests.dll" id="0b45db31-7169-e23f-42e9-87ea0497da14">
+      <Execution id="4fc3c5b4-e01e-40ac-8843-4d66b163648a" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Runtime.Tests/bin/Debug/net8.0/FLua.Runtime.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Runtime.Tests.LuaStringLibTests" name="StringLower_MixedCase_ShouldReturnLowercase" />
+    </UnitTest>
+    <UnitTest name="StringChar_MultipleCodes_ShouldReturnString" storage="/users/bill/repos/flua/flua.runtime.tests/bin/debug/net8.0/flua.runtime.tests.dll" id="a9fe0582-1c7c-45a8-0d84-876052fc7d0f">
+      <Execution id="eeae3db0-5d77-450a-bbb8-4660ee94764f" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Runtime.Tests/bin/Debug/net8.0/FLua.Runtime.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Runtime.Tests.LuaStringLibTests" name="StringChar_MultipleCodes_ShouldReturnString" />
+    </UnitTest>
+    <UnitTest name="StringRep_ZeroCount_ShouldReturnEmptyString" storage="/users/bill/repos/flua/flua.runtime.tests/bin/debug/net8.0/flua.runtime.tests.dll" id="b56740e1-1693-0b10-babe-b809629c19af">
+      <Execution id="b4fe862c-b55d-407e-a8e3-234a9cb4fa65" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Runtime.Tests/bin/Debug/net8.0/FLua.Runtime.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Runtime.Tests.LuaStringLibTests" name="StringRep_ZeroCount_ShouldReturnEmptyString" />
+    </UnitTest>
+    <UnitTest name="MathCeil_PositiveDecimal_ShouldRoundUp" storage="/users/bill/repos/flua/flua.runtime.tests/bin/debug/net8.0/flua.runtime.tests.dll" id="12b23b8c-3355-3c7e-a505-6dc45671db21">
+      <Execution id="50172aa0-0f4d-430d-b584-43eda98e7b59" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Runtime.Tests/bin/Debug/net8.0/FLua.Runtime.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Runtime.Tests.LuaMathLibTests" name="MathCeil_PositiveDecimal_ShouldRoundUp" />
+    </UnitTest>
+    <UnitTest name="MathHuge_ShouldBePositiveInfinity" storage="/users/bill/repos/flua/flua.runtime.tests/bin/debug/net8.0/flua.runtime.tests.dll" id="3cf43540-a72a-2f20-e075-9da6a899c39c">
+      <Execution id="f7e53360-f7a3-4be6-a724-0f274e44588b" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Runtime.Tests/bin/Debug/net8.0/FLua.Runtime.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Runtime.Tests.LuaMathLibTests" name="MathHuge_ShouldBePositiveInfinity" />
+    </UnitTest>
+    <UnitTest name="StringFind_EmptyPattern_ShouldFindAtBeginning" storage="/users/bill/repos/flua/flua.runtime.tests/bin/debug/net8.0/flua.runtime.tests.dll" id="190f3eea-803d-3d7e-7d7d-8040c99a92c3">
+      <Execution id="47e4b422-ed07-4c6a-9759-1e39cde9d755" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Runtime.Tests/bin/Debug/net8.0/FLua.Runtime.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Runtime.Tests.LuaStringLibTests" name="StringFind_EmptyPattern_ShouldFindAtBeginning" />
+    </UnitTest>
+    <UnitTest name="LuaTable_NoMetatable_ShouldReturnNilForMissingKeys" storage="/users/bill/repos/flua/flua.runtime.tests/bin/debug/net8.0/flua.runtime.tests.dll" id="adfffce4-9a54-412c-78d4-175d2b7e6ed0">
+      <Execution id="16a11d4b-d3a2-4d24-95c8-e06fb6378aff" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Runtime.Tests/bin/Debug/net8.0/FLua.Runtime.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Runtime.Tests.LuaTableLibTests" name="LuaTable_NoMetatable_ShouldReturnNilForMissingKeys" />
+    </UnitTest>
+    <UnitTest name="StringRep_OneCount_ShouldReturnOriginalString" storage="/users/bill/repos/flua/flua.runtime.tests/bin/debug/net8.0/flua.runtime.tests.dll" id="7ec8e7ca-3b29-29a7-3695-42d7e5110b59">
+      <Execution id="b78044f7-b29a-435d-9b22-083b656c4a43" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Runtime.Tests/bin/Debug/net8.0/FLua.Runtime.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Runtime.Tests.LuaStringLibTests" name="StringRep_OneCount_ShouldReturnOriginalString" />
+    </UnitTest>
+    <UnitTest name="StringChar_MaxASCII_ShouldReturnCharacter" storage="/users/bill/repos/flua/flua.runtime.tests/bin/debug/net8.0/flua.runtime.tests.dll" id="fff4b68e-ee39-0454-e5c9-f6983bdbccd9">
+      <Execution id="f8309a15-5203-499c-8c61-bf8f2c495201" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Runtime.Tests/bin/Debug/net8.0/FLua.Runtime.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Runtime.Tests.LuaStringLibTests" name="StringChar_MaxASCII_ShouldReturnCharacter" />
+    </UnitTest>
+    <UnitTest name="FromObject_String_ShouldReturnLuaString" storage="/users/bill/repos/flua/flua.runtime.tests/bin/debug/net8.0/flua.runtime.tests.dll" id="1a932349-fbde-ee16-657d-2693b0c5e42d">
+      <Execution id="3fd6cc1f-5401-4192-b73b-68ba9a78dbe0" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Runtime.Tests/bin/Debug/net8.0/FLua.Runtime.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Runtime.Tests.LuaValueTests" name="FromObject_String_ShouldReturnLuaString" />
+    </UnitTest>
+    <UnitTest name="MathDeg_Pi_ShouldReturn180" storage="/users/bill/repos/flua/flua.runtime.tests/bin/debug/net8.0/flua.runtime.tests.dll" id="b27e435c-9699-31c3-d68f-00ef96bca045">
+      <Execution id="2fb1457a-6046-4f85-9b03-818d9c7ff035" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Runtime.Tests/bin/Debug/net8.0/FLua.Runtime.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Runtime.Tests.LuaMathLibTests" name="MathDeg_Pi_ShouldReturn180" />
+    </UnitTest>
+    <UnitTest name="MathMin_TwoArguments_ShouldReturnSmaller" storage="/users/bill/repos/flua/flua.runtime.tests/bin/debug/net8.0/flua.runtime.tests.dll" id="bedb6522-f7cf-6504-4d1b-987167c88cd4">
+      <Execution id="1064fc0c-9c08-496c-a3d8-8c522059e907" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Runtime.Tests/bin/Debug/net8.0/FLua.Runtime.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Runtime.Tests.LuaMathLibTests" name="MathMin_TwoArguments_ShouldReturnSmaller" />
+    </UnitTest>
+    <UnitTest name="LuaBoolean_FalseValue_ShouldBeFalsy" storage="/users/bill/repos/flua/flua.runtime.tests/bin/debug/net8.0/flua.runtime.tests.dll" id="df37e904-2cd9-ba72-831c-29c2ae60a626">
+      <Execution id="9381d645-11fb-4f95-a414-b736c987d865" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Runtime.Tests/bin/Debug/net8.0/FLua.Runtime.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Runtime.Tests.LuaValueTests" name="LuaBoolean_FalseValue_ShouldBeFalsy" />
+    </UnitTest>
+    <UnitTest name="StringUpper_WithNumbers_ShouldKeepNumbersUnchanged" storage="/users/bill/repos/flua/flua.runtime.tests/bin/debug/net8.0/flua.runtime.tests.dll" id="d44a8b90-cc67-18e3-0319-2edcc8c51e34">
+      <Execution id="260ef02c-0bff-4134-a83e-b514b1fe0998" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Runtime.Tests/bin/Debug/net8.0/FLua.Runtime.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Runtime.Tests.LuaStringLibTests" name="StringUpper_WithNumbers_ShouldKeepNumbersUnchanged" />
+    </UnitTest>
+    <UnitTest name="IsValueTruthy_Number_ShouldReturnTrue" storage="/users/bill/repos/flua/flua.runtime.tests/bin/debug/net8.0/flua.runtime.tests.dll" id="6310c7ea-b13f-26b1-d8e6-a774c20691e2">
+      <Execution id="6d549a7c-de9b-4e20-90ca-9b6ea9c57f7e" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Runtime.Tests/bin/Debug/net8.0/FLua.Runtime.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Runtime.Tests.LuaValueTests" name="IsValueTruthy_Number_ShouldReturnTrue" />
+    </UnitTest>
+    <UnitTest name="FromObject_Long_ShouldReturnLuaInteger" storage="/users/bill/repos/flua/flua.runtime.tests/bin/debug/net8.0/flua.runtime.tests.dll" id="409f7739-cf11-22b5-1758-0b50a6d4d309">
+      <Execution id="6da1be5e-3a14-408e-8a9a-0cf6e4c3f6e4" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Runtime.Tests/bin/Debug/net8.0/FLua.Runtime.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Runtime.Tests.LuaValueTests" name="FromObject_Long_ShouldReturnLuaInteger" />
+    </UnitTest>
+    <UnitTest name="FromObject_Bool_ShouldReturnLuaBoolean" storage="/users/bill/repos/flua/flua.runtime.tests/bin/debug/net8.0/flua.runtime.tests.dll" id="2f32e0f8-b691-f71d-4d18-6a4a93955887">
+      <Execution id="d6d76eff-c133-4e41-a7a3-2c3357316fe2" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Runtime.Tests/bin/Debug/net8.0/FLua.Runtime.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Runtime.Tests.LuaValueTests" name="FromObject_Bool_ShouldReturnLuaBoolean" />
+    </UnitTest>
+    <UnitTest name="TestCoroutineResume" storage="/users/bill/repos/flua/flua.runtime.tests/bin/debug/net8.0/flua.runtime.tests.dll" id="12cef88d-3e23-9a0c-ecda-a639ec8ecb68">
+      <Execution id="0e116234-9390-4cd6-a8f8-b6a0f6577bc9" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Runtime.Tests/bin/Debug/net8.0/FLua.Runtime.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Runtime.Tests.WorkingCoroutineTests" name="TestCoroutineResume" />
+    </UnitTest>
+    <UnitTest name="LuaTable_SetMetatable_ShouldStoreMetatable" storage="/users/bill/repos/flua/flua.runtime.tests/bin/debug/net8.0/flua.runtime.tests.dll" id="cf8f5e76-b112-943e-fa01-a93e316dd773">
+      <Execution id="4b6fcce1-f50a-4cab-8864-b0b15c288bed" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Runtime.Tests/bin/Debug/net8.0/FLua.Runtime.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Runtime.Tests.LuaTableLibTests" name="LuaTable_SetMetatable_ShouldStoreMetatable" />
+    </UnitTest>
+    <UnitTest name="StringReverse_RegularString_ShouldReturnReversed" storage="/users/bill/repos/flua/flua.runtime.tests/bin/debug/net8.0/flua.runtime.tests.dll" id="7f02c353-6c51-74fd-4336-87884ce5b093">
+      <Execution id="f01dd22d-6e54-41c2-bc89-dd89d6e2eadb" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Runtime.Tests/bin/Debug/net8.0/FLua.Runtime.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Runtime.Tests.LuaStringLibTests" name="StringReverse_RegularString_ShouldReturnReversed" />
+    </UnitTest>
+    <UnitTest name="MathMin_SingleArgument_ShouldReturnSameValue" storage="/users/bill/repos/flua/flua.runtime.tests/bin/debug/net8.0/flua.runtime.tests.dll" id="5cfe0b97-280b-cbb1-2ee7-0f4bf5dca240">
+      <Execution id="9796b67a-5e2d-4763-bf30-6e742d89168c" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Runtime.Tests/bin/Debug/net8.0/FLua.Runtime.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Runtime.Tests.LuaMathLibTests" name="MathMin_SingleArgument_ShouldReturnSameValue" />
+    </UnitTest>
+    <UnitTest name="LuaNumber_NegativeInfinity_ShouldHandleCorrectly" storage="/users/bill/repos/flua/flua.runtime.tests/bin/debug/net8.0/flua.runtime.tests.dll" id="0bf1f1d6-beae-34ea-7044-93492e91ce33">
+      <Execution id="bd261ff0-8e10-403f-aece-d09737bce24e" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Runtime.Tests/bin/Debug/net8.0/FLua.Runtime.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Runtime.Tests.LuaValueTests" name="LuaNumber_NegativeInfinity_ShouldHandleCorrectly" />
+    </UnitTest>
+    <UnitTest name="MathRandom_WithBounds_ShouldReturnInRange" storage="/users/bill/repos/flua/flua.runtime.tests/bin/debug/net8.0/flua.runtime.tests.dll" id="0ed505a3-9c55-3b78-612d-75b0fd3d3410">
+      <Execution id="fdc9f291-40c3-4a7b-b655-83bb0b354ae1" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Runtime.Tests/bin/Debug/net8.0/FLua.Runtime.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Runtime.Tests.LuaMathLibTests" name="MathRandom_WithBounds_ShouldReturnInRange" />
+    </UnitTest>
+    <UnitTest name="MathPow_AnyNumberToZero_ShouldReturnOne" storage="/users/bill/repos/flua/flua.runtime.tests/bin/debug/net8.0/flua.runtime.tests.dll" id="2e48a0c4-385c-de34-3908-a16504f1c59c">
+      <Execution id="9f4d07fe-7d91-40ff-96b4-7f06466fe38d" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Runtime.Tests/bin/Debug/net8.0/FLua.Runtime.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Runtime.Tests.LuaMathLibTests" name="MathPow_AnyNumberToZero_ShouldReturnOne" />
+    </UnitTest>
+    <UnitTest name="StringFind_PatternExists_ShouldReturnPosition" storage="/users/bill/repos/flua/flua.runtime.tests/bin/debug/net8.0/flua.runtime.tests.dll" id="447c4433-4393-9bee-e3d5-5ecc3b6cc661">
+      <Execution id="f4d4d53b-2f91-42c5-957e-4b654a3d6f86" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Runtime.Tests/bin/Debug/net8.0/FLua.Runtime.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Runtime.Tests.LuaStringLibTests" name="StringFind_PatternExists_ShouldReturnPosition" />
+    </UnitTest>
+    <UnitTest name="LuaNumber_NaN_ShouldHandleCorrectly" storage="/users/bill/repos/flua/flua.runtime.tests/bin/debug/net8.0/flua.runtime.tests.dll" id="7f0fa864-2ea2-18d3-30a0-7aae0a604600">
+      <Execution id="7a823943-2317-4dd8-9299-43ba0dabfc52" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Runtime.Tests/bin/Debug/net8.0/FLua.Runtime.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Runtime.Tests.LuaValueTests" name="LuaNumber_NaN_ShouldHandleCorrectly" />
+    </UnitTest>
+    <UnitTest name="FromObject_Null_ShouldReturnNil" storage="/users/bill/repos/flua/flua.runtime.tests/bin/debug/net8.0/flua.runtime.tests.dll" id="f6e45950-1179-cbeb-37b1-3e30087606ef">
+      <Execution id="bb0502f1-905d-47e4-bd16-2311a360e2ab" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Runtime.Tests/bin/Debug/net8.0/FLua.Runtime.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Runtime.Tests.LuaValueTests" name="FromObject_Null_ShouldReturnNil" />
+    </UnitTest>
+    <UnitTest name="TableSort_Numbers_ShouldSortAscending" storage="/users/bill/repos/flua/flua.runtime.tests/bin/debug/net8.0/flua.runtime.tests.dll" id="12235a19-e292-278e-b670-b7aedaf1b281">
+      <Execution id="2338dd38-4f84-4d3f-8213-96186c8d91e6" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Runtime.Tests/bin/Debug/net8.0/FLua.Runtime.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Runtime.Tests.LuaTableLibTests" name="TableSort_Numbers_ShouldSortAscending" />
+    </UnitTest>
+    <UnitTest name="MathSin_PiOverTwo_ShouldReturnOne" storage="/users/bill/repos/flua/flua.runtime.tests/bin/debug/net8.0/flua.runtime.tests.dll" id="9428cdc8-3fc0-5040-944e-19ca2a3ed0c6">
+      <Execution id="b578781a-f9b2-4d50-9014-3e6933339725" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Runtime.Tests/bin/Debug/net8.0/FLua.Runtime.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Runtime.Tests.LuaMathLibTests" name="MathSin_PiOverTwo_ShouldReturnOne" />
+    </UnitTest>
+    <UnitTest name="LuaTable_MetatableIndexAccess_ShouldCallMetamethod" storage="/users/bill/repos/flua/flua.runtime.tests/bin/debug/net8.0/flua.runtime.tests.dll" id="60de9ef1-6049-dbbf-39ad-87efa4570624">
+      <Execution id="2c5995e9-b955-4f19-bed6-00aad4ecd8f7" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Runtime.Tests/bin/Debug/net8.0/FLua.Runtime.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Runtime.Tests.LuaTableLibTests" name="LuaTable_MetatableIndexAccess_ShouldCallMetamethod" />
+    </UnitTest>
+    <UnitTest name="StringReverse_EmptyString_ShouldReturnEmptyString" storage="/users/bill/repos/flua/flua.runtime.tests/bin/debug/net8.0/flua.runtime.tests.dll" id="016724cf-ff3a-7b18-41c0-220348d67f77">
+      <Execution id="92cd9ec4-d4f7-486f-9ca3-71af4e2c926c" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Runtime.Tests/bin/Debug/net8.0/FLua.Runtime.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Runtime.Tests.LuaStringLibTests" name="StringReverse_EmptyString_ShouldReturnEmptyString" />
+    </UnitTest>
+    <UnitTest name="LuaInteger_MaxValue_ShouldHandleCorrectly" storage="/users/bill/repos/flua/flua.runtime.tests/bin/debug/net8.0/flua.runtime.tests.dll" id="8954ffed-29fd-1bfb-09fb-58b7fbd7b91c">
+      <Execution id="238c1aa5-dd6d-42e2-97c3-d3e1584c36b5" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Runtime.Tests/bin/Debug/net8.0/FLua.Runtime.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Runtime.Tests.LuaValueTests" name="LuaInteger_MaxValue_ShouldHandleCorrectly" />
+    </UnitTest>
+    <UnitTest name="IsValueTruthy_Integer_ShouldReturnTrue" storage="/users/bill/repos/flua/flua.runtime.tests/bin/debug/net8.0/flua.runtime.tests.dll" id="c7410bc4-a8c8-3d24-2477-beefc474c4ff">
+      <Execution id="e3ccdf78-0e8c-47a2-b76c-2553fe4f5493" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Runtime.Tests/bin/Debug/net8.0/FLua.Runtime.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Runtime.Tests.LuaValueTests" name="IsValueTruthy_Integer_ShouldReturnTrue" />
+    </UnitTest>
+    <UnitTest name="MathPow_TwoToThree_ShouldReturnEight" storage="/users/bill/repos/flua/flua.runtime.tests/bin/debug/net8.0/flua.runtime.tests.dll" id="be9e83a5-2d56-6d2e-399e-00e64031ff7c">
+      <Execution id="3a271b6a-3aad-44d3-9fec-60d419eb8953" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Runtime.Tests/bin/Debug/net8.0/FLua.Runtime.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Runtime.Tests.LuaMathLibTests" name="MathPow_TwoToThree_ShouldReturnEight" />
+    </UnitTest>
+    <UnitTest name="MathFMod_PositiveNumbers_ShouldReturnCorrectRemainder" storage="/users/bill/repos/flua/flua.runtime.tests/bin/debug/net8.0/flua.runtime.tests.dll" id="5c1ced93-47a4-2f59-545d-710a5ee3f396">
+      <Execution id="018b8fb3-1cf7-4e85-aca8-b967d0337733" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Runtime.Tests/bin/Debug/net8.0/FLua.Runtime.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Runtime.Tests.LuaMathLibTests" name="MathFMod_PositiveNumbers_ShouldReturnCorrectRemainder" />
+    </UnitTest>
+    <UnitTest name="StringLen_LongString_ShouldReturnCorrectLength" storage="/users/bill/repos/flua/flua.runtime.tests/bin/debug/net8.0/flua.runtime.tests.dll" id="cf1e46f4-da14-d056-26c6-814ac908354d">
+      <Execution id="d4db0e50-fa7c-4671-9a4a-93f373593ca0" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Runtime.Tests/bin/Debug/net8.0/FLua.Runtime.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Runtime.Tests.LuaStringLibTests" name="StringLen_LongString_ShouldReturnCorrectLength" />
+    </UnitTest>
+    <UnitTest name="MathTan_PiOverFour_ShouldReturnOne" storage="/users/bill/repos/flua/flua.runtime.tests/bin/debug/net8.0/flua.runtime.tests.dll" id="62a6695a-3ba4-c7b6-79e2-47071a47fcec">
+      <Execution id="85948a11-c7b2-458f-bcf5-0e1527d2be9b" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Runtime.Tests/bin/Debug/net8.0/FLua.Runtime.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Runtime.Tests.LuaMathLibTests" name="MathTan_PiOverFour_ShouldReturnOne" />
+    </UnitTest>
+    <UnitTest name="LuaRuntimeException_RandomMessages_ShouldHandleCorrectly" storage="/users/bill/repos/flua/flua.runtime.tests/bin/debug/net8.0/flua.runtime.tests.dll" id="b60bdbca-7010-0c39-f967-8cb5070510e8">
+      <Execution id="99e2584b-c7c4-4386-88ab-cc60ebd4fa03" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Runtime.Tests/bin/Debug/net8.0/FLua.Runtime.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Runtime.Tests.LuaRuntimeExceptionTests" name="LuaRuntimeException_RandomMessages_ShouldHandleCorrectly" />
+    </UnitTest>
+    <UnitTest name="StringLen_RegularString_ShouldReturnCorrectLength" storage="/users/bill/repos/flua/flua.runtime.tests/bin/debug/net8.0/flua.runtime.tests.dll" id="3119913a-eb5d-deca-9cff-55dde9d7ea60">
+      <Execution id="1a29bae8-0082-4a7e-ba0f-c8658b57e505" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Runtime.Tests/bin/Debug/net8.0/FLua.Runtime.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Runtime.Tests.LuaStringLibTests" name="StringLen_RegularString_ShouldReturnCorrectLength" />
+    </UnitTest>
+    <UnitTest name="MathFloor_PositiveDecimal_ShouldRoundDown" storage="/users/bill/repos/flua/flua.runtime.tests/bin/debug/net8.0/flua.runtime.tests.dll" id="a28d44a3-4d54-06a7-0116-b16cc7b2a249">
+      <Execution id="b87e4f13-76de-463d-b356-8d2c26744249" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Runtime.Tests/bin/Debug/net8.0/FLua.Runtime.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Runtime.Tests.LuaMathLibTests" name="MathFloor_PositiveDecimal_ShouldRoundDown" />
+    </UnitTest>
+    <UnitTest name="TestCoroutineRunning" storage="/users/bill/repos/flua/flua.runtime.tests/bin/debug/net8.0/flua.runtime.tests.dll" id="82ca22b8-e310-00c1-f827-41250c84f625">
+      <Execution id="77334de0-8515-45d8-b3cc-aaf420333b6d" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Runtime.Tests/bin/Debug/net8.0/FLua.Runtime.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Runtime.Tests.WorkingCoroutineTests" name="TestCoroutineRunning" />
+    </UnitTest>
+    <UnitTest name="TestCoroutineYieldPattern" storage="/users/bill/repos/flua/flua.runtime.tests/bin/debug/net8.0/flua.runtime.tests.dll" id="9c597b82-8afc-f7d6-2d23-5d7af92c9181">
+      <Execution id="65f21e49-fd84-47c8-adea-5bf7bf00ab6c" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Runtime.Tests/bin/Debug/net8.0/FLua.Runtime.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Runtime.Tests.BasicCoroutineTest" name="TestCoroutineYieldPattern" />
+    </UnitTest>
+    <UnitTest name="IsValueTruthy_TrueBoolean_ShouldReturnTrue" storage="/users/bill/repos/flua/flua.runtime.tests/bin/debug/net8.0/flua.runtime.tests.dll" id="e2659f0e-296c-bea7-b861-cd100c36486d">
+      <Execution id="35a4f767-70aa-4c28-8034-386902e6288c" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Runtime.Tests/bin/Debug/net8.0/FLua.Runtime.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Runtime.Tests.LuaValueTests" name="IsValueTruthy_TrueBoolean_ShouldReturnTrue" />
+    </UnitTest>
+    <UnitTest name="LuaTable_NonExistentKey_ShouldReturnNil" storage="/users/bill/repos/flua/flua.runtime.tests/bin/debug/net8.0/flua.runtime.tests.dll" id="742e227d-4a26-9d54-9c88-3d120a108ef2">
+      <Execution id="6c178746-a321-4f3d-81ab-7ef7dd6075cb" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Runtime.Tests/bin/Debug/net8.0/FLua.Runtime.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Runtime.Tests.LuaTableLibTests" name="LuaTable_NonExistentKey_ShouldReturnNil" />
+    </UnitTest>
+    <UnitTest name="StringSub_OutOfBounds_ShouldReturnEmptyString" storage="/users/bill/repos/flua/flua.runtime.tests/bin/debug/net8.0/flua.runtime.tests.dll" id="3738ff02-850b-c742-f6f9-3da9154afe6b">
+      <Execution id="d4501b4c-c99b-44da-81cd-c438f33db9c8" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Runtime.Tests/bin/Debug/net8.0/FLua.Runtime.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Runtime.Tests.LuaStringLibTests" name="StringSub_OutOfBounds_ShouldReturnEmptyString" />
+    </UnitTest>
+    <UnitTest name="MathRad_180_ShouldReturnPi" storage="/users/bill/repos/flua/flua.runtime.tests/bin/debug/net8.0/flua.runtime.tests.dll" id="3516af4b-f8a4-1d2e-6e21-30f165f554ad">
+      <Execution id="fe655a85-8940-4353-b9be-2425d55ac940" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Runtime.Tests/bin/Debug/net8.0/FLua.Runtime.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Runtime.Tests.LuaMathLibTests" name="MathRad_180_ShouldReturnPi" />
+    </UnitTest>
+    <UnitTest name="MathMax_MultipleArguments_ShouldReturnLargest" storage="/users/bill/repos/flua/flua.runtime.tests/bin/debug/net8.0/flua.runtime.tests.dll" id="f499cfc5-18d0-b1c2-029c-8015b53339eb">
+      <Execution id="41b88a88-393c-417d-b8e5-8a7a8abff0ed" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Runtime.Tests/bin/Debug/net8.0/FLua.Runtime.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Runtime.Tests.LuaMathLibTests" name="MathMax_MultipleArguments_ShouldReturnLargest" />
+    </UnitTest>
+    <UnitTest name="StringFormat_FloatSpecifier_ShouldFormatCorrectly" storage="/users/bill/repos/flua/flua.runtime.tests/bin/debug/net8.0/flua.runtime.tests.dll" id="7e24132e-f5f0-8f56-ff45-cbde824a656f">
+      <Execution id="726f6b13-97bf-48af-a097-b2ecfff510dd" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Runtime.Tests/bin/Debug/net8.0/FLua.Runtime.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Runtime.Tests.LuaStringLibTests" name="StringFormat_FloatSpecifier_ShouldFormatCorrectly" />
+    </UnitTest>
+    <UnitTest name="StringLower_EmptyString_ShouldReturnEmptyString" storage="/users/bill/repos/flua/flua.runtime.tests/bin/debug/net8.0/flua.runtime.tests.dll" id="63c99c0d-58f6-0fbc-6054-e3bc3141b24d">
+      <Execution id="78e2a0da-6621-471c-89c6-6d38e1c2abcc" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Runtime.Tests/bin/Debug/net8.0/FLua.Runtime.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Runtime.Tests.LuaStringLibTests" name="StringLower_EmptyString_ShouldReturnEmptyString" />
+    </UnitTest>
+    <UnitTest name="MathFMod_NegativeNumbers_ShouldHandleCorrectly" storage="/users/bill/repos/flua/flua.runtime.tests/bin/debug/net8.0/flua.runtime.tests.dll" id="77a18cf0-1d44-4ea9-aba6-a2a090a3c96f">
+      <Execution id="1967ae0d-8b91-4a88-a8ea-d12eeac872f1" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Runtime.Tests/bin/Debug/net8.0/FLua.Runtime.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Runtime.Tests.LuaMathLibTests" name="MathFMod_NegativeNumbers_ShouldHandleCorrectly" />
+    </UnitTest>
+    <UnitTest name="TestBasicCoroutineCreation" storage="/users/bill/repos/flua/flua.runtime.tests/bin/debug/net8.0/flua.runtime.tests.dll" id="233c87d0-b101-4681-5417-55a74c578e1e">
+      <Execution id="9ea309e1-a76d-4e81-8c80-d50c4a8ebe91" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Runtime.Tests/bin/Debug/net8.0/FLua.Runtime.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Runtime.Tests.WorkingCoroutineTests" name="TestBasicCoroutineCreation" />
+    </UnitTest>
+    <UnitTest name="StringReverse_Palindrome_ShouldReturnSameString" storage="/users/bill/repos/flua/flua.runtime.tests/bin/debug/net8.0/flua.runtime.tests.dll" id="ac415bd2-f04f-008e-041c-c381ec18e66e">
+      <Execution id="96a41fef-ab90-44c8-ac6a-93d80a8dee34" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Runtime.Tests/bin/Debug/net8.0/FLua.Runtime.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Runtime.Tests.LuaStringLibTests" name="StringReverse_Palindrome_ShouldReturnSameString" />
+    </UnitTest>
+    <UnitTest name="StringChar_SingleCode_ShouldReturnCharacter" storage="/users/bill/repos/flua/flua.runtime.tests/bin/debug/net8.0/flua.runtime.tests.dll" id="ca2e7646-1b80-c529-10e3-6cedcfbd596f">
+      <Execution id="6837a4d3-20a0-4d1b-bcc4-9463355e177b" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Runtime.Tests/bin/Debug/net8.0/FLua.Runtime.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Runtime.Tests.LuaStringLibTests" name="StringChar_SingleCode_ShouldReturnCharacter" />
+    </UnitTest>
+    <UnitTest name="TestCoroutineIsYieldable" storage="/users/bill/repos/flua/flua.runtime.tests/bin/debug/net8.0/flua.runtime.tests.dll" id="a4a2d165-f500-7f8b-b3bb-2d17b22e1b74">
+      <Execution id="8d0bfce0-34d8-4583-8fad-ae684ce4f251" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Runtime.Tests/bin/Debug/net8.0/FLua.Runtime.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Runtime.Tests.WorkingCoroutineTests" name="TestCoroutineIsYieldable" />
+    </UnitTest>
+    <UnitTest name="StringLen_NumberInput_ShouldReturnStringLength" storage="/users/bill/repos/flua/flua.runtime.tests/bin/debug/net8.0/flua.runtime.tests.dll" id="4cd663fc-0e79-c759-c440-657cd580b06f">
+      <Execution id="4c743e8e-a5e8-47f2-8da9-0c1f74488ad4" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Runtime.Tests/bin/Debug/net8.0/FLua.Runtime.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Runtime.Tests.LuaStringLibTests" name="StringLen_NumberInput_ShouldReturnStringLength" />
+    </UnitTest>
+    <UnitTest name="MathRandom_NoArgs_ShouldReturnBetweenZeroAndOne" storage="/users/bill/repos/flua/flua.runtime.tests/bin/debug/net8.0/flua.runtime.tests.dll" id="2c87ba23-c6e5-b44a-e9be-9c2a3f8517fd">
+      <Execution id="5a2f6bea-2d08-4936-80d5-a10f68281a23" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Runtime.Tests/bin/Debug/net8.0/FLua.Runtime.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Runtime.Tests.LuaMathLibTests" name="MathRandom_NoArgs_ShouldReturnBetweenZeroAndOne" />
+    </UnitTest>
+    <UnitTest name="LuaNil_ToString_ShouldReturnNil" storage="/users/bill/repos/flua/flua.runtime.tests/bin/debug/net8.0/flua.runtime.tests.dll" id="aeb36a03-ba7f-aaa2-24a8-84a09f2488be">
+      <Execution id="10f8c2e0-c70d-46ff-b356-1d48689cc730" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Runtime.Tests/bin/Debug/net8.0/FLua.Runtime.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Runtime.Tests.LuaValueTests" name="LuaNil_ToString_ShouldReturnNil" />
+    </UnitTest>
+    <UnitTest name="LuaInteger_PositiveValue_ShouldHandleCorrectly" storage="/users/bill/repos/flua/flua.runtime.tests/bin/debug/net8.0/flua.runtime.tests.dll" id="a4bd4216-16d2-a804-490c-fa270d0a3bdc">
+      <Execution id="edc82651-4cea-4b38-8e4e-dfc515078865" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Runtime.Tests/bin/Debug/net8.0/FLua.Runtime.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Runtime.Tests.LuaValueTests" name="LuaInteger_PositiveValue_ShouldHandleCorrectly" />
+    </UnitTest>
+    <UnitTest name="MathPi_ShouldBePiConstant" storage="/users/bill/repos/flua/flua.runtime.tests/bin/debug/net8.0/flua.runtime.tests.dll" id="345334d1-c69b-7394-899b-16c504f7f7e8">
+      <Execution id="bb061168-410c-4f78-92cd-e53f7bd5e63d" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Runtime.Tests/bin/Debug/net8.0/FLua.Runtime.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Runtime.Tests.LuaMathLibTests" name="MathPi_ShouldBePiConstant" />
+    </UnitTest>
+    <UnitTest name="LuaRuntimeException_WithMessage_ShouldCreateException" storage="/users/bill/repos/flua/flua.runtime.tests/bin/debug/net8.0/flua.runtime.tests.dll" id="07815920-769b-4b1d-f50d-155b51a2a33c">
+      <Execution id="cb500790-3bfc-4d28-a939-5dc95e8a5890" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Runtime.Tests/bin/Debug/net8.0/FLua.Runtime.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Runtime.Tests.LuaRuntimeExceptionTests" name="LuaRuntimeException_WithMessage_ShouldCreateException" />
+    </UnitTest>
+    <UnitTest name="MathCos_Zero_ShouldReturnOne" storage="/users/bill/repos/flua/flua.runtime.tests/bin/debug/net8.0/flua.runtime.tests.dll" id="9d05fbf7-3b9b-3c24-e646-4edabac676ae">
+      <Execution id="bcfae1b9-a15b-455b-8e15-2e51eb7f7149" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Runtime.Tests/bin/Debug/net8.0/FLua.Runtime.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Runtime.Tests.LuaMathLibTests" name="MathCos_Zero_ShouldReturnOne" />
+    </UnitTest>
+    <UnitTest name="TableRemove_LastElement_ShouldRemoveAndReturn" storage="/users/bill/repos/flua/flua.runtime.tests/bin/debug/net8.0/flua.runtime.tests.dll" id="6bc27b3d-7609-d58b-b156-3fff4e4456bf">
+      <Execution id="d741d781-afbd-4bc9-ae49-fb1637fb2304" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Runtime.Tests/bin/Debug/net8.0/FLua.Runtime.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Runtime.Tests.LuaTableLibTests" name="TableRemove_LastElement_ShouldRemoveAndReturn" />
+    </UnitTest>
+    <UnitTest name="StringByte_MultipleCharacters_ShouldReturnMultipleCodes" storage="/users/bill/repos/flua/flua.runtime.tests/bin/debug/net8.0/flua.runtime.tests.dll" id="b75ca15c-7313-05b8-454f-f4fb35a59048">
+      <Execution id="23a70f51-c809-4a90-8d99-9721c5810be8" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Runtime.Tests/bin/Debug/net8.0/FLua.Runtime.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Runtime.Tests.LuaStringLibTests" name="StringByte_MultipleCharacters_ShouldReturnMultipleCodes" />
+    </UnitTest>
+    <UnitTest name="FromObject_UnsupportedType_ShouldThrowException" storage="/users/bill/repos/flua/flua.runtime.tests/bin/debug/net8.0/flua.runtime.tests.dll" id="baee95fe-2868-eb7e-cfeb-6d15afc4b93a">
+      <Execution id="b5052511-3f0a-44d6-a00b-f8b897e5034b" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Runtime.Tests/bin/Debug/net8.0/FLua.Runtime.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Runtime.Tests.LuaValueTests" name="FromObject_UnsupportedType_ShouldThrowException" />
+    </UnitTest>
+    <UnitTest name="IsValueTruthy_Nil_ShouldReturnFalse" storage="/users/bill/repos/flua/flua.runtime.tests/bin/debug/net8.0/flua.runtime.tests.dll" id="3b1cd047-c229-82c7-44fa-2b2f45a5f566">
+      <Execution id="b2a608ab-f473-4ed8-ae33-bf15151a4f78" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Runtime.Tests/bin/Debug/net8.0/FLua.Runtime.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Runtime.Tests.LuaValueTests" name="IsValueTruthy_Nil_ShouldReturnFalse" />
+    </UnitTest>
+    <UnitTest name="MathLog_E_ShouldReturnOne" storage="/users/bill/repos/flua/flua.runtime.tests/bin/debug/net8.0/flua.runtime.tests.dll" id="a1183947-ecd5-7c88-1e94-1b329ed24ff1">
+      <Execution id="8f15726c-7a16-4b94-9709-e992a061d1b4" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Runtime.Tests/bin/Debug/net8.0/FLua.Runtime.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Runtime.Tests.LuaMathLibTests" name="MathLog_E_ShouldReturnOne" />
+    </UnitTest>
+    <UnitTest name="TableSort_SingleElement_ShouldRemainUnchanged" storage="/users/bill/repos/flua/flua.runtime.tests/bin/debug/net8.0/flua.runtime.tests.dll" id="daa8c60f-c482-0934-3473-271577cb9df9">
+      <Execution id="ac9ec957-0588-4a22-b400-2ed8dadb0e79" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Runtime.Tests/bin/Debug/net8.0/FLua.Runtime.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Runtime.Tests.LuaTableLibTests" name="TableSort_SingleElement_ShouldRemainUnchanged" />
+    </UnitTest>
+    <UnitTest name="StringSub_StartIndexOnly_ShouldReturnRestOfString" storage="/users/bill/repos/flua/flua.runtime.tests/bin/debug/net8.0/flua.runtime.tests.dll" id="428c733f-08bd-ceb4-6728-a196de5d1055">
+      <Execution id="a95b8fbf-d613-45ce-a4c4-78897a9937df" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Runtime.Tests/bin/Debug/net8.0/FLua.Runtime.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Runtime.Tests.LuaStringLibTests" name="StringSub_StartIndexOnly_ShouldReturnRestOfString" />
+    </UnitTest>
+    <UnitTest name="TestCoroutineStatus" storage="/users/bill/repos/flua/flua.runtime.tests/bin/debug/net8.0/flua.runtime.tests.dll" id="6c9547d4-0a2b-5c52-ecf8-7294e550ba4c">
+      <Execution id="7d1b5170-9282-4367-9243-3da7f1de7eb0" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Runtime.Tests/bin/Debug/net8.0/FLua.Runtime.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Runtime.Tests.WorkingCoroutineTests" name="TestCoroutineStatus" />
+    </UnitTest>
+    <UnitTest name="StringSub_PositiveIndices_ShouldReturnCorrectSubstring" storage="/users/bill/repos/flua/flua.runtime.tests/bin/debug/net8.0/flua.runtime.tests.dll" id="af60203c-9c72-573a-1e94-68b389d07824">
+      <Execution id="fdd493ba-da6b-425d-81c8-383f070eb311" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Runtime.Tests/bin/Debug/net8.0/FLua.Runtime.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Runtime.Tests.LuaStringLibTests" name="StringSub_PositiveIndices_ShouldReturnCorrectSubstring" />
+    </UnitTest>
+    <UnitTest name="StringRep_LargeCount_ShouldHandleCorrectly" storage="/users/bill/repos/flua/flua.runtime.tests/bin/debug/net8.0/flua.runtime.tests.dll" id="5d1a374a-f2eb-eafa-737e-d0c4874d2ce7">
+      <Execution id="d14fa904-5199-43cf-9036-f9c6c77085f2" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Runtime.Tests/bin/Debug/net8.0/FLua.Runtime.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Runtime.Tests.LuaStringLibTests" name="StringRep_LargeCount_ShouldHandleCorrectly" />
+    </UnitTest>
+    <UnitTest name="MathRandomSeed_SameSeed_ShouldProduceSameSequence" storage="/users/bill/repos/flua/flua.runtime.tests/bin/debug/net8.0/flua.runtime.tests.dll" id="b5a43c8e-8970-ccab-5808-6f35f27ce821">
+      <Execution id="86ea33e6-012d-480e-bd90-cffd700bfbb5" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Runtime.Tests/bin/Debug/net8.0/FLua.Runtime.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Runtime.Tests.LuaMathLibTests" name="MathRandomSeed_SameSeed_ShouldProduceSameSequence" />
+    </UnitTest>
+    <UnitTest name="LuaNumber_RegularValue_ShouldHandleCorrectly" storage="/users/bill/repos/flua/flua.runtime.tests/bin/debug/net8.0/flua.runtime.tests.dll" id="83cf361e-bdcf-2c39-c69b-b4d97d1acb77">
+      <Execution id="4089ce54-7376-4582-acf6-52281d06d69a" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Runtime.Tests/bin/Debug/net8.0/FLua.Runtime.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Runtime.Tests.LuaValueTests" name="LuaNumber_RegularValue_ShouldHandleCorrectly" />
+    </UnitTest>
+    <UnitTest name="TableConcat_WithRange_ShouldConcatenateSubset" storage="/users/bill/repos/flua/flua.runtime.tests/bin/debug/net8.0/flua.runtime.tests.dll" id="65c5d66a-b273-5bb3-3605-39ce886f15b4">
+      <Execution id="c011f2ad-d0e8-497a-afe4-8dae998df2f5" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Runtime.Tests/bin/Debug/net8.0/FLua.Runtime.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Runtime.Tests.LuaTableLibTests" name="TableConcat_WithRange_ShouldConcatenateSubset" />
+    </UnitTest>
+    <UnitTest name="MathSin_Zero_ShouldReturnZero" storage="/users/bill/repos/flua/flua.runtime.tests/bin/debug/net8.0/flua.runtime.tests.dll" id="5a309692-c730-5896-5fec-f394cd0b5d5d">
+      <Execution id="af7361b9-b4c9-492d-bb1e-d37f3f691458" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Runtime.Tests/bin/Debug/net8.0/FLua.Runtime.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Runtime.Tests.LuaMathLibTests" name="MathSin_Zero_ShouldReturnZero" />
+    </UnitTest>
+    <UnitTest name="TableRemove_EmptyTable_ShouldReturnNil" storage="/users/bill/repos/flua/flua.runtime.tests/bin/debug/net8.0/flua.runtime.tests.dll" id="ba07ddbe-541e-d177-c381-fb4de2772b36">
+      <Execution id="1232f19b-53e6-46bb-8a58-35ec539c3dc8" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Runtime.Tests/bin/Debug/net8.0/FLua.Runtime.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Runtime.Tests.LuaTableLibTests" name="TableRemove_EmptyTable_ShouldReturnNil" />
+    </UnitTest>
+    <UnitTest name="TableRemove_AtPosition_ShouldRemoveAndShift" storage="/users/bill/repos/flua/flua.runtime.tests/bin/debug/net8.0/flua.runtime.tests.dll" id="b6fff122-a8d7-249a-f08c-c1303bf89970">
+      <Execution id="72986731-e915-4a32-a566-8a81958348c3" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Runtime.Tests/bin/Debug/net8.0/FLua.Runtime.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Runtime.Tests.LuaTableLibTests" name="TableRemove_AtPosition_ShouldRemoveAndShift" />
+    </UnitTest>
+    <UnitTest name="TableSort_EmptyTable_ShouldNotFail" storage="/users/bill/repos/flua/flua.runtime.tests/bin/debug/net8.0/flua.runtime.tests.dll" id="c791235f-5f91-3386-b42c-9204c9e27135">
+      <Execution id="91385274-bee6-4d5f-96f8-f8999ecc6c0f" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Runtime.Tests/bin/Debug/net8.0/FLua.Runtime.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Runtime.Tests.LuaTableLibTests" name="TableSort_EmptyTable_ShouldNotFail" />
+    </UnitTest>
+    <UnitTest name="MathRandom_WithUpperBound_ShouldReturnInRange" storage="/users/bill/repos/flua/flua.runtime.tests/bin/debug/net8.0/flua.runtime.tests.dll" id="96e27d57-d3a2-01e7-7b5b-2519dccd8926">
+      <Execution id="0df02135-4dbe-443e-ad39-183b6fcc6e38" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Runtime.Tests/bin/Debug/net8.0/FLua.Runtime.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Runtime.Tests.LuaMathLibTests" name="MathRandom_WithUpperBound_ShouldReturnInRange" />
+    </UnitTest>
+    <UnitTest name="TableSort_Strings_ShouldSortAlphabetically" storage="/users/bill/repos/flua/flua.runtime.tests/bin/debug/net8.0/flua.runtime.tests.dll" id="bd1e53dd-be4e-115b-80fa-a9099016266a">
+      <Execution id="ad5a514a-85bd-4186-90f5-dea88b1d804a" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Runtime.Tests/bin/Debug/net8.0/FLua.Runtime.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Runtime.Tests.LuaTableLibTests" name="TableSort_Strings_ShouldSortAlphabetically" />
+    </UnitTest>
+    <UnitTest name="MathMinInteger_ShouldBeLongMinValue" storage="/users/bill/repos/flua/flua.runtime.tests/bin/debug/net8.0/flua.runtime.tests.dll" id="b04b042e-c608-14d5-40cb-ccb56ffecb60">
+      <Execution id="6f37e8d7-27f0-4c57-83d1-8d2b7e7010f9" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Runtime.Tests/bin/Debug/net8.0/FLua.Runtime.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Runtime.Tests.LuaMathLibTests" name="MathMinInteger_ShouldBeLongMinValue" />
+    </UnitTest>
+    <UnitTest name="StringUpper_MixedCase_ShouldReturnUppercase" storage="/users/bill/repos/flua/flua.runtime.tests/bin/debug/net8.0/flua.runtime.tests.dll" id="cce500c0-b6c2-8a88-0540-42df7487c4cb">
+      <Execution id="fb049cce-2c76-44f1-a115-16fd335f367c" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Runtime.Tests/bin/Debug/net8.0/FLua.Runtime.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Runtime.Tests.LuaStringLibTests" name="StringUpper_MixedCase_ShouldReturnUppercase" />
+    </UnitTest>
+    <UnitTest name="TableInsert_AtEnd_ShouldAppendToArray" storage="/users/bill/repos/flua/flua.runtime.tests/bin/debug/net8.0/flua.runtime.tests.dll" id="89f7b719-0632-7d2b-b049-a1a94bffa9fb">
+      <Execution id="8379a7c4-fe0c-4761-ba6f-5aeace87fa9e" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Runtime.Tests/bin/Debug/net8.0/FLua.Runtime.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Runtime.Tests.LuaTableLibTests" name="TableInsert_AtEnd_ShouldAppendToArray" />
+    </UnitTest>
+    <UnitTest name="MathCeil_NegativeDecimal_ShouldRoundUp" storage="/users/bill/repos/flua/flua.runtime.tests/bin/debug/net8.0/flua.runtime.tests.dll" id="42fd50f5-818d-6851-86b9-842c5b923988">
+      <Execution id="292d99a7-b3df-42d0-a677-a8161cae66a2" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Runtime.Tests/bin/Debug/net8.0/FLua.Runtime.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Runtime.Tests.LuaMathLibTests" name="MathCeil_NegativeDecimal_ShouldRoundUp" />
+    </UnitTest>
+    <UnitTest name="TableInsert_AtBeginning_ShouldShiftElements" storage="/users/bill/repos/flua/flua.runtime.tests/bin/debug/net8.0/flua.runtime.tests.dll" id="9b8d4a77-e9ee-bfc6-d5e9-f9e426d88ca8">
+      <Execution id="61b57873-8b57-4264-a570-5fba450ec913" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Runtime.Tests/bin/Debug/net8.0/FLua.Runtime.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Runtime.Tests.LuaTableLibTests" name="TableInsert_AtBeginning_ShouldShiftElements" />
+    </UnitTest>
+    <UnitTest name="MathSqrt_NegativeNumber_ShouldReturnNaN" storage="/users/bill/repos/flua/flua.runtime.tests/bin/debug/net8.0/flua.runtime.tests.dll" id="9948571a-a40e-827f-8cf6-88064c91e843">
+      <Execution id="4fdeb645-ac79-4265-be83-eb278bab333b" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Runtime.Tests/bin/Debug/net8.0/FLua.Runtime.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Runtime.Tests.LuaMathLibTests" name="MathSqrt_NegativeNumber_ShouldReturnNaN" />
+    </UnitTest>
+    <UnitTest name="MathAbs_PositiveNumber_ShouldReturnSameValue" storage="/users/bill/repos/flua/flua.runtime.tests/bin/debug/net8.0/flua.runtime.tests.dll" id="7301f02a-4dc7-8dc7-1f6d-9aa851e3c6a2">
+      <Execution id="820f755c-c049-4f2a-81fe-ae70b3782ae9" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Runtime.Tests/bin/Debug/net8.0/FLua.Runtime.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Runtime.Tests.LuaMathLibTests" name="MathAbs_PositiveNumber_ShouldReturnSameValue" />
+    </UnitTest>
+    <UnitTest name="LuaRuntimeException_MessageProperty_ShouldStoreMessage" storage="/users/bill/repos/flua/flua.runtime.tests/bin/debug/net8.0/flua.runtime.tests.dll" id="eb3531da-5b80-6ac2-748b-0f7f81f9d611">
+      <Execution id="1357365a-5ad8-400f-9a27-a94a72836c8f" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Runtime.Tests/bin/Debug/net8.0/FLua.Runtime.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Runtime.Tests.LuaRuntimeExceptionTests" name="LuaRuntimeException_MessageProperty_ShouldStoreMessage" />
+    </UnitTest>
+    <UnitTest name="ThrowLuaRuntimeException_ShouldBeCatchable" storage="/users/bill/repos/flua/flua.runtime.tests/bin/debug/net8.0/flua.runtime.tests.dll" id="0dec1832-226a-9285-f8a3-b62cbc426ef7">
+      <Execution id="4fa650fa-c0d4-47bd-90f5-d4afe9add13f" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Runtime.Tests/bin/Debug/net8.0/FLua.Runtime.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Runtime.Tests.LuaRuntimeExceptionTests" name="ThrowLuaRuntimeException_ShouldBeCatchable" />
+    </UnitTest>
+    <UnitTest name="LuaRuntimeException_WithMessage_ShouldStoreMessage" storage="/users/bill/repos/flua/flua.runtime.tests/bin/debug/net8.0/flua.runtime.tests.dll" id="79fc91a0-094e-4d9c-cde7-a0e550c86f48">
+      <Execution id="3fef8c8e-17ea-42b3-bee0-4d763607dca6" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Runtime.Tests/bin/Debug/net8.0/FLua.Runtime.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Runtime.Tests.LuaRuntimeExceptionTests" name="LuaRuntimeException_WithMessage_ShouldStoreMessage" />
+    </UnitTest>
+    <UnitTest name="LuaTable_IntegerKey_ShouldStoreInArray" storage="/users/bill/repos/flua/flua.runtime.tests/bin/debug/net8.0/flua.runtime.tests.dll" id="a7245264-48e2-ef1d-bf8e-da544214f3e5">
+      <Execution id="a804bac6-af47-4ddc-9a22-6b94db321d9f" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Runtime.Tests/bin/Debug/net8.0/FLua.Runtime.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Runtime.Tests.LuaTableLibTests" name="LuaTable_IntegerKey_ShouldStoreInArray" />
+    </UnitTest>
+    <UnitTest name="StringRep_PositiveCount_ShouldRepeatString" storage="/users/bill/repos/flua/flua.runtime.tests/bin/debug/net8.0/flua.runtime.tests.dll" id="ade95837-ddb4-9ccc-6360-ef92356b3b28">
+      <Execution id="f7df6179-d1d1-41b5-a010-3484a57bbcbd" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Runtime.Tests/bin/Debug/net8.0/FLua.Runtime.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Runtime.Tests.LuaStringLibTests" name="StringRep_PositiveCount_ShouldRepeatString" />
+    </UnitTest>
+    <UnitTest name="MathMaxInteger_ShouldBeLongMaxValue" storage="/users/bill/repos/flua/flua.runtime.tests/bin/debug/net8.0/flua.runtime.tests.dll" id="2e8debc2-1301-c7b3-e67a-745d1c688b80">
+      <Execution id="af1c532e-5cc4-42aa-b494-cbf92aef5da0" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Runtime.Tests/bin/Debug/net8.0/FLua.Runtime.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Runtime.Tests.LuaMathLibTests" name="MathMaxInteger_ShouldBeLongMaxValue" />
+    </UnitTest>
+    <UnitTest name="LuaNil_IsTruthy_ShouldBeFalse" storage="/users/bill/repos/flua/flua.runtime.tests/bin/debug/net8.0/flua.runtime.tests.dll" id="23b7caf5-5cf0-5742-ce43-064db73934c4">
+      <Execution id="a47663ef-ae28-4dc7-ab3f-f38b38712516" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Runtime.Tests/bin/Debug/net8.0/FLua.Runtime.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Runtime.Tests.LuaValueTests" name="LuaNil_IsTruthy_ShouldBeFalse" />
+    </UnitTest>
+    <UnitTest name="StringFormat_MultipleSpecifiers_ShouldFormatCorrectly" storage="/users/bill/repos/flua/flua.runtime.tests/bin/debug/net8.0/flua.runtime.tests.dll" id="5fdd3722-21fa-5c2e-7b6b-68abefe0ae62">
+      <Execution id="55e8c77c-d0a2-4c73-860e-a93b58380152" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Runtime.Tests/bin/Debug/net8.0/FLua.Runtime.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Runtime.Tests.LuaStringLibTests" name="StringFormat_MultipleSpecifiers_ShouldFormatCorrectly" />
+    </UnitTest>
+    <UnitTest name="StringReverse_SingleCharacter_ShouldReturnSameCharacter" storage="/users/bill/repos/flua/flua.runtime.tests/bin/debug/net8.0/flua.runtime.tests.dll" id="2dc6f229-d372-7044-88ff-fedcb4d98019">
+      <Execution id="409dca22-a49a-4043-b1a0-b424659f4f40" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Runtime.Tests/bin/Debug/net8.0/FLua.Runtime.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Runtime.Tests.LuaStringLibTests" name="StringReverse_SingleCharacter_ShouldReturnSameCharacter" />
+    </UnitTest>
+    <UnitTest name="LuaNumber_PositiveInfinity_ShouldHandleCorrectly" storage="/users/bill/repos/flua/flua.runtime.tests/bin/debug/net8.0/flua.runtime.tests.dll" id="270edca5-493a-6569-7b23-0371fc1bbebc">
+      <Execution id="72c53c7e-d920-4ca1-922e-229a045bfb78" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Runtime.Tests/bin/Debug/net8.0/FLua.Runtime.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Runtime.Tests.LuaValueTests" name="LuaNumber_PositiveInfinity_ShouldHandleCorrectly" />
+    </UnitTest>
+    <UnitTest name="LuaNil_Instance_ShouldBeSingleton" storage="/users/bill/repos/flua/flua.runtime.tests/bin/debug/net8.0/flua.runtime.tests.dll" id="d112ffc6-9ab0-06b7-4693-ba4331db0456">
+      <Execution id="3c78c179-243f-423b-927e-b9640b12d6aa" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Runtime.Tests/bin/Debug/net8.0/FLua.Runtime.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Runtime.Tests.LuaValueTests" name="LuaNil_Instance_ShouldBeSingleton" />
+    </UnitTest>
+    <UnitTest name="StringLib_InvalidArgument_ShouldThrowLuaRuntimeException" storage="/users/bill/repos/flua/flua.runtime.tests/bin/debug/net8.0/flua.runtime.tests.dll" id="60341286-ebb9-fc46-49e3-4a8cab0e2e00">
+      <Execution id="786ade7f-729e-4d4d-836b-5a058c0b89aa" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Runtime.Tests/bin/Debug/net8.0/FLua.Runtime.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Runtime.Tests.LuaRuntimeExceptionTests" name="StringLib_InvalidArgument_ShouldThrowLuaRuntimeException" />
+    </UnitTest>
+    <UnitTest name="MathPow_OneToAnyPower_ShouldReturnOne" storage="/users/bill/repos/flua/flua.runtime.tests/bin/debug/net8.0/flua.runtime.tests.dll" id="e70a47f2-b673-3f81-e51f-fba6bbc56ff9">
+      <Execution id="5445865b-b567-40d9-a40e-5d1d34501905" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Runtime.Tests/bin/Debug/net8.0/FLua.Runtime.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Runtime.Tests.LuaMathLibTests" name="MathPow_OneToAnyPower_ShouldReturnOne" />
+    </UnitTest>
+    <UnitTest name="LuaInteger_NegativeValue_ShouldHandleCorrectly" storage="/users/bill/repos/flua/flua.runtime.tests/bin/debug/net8.0/flua.runtime.tests.dll" id="9b25d867-22e7-abd9-0d91-7d89575a0527">
+      <Execution id="ef7142c7-ba31-41f9-8ce4-0a3de9373774" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Runtime.Tests/bin/Debug/net8.0/FLua.Runtime.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Runtime.Tests.LuaValueTests" name="LuaInteger_NegativeValue_ShouldHandleCorrectly" />
+    </UnitTest>
+    <UnitTest name="LuaInteger_Zero_ShouldHandleCorrectly" storage="/users/bill/repos/flua/flua.runtime.tests/bin/debug/net8.0/flua.runtime.tests.dll" id="d9310133-9ac5-aaf3-d288-12dda2339a22">
+      <Execution id="8705b1d5-a8cf-4138-ba7d-4591654092f1" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Runtime.Tests/bin/Debug/net8.0/FLua.Runtime.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Runtime.Tests.LuaValueTests" name="LuaInteger_Zero_ShouldHandleCorrectly" />
+    </UnitTest>
+    <UnitTest name="TableInsert_AtPosition_ShouldInsertCorrectly" storage="/users/bill/repos/flua/flua.runtime.tests/bin/debug/net8.0/flua.runtime.tests.dll" id="b22a4a57-1deb-d974-df69-cbe533b6b400">
+      <Execution id="9e3ba97e-9500-4e54-a46d-ce5754279c2c" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Runtime.Tests/bin/Debug/net8.0/FLua.Runtime.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Runtime.Tests.LuaTableLibTests" name="TableInsert_AtPosition_ShouldInsertCorrectly" />
+    </UnitTest>
+    <UnitTest name="TableConcat_WithSeparator_ShouldUseSeparator" storage="/users/bill/repos/flua/flua.runtime.tests/bin/debug/net8.0/flua.runtime.tests.dll" id="673155f4-965a-c76e-d309-fb8225108a24">
+      <Execution id="96945c09-b991-42a9-bb4c-fdc8cd2bba52" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Runtime.Tests/bin/Debug/net8.0/FLua.Runtime.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Runtime.Tests.LuaTableLibTests" name="TableConcat_WithSeparator_ShouldUseSeparator" />
+    </UnitTest>
+    <UnitTest name="LuaTable_StringKey_ShouldStoreCorrectly" storage="/users/bill/repos/flua/flua.runtime.tests/bin/debug/net8.0/flua.runtime.tests.dll" id="59e8433c-fa31-02c3-9a44-25332417b295">
+      <Execution id="763aca41-9155-45b3-8aac-1e62846d37b3" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Runtime.Tests/bin/Debug/net8.0/FLua.Runtime.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Runtime.Tests.LuaTableLibTests" name="LuaTable_StringKey_ShouldStoreCorrectly" />
+    </UnitTest>
+    <UnitTest name="FromObject_Double_ShouldReturnLuaNumber" storage="/users/bill/repos/flua/flua.runtime.tests/bin/debug/net8.0/flua.runtime.tests.dll" id="5ab7e53d-1b1e-f284-da9d-ecf8bcf0931a">
+      <Execution id="477ae5be-656c-4e03-96b1-3657785fc469" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Runtime.Tests/bin/Debug/net8.0/FLua.Runtime.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Runtime.Tests.LuaValueTests" name="FromObject_Double_ShouldReturnLuaNumber" />
+    </UnitTest>
+    <UnitTest name="MathAbs_Zero_ShouldReturnZero" storage="/users/bill/repos/flua/flua.runtime.tests/bin/debug/net8.0/flua.runtime.tests.dll" id="69ebf2f0-946b-5178-e1dd-a773c05cb781">
+      <Execution id="5ffac340-4921-45bf-8036-50c2028a02f3" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Runtime.Tests/bin/Debug/net8.0/FLua.Runtime.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Runtime.Tests.LuaMathLibTests" name="MathAbs_Zero_ShouldReturnZero" />
+    </UnitTest>
+    <UnitTest name="StringLen_EmptyString_ShouldReturnZero" storage="/users/bill/repos/flua/flua.runtime.tests/bin/debug/net8.0/flua.runtime.tests.dll" id="ece2fee8-4c35-153c-62d3-943f472b7715">
+      <Execution id="143ea2a3-9cbb-4caa-99b0-47264b423cc4" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Runtime.Tests/bin/Debug/net8.0/FLua.Runtime.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Runtime.Tests.LuaStringLibTests" name="StringLen_EmptyString_ShouldReturnZero" />
+    </UnitTest>
+    <UnitTest name="MathFloor_NegativeDecimal_ShouldRoundDown" storage="/users/bill/repos/flua/flua.runtime.tests/bin/debug/net8.0/flua.runtime.tests.dll" id="3523a27b-a699-46a0-e3f4-865722483c74">
+      <Execution id="31511f08-8375-492d-ab1e-cc6f16066238" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Runtime.Tests/bin/Debug/net8.0/FLua.Runtime.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Runtime.Tests.LuaMathLibTests" name="MathFloor_NegativeDecimal_ShouldRoundDown" />
+    </UnitTest>
+    <UnitTest name="LuaInteger_MinValue_ShouldHandleCorrectly" storage="/users/bill/repos/flua/flua.runtime.tests/bin/debug/net8.0/flua.runtime.tests.dll" id="9635de5e-365d-f90e-5cbb-e3014d694243">
+      <Execution id="fe7ef18a-bbcf-4d7b-be05-05a351b88f65" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Runtime.Tests/bin/Debug/net8.0/FLua.Runtime.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Runtime.Tests.LuaValueTests" name="LuaInteger_MinValue_ShouldHandleCorrectly" />
+    </UnitTest>
+    <UnitTest name="TestCoroutineWrap" storage="/users/bill/repos/flua/flua.runtime.tests/bin/debug/net8.0/flua.runtime.tests.dll" id="30be04e6-3d23-02b9-f432-979cee6bd744">
+      <Execution id="12977af7-77be-45fa-a43d-f49d7084e557" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Runtime.Tests/bin/Debug/net8.0/FLua.Runtime.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Runtime.Tests.WorkingCoroutineTests" name="TestCoroutineWrap" />
+    </UnitTest>
+    <UnitTest name="FromObject_Int_ShouldReturnLuaInteger" storage="/users/bill/repos/flua/flua.runtime.tests/bin/debug/net8.0/flua.runtime.tests.dll" id="eb0191eb-c1e7-dc96-6b32-d3b6309defea">
+      <Execution id="d5870429-e687-4c4a-9f9e-a389413ac102" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Runtime.Tests/bin/Debug/net8.0/FLua.Runtime.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Runtime.Tests.LuaValueTests" name="FromObject_Int_ShouldReturnLuaInteger" />
+    </UnitTest>
+    <UnitTest name="LuaTable_NewTable_ShouldBeEmpty" storage="/users/bill/repos/flua/flua.runtime.tests/bin/debug/net8.0/flua.runtime.tests.dll" id="3b1d5a46-1f73-1bbc-8562-7f53faa0bbab">
+      <Execution id="67fc4072-8517-4a21-aa78-a4e26dd66a2c" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Runtime.Tests/bin/Debug/net8.0/FLua.Runtime.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Runtime.Tests.LuaTableLibTests" name="LuaTable_NewTable_ShouldBeEmpty" />
+    </UnitTest>
+    <UnitTest name="MathExp_Zero_ShouldReturnOne" storage="/users/bill/repos/flua/flua.runtime.tests/bin/debug/net8.0/flua.runtime.tests.dll" id="1974c8a7-98a3-e803-8a78-09a2c5239cfb">
+      <Execution id="6d7fd023-722d-4b48-ad84-ecbdae800e1a" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Runtime.Tests/bin/Debug/net8.0/FLua.Runtime.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Runtime.Tests.LuaMathLibTests" name="MathExp_Zero_ShouldReturnOne" />
+    </UnitTest>
+    <UnitTest name="LuaRuntimeException_CustomMessage_ShouldContainMessage" storage="/users/bill/repos/flua/flua.runtime.tests/bin/debug/net8.0/flua.runtime.tests.dll" id="17377364-953b-2c7c-0107-e712e10a64ff">
+      <Execution id="4f5a8cd7-2bd5-46b9-9025-fc979d96eb04" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Runtime.Tests/bin/Debug/net8.0/FLua.Runtime.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Runtime.Tests.LuaRuntimeExceptionTests" name="LuaRuntimeException_CustomMessage_ShouldContainMessage" />
+    </UnitTest>
+    <UnitTest name="LuaTable_SetAndGet_ShouldMaintainState" storage="/users/bill/repos/flua/flua.runtime.tests/bin/debug/net8.0/flua.runtime.tests.dll" id="881b22b1-3c31-ab2a-03f3-284114d3bf9d">
+      <Execution id="594d0523-a3b4-4b6e-98b1-a7bfb7dbd90b" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Runtime.Tests/bin/Debug/net8.0/FLua.Runtime.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Runtime.Tests.LuaTableLibTests" name="LuaTable_SetAndGet_ShouldMaintainState" />
+    </UnitTest>
+    <UnitTest name="TableConcat_EmptyTable_ShouldReturnEmptyString" storage="/users/bill/repos/flua/flua.runtime.tests/bin/debug/net8.0/flua.runtime.tests.dll" id="e37e0405-4441-40cb-0aad-6bce6ee46d04">
+      <Execution id="1c48412e-e1b5-47bf-b75d-8c596a327b80" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Runtime.Tests/bin/Debug/net8.0/FLua.Runtime.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Runtime.Tests.LuaTableLibTests" name="TableConcat_EmptyTable_ShouldReturnEmptyString" />
+    </UnitTest>
+    <UnitTest name="LuaBoolean_TrueValue_ShouldBeTruthy" storage="/users/bill/repos/flua/flua.runtime.tests/bin/debug/net8.0/flua.runtime.tests.dll" id="ed5bf168-a534-ed0d-28f7-4f4622383f90">
+      <Execution id="1af427c0-bfe7-4408-9e30-3eded305d336" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Runtime.Tests/bin/Debug/net8.0/FLua.Runtime.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Runtime.Tests.LuaValueTests" name="LuaBoolean_TrueValue_ShouldBeTruthy" />
+    </UnitTest>
+    <UnitTest name="MathSqrt_Four_ShouldReturnTwo" storage="/users/bill/repos/flua/flua.runtime.tests/bin/debug/net8.0/flua.runtime.tests.dll" id="40802bca-7604-ea47-82b8-dde4ff38bdcb">
+      <Execution id="c74ff0be-52bb-4564-81cb-b62367caf6d4" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Runtime.Tests/bin/Debug/net8.0/FLua.Runtime.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Runtime.Tests.LuaMathLibTests" name="MathSqrt_Four_ShouldReturnTwo" />
+    </UnitTest>
+    <UnitTest name="MathAbs_NegativeNumber_ShouldReturnPositiveValue" storage="/users/bill/repos/flua/flua.runtime.tests/bin/debug/net8.0/flua.runtime.tests.dll" id="52c6cbb3-0fb5-64c2-41c9-b33943da9d95">
+      <Execution id="32a3088d-d4b9-490d-8149-ccc568f33e58" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Runtime.Tests/bin/Debug/net8.0/FLua.Runtime.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Runtime.Tests.LuaMathLibTests" name="MathAbs_NegativeNumber_ShouldReturnPositiveValue" />
+    </UnitTest>
+    <UnitTest name="FromObject_Float_ShouldReturnLuaNumber" storage="/users/bill/repos/flua/flua.runtime.tests/bin/debug/net8.0/flua.runtime.tests.dll" id="f57b7888-6324-b1f2-9843-ef45851f7bfb">
+      <Execution id="398d7032-d204-4d2a-990c-4ee7bd898395" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Runtime.Tests/bin/Debug/net8.0/FLua.Runtime.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Runtime.Tests.LuaValueTests" name="FromObject_Float_ShouldReturnLuaNumber" />
+    </UnitTest>
+    <UnitTest name="StringFind_PatternNotFound_ShouldReturnNil" storage="/users/bill/repos/flua/flua.runtime.tests/bin/debug/net8.0/flua.runtime.tests.dll" id="2106053b-d07c-6568-30e2-8bf9806cf31e">
+      <Execution id="1984c892-4c24-42f8-841d-50d8d14e9f7c" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Runtime.Tests/bin/Debug/net8.0/FLua.Runtime.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Runtime.Tests.LuaStringLibTests" name="StringFind_PatternNotFound_ShouldReturnNil" />
+    </UnitTest>
+    <UnitTest name="StringSub_NegativeIndices_ShouldReturnCorrectSubstring" storage="/users/bill/repos/flua/flua.runtime.tests/bin/debug/net8.0/flua.runtime.tests.dll" id="a8e9dda0-73b1-26d3-83d9-9bb3827af4a0">
+      <Execution id="b03432d3-c23e-48e4-af6b-2c94f3aee006" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Runtime.Tests/bin/Debug/net8.0/FLua.Runtime.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Runtime.Tests.LuaStringLibTests" name="StringSub_NegativeIndices_ShouldReturnCorrectSubstring" />
+    </UnitTest>
+    <UnitTest name="StringFormat_IntegerSpecifier_ShouldFormatCorrectly" storage="/users/bill/repos/flua/flua.runtime.tests/bin/debug/net8.0/flua.runtime.tests.dll" id="db1370d8-1de2-82f8-aadc-4c35fd7d5caa">
+      <Execution id="0b5685da-762c-4164-917a-b1f0836566e6" />
+      <TestMethod codeBase="/Users/bill/Repos/FLua/FLua.Runtime.Tests/bin/Debug/net8.0/FLua.Runtime.Tests.dll" adapterTypeName="executor://mstestadapter/v2" className="FLua.Runtime.Tests.LuaStringLibTests" name="StringFormat_IntegerSpecifier_ShouldFormatCorrectly" />
+    </UnitTest>
+  </TestDefinitions>
+  <TestEntries>
+    <TestEntry testId="2dc6f229-d372-7044-88ff-fedcb4d98019" executionId="409dca22-a49a-4043-b1a0-b424659f4f40" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="6bc27b3d-7609-d58b-b156-3fff4e4456bf" executionId="d741d781-afbd-4bc9-ae49-fb1637fb2304" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="eb3531da-5b80-6ac2-748b-0f7f81f9d611" executionId="1357365a-5ad8-400f-9a27-a94a72836c8f" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="ba07ddbe-541e-d177-c381-fb4de2772b36" executionId="1232f19b-53e6-46bb-8a58-35ec539c3dc8" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="2e8debc2-1301-c7b3-e67a-745d1c688b80" executionId="af1c532e-5cc4-42aa-b494-cbf92aef5da0" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="2e48a0c4-385c-de34-3908-a16504f1c59c" executionId="9f4d07fe-7d91-40ff-96b4-7f06466fe38d" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1974c8a7-98a3-e803-8a78-09a2c5239cfb" executionId="6d7fd023-722d-4b48-ad84-ecbdae800e1a" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="b5a43c8e-8970-ccab-5808-6f35f27ce821" executionId="86ea33e6-012d-480e-bd90-cffd700bfbb5" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="f6e45950-1179-cbeb-37b1-3e30087606ef" executionId="bb0502f1-905d-47e4-bd16-2311a360e2ab" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="cf1e46f4-da14-d056-26c6-814ac908354d" executionId="d4db0e50-fa7c-4671-9a4a-93f373593ca0" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="3b1d5a46-1f73-1bbc-8562-7f53faa0bbab" executionId="67fc4072-8517-4a21-aa78-a4e26dd66a2c" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="c7410bc4-a8c8-3d24-2477-beefc474c4ff" executionId="e3ccdf78-0e8c-47a2-b76c-2553fe4f5493" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="63c99c0d-58f6-0fbc-6054-e3bc3141b24d" executionId="78e2a0da-6621-471c-89c6-6d38e1c2abcc" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="59e8433c-fa31-02c3-9a44-25332417b295" executionId="763aca41-9155-45b3-8aac-1e62846d37b3" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="5a309692-c730-5896-5fec-f394cd0b5d5d" executionId="af7361b9-b4c9-492d-bb1e-d37f3f691458" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="ca2e7646-1b80-c529-10e3-6cedcfbd596f" executionId="6837a4d3-20a0-4d1b-bcc4-9463355e177b" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="3523a27b-a699-46a0-e3f4-865722483c74" executionId="31511f08-8375-492d-ab1e-cc6f16066238" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="ed5bf168-a534-ed0d-28f7-4f4622383f90" executionId="1af427c0-bfe7-4408-9e30-3eded305d336" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="016724cf-ff3a-7b18-41c0-220348d67f77" executionId="92cd9ec4-d4f7-486f-9ca3-71af4e2c926c" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="b27e435c-9699-31c3-d68f-00ef96bca045" executionId="2fb1457a-6046-4f85-9b03-818d9c7ff035" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="3cf43540-a72a-2f20-e075-9da6a899c39c" executionId="f7e53360-f7a3-4be6-a724-0f274e44588b" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="4cd663fc-0e79-c759-c440-657cd580b06f" executionId="4c743e8e-a5e8-47f2-8da9-0c1f74488ad4" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="9428cdc8-3fc0-5040-944e-19ca2a3ed0c6" executionId="b578781a-f9b2-4d50-9014-3e6933339725" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="7301f02a-4dc7-8dc7-1f6d-9aa851e3c6a2" executionId="820f755c-c049-4f2a-81fe-ae70b3782ae9" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="b22a4a57-1deb-d974-df69-cbe533b6b400" executionId="9e3ba97e-9500-4e54-a46d-ce5754279c2c" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="a8e9dda0-73b1-26d3-83d9-9bb3827af4a0" executionId="b03432d3-c23e-48e4-af6b-2c94f3aee006" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="9c597b82-8afc-f7d6-2d23-5d7af92c9181" executionId="65f21e49-fd84-47c8-adea-5bf7bf00ab6c" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="5d1a374a-f2eb-eafa-737e-d0c4874d2ce7" executionId="d14fa904-5199-43cf-9036-f9c6c77085f2" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="42fd50f5-818d-6851-86b9-842c5b923988" executionId="292d99a7-b3df-42d0-a677-a8161cae66a2" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="b75ca15c-7313-05b8-454f-f4fb35a59048" executionId="23a70f51-c809-4a90-8d99-9721c5810be8" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="3b1cd047-c229-82c7-44fa-2b2f45a5f566" executionId="b2a608ab-f473-4ed8-ae33-bf15151a4f78" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="a1134371-e672-5484-c1de-31798068ccce" executionId="6b321743-ad9e-4169-bd9e-09b9ddbb440f" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="69ebf2f0-946b-5178-e1dd-a773c05cb781" executionId="5ffac340-4921-45bf-8036-50c2028a02f3" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="d44a8b90-cc67-18e3-0319-2edcc8c51e34" executionId="260ef02c-0bff-4134-a83e-b514b1fe0998" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="7f0fa864-2ea2-18d3-30a0-7aae0a604600" executionId="7a823943-2317-4dd8-9299-43ba0dabfc52" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="0dec1832-226a-9285-f8a3-b62cbc426ef7" executionId="4fa650fa-c0d4-47bd-90f5-d4afe9add13f" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="bedb6522-f7cf-6504-4d1b-987167c88cd4" executionId="1064fc0c-9c08-496c-a3d8-8c522059e907" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="60341286-ebb9-fc46-49e3-4a8cab0e2e00" executionId="786ade7f-729e-4d4d-836b-5a058c0b89aa" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="a28d44a3-4d54-06a7-0116-b16cc7b2a249" executionId="b87e4f13-76de-463d-b356-8d2c26744249" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="5ab7e53d-1b1e-f284-da9d-ecf8bcf0931a" executionId="477ae5be-656c-4e03-96b1-3657785fc469" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="12b23b8c-3355-3c7e-a505-6dc45671db21" executionId="50172aa0-0f4d-430d-b584-43eda98e7b59" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="5fdd3722-21fa-5c2e-7b6b-68abefe0ae62" executionId="55e8c77c-d0a2-4c73-860e-a93b58380152" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="b56740e1-1693-0b10-babe-b809629c19af" executionId="b4fe862c-b55d-407e-a8e3-234a9cb4fa65" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="65c5d66a-b273-5bb3-3605-39ce886f15b4" executionId="c011f2ad-d0e8-497a-afe4-8dae998df2f5" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="96e27d57-d3a2-01e7-7b5b-2519dccd8926" executionId="0df02135-4dbe-443e-ad39-183b6fcc6e38" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="3c1ede49-f254-eed4-afa7-8793d7bbadf5" executionId="6438adea-c904-4907-953f-8a211601e4cf" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="b04b042e-c608-14d5-40cb-ccb56ffecb60" executionId="6f37e8d7-27f0-4c57-83d1-8d2b7e7010f9" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="ade95837-ddb4-9ccc-6360-ef92356b3b28" executionId="f7df6179-d1d1-41b5-a010-3484a57bbcbd" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="7e24132e-f5f0-8f56-ff45-cbde824a656f" executionId="726f6b13-97bf-48af-a097-b2ecfff510dd" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1a932349-fbde-ee16-657d-2693b0c5e42d" executionId="3fd6cc1f-5401-4192-b73b-68ba9a78dbe0" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="742e227d-4a26-9d54-9c88-3d120a108ef2" executionId="6c178746-a321-4f3d-81ab-7ef7dd6075cb" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="eb0191eb-c1e7-dc96-6b32-d3b6309defea" executionId="d5870429-e687-4c4a-9f9e-a389413ac102" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="12cef88d-3e23-9a0c-ecda-a639ec8ecb68" executionId="0e116234-9390-4cd6-a8f8-b6a0f6577bc9" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="e2659f0e-296c-bea7-b861-cd100c36486d" executionId="35a4f767-70aa-4c28-8034-386902e6288c" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="aeb36a03-ba7f-aaa2-24a8-84a09f2488be" executionId="10f8c2e0-c70d-46ff-b356-1d48689cc730" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="c791235f-5f91-3386-b42c-9204c9e27135" executionId="91385274-bee6-4d5f-96f8-f8999ecc6c0f" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="e9158b92-dc87-237a-859e-dfe676b3134e" executionId="675bf2ac-65b9-4f81-890e-8a4f13ba8031" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="52c6cbb3-0fb5-64c2-41c9-b33943da9d95" executionId="32a3088d-d4b9-490d-8149-ccc568f33e58" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="e70a47f2-b673-3f81-e51f-fba6bbc56ff9" executionId="5445865b-b567-40d9-a40e-5d1d34501905" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="07815920-769b-4b1d-f50d-155b51a2a33c" executionId="cb500790-3bfc-4d28-a939-5dc95e8a5890" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="345334d1-c69b-7394-899b-16c504f7f7e8" executionId="bb061168-410c-4f78-92cd-e53f7bd5e63d" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="881b22b1-3c31-ab2a-03f3-284114d3bf9d" executionId="594d0523-a3b4-4b6e-98b1-a7bfb7dbd90b" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="2c87ba23-c6e5-b44a-e9be-9c2a3f8517fd" executionId="5a2f6bea-2d08-4936-80d5-a10f68281a23" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="baee95fe-2868-eb7e-cfeb-6d15afc4b93a" executionId="b5052511-3f0a-44d6-a00b-f8b897e5034b" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="9d05fbf7-3b9b-3c24-e646-4edabac676ae" executionId="bcfae1b9-a15b-455b-8e15-2e51eb7f7149" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="233c87d0-b101-4681-5417-55a74c578e1e" executionId="9ea309e1-a76d-4e81-8c80-d50c4a8ebe91" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="ac415bd2-f04f-008e-041c-c381ec18e66e" executionId="96a41fef-ab90-44c8-ac6a-93d80a8dee34" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="6310c7ea-b13f-26b1-d8e6-a774c20691e2" executionId="6d549a7c-de9b-4e20-90ca-9b6ea9c57f7e" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="9b8d4a77-e9ee-bfc6-d5e9-f9e426d88ca8" executionId="61b57873-8b57-4264-a570-5fba450ec913" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="673155f4-965a-c76e-d309-fb8225108a24" executionId="96945c09-b991-42a9-bb4c-fdc8cd2bba52" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="7f02c353-6c51-74fd-4336-87884ce5b093" executionId="f01dd22d-6e54-41c2-bc89-dd89d6e2eadb" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="a7245264-48e2-ef1d-bf8e-da544214f3e5" executionId="a804bac6-af47-4ddc-9a22-6b94db321d9f" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="9635de5e-365d-f90e-5cbb-e3014d694243" executionId="fe7ef18a-bbcf-4d7b-be05-05a351b88f65" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="cf8f5e76-b112-943e-fa01-a93e316dd773" executionId="4b6fcce1-f50a-4cab-8864-b0b15c288bed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="0b45db31-7169-e23f-42e9-87ea0497da14" executionId="4fc3c5b4-e01e-40ac-8843-4d66b163648a" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="df37e904-2cd9-ba72-831c-29c2ae60a626" executionId="9381d645-11fb-4f95-a414-b736c987d865" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="60de9ef1-6049-dbbf-39ad-87efa4570624" executionId="2c5995e9-b955-4f19-bed6-00aad4ecd8f7" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="7eb5702b-70b1-d4b2-3996-5192ebac76c5" executionId="b8664edd-66b3-45d6-a1ea-0b4f58da2315" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="9b25d867-22e7-abd9-0d91-7d89575a0527" executionId="ef7142c7-ba31-41f9-8ce4-0a3de9373774" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="82ca22b8-e310-00c1-f827-41250c84f625" executionId="77334de0-8515-45d8-b3cc-aaf420333b6d" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="b60bdbca-7010-0c39-f967-8cb5070510e8" executionId="99e2584b-c7c4-4386-88ab-cc60ebd4fa03" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="428c733f-08bd-ceb4-6728-a196de5d1055" executionId="a95b8fbf-d613-45ce-a4c4-78897a9937df" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="fff4b68e-ee39-0454-e5c9-f6983bdbccd9" executionId="f8309a15-5203-499c-8c61-bf8f2c495201" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="daa8c60f-c482-0934-3473-271577cb9df9" executionId="ac9ec957-0588-4a22-b400-2ed8dadb0e79" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="77a18cf0-1d44-4ea9-aba6-a2a090a3c96f" executionId="1967ae0d-8b91-4a88-a8ea-d12eeac872f1" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="3516af4b-f8a4-1d2e-6e21-30f165f554ad" executionId="fe655a85-8940-4353-b9be-2425d55ac940" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="a4bd4216-16d2-a804-490c-fa270d0a3bdc" executionId="edc82651-4cea-4b38-8e4e-dfc515078865" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="3119913a-eb5d-deca-9cff-55dde9d7ea60" executionId="1a29bae8-0082-4a7e-ba0f-c8658b57e505" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="d9310133-9ac5-aaf3-d288-12dda2339a22" executionId="8705b1d5-a8cf-4138-ba7d-4591654092f1" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="a9fe0582-1c7c-45a8-0d84-876052fc7d0f" executionId="eeae3db0-5d77-450a-bbb8-4660ee94764f" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="f57b7888-6324-b1f2-9843-ef45851f7bfb" executionId="398d7032-d204-4d2a-990c-4ee7bd898395" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="23b7caf5-5cf0-5742-ce43-064db73934c4" executionId="a47663ef-ae28-4dc7-ab3f-f38b38712516" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="db1370d8-1de2-82f8-aadc-4c35fd7d5caa" executionId="0b5685da-762c-4164-917a-b1f0836566e6" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="8954ffed-29fd-1bfb-09fb-58b7fbd7b91c" executionId="238c1aa5-dd6d-42e2-97c3-d3e1584c36b5" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="be9e83a5-2d56-6d2e-399e-00e64031ff7c" executionId="3a271b6a-3aad-44d3-9fec-60d419eb8953" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="83cf361e-bdcf-2c39-c69b-b4d97d1acb77" executionId="4089ce54-7376-4582-acf6-52281d06d69a" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1e6eddb1-4896-29a5-eba9-12e46a956c74" executionId="560026d5-8e29-494e-9a94-21718c134606" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="2106053b-d07c-6568-30e2-8bf9806cf31e" executionId="1984c892-4c24-42f8-841d-50d8d14e9f7c" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="5cfe0b97-280b-cbb1-2ee7-0f4bf5dca240" executionId="9796b67a-5e2d-4763-bf30-6e742d89168c" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="17377364-953b-2c7c-0107-e712e10a64ff" executionId="4f5a8cd7-2bd5-46b9-9025-fc979d96eb04" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="7ec8e7ca-3b29-29a7-3695-42d7e5110b59" executionId="b78044f7-b29a-435d-9b22-083b656c4a43" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="2f32e0f8-b691-f71d-4d18-6a4a93955887" executionId="d6d76eff-c133-4e41-a7a3-2c3357316fe2" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="3738ff02-850b-c742-f6f9-3da9154afe6b" executionId="d4501b4c-c99b-44da-81cd-c438f33db9c8" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="447c4433-4393-9bee-e3d5-5ecc3b6cc661" executionId="f4d4d53b-2f91-42c5-957e-4b654a3d6f86" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="89f7b719-0632-7d2b-b049-a1a94bffa9fb" executionId="8379a7c4-fe0c-4761-ba6f-5aeace87fa9e" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="79fc91a0-094e-4d9c-cde7-a0e550c86f48" executionId="3fef8c8e-17ea-42b3-bee0-4d763607dca6" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="0ed505a3-9c55-3b78-612d-75b0fd3d3410" executionId="fdc9f291-40c3-4a7b-b655-83bb0b354ae1" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="a1183947-ecd5-7c88-1e94-1b329ed24ff1" executionId="8f15726c-7a16-4b94-9709-e992a061d1b4" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="f499cfc5-18d0-b1c2-029c-8015b53339eb" executionId="41b88a88-393c-417d-b8e5-8a7a8abff0ed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="a4a2d165-f500-7f8b-b3bb-2d17b22e1b74" executionId="8d0bfce0-34d8-4583-8fad-ae684ce4f251" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="409f7739-cf11-22b5-1758-0b50a6d4d309" executionId="6da1be5e-3a14-408e-8a9a-0cf6e4c3f6e4" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="30be04e6-3d23-02b9-f432-979cee6bd744" executionId="12977af7-77be-45fa-a43d-f49d7084e557" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="190f3eea-803d-3d7e-7d7d-8040c99a92c3" executionId="47e4b422-ed07-4c6a-9759-1e39cde9d755" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="bd1e53dd-be4e-115b-80fa-a9099016266a" executionId="ad5a514a-85bd-4186-90f5-dea88b1d804a" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="5c1ced93-47a4-2f59-545d-710a5ee3f396" executionId="018b8fb3-1cf7-4e85-aca8-b967d0337733" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="270edca5-493a-6569-7b23-0371fc1bbebc" executionId="72c53c7e-d920-4ca1-922e-229a045bfb78" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="6c9547d4-0a2b-5c52-ecf8-7294e550ba4c" executionId="7d1b5170-9282-4367-9243-3da7f1de7eb0" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="439a2d2d-24e2-fb0c-8644-fc96a7afe81b" executionId="896c2d91-6dc9-4d41-b9b9-1aaf0eeb26eb" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="adfffce4-9a54-412c-78d4-175d2b7e6ed0" executionId="16a11d4b-d3a2-4d24-95c8-e06fb6378aff" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="12235a19-e292-278e-b670-b7aedaf1b281" executionId="2338dd38-4f84-4d3f-8213-96186c8d91e6" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="2d9db9db-0852-50de-4702-f3ba004fe02a" executionId="fbf62d94-136b-46c4-9c77-0627d516d062" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="0bf1f1d6-beae-34ea-7044-93492e91ce33" executionId="bd261ff0-8e10-403f-aece-d09737bce24e" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="62a6695a-3ba4-c7b6-79e2-47071a47fcec" executionId="85948a11-c7b2-458f-bcf5-0e1527d2be9b" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="b6fff122-a8d7-249a-f08c-c1303bf89970" executionId="72986731-e915-4a32-a566-8a81958348c3" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="e37e0405-4441-40cb-0aad-6bce6ee46d04" executionId="1c48412e-e1b5-47bf-b75d-8c596a327b80" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="d112ffc6-9ab0-06b7-4693-ba4331db0456" executionId="3c78c179-243f-423b-927e-b9640b12d6aa" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="40802bca-7604-ea47-82b8-dde4ff38bdcb" executionId="c74ff0be-52bb-4564-81cb-b62367caf6d4" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="9948571a-a40e-827f-8cf6-88064c91e843" executionId="4fdeb645-ac79-4265-be83-eb278bab333b" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="cce500c0-b6c2-8a88-0540-42df7487c4cb" executionId="fb049cce-2c76-44f1-a115-16fd335f367c" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="ece2fee8-4c35-153c-62d3-943f472b7715" executionId="143ea2a3-9cbb-4caa-99b0-47264b423cc4" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="af60203c-9c72-573a-1e94-68b389d07824" executionId="fdd493ba-da6b-425d-81c8-383f070eb311" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+  </TestEntries>
+  <TestLists>
+    <TestList name="Results Not in a List" id="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestList name="All Loaded Results" id="19431567-8539-422a-85d7-44ee4e166bda" />
+  </TestLists>
+  <ResultSummary outcome="Completed">
+    <Counters total="131" executed="131" passed="131" failed="0" error="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
+  </ResultSummary>
+</TestRun>
