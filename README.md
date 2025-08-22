@@ -319,7 +319,6 @@ FLua/
 ├── FLua.Compiler/           # Compilation backends
 │   ├── RoslynLuaCompiler.cs        # Roslyn C# code generation
 │   ├── RoslynCodeGenerator.cs      # Code generation logic
-│   ├── CecilCodeGenerator.cs       # IL generation with Mono.Cecil
 │   └── ContextBoundCompiler.cs     # Config lambda compiler
 ├── FLua.Hosting/            # Hosting API
 │   ├── LuaHost.cs          # Main hosting interface

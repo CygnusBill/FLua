@@ -5,17 +5,10 @@ This document outlines the known limitations of compiled Lua code versus interpr
 ## Compiler Backend Support
 
 ### Supported Backends
-1. **Mono.Cecil Backend** (Default)
-   - Direct IL generation
-   - 16MB executables (77% smaller than Roslyn)
-   - Faster compilation
-   - Currently implements ~30% of Lua features
-
-2. **Roslyn Backend**
+1. **Roslyn Backend** (Only)
    - Generates C# source code
-   - 70MB executables
    - Better debugging experience
-   - More complete feature support
+   - Complete feature support for AOT compilation
 
 ## Dynamic Code Loading
 
@@ -74,7 +67,7 @@ This document outlines the known limitations of compiled Lua code versus interpr
 - **Example**: `load("return " .. expr)()` won't work
 - **Workaround**: Use proper expressions instead of string building
 
-## Current Implementation Status (Cecil Backend)
+## Current Implementation Status (Roslyn Backend)
 
 ### Implemented Features
 - ✅ Print statements
@@ -134,4 +127,4 @@ This document outlines the known limitations of compiled Lua code versus interpr
 
 These limitations are by design to keep compiled binaries small and fast. For use cases requiring these features, use the interpreter or consider hybrid approaches where critical paths are compiled and dynamic features use the interpreter.
 
-The Cecil backend prioritizes executable size and compilation speed over feature completeness. For applications requiring full Lua compatibility, use the interpreter or Roslyn backend.
+The Roslyn backend prioritizes feature completeness and debugging experience. For applications requiring full Lua compatibility, use the interpreter or continue developing the Roslyn backend.
