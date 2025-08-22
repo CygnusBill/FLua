@@ -180,7 +180,7 @@ namespace FLua.Hosting
         /// <summary>
         /// Helper method to convert hosting diagnostics to appropriate exceptions
         /// </summary>
-        private static void ThrowHostingException(IEnumerable<HostingDiagnostic> diagnostics, ExecutionContext? context, string operation)
+        private static void ThrowHostingException(IEnumerable<HostingDiagnostic> diagnostics, FLua.Common.ExecutionContext? context, string operation)
         {
             var errors = diagnostics.Where(d => d.Severity == DiagnosticSeverity.Error).ToList();
             var warnings = diagnostics.Where(d => d.Severity == DiagnosticSeverity.Warning).ToList();
@@ -422,31 +422,7 @@ namespace FLua.Hosting
     /// </summary>
     public static class LuaHostFactory
     {
-        /// <summary>
-        /// Creates a new Result-based Lua host with optional dependencies
-        /// </summary>
-        public static IResultLuaHost CreateResultHost(
-            Environment.IResultEnvironmentProvider? environmentProvider = null,
-            IResultLuaCompiler? compiler = null,
-            ILuaSecurityPolicy? securityPolicy = null)
-        {
-            return new ResultLuaHost(
-                environmentProvider != null ? new EnvironmentProviderAdapter(environmentProvider) : null,
-                compiler != null ? new CompilerAdapter(compiler) : null,
-                securityPolicy);
-        }
-        
-        /// <summary>
-        /// Creates a legacy-compatible Lua host that uses Result pattern internally
-        /// </summary>
-        public static ILuaHost CreateCompatibleHost(
-            Environment.IResultEnvironmentProvider? environmentProvider = null,
-            IResultLuaCompiler? compiler = null,
-            ILuaSecurityPolicy? securityPolicy = null)
-        {
-            var resultHost = CreateResultHost(environmentProvider, compiler, securityPolicy);
-            return new LuaHostAdapter(resultHost);
-        }
+        // TODO: Re-enable Result-based hosts after IResultLuaCompiler integration is complete
         
         /// <summary>
         /// Wraps an existing legacy host to provide Result-based interface (for migration)
@@ -513,43 +489,5 @@ namespace FLua.Hosting
         }
     }
 
-    internal class CompilerAdapter : Compiler.ILuaCompiler
-    {
-        private readonly IResultLuaCompiler _resultCompiler;
-        
-        public CompilerAdapter(IResultLuaCompiler resultCompiler)
-        {
-            _resultCompiler = resultCompiler;
-        }
-        
-        public IEnumerable<Compiler.CompilationTarget> SupportedTargets => _resultCompiler.SupportedTargets;
-        public string BackendName => _resultCompiler.BackendName;
-        
-        public Compiler.CompilationResult Compile(IList<Ast.Statement> ast, Compiler.CompilerOptions options)
-        {
-            var result = _resultCompiler.CompileResult(ast, options);
-            
-            if (result.IsSuccess)
-            {
-                var output = result.Value;
-                return new Compiler.CompilationResult(
-                    Success: true,
-                    Assembly: output.Assembly,
-                    AssemblyPath: output.AssemblyPath,
-                    CompiledDelegate: output.CompiledDelegate,
-                    ExpressionTree: output.ExpressionTree,
-                    GeneratedType: output.GeneratedType,
-                    Warnings: result.Warnings.Select(w => w.Message)
-                );
-            }
-            else
-            {
-                return new Compiler.CompilationResult(
-                    Success: false,
-                    Errors: result.Errors.Select(e => e.Message),
-                    Warnings: result.Warnings.Select(w => w.Message)
-                );
-            }
-        }
-    }
+    // TODO: Re-enable CompilerAdapter after IResultLuaCompiler integration is complete
 }

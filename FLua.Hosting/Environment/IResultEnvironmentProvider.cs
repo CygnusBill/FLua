@@ -454,24 +454,6 @@ namespace FLua.Hosting.Environment
         #endregion
     }
 
-    // Placeholder module resolver implementations
-    internal class FileSystemModuleResolver : IModuleResolver
-    {
-        public LuaValue? ResolveModule(string moduleName) => null;
-    }
-    
-    internal class RestrictedFileSystemModuleResolver : IModuleResolver
-    {
-        public LuaValue? ResolveModule(string moduleName) => null;
-    }
-    
-    internal class SandboxModuleResolver : IModuleResolver
-    {
-        public LuaValue? ResolveModule(string moduleName) => null;
-    }
-    
-    internal class NullModuleResolver : IModuleResolver
-    {
-        public LuaValue? ResolveModule(string moduleName) => null;
-    }
+    // Note: FileSystemModuleResolver is implemented in FileSystemModuleResolver.cs
+    // Placeholder implementations for specialized resolvers would go here
 }
