@@ -1526,7 +1526,7 @@ public class LuaStringLibTests
         var results = CallStringFunctionMultiple("find", LuaValue.String("aabbbaaa"), LuaValue.String("ab*"));
         Assert.AreEqual(2, results.Length);
         Assert.AreEqual(1L, results[0].AsInteger());
-        Assert.AreEqual(2L, results[1].AsInteger()); // "a" matches ab* (b occurs 0 times)
+        Assert.AreEqual(1L, results[1].AsInteger()); // "a" matches ab* (b occurs 0 times)
     }
 
     [TestMethod]
@@ -1613,7 +1613,7 @@ public class LuaStringLibTests
     public void Find_NegativePositionBoundary_WorksFromEnd()
     {
         // Testing Approach: Boundary Value Analysis - Negative position boundary
-        var results = CallStringFunctionMultiple("find", LuaValue.String("hello"), LuaValue.String("l"), LuaValue.Integer(-1));
+        var results = CallStringFunctionMultiple("find", LuaValue.String("hello"), LuaValue.String("l"), LuaValue.Integer(-2));
         Assert.AreEqual(2, results.Length);
         Assert.AreEqual(4L, results[0].AsInteger()); // Last 'l' in "hello"
         Assert.AreEqual(4L, results[1].AsInteger());
@@ -1627,11 +1627,10 @@ public class LuaStringLibTests
     public void Find_AnchoredQuantifierPattern_CombinesFeatures()
     {
         // Testing Approach: Decision Table Testing - Anchor + Quantifier
-        // Note: Star quantifier has implementation gap, returns zero-width match
         var results = CallStringFunctionMultiple("find", LuaValue.String("   hello"), LuaValue.String("^ *"));
         Assert.AreEqual(2, results.Length);
         Assert.AreEqual(1L, results[0].AsInteger());
-        Assert.AreEqual(0L, results[1].AsInteger()); // Zero-width match due to * quantifier limitation
+        Assert.AreEqual(3L, results[1].AsInteger()); // Matches the three spaces at the beginning
     }
 
     [TestMethod]
@@ -1728,7 +1727,7 @@ public class LuaStringLibTests
         var results = CallStringFunctionMultiple("find", LuaValue.String("Hello123World!@#"), LuaValue.String("[A-Za-z0-9]+"));
         Assert.AreEqual(2, results.Length);
         Assert.AreEqual(1L, results[0].AsInteger());
-        Assert.AreEqual(12L, results[1].AsInteger()); // "Hello123World"
+        Assert.AreEqual(13L, results[1].AsInteger()); // "Hello123World"
     }
 
     [TestMethod]

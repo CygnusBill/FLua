@@ -32,6 +32,16 @@ namespace FLua.Runtime
         /// </summary>
         public static LuaPatternMatch? Find(string text, string pattern, int start = 1, bool plain = false)
         {
+            // Handle negative start position (count from end)
+            int actualStart = start;
+            if (start < 0)
+            {
+                actualStart = text.Length + start + 1;
+            }
+            
+            // Clamp to valid range
+            actualStart = Math.Max(1, Math.Min(actualStart, text.Length + 1));
+            
             if (plain)
             {
                 // Plain text search
@@ -40,13 +50,13 @@ namespace FLua.Runtime
                     // Empty pattern special case - should find at start position
                     return new LuaPatternMatch
                     {
-                        Start = start,
-                        End = start - 1, // Empty match: end before start
+                        Start = actualStart,
+                        End = actualStart - 1, // Empty match: end before start
                         Captures = []
                     };
                 }
                 
-                var index = text.IndexOf(pattern, start - 1, StringComparison.Ordinal);
+                var index = text.IndexOf(pattern, actualStart - 1, StringComparison.Ordinal);
                 if (index >= 0)
                 {
                     return new LuaPatternMatch
@@ -61,7 +71,7 @@ namespace FLua.Runtime
 
             // Lua pattern matching
             var matcher = new LuaPatternMatcher(pattern);
-            return matcher.Match(text, start - 1); // Convert to 0-based for internal use
+            return matcher.Match(text, actualStart - 1); // Convert to 0-based for internal use
         }
 
         /// <summary>
@@ -221,7 +231,7 @@ namespace FLua.Runtime
                     return new LuaPatternMatch
                     {
                         Start = pos + 1, // Convert to 1-based
-                        End = match.Value, // TryMatch returns 1-based end position
+                        End = match.Value, // TryMatch returns position after match (0-based), so this is already 1-based position after match
                         Captures = [..captures]
                     };
                 }
@@ -239,7 +249,21 @@ namespace FLua.Runtime
         /// <summary>
         /// Tries to match the pattern starting at a specific position
         /// </summary>
+        /// <summary>
+        /// Tries to match the pattern starting at a specific position
+        /// </summary>
+        /// <summary>
+        /// Tries to match the pattern starting at a specific position
+        /// </summary>
         private int? TryMatch(string text, int textPos, int patternPos, List<string> captures)
+        {
+            return TryMatchInternal(text, textPos, patternPos, captures, new Stack<int>());
+        }
+
+        /// <summary>
+        /// Internal recursive match method with capture stack tracking
+        /// </summary>
+        private int? TryMatchInternal(string text, int textPos, int patternPos, List<string> captures, Stack<int> captureStack)
         {
             while (patternPos < _elements.Count)
             {
@@ -259,25 +283,20 @@ namespace FLua.Runtime
                 {
                     if (capture.IsStart)
                     {
-                        // Find matching end capture
-                        var captureStart = textPos;
-                        var endCapturePos = FindMatchingCaptureEnd(patternPos);
-                        
-                        if (endCapturePos == -1)
-                            return null;
-
-                        // Try to match the content between captures
-                        var innerMatch = TryMatch(text, textPos, patternPos + 1, captures);
-                        if (innerMatch.HasValue)
-                        {
-                            captures.Add(text.Substring(captureStart, innerMatch.Value - captureStart));
-                            return innerMatch;
-                        }
-                        return null;
+                        // Push the current text position as capture start
+                        captureStack.Push(textPos);
+                        patternPos++;
+                        continue;
                     }
                     else
                     {
-                        // End capture - just advance
+                        // Pop capture start and add to captures
+                        if (captureStack.Count > 0)
+                        {
+                            var captureStart = captureStack.Pop();
+                            var captureText = text.Substring(captureStart, textPos - captureStart);
+                            captures.Add(captureText);
+                        }
                         patternPos++;
                         continue;
                     }
@@ -285,31 +304,49 @@ namespace FLua.Runtime
 
                 if (element is CharacterElement charElem)
                 {
-                    if (textPos >= text.Length)
-                        return null;
-
-                    var matches = charElem.Matches(text[textPos]);
                     var minRepeats = charElem.MinRepeats;
                     var maxRepeats = charElem.MaxRepeats;
-
-                    if (maxRepeats == 0) // * or -
+                    var isUnlimited = maxRepeats == 0; // 0 is special value for unlimited
+                    
+                    // For greedy quantifiers (*, +), try longest match first
+                    // For non-greedy quantifiers (-), try shortest match first
+                    var tryGreedy = !charElem.IsNonGreedy;
+                    
+                    if (isUnlimited)
                     {
-                        // Try matching as few as possible first (non-greedy)
-                        for (int count = minRepeats; count <= text.Length - textPos; count++)
+                        // Unlimited quantifiers: *, +, -
+                        var maxPossible = text.Length - textPos;
+                        
+                        // Find the maximum number of characters that match
+                        int actualMax = 0;
+                        for (int i = 0; i < maxPossible; i++)
                         {
-                            bool allMatch = true;
-                            for (int i = 0; i < count; i++)
+                            if (textPos + i >= text.Length || !charElem.Matches(text[textPos + i]))
+                                break;
+                            actualMax++;
+                        }
+                        
+                        // Ensure we satisfy minimum requirements
+                        if (actualMax < minRepeats)
+                            return null;
+                        
+                        // Try different counts based on greediness
+                        if (tryGreedy)
+                        {
+                            // Greedy: try from maximum down to minimum
+                            for (int count = actualMax; count >= minRepeats; count--)
                             {
-                                if (textPos + i >= text.Length || !charElem.Matches(text[textPos + i]))
-                                {
-                                    allMatch = false;
-                                    break;
-                                }
+                                var nextMatch = TryMatchInternal(text, textPos + count, patternPos + 1, captures, captureStack);
+                                if (nextMatch.HasValue)
+                                    return nextMatch;
                             }
-
-                            if (allMatch)
+                        }
+                        else
+                        {
+                            // Non-greedy: try from minimum up to maximum
+                            for (int count = minRepeats; count <= actualMax; count++)
                             {
-                                var nextMatch = TryMatch(text, textPos + count, patternPos + 1, captures);
+                                var nextMatch = TryMatchInternal(text, textPos + count, patternPos + 1, captures, captureStack);
                                 if (nextMatch.HasValue)
                                     return nextMatch;
                             }
@@ -318,25 +355,28 @@ namespace FLua.Runtime
                     }
                     else
                     {
-                        // Fixed or range repeats
-                        for (int count = minRepeats; count <= maxRepeats && count <= text.Length - textPos; count++)
+                        // Fixed or range repeats (like ? which is {0,1})
+                        var effectiveMax = Math.Min(maxRepeats, text.Length - textPos);
+                        
+                        // Find how many characters actually match
+                        int actualMatches = 0;
+                        for (int i = 0; i < effectiveMax; i++)
                         {
-                            bool allMatch = true;
-                            for (int i = 0; i < count; i++)
-                            {
-                                if (textPos + i >= text.Length || !charElem.Matches(text[textPos + i]))
-                                {
-                                    allMatch = false;
-                                    break;
-                                }
-                            }
-
-                            if (allMatch)
-                            {
-                                var nextMatch = TryMatch(text, textPos + count, patternPos + 1, captures);
-                                if (nextMatch.HasValue)
-                                    return nextMatch;
-                            }
+                            if (textPos + i >= text.Length || !charElem.Matches(text[textPos + i]))
+                                break;
+                            actualMatches++;
+                        }
+                        
+                        // Ensure we can satisfy minimum requirements
+                        if (actualMatches < minRepeats)
+                            return null;
+                        
+                        // For fixed ranges, try from maximum possible down to minimum
+                        for (int count = Math.Min(actualMatches, effectiveMax); count >= minRepeats; count--)
+                        {
+                            var nextMatch = TryMatchInternal(text, textPos + count, patternPos + 1, captures, captureStack);
+                            if (nextMatch.HasValue)
+                                return nextMatch;
                         }
                         return null;
                     }
@@ -345,7 +385,7 @@ namespace FLua.Runtime
                 patternPos++;
             }
 
-            return textPos; // Successful match
+            return textPos; // Successful match, return current position
         }
 
         /// <summary>
@@ -399,24 +439,109 @@ namespace FLua.Runtime
                         break;
                         
                     case '(':
-                        elements.Add(new CaptureElement { IsStart = true });
+                        // Only treat as capture if there's a matching closing paren
+                        var closingParen = pattern.IndexOf(')', i + 1);
+                        if (closingParen != -1)
+                            elements.Add(new CaptureElement { IsStart = true });
+                        else
+                            elements.Add(new CharacterElement('(')); // Treat as literal
                         break;
                         
                     case ')':
-                        elements.Add(new CaptureElement { IsStart = false });
+                        // Only treat as capture end if there was an unmatched opening paren before
+                        int openCount = 0;
+                        for (int j = 0; j < elements.Count; j++)
+                        {
+                            if (elements[j] is CaptureElement capture)
+                            {
+                                if (capture.IsStart) openCount++;
+                                else openCount--;
+                            }
+                        }
+                        if (openCount > 0)
+                            elements.Add(new CaptureElement { IsStart = false });
+                        else
+                            elements.Add(new CharacterElement(')')); // Treat as literal
                         break;
                         
                     case '%':
                         if (i + 1 < pattern.Length)
                         {
                             var next = pattern[i + 1];
-                            elements.Add(new CharacterElement(next, isEscape: true));
+                            var escapeElem = new CharacterElement(next, isEscape: true);
                             i++; // Skip next character
+                            
+                            // Check for quantifiers after escape sequence
+                            if (i + 1 < pattern.Length)
+                            {
+                                var quantifier = pattern[i + 1];
+                                switch (quantifier)
+                                {
+                                    case '*':
+                                        escapeElem.MinRepeats = 0;
+                                        escapeElem.MaxRepeats = 0; // Special value for unlimited
+                                        i++;
+                                        break;
+                                    case '+':
+                                        escapeElem.MinRepeats = 1;
+                                        escapeElem.MaxRepeats = 0; // Special value for unlimited
+                                        i++;
+                                        break;
+                                    case '-':
+                                        escapeElem.MinRepeats = 0;
+                                        escapeElem.MaxRepeats = 0; // Non-greedy unlimited
+                                        escapeElem.IsNonGreedy = true;
+                                        i++;
+                                        break;
+                                    case '?':
+                                        escapeElem.MinRepeats = 0;
+                                        escapeElem.MaxRepeats = 1;
+                                        i++;
+                                        break;
+                                }
+                            }
+                            elements.Add(escapeElem);
+                        }
+                        else
+                        {
+                            // Trailing % - treat as literal
+                            elements.Add(new CharacterElement('%'));
                         }
                         break;
                         
                     case '.':
-                        elements.Add(new CharacterElement('.', isDot: true));
+                        var dotElem = new CharacterElement('.', isDot: true);
+                        
+                        // Check for quantifiers after dot
+                        if (i + 1 < pattern.Length)
+                        {
+                            var next = pattern[i + 1];
+                            switch (next)
+                            {
+                                case '*':
+                                    dotElem.MinRepeats = 0;
+                                    dotElem.MaxRepeats = 0; // Special value for unlimited
+                                    i++;
+                                    break;
+                                case '+':
+                                    dotElem.MinRepeats = 1;
+                                    dotElem.MaxRepeats = 0; // Special value for unlimited
+                                    i++;
+                                    break;
+                                case '-':
+                                    dotElem.MinRepeats = 0;
+                                    dotElem.MaxRepeats = 0; // Non-greedy unlimited
+                                    dotElem.IsNonGreedy = true;
+                                    i++;
+                                    break;
+                                case '?':
+                                    dotElem.MinRepeats = 0;
+                                    dotElem.MaxRepeats = 1;
+                                    i++;
+                                    break;
+                            }
+                        }
+                        elements.Add(dotElem);
                         break;
                         
                     case '[':
@@ -425,8 +550,39 @@ namespace FLua.Runtime
                         if (endBracket != -1)
                         {
                             var charClass = pattern.Substring(i + 1, endBracket - i - 1);
-                            elements.Add(new CharacterElement(charClass, isCharClass: true));
+                            var classElem = new CharacterElement(charClass, isCharClass: true);
                             i = endBracket;
+                            
+                            // Check for quantifiers after character class
+                            if (i + 1 < pattern.Length)
+                            {
+                                var next = pattern[i + 1];
+                                switch (next)
+                                {
+                                    case '*':
+                                        classElem.MinRepeats = 0;
+                                        classElem.MaxRepeats = 0; // Special value for unlimited
+                                        i++;
+                                        break;
+                                    case '+':
+                                        classElem.MinRepeats = 1;
+                                        classElem.MaxRepeats = 0; // Special value for unlimited
+                                        i++;
+                                        break;
+                                    case '-':
+                                        classElem.MinRepeats = 0;
+                                        classElem.MaxRepeats = 0; // Non-greedy unlimited
+                                        classElem.IsNonGreedy = true;
+                                        i++;
+                                        break;
+                                    case '?':
+                                        classElem.MinRepeats = 0;
+                                        classElem.MaxRepeats = 1;
+                                        i++;
+                                        break;
+                                }
+                            }
+                            elements.Add(classElem);
                         }
                         else
                         {
