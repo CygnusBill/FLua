@@ -533,6 +533,71 @@ namespace FLua.Runtime
         }
 
         /// <summary>
+        /// Optimized string method call that bypasses table lookup for common operations
+        /// </summary>
+        public static LuaValue? TryFastStringMethodCall(string str, string methodName, LuaValue[] args)
+        {
+            switch (methodName)
+            {
+                case "upper":
+                    return LuaValue.String(str.ToUpper());
+                    
+                case "lower":
+                    return LuaValue.String(str.ToLower());
+                    
+                case "len":
+                    return LuaValue.Integer(str.Length);
+                    
+                case "reverse":
+                    return LuaValue.String(new string(str.Reverse().ToArray()));
+                    
+                case "sub":
+                    if (args.Length >= 1 && args[0].TryGetInteger(out long start))
+                    {
+                        var startIdx = start > 0 ? (int)(start - 1) : (int)(str.Length + start);
+                        startIdx = Math.Max(0, Math.Min(startIdx, str.Length));
+                        
+                        if (args.Length >= 2 && args[1].TryGetInteger(out long end))
+                        {
+                            var endIdx = end > 0 ? (int)end - 1 : (int)(str.Length + end);
+                            endIdx = Math.Max(-1, Math.Min(endIdx, str.Length - 1));
+                            
+                            if (startIdx <= endIdx)
+                            {
+                                return LuaValue.String(str.Substring(startIdx, endIdx - startIdx + 1));
+                            }
+                            return LuaValue.String("");
+                        }
+                        else
+                        {
+                            return LuaValue.String(str.Substring(startIdx));
+                        }
+                    }
+                    throw new LuaRuntimeException("bad argument #1 to 'sub' (number expected)");
+                    
+                case "rep":
+                    if (args.Length >= 1 && args[0].TryGetInteger(out long count))
+                    {
+                        if (count <= 0) return LuaValue.String("");
+                        var separator = args.Length >= 2 ? args[1].AsString() : "";
+                        if (separator == "")
+                        {
+                            return LuaValue.String(string.Concat(Enumerable.Repeat(str, (int)count)));
+                        }
+                        else
+                        {
+                            return LuaValue.String(string.Join(separator, Enumerable.Repeat(str, (int)count)));
+                        }
+                    }
+                    throw new LuaRuntimeException("bad argument #1 to 'rep' (number expected)");
+                    
+                default:
+                    // Return null to indicate no fast path available
+                    return null;
+            }
+        }
+
+        /// <summary>
         /// Gets a method from a value (handles both tables and values with metatables)
         /// </summary>
         public static LuaValue GetMethod(LuaEnvironment env, LuaValue obj, LuaValue methodName)

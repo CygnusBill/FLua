@@ -970,7 +970,23 @@ namespace FLua.Interpreter
                 // Evaluate the object
                 var objValue = EvaluateExpr(objExpr);
                 
-                // Evaluate arguments
+                // Fast path for string method calls - skip table lookup
+                if (objValue.IsString)
+                {
+                    var str = objValue.AsString();
+                    var stringArgs = argExprs.ToArray().Select(EvaluateExpr).ToArray();
+                    
+                    // Try the fast path first
+                    var fastResult = LuaOperations.TryFastStringMethodCall(str, methodName, stringArgs);
+                    if (fastResult.HasValue)
+                    {
+                        return [fastResult.Value];
+                    }
+                    
+                    // Fall back to table lookup for other methods (find, match, gsub, etc.)
+                }
+                
+                // Evaluate arguments for table-based method calls
                 var args = argExprs.ToArray().Select(EvaluateExpr).ToArray();
                 
                 // Get the method from the object (which should be a table)
@@ -990,6 +1006,30 @@ namespace FLua.Interpreter
                     }
                     
                     throw new LuaRuntimeException($"Attempt to call method '{methodName}' on table (not a function)");
+                }
+                
+                // For strings, fall back to string library lookup (complex methods like find, match, gsub)
+                if (objValue.IsString)
+                {
+                    var stringLibValue = _environment.GetVariable("string");
+                    if (stringLibValue.IsTable)
+                    {
+                        var stringLib = stringLibValue.AsTable<LuaTable>();
+                        var methodValue = stringLib.Get(LuaValue.String(methodName));
+                        
+                        if (methodValue.IsFunction)
+                        {
+                            // Add the string as the first argument (self)
+                            var callArgs = new LuaValue[args.Length + 1];
+                            callArgs[0] = objValue;
+                            Array.Copy(args, 0, callArgs, 1, args.Length);
+                            
+                            // Call the method
+                            return methodValue.AsFunction<LuaFunction>().Call(callArgs);
+                        }
+                    }
+                    
+                    throw new LuaRuntimeException($"Attempt to call method '{methodName}' on string (method not found)");
                 }
                 
                 throw new LuaRuntimeException("Attempt to call method on non-table");
