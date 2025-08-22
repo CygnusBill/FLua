@@ -293,8 +293,9 @@ namespace FLua.Runtime
                 }
                 else if (match != null)
                 {
-                    // No captures, return the whole match
-                    return Result<LuaValue[]>.Success([LuaValue.String(match.Value)]);
+                    // No captures, return the whole match - extract from original string
+                    var matchText = str.Substring(match.Start - 1, match.End - match.Start);
+                    return Result<LuaValue[]>.Success([LuaValue.String(matchText)]);
                 }
                 
                 return Result<LuaValue[]>.Success([LuaValue.Nil]);
@@ -320,8 +321,17 @@ namespace FLua.Runtime
             
             try
             {
-                var (result, count) = LuaPatterns.GSub(str, pattern, replacement, limit);
-                return Result<LuaValue[]>.Success([LuaValue.String(result), LuaValue.Integer(count)]);
+                // For now, only support string replacement
+                if (replacement.IsString)
+                {
+                    var (result, count) = LuaPatterns.GSub(str, pattern, replacement.AsString(), limit);
+                    return Result<LuaValue[]>.Success([LuaValue.String(result), LuaValue.Integer(count)]);
+                }
+                else
+                {
+                    // Function and table replacements would need more complex implementation
+                    return Result<LuaValue[]>.Failure("Function and table replacements not yet implemented in Result version");
+                }
             }
             catch (Exception ex) when (ex.Message.Contains("invalid pattern"))
             {
@@ -339,8 +349,29 @@ namespace FLua.Runtime
             
             try
             {
-                var iterator = LuaPatterns.GMatch(str, pattern);
-                return Result<LuaValue[]>.Success([iterator]);
+                // Use LuaPatterns.FindAll to get all matches
+                var matches = LuaPatterns.FindAll(str, pattern);
+                var matchStrings = new List<string>();
+                
+                foreach (var match in matches)
+                {
+                    // Get the matched text
+                    var matchText = str.Substring(match.Start - 1, match.End - match.Start);
+                    matchStrings.Add(matchText);
+                }
+                
+                // Create an iterator function
+                var index = 0;
+                var iterator = new BuiltinFunction(iterArgs =>
+                {
+                    if (index < matchStrings.Count)
+                    {
+                        return [LuaValue.String(matchStrings[index++])];
+                    }
+                    return [];
+                });
+                
+                return Result<LuaValue[]>.Success([LuaValue.Function(iterator)]);
             }
             catch (Exception ex) when (ex.Message.Contains("invalid pattern"))
             {
