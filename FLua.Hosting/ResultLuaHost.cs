@@ -1,0 +1,727 @@
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using System.Linq.Expressions;
+using System.Reflection;
+using System.Threading;
+using System.Threading.Tasks;
+using FLua.Ast;
+using FLua.Common;
+using FLua.Compiler;
+using FLua.Hosting.Environment;
+using FLua.Hosting.Security;
+using FLua.Interpreter;
+using FLua.Parser;
+using FLua.Runtime;
+using Microsoft.FSharp.Collections;
+
+namespace FLua.Hosting
+{
+    /// <summary>
+    /// Result-based implementation of the FLua hosting infrastructure.
+    /// Provides secure execution, compilation, and management of Lua scripts with explicit error handling.
+    /// </summary>
+    public class ResultLuaHost : IResultLuaHost
+    {
+        private readonly IEnvironmentProvider _environmentProvider;
+        private readonly ILuaCompiler _compiler;
+        private readonly ILuaSecurityPolicy _securityPolicy;
+        private readonly LuaInterpreter _interpreter;
+        
+        public LuaHostOptions DefaultOptions { get; set; } = new LuaHostOptions();
+        public ILuaSecurityPolicy SecurityPolicy { get; set; }
+        public IModuleResolver ModuleResolver { get; set; } = null!;
+        
+        public ResultLuaHost(
+            IEnvironmentProvider? environmentProvider = null,
+            ILuaCompiler? compiler = null,
+            ILuaSecurityPolicy? securityPolicy = null)
+        {
+            _securityPolicy = securityPolicy ?? new StandardSecurityPolicy();
+            SecurityPolicy = _securityPolicy;
+            _environmentProvider = environmentProvider ?? new FilteredEnvironmentProvider(_securityPolicy);
+            _compiler = compiler ?? new RoslynLuaCompiler();
+            _interpreter = new LuaInterpreter();
+        }
+        
+        public HostingResult<LuaValue> ExecuteResult(string luaCode, LuaHostOptions? options = null)
+        {
+            var stopwatch = Stopwatch.StartNew();
+            options ??= DefaultOptions;
+            
+            try
+            {
+                // Validate the code first
+                var validationResult = ValidateCodeResult(luaCode);
+                if (!validationResult.IsSuccess)
+                {
+                    return HostingResult<LuaValue>.Failure(validationResult.Diagnostics.Select(d =>
+                        new HostingDiagnostic(d.Severity, d.Message, HostingOperation.Validation)).ToList());
+                }
+                
+                if (!validationResult.Value.IsValid)
+                {
+                    var errors = validationResult.Value.SyntaxErrors.Select(e =>
+                        new HostingDiagnostic(DiagnosticSeverity.Error, e.Message, HostingOperation.Parsing, $"Line {e.Line}, Column {e.Column}")).ToList();
+                    return HostingResult<LuaValue>.Failure(errors);
+                }
+                
+                // Create filtered environment based on trust level
+                var envResult = CreateFilteredEnvironmentResult(options.TrustLevel, options);
+                if (!envResult.IsSuccess)
+                    return HostingResult<LuaValue>.Failure(envResult.Diagnostics);
+                
+                var env = envResult.Value;
+                
+                // Parse the code
+                var parseResult = ParseLuaCode(luaCode);
+                if (!parseResult.IsSuccess)
+                    return HostingResult<LuaValue>.FromCompilationResult(parseResult);
+                
+                var statements = parseResult.Value;
+                
+                // Execute with timeout if specified
+                if (options.ExecutionTimeout.HasValue)
+                {
+                    using var cts = new CancellationTokenSource(options.ExecutionTimeout.Value);
+                    var task = Task.Run(() => ExecuteInternalResult(statements, env), cts.Token);
+                    
+                    try
+                    {
+                        task.Wait(cts.Token);
+                        var result = task.Result;
+                        stopwatch.Stop();
+                        
+                        if (result.IsSuccess)
+                        {
+                            var context = new ExecutionContext(
+                                stopwatch.Elapsed,
+                                null, // Memory tracking would require additional instrumentation
+                                null,
+                                options.TrustLevel.ToString());
+                            return HostingResult<LuaValue>.Success(result.Value, result.Diagnostics, context);
+                        }
+                        else
+                        {
+                            return result;
+                        }
+                    }
+                    catch (OperationCanceledException)
+                    {
+                        stopwatch.Stop();
+                        var context = new ExecutionContext(stopwatch.Elapsed, trustLevel: options.TrustLevel.ToString());
+                        return HostingResult<LuaValue>.Error(
+                            $"Script execution exceeded timeout of {options.ExecutionTimeout.Value}",
+                            HostingOperation.Execution,
+                            context: context);
+                    }
+                }
+                
+                var executeResult = ExecuteInternalResult(statements, env);
+                stopwatch.Stop();
+                
+                if (executeResult.IsSuccess)
+                {
+                    var context = new ExecutionContext(stopwatch.Elapsed, trustLevel: options.TrustLevel.ToString());
+                    return HostingResult<LuaValue>.Success(executeResult.Value, executeResult.Diagnostics, context);
+                }
+                else
+                {
+                    return executeResult;
+                }
+            }
+            catch (Exception ex)
+            {
+                stopwatch.Stop();
+                var context = new ExecutionContext(stopwatch.Elapsed);
+                return HostingResult<LuaValue>.FromException(ex, HostingOperation.Execution, context: context);
+            }
+        }
+        
+        private HostingResult<LuaValue> ExecuteInternalResult(FSharpList<Statement> statements, LuaEnvironment env)
+        {
+            try
+            {
+                // Save current interpreter environment
+                var originalEnv = _interpreter.GetType()
+                    .GetField("_environment", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
+                    ?.GetValue(_interpreter) as LuaEnvironment;
+                
+                try
+                {
+                    // Set our custom environment
+                    var envField = _interpreter.GetType()
+                        .GetField("_environment", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+                    envField?.SetValue(_interpreter, env);
+                    
+                    // Execute the statements
+                    var result = _interpreter.ExecuteStatements(statements);
+                    return HostingResult<LuaValue>.Success(result);
+                }
+                finally
+                {
+                    // Restore original environment
+                    if (originalEnv != null)
+                    {
+                        var envField = _interpreter.GetType()
+                            .GetField("_environment", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+                        envField?.SetValue(_interpreter, originalEnv);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                return HostingResult<LuaValue>.FromException(ex, HostingOperation.Execution);
+            }
+        }
+        
+        public async Task<HostingResult<LuaValue>> ExecuteResultAsync(string luaCode, LuaHostOptions? options = null, CancellationToken cancellationToken = default)
+        {
+            var stopwatch = Stopwatch.StartNew();
+            options ??= DefaultOptions;
+            
+            try
+            {
+                // Validate the code first
+                var validationResult = ValidateCodeResult(luaCode);
+                if (!validationResult.IsSuccess)
+                {
+                    return HostingResult<LuaValue>.Failure(validationResult.Diagnostics.Select(d =>
+                        new HostingDiagnostic(d.Severity, d.Message, HostingOperation.Validation)).ToList());
+                }
+                
+                if (!validationResult.Value.IsValid)
+                {
+                    var errors = validationResult.Value.SyntaxErrors.Select(e =>
+                        new HostingDiagnostic(DiagnosticSeverity.Error, e.Message, HostingOperation.Parsing, $"Line {e.Line}, Column {e.Column}")).ToList();
+                    return HostingResult<LuaValue>.Failure(errors);
+                }
+                
+                // Create filtered environment
+                var envResult = CreateFilteredEnvironmentResult(options.TrustLevel, options);
+                if (!envResult.IsSuccess)
+                    return HostingResult<LuaValue>.Failure(envResult.Diagnostics);
+                
+                var env = envResult.Value;
+                
+                // Parse the code
+                var parseResult = ParseLuaCode(luaCode);
+                if (!parseResult.IsSuccess)
+                    return HostingResult<LuaValue>.FromCompilationResult(parseResult);
+                
+                var statements = parseResult.Value;
+                
+                // Execute asynchronously
+                var executeResult = await Task.Run(() => ExecuteInternalResult(statements, env), cancellationToken);
+                stopwatch.Stop();
+                
+                if (executeResult.IsSuccess)
+                {
+                    var context = new ExecutionContext(stopwatch.Elapsed, trustLevel: options.TrustLevel.ToString());
+                    return HostingResult<LuaValue>.Success(executeResult.Value, executeResult.Diagnostics, context);
+                }
+                else
+                {
+                    return executeResult;
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                stopwatch.Stop();
+                var context = new ExecutionContext(stopwatch.Elapsed, trustLevel: options?.TrustLevel.ToString());
+                return HostingResult<LuaValue>.Error(
+                    "Script execution was cancelled",
+                    HostingOperation.Execution,
+                    context: context);
+            }
+            catch (Exception ex)
+            {
+                stopwatch.Stop();
+                var context = new ExecutionContext(stopwatch.Elapsed);
+                return HostingResult<LuaValue>.FromException(ex, HostingOperation.Execution, context: context);
+            }
+        }
+        
+        public HostingResult<Func<T>> CompileToFunctionResult<T>(string luaCode, LuaHostOptions? options = null)
+        {
+            var stopwatch = Stopwatch.StartNew();
+            options ??= DefaultOptions;
+            
+            try
+            {
+                // Validate the code first
+                var validationResult = ValidateCodeResult(luaCode);
+                if (!validationResult.IsSuccess)
+                {
+                    return HostingResult<Func<T>>.Failure(validationResult.Diagnostics.Select(d =>
+                        new HostingDiagnostic(d.Severity, d.Message, HostingOperation.Validation)).ToList());
+                }
+                
+                if (!validationResult.Value.IsValid)
+                {
+                    var errors = validationResult.Value.SyntaxErrors.Select(e =>
+                        new HostingDiagnostic(DiagnosticSeverity.Error, e.Message, HostingOperation.Parsing, $"Line {e.Line}, Column {e.Column}")).ToList();
+                    return HostingResult<Func<T>>.Failure(errors);
+                }
+                
+                // Parse the code
+                var parseResult = ParseLuaCode(luaCode);
+                if (!parseResult.IsSuccess)
+                    return HostingResult<Func<T>>.FromCompilationResult(parseResult);
+                
+                var statements = parseResult.Value;
+                
+                // Set up compiler options
+                var compilerOptions = new CompilerOptions(
+                    OutputPath: "",
+                    Target: CompilationTarget.Lambda,
+                    GenerateInMemory: true
+                );
+                
+                // Compile to lambda
+                var compilationResult = _compiler.Compile(statements.ToArray(), compilerOptions);
+                stopwatch.Stop();
+                
+                var context = new ExecutionContext(stopwatch.Elapsed, trustLevel: options.TrustLevel.ToString());
+                
+                if (!compilationResult.Success)
+                {
+                    var errors = (compilationResult.Errors ?? Enumerable.Empty<string>()).Select(e =>
+                        new HostingDiagnostic(DiagnosticSeverity.Error, e, HostingOperation.Compilation)).ToList();
+                    return HostingResult<Func<T>>.Failure(errors, context);
+                }
+                
+                if (compilationResult.CompiledDelegate is Func<T> func)
+                {
+                    return HostingResult<Func<T>>.Success(func, context: context);
+                }
+                
+                // Try to convert the result
+                var result = ExecuteResult(luaCode, options);
+                if (!result.IsSuccess)
+                    return HostingResult<Func<T>>.Failure(result.Diagnostics, context);
+                
+                var luaValue = result.Value;
+                
+                try
+                {
+                    var convertedValue = ConvertLuaValueResult<T>(luaValue);
+                    if (!convertedValue.IsSuccess)
+                        return HostingResult<Func<T>>.Failure(convertedValue.Diagnostics.Select(d =>
+                            new HostingDiagnostic(d.Severity, d.Message, HostingOperation.Compilation)).ToList(), context);
+                    
+                    return HostingResult<Func<T>>.Success(() => convertedValue.Value, context: context);
+                }
+                catch (Exception ex)
+                {
+                    return HostingResult<Func<T>>.FromException(ex, HostingOperation.Compilation, context: context);
+                }
+            }
+            catch (Exception ex)
+            {
+                stopwatch.Stop();
+                var context = new ExecutionContext(stopwatch.Elapsed);
+                return HostingResult<Func<T>>.FromException(ex, HostingOperation.Compilation, context: context);
+            }
+        }
+        
+        public HostingResult<Delegate> CompileToDelegateResult(string luaCode, Type delegateType, string[]? parameterNames = null, LuaHostOptions? options = null)
+        {
+            var stopwatch = Stopwatch.StartNew();
+            options ??= DefaultOptions;
+            
+            try
+            {
+                // Validate the code first
+                var validationResult = ValidateCodeResult(luaCode);
+                if (!validationResult.IsSuccess)
+                {
+                    return HostingResult<Delegate>.Failure(validationResult.Diagnostics.Select(d =>
+                        new HostingDiagnostic(d.Severity, d.Message, HostingOperation.Validation)).ToList());
+                }
+                
+                if (!validationResult.Value.IsValid)
+                {
+                    var errors = validationResult.Value.SyntaxErrors.Select(e =>
+                        new HostingDiagnostic(DiagnosticSeverity.Error, e.Message, HostingOperation.Parsing, $"Line {e.Line}, Column {e.Column}")).ToList();
+                    return HostingResult<Delegate>.Failure(errors);
+                }
+                
+                // Parse the code
+                var parseResult = ParseLuaCode(luaCode);
+                if (!parseResult.IsSuccess)
+                    return HostingResult<Delegate>.FromCompilationResult(parseResult);
+                
+                var statements = parseResult.Value;
+                
+                // Set up compiler options
+                var compilerOptions = new CompilerOptions(
+                    OutputPath: "",
+                    Target: CompilationTarget.Lambda,
+                    GenerateInMemory: true
+                );
+                
+                // Compile to delegate
+                var compilationResult = _compiler.Compile(statements.ToArray(), compilerOptions);
+                stopwatch.Stop();
+                
+                var context = new ExecutionContext(stopwatch.Elapsed, trustLevel: options.TrustLevel.ToString());
+                
+                if (!compilationResult.Success)
+                {
+                    var errors = (compilationResult.Errors ?? Enumerable.Empty<string>()).Select(e =>
+                        new HostingDiagnostic(DiagnosticSeverity.Error, e, HostingOperation.Compilation)).ToList();
+                    return HostingResult<Delegate>.Failure(errors, context);
+                }
+                
+                if (compilationResult.CompiledDelegate != null)
+                {
+                    return HostingResult<Delegate>.Success(compilationResult.CompiledDelegate, context: context);
+                }
+                
+                return HostingResult<Delegate>.Error(
+                    "Lambda compilation did not produce a delegate", 
+                    HostingOperation.Compilation, 
+                    context: context);
+            }
+            catch (Exception ex)
+            {
+                stopwatch.Stop();
+                var context = new ExecutionContext(stopwatch.Elapsed);
+                return HostingResult<Delegate>.FromException(ex, HostingOperation.Compilation, context: context);
+            }
+        }
+        
+        public HostingResult<Expression<Func<T>>> CompileToExpressionResult<T>(string luaCode, LuaHostOptions? options = null)
+        {
+            var stopwatch = Stopwatch.StartNew();
+            options ??= DefaultOptions;
+            
+            try
+            {
+                // Validate the code first
+                var validationResult = ValidateCodeResult(luaCode);
+                if (!validationResult.IsSuccess)
+                {
+                    return HostingResult<Expression<Func<T>>>.Failure(validationResult.Diagnostics.Select(d =>
+                        new HostingDiagnostic(d.Severity, d.Message, HostingOperation.Validation)).ToList());
+                }
+                
+                if (!validationResult.Value.IsValid)
+                {
+                    var errors = validationResult.Value.SyntaxErrors.Select(e =>
+                        new HostingDiagnostic(DiagnosticSeverity.Error, e.Message, HostingOperation.Parsing, $"Line {e.Line}, Column {e.Column}")).ToList();
+                    return HostingResult<Expression<Func<T>>>.Failure(errors);
+                }
+                
+                // Parse the code
+                var parseResult = ParseLuaCode(luaCode);
+                if (!parseResult.IsSuccess)
+                    return HostingResult<Expression<Func<T>>>.FromCompilationResult(parseResult);
+                
+                var statements = parseResult.Value;
+                
+                // Set up compiler options for expression tree generation
+                var compilerOptions = new CompilerOptions(
+                    OutputPath: "",
+                    Target: CompilationTarget.Expression,
+                    GenerateExpressionTree: true,
+                    GenerateInMemory: true
+                );
+                
+                // Compile to expression tree
+                var compilationResult = _compiler.Compile(statements.ToArray(), compilerOptions);
+                stopwatch.Stop();
+                
+                var context = new ExecutionContext(stopwatch.Elapsed, trustLevel: options.TrustLevel.ToString());
+                
+                if (!compilationResult.Success)
+                {
+                    var errors = (compilationResult.Errors ?? Enumerable.Empty<string>()).Select(e =>
+                        new HostingDiagnostic(DiagnosticSeverity.Error, e, HostingOperation.ExpressionTreeGeneration)).ToList();
+                    return HostingResult<Expression<Func<T>>>.Failure(errors, context);
+                }
+                
+                if (compilationResult.ExpressionTree is Expression<Func<T>> expr)
+                {
+                    return HostingResult<Expression<Func<T>>>.Success(expr, context: context);
+                }
+                
+                return HostingResult<Expression<Func<T>>>.Error(
+                    "Expression tree generation did not produce an expression", 
+                    HostingOperation.ExpressionTreeGeneration, 
+                    context: context);
+            }
+            catch (Exception ex)
+            {
+                stopwatch.Stop();
+                var context = new ExecutionContext(stopwatch.Elapsed);
+                return HostingResult<Expression<Func<T>>>.FromException(ex, HostingOperation.ExpressionTreeGeneration, context: context);
+            }
+        }
+        
+        public HostingResult<Assembly> CompileToAssemblyResult(string luaCode, LuaHostOptions? options = null)
+        {
+            var stopwatch = Stopwatch.StartNew();
+            options ??= DefaultOptions;
+            
+            try
+            {
+                // Validate the code first
+                var validationResult = ValidateCodeResult(luaCode);
+                if (!validationResult.IsSuccess)
+                {
+                    return HostingResult<Assembly>.Failure(validationResult.Diagnostics.Select(d =>
+                        new HostingDiagnostic(d.Severity, d.Message, HostingOperation.Validation)).ToList());
+                }
+                
+                if (!validationResult.Value.IsValid)
+                {
+                    var errors = validationResult.Value.SyntaxErrors.Select(e =>
+                        new HostingDiagnostic(DiagnosticSeverity.Error, e.Message, HostingOperation.Parsing, $"Line {e.Line}, Column {e.Column}")).ToList();
+                    return HostingResult<Assembly>.Failure(errors);
+                }
+                
+                // Parse the code
+                var parseResult = ParseLuaCode(luaCode);
+                if (!parseResult.IsSuccess)
+                    return HostingResult<Assembly>.FromCompilationResult(parseResult);
+                
+                var statements = parseResult.Value;
+                
+                // Set up compiler options for assembly generation
+                var compilerOptions = new CompilerOptions(
+                    OutputPath: System.IO.Path.GetTempPath(),
+                    Target: CompilationTarget.Library,
+                    GenerateInMemory: true
+                );
+                
+                // Compile to assembly
+                var compilationResult = _compiler.Compile(statements.ToArray(), compilerOptions);
+                stopwatch.Stop();
+                
+                var context = new ExecutionContext(stopwatch.Elapsed, trustLevel: options.TrustLevel.ToString());
+                
+                if (!compilationResult.Success)
+                {
+                    var errors = (compilationResult.Errors ?? Enumerable.Empty<string>()).Select(e =>
+                        new HostingDiagnostic(DiagnosticSeverity.Error, e, HostingOperation.AssemblyGeneration)).ToList();
+                    return HostingResult<Assembly>.Failure(errors, context);
+                }
+                
+                if (compilationResult.Assembly != null)
+                {
+                    try
+                    {
+                        var assembly = Assembly.Load(compilationResult.Assembly);
+                        return HostingResult<Assembly>.Success(assembly, context: context);
+                    }
+                    catch (Exception ex)
+                    {
+                        return HostingResult<Assembly>.FromException(ex, HostingOperation.AssemblyGeneration, context: context);
+                    }
+                }
+                
+                return HostingResult<Assembly>.Error(
+                    "Failed to compile or load assembly", 
+                    HostingOperation.AssemblyGeneration, 
+                    context: context);
+            }
+            catch (Exception ex)
+            {
+                stopwatch.Stop();
+                var context = new ExecutionContext(stopwatch.Elapsed);
+                return HostingResult<Assembly>.FromException(ex, HostingOperation.AssemblyGeneration, context: context);
+            }
+        }
+        
+        public HostingResult<byte[]> CompileToBytesResult(string luaCode, LuaHostOptions? options = null)
+        {
+            return CompileToAssemblyResult(luaCode, options)
+                .Bind(assembly =>
+                {
+                    try
+                    {
+                        var assemblyBytes = System.IO.File.ReadAllBytes(assembly.Location);
+                        return HostingResult<byte[]>.Success(assemblyBytes);
+                    }
+                    catch (Exception ex)
+                    {
+                        return HostingResult<byte[]>.FromException(ex, HostingOperation.AssemblyGeneration);
+                    }
+                });
+        }
+        
+        public HostingResult<LuaEnvironment> CreateFilteredEnvironmentResult(TrustLevel trustLevel, LuaHostOptions? options = null)
+        {
+            try
+            {
+                options ??= DefaultOptions;
+                var environment = _environmentProvider.CreateEnvironment(trustLevel, options);
+                return HostingResult<LuaEnvironment>.Success(environment);
+            }
+            catch (Exception ex)
+            {
+                return HostingResult<LuaEnvironment>.FromException(ex, HostingOperation.EnvironmentCreation);
+            }
+        }
+        
+        public HostingResult<ValidationInfo> ValidateCodeResult(string luaCode)
+        {
+            try
+            {
+                var syntaxErrors = new List<SyntaxError>();
+                var semanticWarnings = new List<SemanticWarning>();
+                var performanceHints = new List<PerformanceHint>();
+                var securityViolations = new List<SecurityViolation>();
+                
+                // Parse the code to check for syntax errors
+                var parseResult = ParseLuaCodeForValidation(luaCode);
+                if (!parseResult.IsSuccess)
+                {
+                    var compilerDiagnostics = parseResult.Diagnostics.Where(d => d.Severity == DiagnosticSeverity.Error);
+                    foreach (var diagnostic in compilerDiagnostics)
+                    {
+                        syntaxErrors.Add(new SyntaxError(diagnostic.Message, diagnostic.Line, diagnostic.Column));
+                    }
+                    
+                    return HostingResult<ValidationInfo>.Success(ValidationInfo.Invalid(syntaxErrors, securityViolations));
+                }
+                
+                var statements = parseResult.Value;
+                
+                // Analyze AST for metrics and warnings
+                var astInfo = AnalyzeAst(statements);
+                var complexity = CalculateComplexity(statements);
+                
+                // Check for semantic issues and performance hints
+                AnalyzeSemantics(statements, semanticWarnings, performanceHints);
+                
+                // Security analysis would go here
+                AnalyzeSecurity(statements, securityViolations, DefaultOptions.TrustLevel);
+                
+                var validationInfo = ValidationInfo.Valid(astInfo, complexity, semanticWarnings, performanceHints);
+                return HostingResult<ValidationInfo>.Success(validationInfo);
+            }
+            catch (Exception ex)
+            {
+                return HostingResult<ValidationInfo>.FromException(ex, HostingOperation.Validation);
+            }
+        }
+        
+        #region Helper Methods
+        
+        private CompilationResult<FSharpList<Statement>> ParseLuaCode(string luaCode)
+        {
+            try
+            {
+                var statements = ParserHelper.ParseString(luaCode);
+                return CompilationResult<FSharpList<Statement>>.Success(statements);
+            }
+            catch (Exception ex)
+            {
+                return CompilationResult<FSharpList<Statement>>.Error($"Parse error: {ex.Message}");
+            }
+        }
+        
+        private CompilationResult<FSharpList<Statement>> ParseLuaCodeForValidation(string luaCode)
+        {
+            try
+            {
+                var statements = ParserHelper.ParseString(luaCode);
+                return CompilationResult<FSharpList<Statement>>.Success(statements);
+            }
+            catch (Exception ex)
+            {
+                // Extract line/column information if available
+                var diagnostic = new CompilerDiagnostic(DiagnosticSeverity.Error, ex.Message, "validation", 1, 1);
+                return CompilationResult<FSharpList<Statement>>.Failure(new[] { diagnostic });
+            }
+        }
+        
+        private Result<T> ConvertLuaValueResult<T>(LuaValue luaValue)
+        {
+            try
+            {
+                var targetType = typeof(T);
+                
+                if (targetType == typeof(LuaValue))
+                    return Result<T>.Success((T)(object)luaValue);
+                
+                if (targetType == typeof(string))
+                    return luaValue.TryAsString().Map(s => (T)(object)s);
+                
+                if (targetType == typeof(bool))
+                    return luaValue.TryAsBoolean().Map(b => (T)(object)b);
+                
+                if (targetType == typeof(long) || targetType == typeof(int))
+                    return luaValue.TryAsInteger().Map(i => (T)(object)i);
+                
+                if (targetType == typeof(double) || targetType == typeof(float))
+                    return luaValue.TryAsDouble().Map(d => (T)(object)d);
+                
+                return Result<T>.Failure($"Cannot convert LuaValue to type {targetType}");
+            }
+            catch (Exception ex)
+            {
+                return Result<T>.Failure($"Conversion error: {ex.Message}");
+            }
+        }
+        
+        private AstInfo AnalyzeAst(FSharpList<Statement> statements)
+        {
+            // Simple AST analysis - could be more sophisticated
+            var statementCount = statements.Length;
+            var functionCount = CountFunctions(statements);
+            var loopCount = CountLoops(statements);
+            var maxNestingDepth = CalculateMaxNesting(statements);
+            var globalVariables = ExtractGlobalVariables(statements);
+            var localVariables = ExtractLocalVariables(statements);
+            var hasTailCalls = CheckForTailCalls(statements);
+            var usesCoroutines = CheckForCoroutines(statements);
+            
+            return new AstInfo(statementCount, functionCount, loopCount, maxNestingDepth, 
+                globalVariables, localVariables, hasTailCalls, usesCoroutines);
+        }
+        
+        private ComplexityMetrics CalculateComplexity(FSharpList<Statement> statements)
+        {
+            // Basic complexity calculation
+            var cyclomaticComplexity = CalculateCyclomaticComplexity(statements);
+            var linesOfCode = statements.Length; // Simplified
+            var tokenCount = EstimateTokenCount(statements);
+            var halsteadComplexity = CalculateHalsteadComplexity(statements);
+            var estimatedExecutionTime = EstimateExecutionTime(statements);
+            
+            return new ComplexityMetrics(cyclomaticComplexity, linesOfCode, tokenCount, halsteadComplexity, estimatedExecutionTime);
+        }
+        
+        private void AnalyzeSemantics(FSharpList<Statement> statements, List<SemanticWarning> warnings, List<PerformanceHint> hints)
+        {
+            // Placeholder for semantic analysis
+            // Could analyze variable usage, dead code, etc.
+        }
+        
+        private void AnalyzeSecurity(FSharpList<Statement> statements, List<SecurityViolation> violations, TrustLevel trustLevel)
+        {
+            // Placeholder for security analysis
+            // Could check for dangerous operations based on trust level
+        }
+        
+        // Placeholder implementations for AST analysis
+        private int CountFunctions(FSharpList<Statement> statements) => 0;
+        private int CountLoops(FSharpList<Statement> statements) => 0;
+        private int CalculateMaxNesting(FSharpList<Statement> statements) => 1;
+        private List<string> ExtractGlobalVariables(FSharpList<Statement> statements) => new();
+        private List<string> ExtractLocalVariables(FSharpList<Statement> statements) => new();
+        private bool CheckForTailCalls(FSharpList<Statement> statements) => false;
+        private bool CheckForCoroutines(FSharpList<Statement> statements) => false;
+        private int CalculateCyclomaticComplexity(FSharpList<Statement> statements) => 1;
+        private int EstimateTokenCount(FSharpList<Statement> statements) => statements.Length * 5;
+        private double CalculateHalsteadComplexity(FSharpList<Statement> statements) => 1.0;
+        private TimeSpan EstimateExecutionTime(FSharpList<Statement> statements) => TimeSpan.FromMilliseconds(statements.Length);
+        
+        #endregion
+    }
+}
