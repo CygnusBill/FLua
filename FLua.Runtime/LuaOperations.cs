@@ -598,6 +598,152 @@ namespace FLua.Runtime
         }
 
         /// <summary>
+        /// Optimized math function call that bypasses table lookup for common operations
+        /// </summary>
+        public static LuaValue[]? TryFastMathFunctionCall(string functionName, LuaValue[] args)
+        {
+            switch (functionName)
+            {
+                case "abs":
+                    if (args.Length == 0)
+                        throw new LuaRuntimeException("bad argument #1 to 'abs' (number expected)");
+                    
+                    var value = args[0];
+                    if (value.IsInteger)
+                    {
+                        var intVal = value.AsInteger();
+                        if (intVal == long.MinValue)
+                            return [LuaValue.Integer(long.MinValue)]; // MinValue abs is itself in Lua
+                        return [LuaValue.Integer(Math.Abs(intVal))];
+                    }
+                    
+                    if (value.IsNumber)
+                    {
+                        return [LuaValue.Number(Math.Abs(value.AsDouble()))];
+                    }
+                    
+                    throw new LuaRuntimeException("bad argument #1 to 'abs' (number expected)");
+                    
+                case "sin":
+                    if (args.Length == 0)
+                        throw new LuaRuntimeException("bad argument #1 to 'sin' (number expected)");
+                    
+                    if (!args[0].IsNumber)
+                        throw new LuaRuntimeException("bad argument #1 to 'sin' (number expected)");
+                    
+                    return [LuaValue.Float(Math.Sin(args[0].AsDouble()))];
+                    
+                case "cos":
+                    if (args.Length == 0)
+                        throw new LuaRuntimeException("bad argument #1 to 'cos' (number expected)");
+                    
+                    if (!args[0].IsNumber)
+                        throw new LuaRuntimeException("bad argument #1 to 'cos' (number expected)");
+                    
+                    return [LuaValue.Float(Math.Cos(args[0].AsDouble()))];
+                    
+                case "tan":
+                    if (args.Length == 0)
+                        throw new LuaRuntimeException("bad argument #1 to 'tan' (number expected)");
+                    
+                    if (!args[0].IsNumber)
+                        throw new LuaRuntimeException("bad argument #1 to 'tan' (number expected)");
+                    
+                    return [LuaValue.Float(Math.Tan(args[0].AsDouble()))];
+                    
+                case "sqrt":
+                    if (args.Length == 0)
+                        throw new LuaRuntimeException("bad argument #1 to 'sqrt' (number expected)");
+                    
+                    if (!args[0].IsNumber)
+                        throw new LuaRuntimeException("bad argument #1 to 'sqrt' (number expected)");
+                    
+                    return [LuaValue.Float(Math.Sqrt(args[0].AsDouble()))];
+                    
+                case "exp":
+                    if (args.Length == 0)
+                        throw new LuaRuntimeException("bad argument #1 to 'exp' (number expected)");
+                    
+                    if (!args[0].IsNumber)
+                        throw new LuaRuntimeException("bad argument #1 to 'exp' (number expected)");
+                    
+                    return [LuaValue.Float(Math.Exp(args[0].AsDouble()))];
+                    
+                case "floor":
+                    if (args.Length == 0)
+                        throw new LuaRuntimeException("bad argument #1 to 'floor' (number expected)");
+                    
+                    var floorValue = args[0];
+                    if (!floorValue.IsNumber)
+                        throw new LuaRuntimeException("bad argument #1 to 'floor' (number expected)");
+                    
+                    var floorResult = Math.Floor(floorValue.AsDouble());
+                    if (floorResult >= long.MinValue && floorResult <= long.MaxValue && floorResult == Math.Truncate(floorResult))
+                        return [LuaValue.Integer((long)floorResult)];
+                    else
+                        return [LuaValue.Float(floorResult)];
+                        
+                case "ceil":
+                    if (args.Length == 0)
+                        throw new LuaRuntimeException("bad argument #1 to 'ceil' (number expected)");
+                    
+                    var ceilValue = args[0];
+                    if (!ceilValue.IsNumber)
+                        throw new LuaRuntimeException("bad argument #1 to 'ceil' (number expected)");
+                    
+                    var ceilResult = Math.Ceiling(ceilValue.AsDouble());
+                    if (ceilResult >= long.MinValue && ceilResult <= long.MaxValue && ceilResult == Math.Truncate(ceilResult))
+                        return [LuaValue.Integer((long)ceilResult)];
+                    else
+                        return [LuaValue.Float(ceilResult)];
+                        
+                case "max":
+                    if (args.Length == 0)
+                        throw new LuaRuntimeException("bad argument #1 to 'max' (value expected)");
+                    
+                    var max = args[0];
+                    if (!max.IsNumber)
+                        throw new LuaRuntimeException("bad argument #1 to 'max' (number expected)");
+                    
+                    for (int i = 1; i < args.Length; i++)
+                    {
+                        var current = args[i];
+                        if (!current.IsNumber)
+                            throw new LuaRuntimeException($"bad argument #{i + 1} to 'max' (number expected)");
+                        
+                        if (current.AsDouble() > max.AsDouble())
+                            max = current;
+                    }
+                    
+                    return [max];
+                    
+                case "min":
+                    if (args.Length == 0)
+                        throw new LuaRuntimeException("bad argument #1 to 'min' (value expected)");
+                    
+                    var min = args[0];
+                    if (!min.IsNumber)
+                        throw new LuaRuntimeException("bad argument #1 to 'min' (number expected)");
+                    
+                    for (int i = 1; i < args.Length; i++)
+                    {
+                        var current = args[i];
+                        if (!current.IsNumber)
+                            throw new LuaRuntimeException($"bad argument #{i + 1} to 'min' (number expected)");
+                        
+                        if (current.AsDouble() < min.AsDouble())
+                            min = current;
+                    }
+                    
+                    return [min];
+                    
+                default:
+                    // Return null to indicate no fast path available
+                    return null;
+            }
+        }
+
+        /// <summary>
         /// Gets a method from a value (handles both tables and values with metatables)
         /// </summary>
         public static LuaValue GetMethod(LuaEnvironment env, LuaValue obj, LuaValue methodName)

@@ -16,42 +16,70 @@ namespace FLua.Runtime
         {
             var mathTable = new LuaTable();
             
-            // Constants
+            // Initialize as built-in library with fast path optimization
+            mathTable.InitializeAsBuiltinLibrary("math");
+            
+            // Constants (no fast path needed, just stored values)
             mathTable.Set(LuaValue.String("pi"), LuaValue.Number(Math.PI));
             mathTable.Set(LuaValue.String("huge"), LuaValue.Number(double.PositiveInfinity));
             mathTable.Set(LuaValue.String("mininteger"), LuaValue.Integer(long.MinValue));
             mathTable.Set(LuaValue.String("maxinteger"), LuaValue.Integer(long.MaxValue));
             
-            // Basic arithmetic functions
+            // Basic arithmetic functions - optimized functions
             mathTable.Set(LuaValue.String("abs"), new BuiltinFunction(Abs));
+            mathTable.EnableFastPath("abs");
+            
             mathTable.Set(LuaValue.String("max"), new BuiltinFunction(Max));
+            mathTable.EnableFastPath("max");
+            
             mathTable.Set(LuaValue.String("min"), new BuiltinFunction(Min));
+            mathTable.EnableFastPath("min");
+            
             mathTable.Set(LuaValue.String("floor"), new BuiltinFunction(Floor));
+            mathTable.EnableFastPath("floor");
+            
             mathTable.Set(LuaValue.String("ceil"), new BuiltinFunction(Ceil));
+            mathTable.EnableFastPath("ceil");
+            
+            // Non-optimized functions (fallback to table lookup)
             mathTable.Set(LuaValue.String("fmod"), new BuiltinFunction(FMod));
             mathTable.Set(LuaValue.String("modf"), new BuiltinFunction(Modf));
             
-            // Trigonometric functions
+            // Trigonometric functions - optimized functions
             mathTable.Set(LuaValue.String("sin"), new BuiltinFunction(Sin));
+            mathTable.EnableFastPath("sin");
+            
             mathTable.Set(LuaValue.String("cos"), new BuiltinFunction(Cos));
+            mathTable.EnableFastPath("cos");
+            
             mathTable.Set(LuaValue.String("tan"), new BuiltinFunction(Tan));
+            mathTable.EnableFastPath("tan");
+            
+            // Non-optimized trigonometric functions
             mathTable.Set(LuaValue.String("asin"), new BuiltinFunction(ASin));
             mathTable.Set(LuaValue.String("acos"), new BuiltinFunction(ACos));
             mathTable.Set(LuaValue.String("atan"), new BuiltinFunction(ATan));
             mathTable.Set(LuaValue.String("deg"), new BuiltinFunction(Deg));
             mathTable.Set(LuaValue.String("rad"), new BuiltinFunction(Rad));
             
-            // Exponential and logarithmic functions
+            // Exponential and logarithmic functions - optimized functions
             mathTable.Set(LuaValue.String("exp"), new BuiltinFunction(Exp));
-            mathTable.Set(LuaValue.String("log"), new BuiltinFunction(Log));
-            mathTable.Set(LuaValue.String("sqrt"), new BuiltinFunction(Sqrt));
-            mathTable.Set(LuaValue.String("pow"), new BuiltinFunction(Pow));
+            mathTable.EnableFastPath("exp");
             
-            // Random functions
+            mathTable.Set(LuaValue.String("log"), new BuiltinFunction(Log));
+            mathTable.EnableFastPath("log");
+            
+            mathTable.Set(LuaValue.String("sqrt"), new BuiltinFunction(Sqrt));
+            mathTable.EnableFastPath("sqrt");
+            
+            mathTable.Set(LuaValue.String("pow"), new BuiltinFunction(Pow));
+            mathTable.EnableFastPath("pow");
+            
+            // Random functions (stateful, not optimized)
             mathTable.Set(LuaValue.String("random"), new BuiltinFunction(Random));
             mathTable.Set(LuaValue.String("randomseed"), new BuiltinFunction(RandomSeed));
             
-            // Type and conversion functions
+            // Type and conversion functions (not optimized)
             mathTable.Set(LuaValue.String("type"), new BuiltinFunction(Type));
             mathTable.Set(LuaValue.String("tointeger"), new BuiltinFunction(ToInteger));
             mathTable.Set(LuaValue.String("ult"), new BuiltinFunction(Ult));

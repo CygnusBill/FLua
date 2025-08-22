@@ -18,30 +18,42 @@ namespace FLua.Runtime
         {
             var stringTable = new LuaTable();
             
-            // Basic string functions
-            stringTable.Set(LuaValue.String("len"), new BuiltinFunction(Len));
-            stringTable.Set(LuaValue.String("sub"), new BuiltinFunction(Sub));
-            stringTable.Set(LuaValue.String("upper"), new BuiltinFunction(Upper));
-            stringTable.Set(LuaValue.String("lower"), new BuiltinFunction(Lower));
-            stringTable.Set(LuaValue.String("reverse"), new BuiltinFunction(Reverse));
+            // Initialize as built-in library with fast path optimization
+            stringTable.InitializeAsBuiltinLibrary("string");
             
-            // Character functions
+            // Basic string functions - optimized functions
+            stringTable.Set(LuaValue.String("len"), new BuiltinFunction(Len));
+            stringTable.EnableFastPath("len");
+            
+            stringTable.Set(LuaValue.String("sub"), new BuiltinFunction(Sub));
+            stringTable.EnableFastPath("sub");
+            
+            stringTable.Set(LuaValue.String("upper"), new BuiltinFunction(Upper));
+            stringTable.EnableFastPath("upper");
+            
+            stringTable.Set(LuaValue.String("lower"), new BuiltinFunction(Lower));
+            stringTable.EnableFastPath("lower");
+            
+            stringTable.Set(LuaValue.String("reverse"), new BuiltinFunction(Reverse));
+            stringTable.EnableFastPath("reverse");
+            
+            stringTable.Set(LuaValue.String("rep"), new BuiltinFunction(Rep));
+            stringTable.EnableFastPath("rep");
+            
+            // Character functions (not optimized - less common)
             stringTable.Set(LuaValue.String("char"), new BuiltinFunction(Char));
             stringTable.Set(LuaValue.String("byte"), new BuiltinFunction(Byte));
             
-            // Repetition
-            stringTable.Set(LuaValue.String("rep"), new BuiltinFunction(Rep));
-            
-            // Pattern matching (simplified - full Lua patterns are complex)
+            // Pattern matching (complex, not optimized - use table lookup)
             stringTable.Set(LuaValue.String("find"), new BuiltinFunction(Find));
             stringTable.Set(LuaValue.String("match"), new BuiltinFunction(Match));
             stringTable.Set(LuaValue.String("gsub"), new BuiltinFunction(GSub));
             stringTable.Set(LuaValue.String("gmatch"), new BuiltinFunction(GMatch));
             
-            // Formatting
+            // Formatting (complex, not optimized)
             stringTable.Set(LuaValue.String("format"), new BuiltinFunction(Format));
             
-            // Binary packing/unpacking (Lua 5.3+)
+            // Binary packing/unpacking (complex, not optimized)
             stringTable.Set(LuaValue.String("pack"), new BuiltinFunction(Pack));
             stringTable.Set(LuaValue.String("unpack"), new BuiltinFunction(Unpack));
             stringTable.Set(LuaValue.String("packsize"), new BuiltinFunction(PackSize));

@@ -11,6 +11,10 @@ namespace FLua.Runtime
         private readonly Dictionary<LuaValue, LuaValue> _dictionary = new Dictionary<LuaValue, LuaValue>();
         private readonly List<LuaValue> _array = [];
         private LuaTable? _metatable;
+        
+        // Built-in library optimization support
+        private string? _builtinLibraryName;
+        private Dictionary<string, bool>? _fastPathEnabled;
 
         public IReadOnlyDictionary<LuaValue, LuaValue> Dictionary => _dictionary;
         public IReadOnlyList<LuaValue> Array => _array;
@@ -19,6 +23,10 @@ namespace FLua.Runtime
             get => _metatable; 
             set => _metatable = value; 
         }
+        
+        // Built-in library optimization properties
+        public string? BuiltinLibraryName => _builtinLibraryName;
+        public bool IsBuiltinLibrary => _builtinLibraryName != null;
 
         public LuaValue Get(LuaValue key)
         {
@@ -71,6 +79,17 @@ namespace FLua.Runtime
 
         public void Set(LuaValue key, LuaValue value)
         {
+            // Track modifications to built-in library functions
+            if (_fastPathEnabled != null && key.IsString)
+            {
+                var keyStr = key.AsString();
+                if (_fastPathEnabled.ContainsKey(keyStr))
+                {
+                    // Mark this function as modified (disable fast path)
+                    _fastPathEnabled[keyStr] = false;
+                }
+            }
+            
             // Handle array part for positive integer keys
             if (key.TryGetInteger(out long index) && index > 0)
             {
@@ -123,6 +142,45 @@ namespace FLua.Runtime
                 len--;
             }
             return len;
+        }
+
+        /// <summary>
+        /// Initialize this table as a built-in library with fast path optimization
+        /// </summary>
+        public void InitializeAsBuiltinLibrary(string libraryName)
+        {
+            _builtinLibraryName = libraryName;
+            _fastPathEnabled = new Dictionary<string, bool>();
+        }
+        
+        /// <summary>
+        /// Mark a function as eligible for fast path optimization
+        /// </summary>
+        public void EnableFastPath(string functionName)
+        {
+            if (_fastPathEnabled != null)
+            {
+                _fastPathEnabled[functionName] = true;
+            }
+        }
+        
+        /// <summary>
+        /// Check if a function can use fast path optimization
+        /// </summary>
+        public bool CanUseFastPath(string functionName)
+        {
+            return _fastPathEnabled?.GetValueOrDefault(functionName, false) ?? false;
+        }
+        
+        /// <summary>
+        /// Disable fast path for a specific function (used when function is modified)
+        /// </summary>
+        public void DisableFastPath(string functionName)
+        {
+            if (_fastPathEnabled != null && _fastPathEnabled.ContainsKey(functionName))
+            {
+                _fastPathEnabled[functionName] = false;
+            }
         }
 
         public LuaValue ToLuaValue() => LuaValue.Table(this);

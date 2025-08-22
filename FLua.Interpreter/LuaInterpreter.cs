@@ -893,6 +893,42 @@ namespace FLua.Interpreter
             else if (expr.IsFunctionCall)
             {
                 var funcCall = (Expr.FunctionCall)expr;
+                
+                // Fast path for math function calls - check if it's math.function_name
+                if (funcCall.Item1.IsTableAccess)
+                {
+                    var tableAccess = (Expr.TableAccess)funcCall.Item1;
+                    if (tableAccess.Item1.IsVar)
+                    {
+                        var varExpr = (Expr.Var)tableAccess.Item1;
+                        if (varExpr.Item == "math" && tableAccess.Item2.IsLiteral)
+                        {
+                            var literalExpr = (Expr.Literal)tableAccess.Item2;
+                            if (literalExpr.Item.IsString)
+                            {
+                                var stringLiteral = (Literal.String)literalExpr.Item;
+                                var functionName = stringLiteral.Item;
+                                var mathArgs = funcCall.Item2.ToArray().Select(EvaluateExpr).ToArray();
+                                
+                                // Try the fast path only if math table and function are unmodified
+                                var mathValue = _environment.GetVariable("math");
+                                if (mathValue.IsTable)
+                                {
+                                    var mathTable = mathValue.AsTable<LuaTable>();
+                                    if (mathTable.CanUseFastPath(functionName))
+                                    {
+                                        var fastResult = LuaOperations.TryFastMathFunctionCall(functionName, mathArgs);
+                                        if (fastResult != null)
+                                        {
+                                            return fastResult;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                
                 var func = EvaluateExpr(funcCall.Item1);
                 var args = funcCall.Item2.ToArray().Select(EvaluateExpr).ToArray();
                 
@@ -922,6 +958,42 @@ namespace FLua.Interpreter
             else if (expr.IsFunctionCallPos)
             {
                 var funcCall = (Expr.FunctionCallPos)expr;
+                
+                // Fast path for math function calls - check if it's math.function_name
+                if (funcCall.Item1.IsTableAccess)
+                {
+                    var tableAccess = (Expr.TableAccess)funcCall.Item1;
+                    if (tableAccess.Item1.IsVar)
+                    {
+                        var varExpr = (Expr.Var)tableAccess.Item1;
+                        if (varExpr.Item == "math" && tableAccess.Item2.IsLiteral)
+                        {
+                            var literalExpr = (Expr.Literal)tableAccess.Item2;
+                            if (literalExpr.Item.IsString)
+                            {
+                                var stringLiteral = (Literal.String)literalExpr.Item;
+                                var functionName = stringLiteral.Item;
+                                var mathArgs = funcCall.Item2.ToArray().Select(EvaluateExpr).ToArray();
+                                
+                                // Try the fast path only if math table and function are unmodified
+                                var mathValue = _environment.GetVariable("math");
+                                if (mathValue.IsTable)
+                                {
+                                    var mathTable = mathValue.AsTable<LuaTable>();
+                                    if (mathTable.CanUseFastPath(functionName))
+                                    {
+                                        var fastResult = LuaOperations.TryFastMathFunctionCall(functionName, mathArgs);
+                                        if (fastResult != null)
+                                        {
+                                            return fastResult;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                
                 var func = EvaluateExpr(funcCall.Item1);
                 var args = funcCall.Item2.ToArray().Select(EvaluateExpr).ToArray();
                 
@@ -976,11 +1048,19 @@ namespace FLua.Interpreter
                     var str = objValue.AsString();
                     var stringArgs = argExprs.ToArray().Select(EvaluateExpr).ToArray();
                     
-                    // Try the fast path first
-                    var fastResult = LuaOperations.TryFastStringMethodCall(str, methodName, stringArgs);
-                    if (fastResult.HasValue)
+                    // Check if the string library allows fast path for this method
+                    var stringValue = _environment.GetVariable("string");
+                    if (stringValue.IsTable)
                     {
-                        return [fastResult.Value];
+                        var stringTable = stringValue.AsTable<LuaTable>();
+                        if (stringTable.CanUseFastPath(methodName))
+                        {
+                            var fastResult = LuaOperations.TryFastStringMethodCall(str, methodName, stringArgs);
+                            if (fastResult.HasValue)
+                            {
+                                return [fastResult.Value];
+                            }
+                        }
                     }
                     
                     // Fall back to table lookup for other methods (find, match, gsub, etc.)
