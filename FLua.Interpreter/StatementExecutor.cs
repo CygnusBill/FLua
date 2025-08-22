@@ -465,7 +465,18 @@ namespace FLua.Interpreter
                 while (true)
                 {
                     // Call iterator function
-                    var iteratorResult = iteratorFunc.AsFunction<LuaFunction>().Call([state, controlVar]);
+                    var iterator = iteratorFunc.AsFunction<LuaFunction>();
+                    LuaValue[] iteratorResult;
+                    
+                    // Check if it's a user-defined function that needs interpreter execution
+                    if (iterator is LuaUserFunction userIterator)
+                    {
+                        iteratorResult = ExecuteUserFunction(userIterator, [state, controlVar]);
+                    }
+                    else
+                    {
+                        iteratorResult = iterator.Call([state, controlVar]);
+                    }
                     
                     if (iteratorResult.Length == 0 || iteratorResult[0].IsNil)
                     {
@@ -619,6 +630,57 @@ namespace FLua.Interpreter
                 }
             }
             return new StatementResult();
+        }
+
+        private LuaValue[] ExecuteUserFunction(LuaUserFunction userFunc, LuaValue[] argValues)
+        {
+            // Create a new environment for the function execution
+            var functionEnv = new LuaEnvironment(userFunc.CapturedEnvironment);
+            
+            // Bind parameters to arguments
+            for (int i = 0; i < userFunc.Parameters.Length; i++)
+            {
+                var paramName = userFunc.Parameters[i];
+                if (paramName == "...") // varargs parameter
+                {
+                    // Handle varargs - collect remaining arguments
+                    var varargsValues = new LuaValue[Math.Max(0, argValues.Length - i)];
+                    Array.Copy(argValues, i, varargsValues, 0, varargsValues.Length);
+                    // TODO: Set varargs in environment when varargs support is added
+                    break;
+                }
+                
+                var argValue = i < argValues.Length ? argValues[i] : LuaValue.Nil;
+                functionEnv.SetVariable(paramName, argValue);
+            }
+            
+            // Execute the function body using a StatementExecutor
+            var originalEnv = _environment;
+            _environment = functionEnv;
+            
+            try
+            {
+                var statementExecutor = new StatementExecutor(functionEnv);
+                var funcDef = (FunctionDef)userFunc.Body;
+                
+                // Execute each statement in the function body
+                foreach (var statement in funcDef.Body)
+                {
+                    var result = statementExecutor.Execute(statement);
+                    if (result.ReturnValues != null || result.Break || result.GotoLabel != null)
+                    {
+                        // Return the result values or nil if no return
+                        return result.ReturnValues ?? new[] { LuaValue.Nil };
+                    }
+                }
+                
+                // If no return statement was executed, return nil
+                return new[] { LuaValue.Nil };
+            }
+            finally
+            {
+                _environment = originalEnv;
+            }
         }
     }
 }

@@ -400,8 +400,17 @@ namespace FLua.Interpreter
                     {
                         try
                         {
-                            var result = function.Call(argValues);
-                            return Result<LuaValue[]>.Success(result);
+                            // Check if it's a user-defined function that needs interpreter execution
+                            if (function is LuaUserFunction userFunc)
+                            {
+                                var result = ExecuteUserFunction(userFunc, argValues);
+                                return Result<LuaValue[]>.Success(result);
+                            }
+                            else
+                            {
+                                var result = function.Call(argValues);
+                                return Result<LuaValue[]>.Success(result);
+                            }
                         }
                         catch (Exception ex)
                         {
@@ -431,8 +440,17 @@ namespace FLua.Interpreter
 
                                         try
                                         {
-                                            var result = metamethod.Call(callArgs);
-                                            return Result<LuaValue[]>.Success(result);
+                                            // Check if it's a user-defined function that needs interpreter execution
+                                            if (metamethod is LuaUserFunction userMetamethod)
+                                            {
+                                                var result = ExecuteUserFunction(userMetamethod, callArgs);
+                                                return Result<LuaValue[]>.Success(result);
+                                            }
+                                            else
+                                            {
+                                                var result = metamethod.Call(callArgs);
+                                                return Result<LuaValue[]>.Success(result);
+                                            }
                                         }
                                         catch (Exception ex)
                                         {
@@ -467,8 +485,17 @@ namespace FLua.Interpreter
 
                         try
                         {
-                            var result = method.Call(callArgs);
-                            return Result<LuaValue[]>.Success(result);
+                            // Check if it's a user-defined function that needs interpreter execution
+                            if (method is LuaUserFunction userMethod)
+                            {
+                                var result = ExecuteUserFunction(userMethod, callArgs);
+                                return Result<LuaValue[]>.Success(result);
+                            }
+                            else
+                            {
+                                var result = method.Call(callArgs);
+                                return Result<LuaValue[]>.Success(result);
+                            }
                         }
                         catch (Exception ex)
                         {
@@ -507,6 +534,57 @@ namespace FLua.Interpreter
         {
             // Use the centralized operations from FLua.Runtime
             return InterpreterOperations.EvaluateUnaryOp(op, value);
+        }
+
+        private LuaValue[] ExecuteUserFunction(LuaUserFunction userFunc, LuaValue[] argValues)
+        {
+            // Create a new environment for the function execution
+            var functionEnv = new LuaEnvironment(userFunc.CapturedEnvironment);
+            
+            // Bind parameters to arguments
+            for (int i = 0; i < userFunc.Parameters.Length; i++)
+            {
+                var paramName = userFunc.Parameters[i];
+                if (paramName == "...") // varargs parameter
+                {
+                    // Handle varargs - collect remaining arguments
+                    var varargsValues = new LuaValue[Math.Max(0, argValues.Length - i)];
+                    Array.Copy(argValues, i, varargsValues, 0, varargsValues.Length);
+                    // TODO: Set varargs in environment when varargs support is added
+                    break;
+                }
+                
+                var argValue = i < argValues.Length ? argValues[i] : LuaValue.Nil;
+                functionEnv.SetVariable(paramName, argValue);
+            }
+            
+            // Execute the function body using a StatementExecutor
+            var originalEnv = _environment;
+            _environment = functionEnv;
+            
+            try
+            {
+                var statementExecutor = new StatementExecutor(functionEnv);
+                var funcDef = (FunctionDef)userFunc.Body;
+                
+                // Execute each statement in the function body
+                foreach (var statement in funcDef.Body)
+                {
+                    var result = statementExecutor.Execute(statement);
+                    if (result.ReturnValues != null || result.Break || result.GotoLabel != null)
+                    {
+                        // Return the result values or nil if no return
+                        return result.ReturnValues ?? new[] { LuaValue.Nil };
+                    }
+                }
+                
+                // If no return statement was executed, return nil
+                return new[] { LuaValue.Nil };
+            }
+            finally
+            {
+                _environment = originalEnv;
+            }
         }
     }
 }

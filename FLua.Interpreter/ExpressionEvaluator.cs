@@ -178,7 +178,17 @@ namespace FLua.Interpreter
                     callArgs[0] = objValue;
                     Array.Copy(argValues, 0, callArgs, 1, argValues.Length);
 
-                    return methodValue.AsFunction<LuaFunction>().Call(callArgs);
+                    var method = methodValue.AsFunction<LuaFunction>();
+                    
+                    // Check if it's a user-defined function that needs interpreter execution
+                    if (method is LuaUserFunction userMethod)
+                    {
+                        return ExecuteUserFunction(userMethod, callArgs);
+                    }
+                    else
+                    {
+                        return method.Call(callArgs);
+                    }
                 }
             }
 
@@ -255,7 +265,19 @@ namespace FLua.Interpreter
 
             if (funcValue.IsFunction)
             {
-                return funcValue.AsFunction<LuaFunction>().Call(argValues);
+                var function = funcValue.AsFunction<LuaFunction>();
+                
+                // Check if it's a user-defined function that needs interpreter execution
+                if (function is LuaUserFunction userFunc)
+                {
+                    // Execute the function body with the interpreter
+                    return ExecuteUserFunction(userFunc, argValues);
+                }
+                else
+                {
+                    // Built-in function - call directly
+                    return function.Call(argValues);
+                }
             }
             else if (funcValue.IsTable && funcValue.AsTable<LuaTable>().Metatable != null)
             {
@@ -270,7 +292,17 @@ namespace FLua.Interpreter
                     callArgs[0] = table;
                     Array.Copy(argValues, 0, callArgs, 1, argValues.Length);
 
-                    return callMethod.AsFunction<LuaFunction>().Call(callArgs);
+                    var metamethod = callMethod.AsFunction<LuaFunction>();
+                    
+                    // Check if it's a user-defined function that needs interpreter execution
+                    if (metamethod is LuaUserFunction userMetamethod)
+                    {
+                        return ExecuteUserFunction(userMetamethod, callArgs);
+                    }
+                    else
+                    {
+                        return metamethod.Call(callArgs);
+                    }
                 }
             }
 
@@ -303,6 +335,57 @@ namespace FLua.Interpreter
         {
             // Use the centralized operations from FLua.Runtime
             return InterpreterOperations.EvaluateUnaryOp(op, value);
+        }
+
+        private LuaValue[] ExecuteUserFunction(LuaUserFunction userFunc, LuaValue[] argValues)
+        {
+            // Create a new environment for the function execution
+            var functionEnv = new LuaEnvironment(userFunc.CapturedEnvironment);
+            
+            // Bind parameters to arguments
+            for (int i = 0; i < userFunc.Parameters.Length; i++)
+            {
+                var paramName = userFunc.Parameters[i];
+                if (paramName == "...") // varargs parameter
+                {
+                    // Handle varargs - collect remaining arguments
+                    var varargsValues = new LuaValue[Math.Max(0, argValues.Length - i)];
+                    Array.Copy(argValues, i, varargsValues, 0, varargsValues.Length);
+                    // TODO: Set varargs in environment when varargs support is added
+                    break;
+                }
+                
+                var argValue = i < argValues.Length ? argValues[i] : LuaValue.Nil;
+                functionEnv.SetVariable(paramName, argValue);
+            }
+            
+            // Execute the function body using a StatementExecutor
+            var originalEnv = _environment;
+            _environment = functionEnv;
+            
+            try
+            {
+                var statementExecutor = new StatementExecutor(functionEnv);
+                var funcDef = (FunctionDef)userFunc.Body;
+                
+                // Execute each statement in the function body
+                foreach (var statement in funcDef.Body)
+                {
+                    var result = statementExecutor.Execute(statement);
+                    if (result.ReturnValues != null || result.Break || result.GotoLabel != null)
+                    {
+                        // Return the result values or nil if no return
+                        return result.ReturnValues ?? new[] { LuaValue.Nil };
+                    }
+                }
+                
+                // If no return statement was executed, return nil
+                return new[] { LuaValue.Nil };
+            }
+            finally
+            {
+                _environment = originalEnv;
+            }
         }
     }
 }
