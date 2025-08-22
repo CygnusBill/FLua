@@ -347,13 +347,13 @@ namespace FLua.Hosting
                 var result = _legacyHost.Execute(luaCode, options);
                 stopwatch.Stop();
                 
-                var context = new ExecutionContext(stopwatch.Elapsed, trustLevel: options?.TrustLevel.ToString());
+                var context = new FLua.Common.ExecutionContext(stopwatch.Elapsed, trustLevel: options?.TrustLevel.ToString());
                 return HostingResult<LuaValue>.Success(result, context: context);
             }
             catch (Exception ex)
             {
                 stopwatch.Stop();
-                var context = new ExecutionContext(stopwatch.Elapsed);
+                var context = new FLua.Common.ExecutionContext(stopwatch.Elapsed);
                 return HostingResult<LuaValue>.FromException(ex, HostingOperation.Execution, context: context);
             }
         }
@@ -366,13 +366,13 @@ namespace FLua.Hosting
                 var result = await _legacyHost.ExecuteAsync(luaCode, options, cancellationToken);
                 stopwatch.Stop();
                 
-                var context = new ExecutionContext(stopwatch.Elapsed, trustLevel: options?.TrustLevel.ToString());
+                var context = new FLua.Common.ExecutionContext(stopwatch.Elapsed, trustLevel: options?.TrustLevel.ToString());
                 return HostingResult<LuaValue>.Success(result, context: context);
             }
             catch (Exception ex)
             {
                 stopwatch.Stop();
-                var context = new ExecutionContext(stopwatch.Elapsed);
+                var context = new FLua.Common.ExecutionContext(stopwatch.Elapsed);
                 return HostingResult<LuaValue>.FromException(ex, HostingOperation.Execution, context: context);
             }
         }

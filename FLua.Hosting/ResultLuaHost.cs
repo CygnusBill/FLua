@@ -77,7 +77,7 @@ namespace FLua.Hosting
                 // Parse the code
                 var parseResult = ParseLuaCode(luaCode);
                 if (!parseResult.IsSuccess)
-                    return HostingResult<LuaValue>.FromCompilationResult(parseResult);
+                    return HandleParseFailure<LuaValue>(parseResult);
                 
                 var statements = parseResult.Value;
                 
@@ -95,7 +95,7 @@ namespace FLua.Hosting
                         
                         if (result.IsSuccess)
                         {
-                            var context = new ExecutionContext(
+                            var context = new FLua.Common.ExecutionContext(
                                 stopwatch.Elapsed,
                                 null, // Memory tracking would require additional instrumentation
                                 null,
@@ -110,7 +110,7 @@ namespace FLua.Hosting
                     catch (OperationCanceledException)
                     {
                         stopwatch.Stop();
-                        var context = new ExecutionContext(stopwatch.Elapsed, trustLevel: options.TrustLevel.ToString());
+                        var context = new FLua.Common.ExecutionContext(stopwatch.Elapsed, trustLevel: options.TrustLevel.ToString());
                         return HostingResult<LuaValue>.Error(
                             $"Script execution exceeded timeout of {options.ExecutionTimeout.Value}",
                             HostingOperation.Execution,
@@ -123,7 +123,7 @@ namespace FLua.Hosting
                 
                 if (executeResult.IsSuccess)
                 {
-                    var context = new ExecutionContext(stopwatch.Elapsed, trustLevel: options.TrustLevel.ToString());
+                    var context = new FLua.Common.ExecutionContext(stopwatch.Elapsed, trustLevel: options.TrustLevel.ToString());
                     return HostingResult<LuaValue>.Success(executeResult.Value, executeResult.Diagnostics, context);
                 }
                 else
@@ -134,7 +134,7 @@ namespace FLua.Hosting
             catch (Exception ex)
             {
                 stopwatch.Stop();
-                var context = new ExecutionContext(stopwatch.Elapsed);
+                var context = new FLua.Common.ExecutionContext(stopwatch.Elapsed);
                 return HostingResult<LuaValue>.FromException(ex, HostingOperation.Execution, context: context);
             }
         }
@@ -156,7 +156,8 @@ namespace FLua.Hosting
                     envField?.SetValue(_interpreter, env);
                     
                     // Execute the statements
-                    var result = _interpreter.ExecuteStatements(statements);
+                    var results = _interpreter.ExecuteStatements(statements);
+                    var result = results.Length > 0 ? results[0] : LuaValue.Nil;
                     return HostingResult<LuaValue>.Success(result);
                 }
                 finally
@@ -208,7 +209,7 @@ namespace FLua.Hosting
                 // Parse the code
                 var parseResult = ParseLuaCode(luaCode);
                 if (!parseResult.IsSuccess)
-                    return HostingResult<LuaValue>.FromCompilationResult(parseResult);
+                    return HandleParseFailure<LuaValue>(parseResult);
                 
                 var statements = parseResult.Value;
                 
@@ -218,7 +219,7 @@ namespace FLua.Hosting
                 
                 if (executeResult.IsSuccess)
                 {
-                    var context = new ExecutionContext(stopwatch.Elapsed, trustLevel: options.TrustLevel.ToString());
+                    var context = new FLua.Common.ExecutionContext(stopwatch.Elapsed, trustLevel: options.TrustLevel.ToString());
                     return HostingResult<LuaValue>.Success(executeResult.Value, executeResult.Diagnostics, context);
                 }
                 else
@@ -229,7 +230,7 @@ namespace FLua.Hosting
             catch (OperationCanceledException)
             {
                 stopwatch.Stop();
-                var context = new ExecutionContext(stopwatch.Elapsed, trustLevel: options?.TrustLevel.ToString());
+                var context = new FLua.Common.ExecutionContext(stopwatch.Elapsed, trustLevel: options?.TrustLevel.ToString());
                 return HostingResult<LuaValue>.Error(
                     "Script execution was cancelled",
                     HostingOperation.Execution,
@@ -238,7 +239,7 @@ namespace FLua.Hosting
             catch (Exception ex)
             {
                 stopwatch.Stop();
-                var context = new ExecutionContext(stopwatch.Elapsed);
+                var context = new FLua.Common.ExecutionContext(stopwatch.Elapsed);
                 return HostingResult<LuaValue>.FromException(ex, HostingOperation.Execution, context: context);
             }
         }
@@ -268,7 +269,7 @@ namespace FLua.Hosting
                 // Parse the code
                 var parseResult = ParseLuaCode(luaCode);
                 if (!parseResult.IsSuccess)
-                    return HostingResult<Func<T>>.FromCompilationResult(parseResult);
+                    return HandleParseFailure<Func<T>>(parseResult);
                 
                 var statements = parseResult.Value;
                 
@@ -283,7 +284,7 @@ namespace FLua.Hosting
                 var compilationResult = _compiler.Compile(statements.ToArray(), compilerOptions);
                 stopwatch.Stop();
                 
-                var context = new ExecutionContext(stopwatch.Elapsed, trustLevel: options.TrustLevel.ToString());
+                var context = new FLua.Common.ExecutionContext(stopwatch.Elapsed, trustLevel: options.TrustLevel.ToString());
                 
                 if (!compilationResult.Success)
                 {
@@ -308,8 +309,9 @@ namespace FLua.Hosting
                 {
                     var convertedValue = ConvertLuaValueResult<T>(luaValue);
                     if (!convertedValue.IsSuccess)
-                        return HostingResult<Func<T>>.Failure(convertedValue.Diagnostics.Select(d =>
-                            new HostingDiagnostic(d.Severity, d.Message, HostingOperation.Compilation)).ToList(), context);
+                        return HostingResult<Func<T>>.Failure(new List<HostingDiagnostic> {
+                            new HostingDiagnostic(DiagnosticSeverity.Error, convertedValue.Error, HostingOperation.Compilation)
+                        }, context);
                     
                     return HostingResult<Func<T>>.Success(() => convertedValue.Value, context: context);
                 }
@@ -321,7 +323,7 @@ namespace FLua.Hosting
             catch (Exception ex)
             {
                 stopwatch.Stop();
-                var context = new ExecutionContext(stopwatch.Elapsed);
+                var context = new FLua.Common.ExecutionContext(stopwatch.Elapsed);
                 return HostingResult<Func<T>>.FromException(ex, HostingOperation.Compilation, context: context);
             }
         }
@@ -351,7 +353,7 @@ namespace FLua.Hosting
                 // Parse the code
                 var parseResult = ParseLuaCode(luaCode);
                 if (!parseResult.IsSuccess)
-                    return HostingResult<Delegate>.FromCompilationResult(parseResult);
+                    return HandleParseFailure<Delegate>(parseResult);
                 
                 var statements = parseResult.Value;
                 
@@ -366,7 +368,7 @@ namespace FLua.Hosting
                 var compilationResult = _compiler.Compile(statements.ToArray(), compilerOptions);
                 stopwatch.Stop();
                 
-                var context = new ExecutionContext(stopwatch.Elapsed, trustLevel: options.TrustLevel.ToString());
+                var context = new FLua.Common.ExecutionContext(stopwatch.Elapsed, trustLevel: options.TrustLevel.ToString());
                 
                 if (!compilationResult.Success)
                 {
@@ -388,7 +390,7 @@ namespace FLua.Hosting
             catch (Exception ex)
             {
                 stopwatch.Stop();
-                var context = new ExecutionContext(stopwatch.Elapsed);
+                var context = new FLua.Common.ExecutionContext(stopwatch.Elapsed);
                 return HostingResult<Delegate>.FromException(ex, HostingOperation.Compilation, context: context);
             }
         }
@@ -418,7 +420,7 @@ namespace FLua.Hosting
                 // Parse the code
                 var parseResult = ParseLuaCode(luaCode);
                 if (!parseResult.IsSuccess)
-                    return HostingResult<Expression<Func<T>>>.FromCompilationResult(parseResult);
+                    return HandleParseFailure<Expression<Func<T>>>(parseResult);
                 
                 var statements = parseResult.Value;
                 
@@ -434,7 +436,7 @@ namespace FLua.Hosting
                 var compilationResult = _compiler.Compile(statements.ToArray(), compilerOptions);
                 stopwatch.Stop();
                 
-                var context = new ExecutionContext(stopwatch.Elapsed, trustLevel: options.TrustLevel.ToString());
+                var context = new FLua.Common.ExecutionContext(stopwatch.Elapsed, trustLevel: options.TrustLevel.ToString());
                 
                 if (!compilationResult.Success)
                 {
@@ -456,7 +458,7 @@ namespace FLua.Hosting
             catch (Exception ex)
             {
                 stopwatch.Stop();
-                var context = new ExecutionContext(stopwatch.Elapsed);
+                var context = new FLua.Common.ExecutionContext(stopwatch.Elapsed);
                 return HostingResult<Expression<Func<T>>>.FromException(ex, HostingOperation.ExpressionTreeGeneration, context: context);
             }
         }
@@ -486,7 +488,7 @@ namespace FLua.Hosting
                 // Parse the code
                 var parseResult = ParseLuaCode(luaCode);
                 if (!parseResult.IsSuccess)
-                    return HostingResult<Assembly>.FromCompilationResult(parseResult);
+                    return HandleParseFailure<Assembly>(parseResult);
                 
                 var statements = parseResult.Value;
                 
@@ -501,7 +503,7 @@ namespace FLua.Hosting
                 var compilationResult = _compiler.Compile(statements.ToArray(), compilerOptions);
                 stopwatch.Stop();
                 
-                var context = new ExecutionContext(stopwatch.Elapsed, trustLevel: options.TrustLevel.ToString());
+                var context = new FLua.Common.ExecutionContext(stopwatch.Elapsed, trustLevel: options.TrustLevel.ToString());
                 
                 if (!compilationResult.Success)
                 {
@@ -531,7 +533,7 @@ namespace FLua.Hosting
             catch (Exception ex)
             {
                 stopwatch.Stop();
-                var context = new ExecutionContext(stopwatch.Elapsed);
+                var context = new FLua.Common.ExecutionContext(stopwatch.Elapsed);
                 return HostingResult<Assembly>.FromException(ex, HostingOperation.AssemblyGeneration, context: context);
             }
         }
@@ -721,6 +723,12 @@ namespace FLua.Hosting
         private int EstimateTokenCount(FSharpList<Statement> statements) => statements.Length * 5;
         private double CalculateHalsteadComplexity(FSharpList<Statement> statements) => 1.0;
         private TimeSpan EstimateExecutionTime(FSharpList<Statement> statements) => TimeSpan.FromMilliseconds(statements.Length);
+        
+        private HostingResult<T> HandleParseFailure<T>(CompilationResult<FSharpList<Statement>> parseResult)
+        {
+            var hostingResult = HostingResult.FromCompilationResult(parseResult);
+            return HostingResult<T>.Failure(hostingResult.Diagnostics, hostingResult.ExecutionContext);
+        }
         
         #endregion
     }

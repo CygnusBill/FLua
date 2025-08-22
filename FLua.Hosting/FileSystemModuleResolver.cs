@@ -20,7 +20,7 @@ public class FileSystemModuleResolver : IModuleResolver
         _enableCaching = enableCaching;
     }
     
-    public async Task<ModuleResolutionResult> ResolveModuleAsync(string moduleName, ModuleContext context)
+    public virtual async Task<ModuleResolutionResult> ResolveModuleAsync(string moduleName, ModuleContext context)
     {
         // Check cache first
         if (_enableCaching && _moduleCache.TryGetValue(moduleName, out var cached))

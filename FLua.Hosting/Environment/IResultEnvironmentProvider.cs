@@ -121,7 +121,7 @@ namespace FLua.Hosting.Environment
                     var defaultResolver = CreateDefaultModuleResolver(trustLevel);
                     var resolverResult = ConfigureModuleResolver(environment, defaultResolver, trustLevel);
                     if (!resolverResult.IsSuccess)
-                        return resolverResult;
+                        return HostingResult<LuaEnvironment>.Failure(resolverResult.Diagnostics, resolverResult.ExecutionContext);
                     
                     diagnostics.AddRange(resolverResult.Diagnostics);
                 }
@@ -130,12 +130,11 @@ namespace FLua.Hosting.Environment
                     // Validate the provided resolver against security policy
                     var validationResult = ValidateModuleResolver(moduleResolver, trustLevel);
                     if (!validationResult.IsSuccess)
-                        return HostingResult<LuaEnvironment>.Failure(validationResult.Diagnostics.Select(d =>
-                            new HostingDiagnostic(d.Severity, d.Message, HostingOperation.ModuleResolution)).ToList());
+                        return HostingResult<LuaEnvironment>.Error(validationResult.Error, HostingOperation.ModuleResolution);
                     
                     var resolverResult = ConfigureModuleResolver(environment, moduleResolver, trustLevel);
                     if (!resolverResult.IsSuccess)
-                        return resolverResult;
+                        return HostingResult<LuaEnvironment>.Failure(resolverResult.Diagnostics, resolverResult.ExecutionContext);
                     
                     diagnostics.AddRange(resolverResult.Diagnostics);
                 }
@@ -172,7 +171,7 @@ namespace FLua.Hosting.Environment
                     
                     try
                     {
-                        environment.SetGlobal(name, new LuaFunction(wrappedFunction));
+                        environment.SetGlobal(name, new BuiltinFunction(args => [wrappedFunction(args)]));
                         diagnostics.Add(new HostingDiagnostic(
                             DiagnosticSeverity.Info,
                             $"Added host function '{name}'",
@@ -353,16 +352,33 @@ namespace FLua.Hosting.Environment
             try
             {
                 // Configure the environment's require function to use the resolver
-                var requireFunction = new LuaFunction(args =>
+                var requireFunction = new BuiltinFunction(args =>
                 {
                     if (args.Length == 0 || !args[0].IsString)
                         return new[] { LuaValue.Nil };
                     
                     var moduleName = args[0].AsString();
-                    var moduleResult = resolver.ResolveModule(moduleName);
+                    var moduleContext = new ModuleContext 
+                    { 
+                        TrustLevel = trustLevel, 
+                        RequestingModulePath = null 
+                    };
                     
-                    // Note: This would need to be updated to handle Result-based module resolution
-                    return new[] { moduleResult ?? LuaValue.Nil };
+                    // Note: This synchronous call is a simplification - in practice,
+                    // module resolution should be done asynchronously or the modules
+                    // should be pre-resolved and cached.
+                    var moduleTask = resolver.ResolveModuleAsync(moduleName, moduleContext);
+                    moduleTask.Wait(); // Blocking call - not ideal but needed for sync function
+                    var moduleResult = moduleTask.Result;
+                    
+                    if (moduleResult.Success && !string.IsNullOrEmpty(moduleResult.SourceCode))
+                    {
+                        // TODO: Parse and execute the module code, return the module's exports
+                        // For now, return a placeholder indicating successful load
+                        return new[] { LuaValue.Boolean(true) };
+                    }
+                    
+                    return new[] { LuaValue.Nil };
                 });
                 
                 environment.SetGlobal("require", requireFunction);

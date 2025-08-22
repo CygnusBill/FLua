@@ -85,4 +85,28 @@ public class StandardSecurityPolicy : ILuaSecurityPolicy
             ? allowed 
             : Enumerable.Empty<string>();
     }
+    
+    public SecurityRestrictions GetRestrictionsForTrustLevel(TrustLevel trustLevel)
+    {
+        return new SecurityRestrictions
+        {
+            ForbiddenGlobals = GetBlockedFunctions(trustLevel),
+            AllowedLibraries = GetAllowedLibraries(trustLevel),
+            BlockedFunctions = GetBlockedFunctions(trustLevel),
+            ForbiddenModules = GetForbiddenModules(trustLevel)
+        };
+    }
+    
+    private IEnumerable<string> GetForbiddenModules(TrustLevel trustLevel)
+    {
+        return trustLevel switch
+        {
+            TrustLevel.Untrusted => new[] { "*" }, // All modules forbidden
+            TrustLevel.Sandbox => new[] { "io", "os", "package", "debug", "ffi" },
+            TrustLevel.Restricted => new[] { "debug", "ffi" },
+            TrustLevel.Trusted => new[] { "debug", "ffi" },
+            TrustLevel.FullTrust => Array.Empty<string>(),
+            _ => new[] { "*" }
+        };
+    }
 }

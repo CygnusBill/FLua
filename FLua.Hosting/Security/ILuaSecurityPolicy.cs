@@ -46,4 +46,22 @@ public interface ILuaSecurityPolicy
     /// <param name="trustLevel">The trust level to get allowed libraries for</param>
     /// <returns>A collection of library names that are allowed</returns>
     IEnumerable<string> GetAllowedLibraries(TrustLevel trustLevel);
+    
+    /// <summary>
+    /// Gets security restrictions for the specified trust level
+    /// </summary>
+    /// <param name="trustLevel">The trust level to get restrictions for</param>
+    /// <returns>Security restrictions for the trust level</returns>
+    SecurityRestrictions GetRestrictionsForTrustLevel(TrustLevel trustLevel);
+}
+
+/// <summary>
+/// Represents security restrictions for a trust level
+/// </summary>
+public class SecurityRestrictions
+{
+    public IEnumerable<string> ForbiddenGlobals { get; set; } = [];
+    public IEnumerable<string> AllowedLibraries { get; set; } = [];
+    public IEnumerable<string> BlockedFunctions { get; set; } = [];
+    public IEnumerable<string> ForbiddenModules { get; set; } = [];
 }

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -220,23 +221,29 @@ namespace FLua.Runtime
         /// </summary>
         public LuaPatternMatch? Match(string text, int start)
         {
-            var captures = new List<string>();
+            var captureInfos = new List<(int CaptureNumber, string Text)>();
             
             // Try matching at each position from start
             for (int pos = start; pos < text.Length; pos++)
             {
-                var match = TryMatch(text, pos, 0, captures);
+                var match = TryMatch(text, pos, 0, captureInfos);
                 if (match.HasValue)
                 {
+                    // Sort captures by their capture number to maintain left-to-right order
+                    var sortedCaptures = captureInfos
+                        .OrderBy(c => c.CaptureNumber)
+                        .Select(c => c.Text)
+                        .ToList();
+                    
                     return new LuaPatternMatch
                     {
                         Start = pos + 1, // Convert to 1-based
                         End = match.Value, // TryMatch returns position after match (0-based), so this is already 1-based position after match
-                        Captures = [..captures]
+                        Captures = sortedCaptures
                     };
                 }
                 
-                captures.Clear();
+                captureInfos.Clear();
                 
                 // If pattern starts with ^, only try at the specified start position
                 if (_elements.Count > 0 && _elements[0] is AnchorElement anchor && anchor.IsStart)
@@ -249,21 +256,15 @@ namespace FLua.Runtime
         /// <summary>
         /// Tries to match the pattern starting at a specific position
         /// </summary>
-        /// <summary>
-        /// Tries to match the pattern starting at a specific position
-        /// </summary>
-        /// <summary>
-        /// Tries to match the pattern starting at a specific position
-        /// </summary>
-        private int? TryMatch(string text, int textPos, int patternPos, List<string> captures)
+        private int? TryMatch(string text, int textPos, int patternPos, List<(int CaptureNumber, string Text)> captureInfos)
         {
-            return TryMatchInternal(text, textPos, patternPos, captures, new Stack<int>());
+            return TryMatchInternal(text, textPos, patternPos, captureInfos, new Stack<(int captureNumber, int startIndex)>());
         }
 
         /// <summary>
         /// Internal recursive match method with capture stack tracking
         /// </summary>
-        private int? TryMatchInternal(string text, int textPos, int patternPos, List<string> captures, Stack<int> captureStack)
+        private int? TryMatchInternal(string text, int textPos, int patternPos, List<(int CaptureNumber, string Text)> captureInfos, Stack<(int captureNumber, int startIndex)> captureStack)
         {
             while (patternPos < _elements.Count)
             {
@@ -283,19 +284,19 @@ namespace FLua.Runtime
                 {
                     if (capture.IsStart)
                     {
-                        // Push the current text position as capture start
-                        captureStack.Push(textPos);
+                        // Push the current text position and capture number as capture start
+                        captureStack.Push((capture.CaptureNumber, textPos));
                         patternPos++;
                         continue;
                     }
                     else
                     {
-                        // Pop capture start and add to captures
+                        // Pop capture start and add to captures with capture number for sorting
                         if (captureStack.Count > 0)
                         {
                             var captureStart = captureStack.Pop();
-                            var captureText = text.Substring(captureStart, textPos - captureStart);
-                            captures.Add(captureText);
+                            var captureText = text.Substring(captureStart.startIndex, textPos - captureStart.startIndex);
+                            captureInfos.Add((captureStart.captureNumber, captureText));
                         }
                         patternPos++;
                         continue;
@@ -336,7 +337,7 @@ namespace FLua.Runtime
                             // Greedy: try from maximum down to minimum
                             for (int count = actualMax; count >= minRepeats; count--)
                             {
-                                var nextMatch = TryMatchInternal(text, textPos + count, patternPos + 1, captures, captureStack);
+                                var nextMatch = TryMatchInternal(text, textPos + count, patternPos + 1, captureInfos, captureStack);
                                 if (nextMatch.HasValue)
                                     return nextMatch;
                             }
@@ -346,7 +347,7 @@ namespace FLua.Runtime
                             // Non-greedy: try from minimum up to maximum
                             for (int count = minRepeats; count <= actualMax; count++)
                             {
-                                var nextMatch = TryMatchInternal(text, textPos + count, patternPos + 1, captures, captureStack);
+                                var nextMatch = TryMatchInternal(text, textPos + count, patternPos + 1, captureInfos, captureStack);
                                 if (nextMatch.HasValue)
                                     return nextMatch;
                             }
@@ -374,7 +375,7 @@ namespace FLua.Runtime
                         // For fixed ranges, try from maximum possible down to minimum
                         for (int count = Math.Min(actualMatches, effectiveMax); count >= minRepeats; count--)
                         {
-                            var nextMatch = TryMatchInternal(text, textPos + count, patternPos + 1, captures, captureStack);
+                            var nextMatch = TryMatchInternal(text, textPos + count, patternPos + 1, captureInfos, captureStack);
                             if (nextMatch.HasValue)
                                 return nextMatch;
                         }
@@ -417,6 +418,8 @@ namespace FLua.Runtime
         private List<PatternElement> ParsePattern(string pattern)
         {
             var elements = new List<PatternElement>();
+            var captureNumber = 1; // Capture numbers start from 1
+            var openCaptureStack = new Stack<int>(); // Track which capture numbers are open
             
             for (int i = 0; i < pattern.Length; i++)
             {
@@ -439,27 +442,25 @@ namespace FLua.Runtime
                         break;
                         
                     case '(':
-                        // Only treat as capture if there's a matching closing paren
-                        var closingParen = pattern.IndexOf(')', i + 1);
+                        // Only treat as capture if there's a properly nested matching closing paren
+                        var closingParen = FindMatchingParen(pattern, i);
                         if (closingParen != -1)
-                            elements.Add(new CaptureElement { IsStart = true });
+                        {
+                            elements.Add(new CaptureElement { IsStart = true, CaptureNumber = captureNumber });
+                            openCaptureStack.Push(captureNumber);
+                            captureNumber++;
+                        }
                         else
                             elements.Add(new CharacterElement('(')); // Treat as literal
                         break;
                         
                     case ')':
-                        // Only treat as capture end if there was an unmatched opening paren before
-                        int openCount = 0;
-                        for (int j = 0; j < elements.Count; j++)
+                        // Only treat as capture end if there's an unmatched opening paren before
+                        if (openCaptureStack.Count > 0)
                         {
-                            if (elements[j] is CaptureElement capture)
-                            {
-                                if (capture.IsStart) openCount++;
-                                else openCount--;
-                            }
+                            var matchingCaptureNumber = openCaptureStack.Pop();
+                            elements.Add(new CaptureElement { IsStart = false, CaptureNumber = matchingCaptureNumber });
                         }
-                        if (openCount > 0)
-                            elements.Add(new CaptureElement { IsStart = false });
                         else
                             elements.Add(new CharacterElement(')')); // Treat as literal
                         break;
@@ -630,6 +631,34 @@ namespace FLua.Runtime
             
             return elements;
         }
+
+        /// <summary>
+        /// Finds the matching closing parenthesis for the opening paren at the given index
+        /// </summary>
+        private int FindMatchingParen(string pattern, int openIndex)
+        {
+            int depth = 1;
+            for (int i = openIndex + 1; i < pattern.Length; i++)
+            {
+                switch (pattern[i])
+                {
+                    case '(':
+                        depth++;
+                        break;
+                    case ')':
+                        depth--;
+                        if (depth == 0)
+                            return i;
+                        break;
+                    case '%':
+                        // Skip escaped characters
+                        if (i + 1 < pattern.Length)
+                            i++;
+                        break;
+                }
+            }
+            return -1; // No matching closing paren found
+        }
     }
 
     /// <summary>
@@ -654,6 +683,7 @@ namespace FLua.Runtime
     internal class CaptureElement : PatternElement
     {
         public bool IsStart { get; set; }
+        public int CaptureNumber { get; set; } // For ordering captures
     }
 
     /// <summary>
@@ -726,14 +756,24 @@ namespace FLua.Runtime
             {
                 if (charClass[i] == '%' && i + 1 < charClass.Length)
                 {
-                    // Escaped character class
+                    // Escaped character class or literal escape
                     var classChar = charClass[i + 1];
                     if (LuaPatterns.CharacterClasses.TryGetValue(char.ToLower(classChar), out var predicate))
                     {
+                        // It's a character class like %d, %w, etc.
                         bool classMatches = predicate(c);
                         if (char.IsUpper(classChar))
                             classMatches = !classMatches;
                         if (classMatches)
+                        {
+                            matches = true;
+                            break;
+                        }
+                    }
+                    else
+                    {
+                        // It's a literal escaped character like %., %%, %(, etc.
+                        if (c == classChar)
                         {
                             matches = true;
                             break;

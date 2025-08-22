@@ -925,6 +925,39 @@ namespace FLua.Runtime
             
             return [LuaValue.Nil, LuaValue.String("bad argument #1 to 'load' (string expected)")];
         }
+        
+        /// <summary>
+        /// Sets a global variable value
+        /// </summary>
+        public void SetGlobal(string name, LuaValue value)
+        {
+            Globals.Set(LuaValue.String(name), value);
+        }
+        
+        /// <summary>
+        /// Gets a global variable value
+        /// </summary>
+        public LuaValue GetGlobal(string name)
+        {
+            return Globals.Get(LuaValue.String(name));
+        }
+        
+        /// <summary>
+        /// Checks if a global variable exists
+        /// </summary>
+        public bool HasGlobal(string name)
+        {
+            var key = LuaValue.String(name);
+            return Globals.Get(key) != LuaValue.Nil;
+        }
+        
+        /// <summary>
+        /// Removes a global variable
+        /// </summary>
+        public void RemoveGlobal(string name)
+        {
+            Globals.Set(LuaValue.String(name), LuaValue.Nil);
+        }
     }
 
     // Moved to LuaTypes.cs
