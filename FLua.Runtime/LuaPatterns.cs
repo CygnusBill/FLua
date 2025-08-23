@@ -216,6 +216,13 @@ namespace FLua.Runtime
             _elements = ParsePattern(pattern);
         }
 
+        // Constructor for sub-patterns (used in quantified captures)
+        internal LuaPatternMatcher(List<PatternElement> elements)
+        {
+            _pattern = string.Empty; // Not used for sub-patterns
+            _elements = elements;
+        }
+
         /// <summary>
         /// Attempts to match the pattern at the specified position
         /// </summary>
@@ -270,6 +277,11 @@ namespace FLua.Runtime
             {
                 var element = _elements[patternPos];
                 
+                if (textPos >= text.Length && !(element is AnchorElement || element is CaptureElement))
+                {
+                    return null;
+                }
+                
                 if (element is AnchorElement anchor)
                 {
                     if (anchor.IsStart && textPos != 0)
@@ -291,15 +303,24 @@ namespace FLua.Runtime
                     }
                     else
                     {
-                        // Pop capture start and add to captures with capture number for sorting
-                        if (captureStack.Count > 0)
+                        // This is a capture end - check if it has quantifiers
+                        if (capture.MinRepeats != 1 || capture.MaxRepeats != 1)
                         {
-                            var captureStart = captureStack.Pop();
-                            var captureText = text.Substring(captureStart.startIndex, textPos - captureStart.startIndex);
-                            captureInfos.Add((captureStart.captureNumber, captureText));
+                            // Handle quantified capture groups
+                            return HandleQuantifiedCapture(text, textPos, patternPos, captureInfos, captureStack, capture);
                         }
-                        patternPos++;
-                        continue;
+                        else
+                        {
+                            // Normal capture end without quantifiers
+                            if (captureStack.Count > 0)
+                            {
+                                var captureStart = captureStack.Pop();
+                                var captureText = text.Substring(captureStart.startIndex, textPos - captureStart.startIndex);
+                                captureInfos.Add((captureStart.captureNumber, captureText));
+                            }
+                            patternPos++;
+                            continue;
+                        }
                     }
                 }
 
@@ -389,6 +410,173 @@ namespace FLua.Runtime
             return textPos; // Successful match, return current position
         }
 
+        private int? HandleQuantifiedCapture(string text, int textPos, int patternPos, List<(int CaptureNumber, string Text)> captureInfos, Stack<(int captureNumber, int startIndex)> captureStack, CaptureElement capture)
+        {
+            // For quantified captures like (st)?, we need to try different numbers of matches
+            var minRepeats = capture.MinRepeats;
+            var maxRepeats = capture.MaxRepeats;
+            var isUnlimited = maxRepeats == 0; // 0 is special value for unlimited
+            var tryGreedy = !capture.IsNonGreedy;
+            
+            // Find the pattern elements inside the capture group
+            var captureStartIndex = -1;
+            var captureEndIndex = patternPos;
+            
+            // Walk backwards to find the matching capture start
+            for (int i = patternPos - 1; i >= 0; i--)
+            {
+                if (_elements[i] is CaptureElement startCapture && 
+                    startCapture.IsStart && 
+                    startCapture.CaptureNumber == capture.CaptureNumber)
+                {
+                    captureStartIndex = i;
+                    break;
+                }
+            }
+            
+            if (captureStartIndex == -1)
+                return null; // Invalid pattern structure
+            
+            // Get the sub-pattern elements between capture start and end (exclusive)
+            var subPatternElements = new List<PatternElement>();
+            for (int i = captureStartIndex + 1; i < captureEndIndex; i++)
+            {
+                subPatternElements.Add(_elements[i]);
+            }
+            
+            if (isUnlimited)
+            {
+                // Try to match the capture group as many times as possible
+                var matches = new List<string>();
+                var currentPos = textPos;
+                
+                // Find maximum possible matches
+                while (currentPos < text.Length)
+                {
+                    var subMatcher = new LuaPatternMatcher(subPatternElements);
+                    var subCaptureInfos = new List<(int CaptureNumber, string Text)>();
+                    var match = subMatcher.TryMatch(text, currentPos, 0, subCaptureInfos);
+                    
+                    if (match.HasValue && match.Value > currentPos)
+                    {
+                        matches.Add(text.Substring(currentPos, match.Value - currentPos));
+                        currentPos = match.Value;
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+                
+                // Ensure we have at least minRepeats matches
+                if (matches.Count < minRepeats)
+                    return null;
+                
+                // Try different counts based on greediness
+                if (tryGreedy)
+                {
+                    // Greedy: try from maximum down to minimum
+                    for (int count = matches.Count; count >= minRepeats; count--)
+                    {
+                        // Add the capture(s) for this count
+                        if (count > 0)
+                        {
+                            // For quantified captures, we typically add the last match
+                            captureInfos.Add((capture.CaptureNumber, matches[count - 1]));
+                        }
+                        
+                        var totalConsumed = matches.Take(count).Sum(m => m.Length);
+                        var nextMatch = TryMatchInternal(text, textPos + totalConsumed, patternPos + 1, captureInfos, captureStack);
+                        if (nextMatch.HasValue)
+                            return nextMatch;
+                            
+                        // Remove the capture we added for backtracking
+                        if (count > 0 && captureInfos.Count > 0 && captureInfos.Last().CaptureNumber == capture.CaptureNumber)
+                        {
+                            captureInfos.RemoveAt(captureInfos.Count - 1);
+                        }
+                    }
+                }
+                else
+                {
+                    // Non-greedy: try from minimum up to maximum
+                    for (int count = minRepeats; count <= matches.Count; count++)
+                    {
+                        // Add the capture(s) for this count
+                        if (count > 0)
+                        {
+                            // For quantified captures, we typically add the last match
+                            captureInfos.Add((capture.CaptureNumber, matches[count - 1]));
+                        }
+                        
+                        var totalConsumed = matches.Take(count).Sum(m => m.Length);
+                        var nextMatch = TryMatchInternal(text, textPos + totalConsumed, patternPos + 1, captureInfos, captureStack);
+                        if (nextMatch.HasValue)
+                            return nextMatch;
+                            
+                        // Remove the capture we added for backtracking
+                        if (count > 0 && captureInfos.Count > 0 && captureInfos.Last().CaptureNumber == capture.CaptureNumber)
+                        {
+                            captureInfos.RemoveAt(captureInfos.Count - 1);
+                        }
+                    }
+                }
+                return null;
+            }
+            else
+            {
+                // Fixed range quantifiers (like ? which is {0,1})
+                var effectiveMax = Math.Min(maxRepeats, text.Length - textPos);
+                var matches = new List<string>();
+                var currentPos = textPos;
+                
+                // Find matches up to the maximum allowed
+                for (int attempt = 0; attempt < effectiveMax && currentPos < text.Length; attempt++)
+                {
+                    var subMatcher = new LuaPatternMatcher(subPatternElements);
+                    var subCaptureInfos = new List<(int CaptureNumber, string Text)>();
+                    var match = subMatcher.TryMatch(text, currentPos, 0, subCaptureInfos);
+                    
+                    if (match.HasValue && match.Value > currentPos)
+                    {
+                        matches.Add(text.Substring(currentPos, match.Value - currentPos));
+                        currentPos = match.Value;
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+                
+                // Ensure we can satisfy minimum requirements
+                if (matches.Count < minRepeats)
+                    return null;
+                
+                // Try from maximum possible down to minimum
+                for (int count = Math.Min(matches.Count, effectiveMax); count >= minRepeats; count--)
+                {
+                    // Add the capture(s) for this count
+                    if (count > 0)
+                    {
+                        // For quantified captures, we typically add the last match
+                        captureInfos.Add((capture.CaptureNumber, matches[count - 1]));
+                    }
+                    
+                    var totalConsumed = matches.Take(count).Sum(m => m.Length);
+                    var nextMatch = TryMatchInternal(text, textPos + totalConsumed, patternPos + 1, captureInfos, captureStack);
+                    if (nextMatch.HasValue)
+                        return nextMatch;
+                        
+                    // Remove the capture we added for backtracking
+                    if (count > 0 && captureInfos.Count > 0 && captureInfos.Last().CaptureNumber == capture.CaptureNumber)
+                    {
+                        captureInfos.RemoveAt(captureInfos.Count - 1);
+                    }
+                }
+                return null;
+            }
+        }
+
         /// <summary>
         /// Finds the matching end capture for a start capture
         /// </summary>
@@ -459,7 +647,39 @@ namespace FLua.Runtime
                         if (openCaptureStack.Count > 0)
                         {
                             var matchingCaptureNumber = openCaptureStack.Pop();
-                            elements.Add(new CaptureElement { IsStart = false, CaptureNumber = matchingCaptureNumber });
+                            var captureEnd = new CaptureElement { IsStart = false, CaptureNumber = matchingCaptureNumber };
+                            
+                            // Check for quantifiers after capture group
+                            if (i + 1 < pattern.Length)
+                            {
+                                var next = pattern[i + 1];
+                                switch (next)
+                                {
+                                    case '*':
+                                        captureEnd.MinRepeats = 0;
+                                        captureEnd.MaxRepeats = 0; // Special value for unlimited
+                                        i++;
+                                        break;
+                                    case '+':
+                                        captureEnd.MinRepeats = 1;
+                                        captureEnd.MaxRepeats = 0; // Special value for unlimited
+                                        i++;
+                                        break;
+                                    case '-':
+                                        captureEnd.MinRepeats = 0;
+                                        captureEnd.MaxRepeats = 0; // Non-greedy unlimited
+                                        captureEnd.IsNonGreedy = true;
+                                        i++;
+                                        break;
+                                    case '?':
+                                        captureEnd.MinRepeats = 0;
+                                        captureEnd.MaxRepeats = 1;
+                                        i++;
+                                        break;
+                                }
+                            }
+                            
+                            elements.Add(captureEnd);
                         }
                         else
                             elements.Add(new CharacterElement(')')); // Treat as literal
@@ -684,6 +904,9 @@ namespace FLua.Runtime
     {
         public bool IsStart { get; set; }
         public int CaptureNumber { get; set; } // For ordering captures
+        public int MinRepeats { get; set; } = 1;
+        public int MaxRepeats { get; set; } = 1;
+        public bool IsNonGreedy { get; set; }
     }
 
     /// <summary>

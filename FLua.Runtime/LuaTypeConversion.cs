@@ -13,7 +13,7 @@ namespace FLua.Runtime
         /// Converts a Lua value to a number (double).
         /// This includes parsing hex strings which LuaValue doesn't handle.
         /// </summary>
-        public static double? ToNumber(LuaValue value)
+        public static double ToNumber(LuaValue value)
         {
             if (value.IsNumber)
                 return value.AsDouble();
@@ -44,14 +44,14 @@ namespace FLua.Runtime
                 }
             }
             
-            return null;
+            throw new InvalidOperationException($"Cannot convert {value.Type} to number");
         }
 
         /// <summary>
         /// Converts a Lua value to an integer (long).
         /// This includes parsing hex strings which LuaValue doesn't handle.
         /// </summary>
-        public static long? ToInteger(LuaValue value)
+        public static long ToInteger(LuaValue value)
         {
             if (value.IsInteger)
                 return value.AsInteger();
@@ -64,7 +64,7 @@ namespace FLua.Runtime
                 {
                     return (long)d;
                 }
-                return null;
+                throw new InvalidOperationException($"Cannot convert float {d} to integer (not a whole number)");
             }
             
             if (value.IsString)
@@ -93,18 +93,22 @@ namespace FLua.Runtime
                 }
                 
                 // Try parsing as double first and check if it's an integer
-                var numValue = ToNumber(value);
-                if (numValue.HasValue)
+                try
                 {
-                    double dValue = numValue.Value;
+                    double dValue = ToNumber(value);
                     if (Math.Floor(dValue) == dValue && dValue >= long.MinValue && dValue <= long.MaxValue)
                     {
                         return (long)dValue;
                     }
+                    throw new InvalidOperationException($"Cannot convert number {dValue} to integer (not a whole number)");
+                }
+                catch (InvalidOperationException)
+                {
+                    // ToNumber failed, so this string is not numeric
                 }
             }
             
-            return null;
+            throw new InvalidOperationException($"Cannot convert {value.Type} to integer");
         }
 
         /// <summary>
@@ -113,7 +117,13 @@ namespace FLua.Runtime
         /// </summary>
         public static string ToString(LuaValue value)
         {
-            return value.ToString();
+            if (value.IsString)
+                return value.AsString();
+                
+            if (value.IsNumber)
+                return value.ToString();
+                
+            throw new InvalidOperationException($"Cannot convert {value.Type} to string");
         }
 
         /// <summary>
@@ -148,7 +158,7 @@ namespace FLua.Runtime
         /// Converts a value to a string for concatenation.
         /// Returns null if the value cannot be concatenated.
         /// </summary>
-        public static string? ToConcatString(LuaValue value)
+        public static string ToConcatString(LuaValue value)
         {
             if (value.IsString)
                 return value.AsString();
@@ -164,11 +174,11 @@ namespace FLua.Runtime
                 {
                     var concat = table.Metatable.RawGet(LuaValue.String("__concat"));
                     if (!concat.IsNil)
-                        return null; // Has metamethod, should use it instead
+                        throw new InvalidOperationException("Value has __concat metamethod, should use it instead");
                 }
             }
             
-            return null;
+            throw new InvalidOperationException($"Cannot convert {value.Type} to string for concatenation");
         }
 
         /// <summary>
@@ -176,6 +186,9 @@ namespace FLua.Runtime
         /// </summary>
         public static LuaValue? StringToNumber(string str, int? base_ = null)
         {
+            if (str == null)
+                return null;
+                
             str = str.Trim();
             
             if (base_ == null)
@@ -201,7 +214,7 @@ namespace FLua.Runtime
                 }
                 if (double.TryParse(str, NumberStyles.Float | NumberStyles.AllowLeadingSign, CultureInfo.InvariantCulture, out double floatResult))
                 {
-                    return LuaValue.Number(floatResult);
+                    return LuaValue.Float(floatResult);
                 }
             }
             else if (base_ == 16)

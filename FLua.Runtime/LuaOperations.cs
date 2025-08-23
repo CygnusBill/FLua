@@ -113,7 +113,16 @@ namespace FLua.Runtime
                     throw new LuaRuntimeException("Division by zero");
                 }
 
-                return LuaValue.Number(Math.Floor(left.AsDouble() / right.AsDouble()));
+                var result = Math.Floor(left.AsDouble() / right.AsDouble());
+                
+                // Floor division should always return integer if result fits in long range
+                if (result == Math.Truncate(result) &&
+                    result >= long.MinValue && result <= long.MaxValue)
+                {
+                    return LuaValue.Integer((long)result);
+                }
+                
+                return LuaValue.Float(result);
             }
 
             throw new LuaRuntimeException("Attempt to perform floor division on non-numbers");

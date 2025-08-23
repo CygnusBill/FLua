@@ -87,6 +87,9 @@ namespace FLua.Runtime
 
         public static LuaValue String(string value)
         {
+            if (value == null)
+                return Nil;
+                
             var result = new LuaValue { Type = LuaType.String };
             var handle = GCHandle.Alloc(value, GCHandleType.Normal);
             var ptr = GCHandle.ToIntPtr(handle);
@@ -320,6 +323,12 @@ namespace FLua.Runtime
                 return true;
             }
 
+            if (Type == LuaType.Integer)
+            {
+                value = (double)BitConverter.ToInt64(Data);
+                return true;
+            }
+
             value = 0.0;
             return false;
         }
@@ -526,9 +535,8 @@ namespace FLua.Runtime
 
             var result = Math.Floor(left.AsDouble() / right.AsDouble());
 
-            // Try to keep as integer if possible
-            if (left.IsInteger && right.IsInteger &&
-                result == Math.Truncate(result) &&
+            // Floor division should always return integer if result fits in long range
+            if (result == Math.Truncate(result) &&
                 result >= long.MinValue && result <= long.MaxValue)
             {
                 return Integer((long)result);
@@ -673,13 +681,6 @@ namespace FLua.Runtime
         {
             if (Type != other.Type)
             {
-                // Special case: allow integer/float comparison if values are equal
-                if ((Type == LuaType.Integer && other.Type == LuaType.Float) ||
-                    (Type == LuaType.Float && other.Type == LuaType.Integer))
-                {
-                    return Math.Abs(AsDouble() - other.AsDouble()) < double.Epsilon;
-                }
-
                 return false;
             }
 

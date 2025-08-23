@@ -384,8 +384,26 @@ namespace FLua.Interpreter
                             case OutputBehavior.EvaluateAsExpression:
                                 try
                                 {
-                                    var expressionResult = _interpreter.EvaluateExpression(input);
-                                    _output.WriteLine($"= {expressionResult}");
+                                    // For multiple statements, extract and evaluate the last statement
+                                    if (statements.Length > 1)
+                                    {
+                                        // Find the last statement by getting the last non-REPL-command, non-empty line
+                                        var lines = input.Split('\n', StringSplitOptions.RemoveEmptyEntries);
+                                        var lastNonCommandLine = lines.LastOrDefault(line => 
+                                            !string.IsNullOrWhiteSpace(line) && 
+                                            !line.Trim().StartsWith("."))?.Trim();
+                                        
+                                        if (!string.IsNullOrEmpty(lastNonCommandLine))
+                                        {
+                                            var expressionResult = _interpreter.EvaluateExpression(lastNonCommandLine);
+                                            _output.WriteLine($"= {expressionResult}");
+                                        }
+                                    }
+                                    else
+                                    {
+                                        var expressionResult = _interpreter.EvaluateExpression(input);
+                                        _output.WriteLine($"= {expressionResult}");
+                                    }
                                 }
                                 catch
                                 {
@@ -395,8 +413,30 @@ namespace FLua.Interpreter
                             case OutputBehavior.EvaluateAsFunctionCall:
                                 try
                                 {
-                                    var expressionResult = _interpreter.EvaluateExpression(input);
-                                    _output.WriteLine($"=> {expressionResult}");
+                                    // For multiple statements, extract and evaluate the last statement as function call
+                                    if (statements.Length > 1)
+                                    {
+                                        // Find the last statement by getting the last non-REPL-command, non-empty line
+                                        var lines = input.Split('\n', StringSplitOptions.RemoveEmptyEntries);
+                                        var lastNonCommandLine = lines.LastOrDefault(line => 
+                                            !string.IsNullOrWhiteSpace(line) && 
+                                            !line.Trim().StartsWith("."))?.Trim();
+                                        
+                                        if (!string.IsNullOrEmpty(lastNonCommandLine))
+                                        {
+                                            var expressionResult = _interpreter.EvaluateExpression(lastNonCommandLine);
+                                            _output.WriteLine($"=> {expressionResult}");
+                                        }
+                                        else
+                                        {
+                                            _output.WriteLine("=> nil");
+                                        }
+                                    }
+                                    else
+                                    {
+                                        var expressionResult = _interpreter.EvaluateExpression(input);
+                                        _output.WriteLine($"=> {expressionResult}");
+                                    }
                                 }
                                 catch
                                 {
@@ -514,7 +554,59 @@ namespace FLua.Interpreter
                 }
             }
             
-            // Multiple statements - no additional output
+            // Multiple statements - check the last statement for output behavior
+            if (statements.Length > 1)
+            {
+                // Find the last statement by iterating through the list
+                FLua.Ast.Statement? lastStatement = null;
+                foreach (var stmt in statements)
+                {
+                    lastStatement = stmt;
+                }
+                
+                if (lastStatement != null)
+                {
+                    switch (lastStatement.Tag)
+                    {
+                        case FLua.Ast.Statement.Tags.FunctionCall:
+                            // Check if this is a side-effect function like print
+                            if (IsSideEffectFunctionCall(lastStatement))
+                            {
+                                return OutputBehavior.ShowNil;
+                            }
+                            else if (IsSimpleExpressionWrappedAsStatement(lastStatement))
+                            {
+                                // Simple expressions wrapped as statements should be treated as expressions
+                                return OutputBehavior.EvaluateAsExpression;
+                            }
+                            else
+                            {
+                                return OutputBehavior.EvaluateAsFunctionCall;
+                            }
+                        
+                        case FLua.Ast.Statement.Tags.Assignment:
+                        case FLua.Ast.Statement.Tags.LocalAssignment:
+                        case FLua.Ast.Statement.Tags.FunctionDef:
+                        case FLua.Ast.Statement.Tags.LocalFunctionDef:
+                        case FLua.Ast.Statement.Tags.DoBlock:
+                        case FLua.Ast.Statement.Tags.While:
+                        case FLua.Ast.Statement.Tags.Repeat:
+                        case FLua.Ast.Statement.Tags.If:
+                        case FLua.Ast.Statement.Tags.NumericFor:
+                        case FLua.Ast.Statement.Tags.GenericFor:
+                        case FLua.Ast.Statement.Tags.Label:
+                        case FLua.Ast.Statement.Tags.Goto:
+                        case FLua.Ast.Statement.Tags.Break:
+                        case FLua.Ast.Statement.Tags.Empty:
+                        case FLua.Ast.Statement.Tags.Return:
+                            return OutputBehavior.NoOutput;
+                        
+                        default:
+                            return OutputBehavior.EvaluateAsExpression;
+                    }
+                }
+            }
+            
             return OutputBehavior.NoOutput;
         }
 

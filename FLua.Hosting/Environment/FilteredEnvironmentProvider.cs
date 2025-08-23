@@ -31,16 +31,12 @@ public class FilteredEnvironmentProvider : IEnvironmentProvider
     public LuaEnvironment CreateEnvironment(TrustLevel trustLevel, LuaHostOptions? options = null)
     {
         // Start with the standard environment and then filter it
-        var env = LuaEnvironment.CreateStandardEnvironment();
+        // Skip the standard package library if we have a custom module resolver
+        bool includeStandardPackageLibrary = options?.ModuleResolver == null;
+        var env = LuaEnvironment.CreateStandardEnvironment(includeStandardPackageLibrary, (int)trustLevel);
         
         // Filter functions based on trust level
         FilterEnvironmentByTrustLevel(env, trustLevel);
-        
-        // Configure module system if resolver provided
-        if (options?.ModuleResolver != null)
-        {
-            ConfigureModuleSystem(env, options.ModuleResolver, trustLevel);
-        }
         
         // Add host functions if provided
         if (options?.HostFunctions?.Count > 0)
@@ -54,59 +50,66 @@ public class FilteredEnvironmentProvider : IEnvironmentProvider
             InjectHostContext(env, options.HostContext);
         }
         
+        // Configure module system if resolver provided - MUST BE LAST to override standard require
+        if (options?.ModuleResolver != null)
+        {
+            ConfigureModuleSystem(env, options.ModuleResolver, trustLevel);
+        }
+        
         return env;
     }
     
     private void FilterEnvironmentByTrustLevel(LuaEnvironment env, TrustLevel trustLevel)
     {
-        // Remove dangerous functions based on trust level
+        // Remove dangerous functions based on trust level (matching StandardSecurityPolicy)
         var functionsToRemove = new List<string>();
         
         switch (trustLevel)
         {
             case TrustLevel.Untrusted:
-                // Remove everything except the most basic functions
+                // Most restrictive - only basic functions allowed
                 functionsToRemove.AddRange(new[] {
-                    "load", "loadfile", "dofile", "require",
-                    "io", "os", "debug", "package",
-                    "collectgarbage", "rawget", "rawset", "rawequal", "rawlen",
-                    "setmetatable", "getmetatable",
-                    "pcall", "xpcall", "error"
+                    "load", "loadfile", "dofile", "require", "collectgarbage",
+                    "rawget", "rawset", "rawequal", "rawlen", "getmetatable", "setmetatable",
+                    "pcall", "xpcall", "error", "warn"
                 });
+                // Note: io, os, debug libraries already not loaded for Untrusted
                 break;
                 
             case TrustLevel.Sandbox:
-                // Remove dangerous functions but keep safe libraries
+                // Limited functionality - safe computation only
                 functionsToRemove.AddRange(new[] {
-                    "load", "loadfile", "dofile", // Don't remove require - it will be replaced with controlled version
-                    "io", "os", "debug"
+                    "load", "loadfile", "dofile", "require", "collectgarbage"
                 });
+                // Note: io, os, debug libraries already not loaded for Sandbox
                 break;
                 
             case TrustLevel.Restricted:
-                // Remove file I/O and dangerous OS functions
+                // Some IO allowed - file operations in designated areas only
                 functionsToRemove.AddRange(new[] {
-                    "loadfile", "dofile",
-                    "io", "debug"
+                    "loadfile", "dofile"
                 });
-                // Also remove dangerous OS functions (but keep time functions)
-                if (env.GetVariable("os").AsTable<LuaTable>() is { } osTable)
+                // Remove dangerous OS functions (but keep time functions)
+                if (env.GetVariable("os") != LuaValue.Nil && env.GetVariable("os").IsTable)
                 {
+                    var osTable = env.GetVariable("os").AsTable<LuaTable>();
                     osTable.Set("execute", LuaValue.Nil);
                     osTable.Set("exit", LuaValue.Nil);
                     osTable.Set("setenv", LuaValue.Nil);
                     osTable.Set("remove", LuaValue.Nil);
                     osTable.Set("rename", LuaValue.Nil);
                 }
+                // Note: debug library already not loaded for Restricted
                 break;
                 
             case TrustLevel.Trusted:
-                // Remove only debug library
-                functionsToRemove.Add("debug");
+                // Full standard library access except debug functions
+                // Note: debug library already not loaded for Trusted
                 break;
                 
             case TrustLevel.FullTrust:
-                // Keep everything
+                // Complete access including debug functions
+                // Note: debug library is loaded for FullTrust
                 break;
         }
         
@@ -127,7 +130,7 @@ public class FilteredEnvironmentProvider : IEnvironmentProvider
         // Replace the standard require function with host-controlled version
         var requireFunc = new BuiltinFunction((args) =>
         {
-            if (args.Length == 0)
+                if (args.Length == 0)
                 throw new LuaRuntimeException("require: module name expected");
             
             var moduleName = args[0].AsString();
@@ -171,7 +174,8 @@ public class FilteredEnvironmentProvider : IEnvironmentProvider
         environment.SetVariable("require", requireFunc);
         
         // Configure package table based on module resolver's search paths
-        var packageTable = environment.GetVariable("package").AsTable<LuaTable>() ?? new LuaTable();
+        var packageValue = environment.GetVariable("package");
+        var packageTable = packageValue.IsTable ? packageValue.AsTable<LuaTable>() : new LuaTable();
         packageTable.Set("path", string.Join(";", moduleResolver.SearchPaths.Select(p => System.IO.Path.Combine(p, "?.lua"))));
         packageTable.Set("loaded", loadedModules); // Standard Lua package.loaded table
         environment.SetVariable("package", packageTable);
@@ -195,7 +199,7 @@ public class FilteredEnvironmentProvider : IEnvironmentProvider
         }
     }
     
-    private LuaValue ConvertToLuaValue(object value)
+    private LuaValue ConvertToLuaValue(object? value)
     {
         return value switch
         {
@@ -214,7 +218,7 @@ public class FilteredEnvironmentProvider : IEnvironmentProvider
     
     private LuaValue ConvertObjectToTable(object obj)
     {
-        return new ObjectFacadeTable(obj, this);
+        return LuaValue.Table(new ObjectFacadeTable(obj, this));
     }
 
     /// <summary>
@@ -233,9 +237,19 @@ public class FilteredEnvironmentProvider : IEnvironmentProvider
                 
             foreach (var property in properties)
             {
-                var value = property.GetValue(obj);
-                var luaValue = provider.ConvertToLuaValue(value);
-                this.Set(LuaValue.String(property.Name), luaValue);
+                try
+                {
+                    var value = property.GetValue(obj);
+                    var luaValue = provider.ConvertToLuaValue(value);
+                    
+                    // Use property name as-is for now (can be changed to lowercase if needed)
+                    this.Set(LuaValue.String(property.Name), luaValue);
+                }
+                catch (Exception)
+                {
+                    // If we can't get the property value, skip it
+                    continue;
+                }
             }
         }
     }
@@ -291,44 +305,43 @@ public class FilteredEnvironmentProvider : IEnvironmentProvider
             }
             
             // Interpret the module
-            // Create a new interpreter instance with the shared environment
+            // Create a new interpreter instance with the correct environment
             var moduleInterpreter = new LuaInterpreter();
             
-            // HACK: Use reflection to set the environment since there's no public constructor
-            // This should be improved by adding a constructor that accepts an environment
-            var envField = moduleInterpreter.GetType()
-                .GetField("_environment", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+            // Create module environment as a child of the current environment
+            // This allows the module to see global functions including require
+            var moduleEnv = new LuaEnvironment(environment);
             
-            if (envField != null)
+            // Set module-specific variables
+            moduleEnv.SetVariable("...", moduleName); // Module name vararg
+            
+            // Set the environment using reflection and create new evaluators with correct environment
+            moduleInterpreter.GetType()
+                .GetField("_environment", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
+                ?.SetValue(moduleInterpreter, moduleEnv);
+            
+            // Create new evaluators with the correct environment (same fix as in LuaHost.ExecuteInternal)
+            var expressionEvaluatorField = moduleInterpreter.GetType()
+                .GetField("_expressionEvaluator", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+            var statementExecutorField = moduleInterpreter.GetType()
+                .GetField("_statementExecutor", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+                
+            expressionEvaluatorField?.SetValue(moduleInterpreter, new ExpressionEvaluator(moduleEnv));
+            statementExecutorField?.SetValue(moduleInterpreter, new StatementExecutor(moduleEnv));
+            
+            // Execute the module
+            var moduleResults = moduleInterpreter.ExecuteStatements(statements);
+            
+            // Module should return a table or value
+            if (moduleResults.Length > 0)
             {
-                // Create module environment as a child of the current environment
-                // This allows the module to see global functions including require
-                var moduleEnv = new LuaEnvironment(environment);
-                
-                // Set module-specific variables
-                moduleEnv.SetVariable("...", moduleName); // Module name vararg
-                
-                // Set the environment
-                envField.SetValue(moduleInterpreter, moduleEnv);
-                
-                // Execute the module
-                var moduleResults = moduleInterpreter.ExecuteStatements(statements);
-                
-                // Module should return a table or value
-                if (moduleResults.Length > 0)
-                {
-                    return moduleResults;
-                }
-                
-                // If no explicit return, create an empty table
-                // (Lua modules typically must explicitly return their exports)
-                var emptyTable = new LuaTable();
-                return new LuaValue[] { emptyTable };
+                return moduleResults;
             }
-            else
-            {
-                throw new InvalidOperationException("Cannot access interpreter environment field");
-            }
+            
+            // If no explicit return, create an empty table
+            // (Lua modules typically must explicitly return their exports)
+            var emptyTable = new LuaTable();
+            return new LuaValue[] { emptyTable };
         }
         catch (Exception ex) when (!(ex is LuaRuntimeException))
         {

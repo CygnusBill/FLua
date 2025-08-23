@@ -90,31 +90,25 @@ public class LuaHost : ILuaHost
     
     private LuaValue ExecuteInternal(FSharpList<Statement> statements, LuaEnvironment env)
     {
-        // Save current interpreter environment
-        var originalEnv = _interpreter.GetType()
-            .GetField("_environment", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
-            ?.GetValue(_interpreter) as LuaEnvironment;
+        // Create a new interpreter with the correct environment instead of trying to modify the existing one
+        var interpreter = new LuaInterpreter();
         
-        try
-        {
-            // Set our custom environment
-            _interpreter.GetType()
-                .GetField("_environment", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
-                ?.SetValue(_interpreter, env);
+        // Set the environment using reflection (but create new evaluators with correct environment)
+        interpreter.GetType()
+            .GetField("_environment", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
+            ?.SetValue(interpreter, env);
+        
+        // Create new evaluators with the correct environment
+        var expressionEvaluatorField = interpreter.GetType()
+            .GetField("_expressionEvaluator", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+        var statementExecutorField = interpreter.GetType()
+            .GetField("_statementExecutor", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+            
+        expressionEvaluatorField?.SetValue(interpreter, new ExpressionEvaluator(env));
+        statementExecutorField?.SetValue(interpreter, new StatementExecutor(env));
                 
-            var results = _interpreter.ExecuteStatements(statements);
-            return results.Length > 0 ? results[0] : LuaValue.Nil;
-        }
-        finally
-        {
-            // Restore original environment
-            if (originalEnv != null)
-            {
-                _interpreter.GetType()
-                    .GetField("_environment", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
-                    ?.SetValue(_interpreter, originalEnv);
-            }
-        }
+        var results = interpreter.ExecuteStatements(statements);
+        return results.Length > 0 ? results[0] : LuaValue.Nil;
     }
     
     public async Task<LuaValue> ExecuteAsync(string luaCode, LuaHostOptions? options = null, CancellationToken cancellationToken = default)

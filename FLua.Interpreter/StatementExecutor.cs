@@ -438,8 +438,9 @@ namespace FLua.Interpreter
                 throw new LuaRuntimeException("Generic for requires at least one expression");
             }
             
-            // Evaluate iterator expressions
-            var iteratorValues = expressionArray.Select(expr => _expressionEvaluator.Evaluate(expr)[0]).ToArray();
+            // Evaluate iterator expressions (handling multiple return values)
+            var allResults = expressionArray.SelectMany(expr => _expressionEvaluator.Evaluate(expr)).ToArray();
+            var iteratorValues = allResults;
             
             if (iteratorValues.Length < 3)
             {

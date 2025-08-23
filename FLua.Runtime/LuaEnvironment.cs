@@ -164,7 +164,7 @@ namespace FLua.Runtime
         /// <summary>
         /// Creates a standard Lua environment with built-in functions
         /// </summary>
-        public static LuaEnvironment CreateStandardEnvironment()
+        public static LuaEnvironment CreateStandardEnvironment(bool includePackageLibrary = true, int? trustLevel = null)
         {
             var env = new LuaEnvironment();
             
@@ -208,18 +208,41 @@ namespace FLua.Runtime
             // Dynamic loading (simplified - no actual compilation)
             env.SetVariable("load", new BuiltinFunction(Load));
             
-            // Add standard libraries
-            LuaCoroutineLib.AddCoroutineLibrary(env);
+            // Add standard libraries based on trust level
+            // Trust levels: Untrusted=0, Sandbox=1, Restricted=2, Trusted=3, FullTrust=4
+            
+            // Always add math and string (available at all trust levels except when explicitly blocked)
             LuaMathLib.AddMathLibrary(env);
             LuaStringLib.AddStringLibrary(env);
-            LuaTableLib.AddTableLibrary(env);
-            LuaIOLib.AddIOLibrary(env);
-            LuaOSLib.AddOSLibrary(env);
-            LuaUTF8Lib.AddUTF8Library(env);
-            LuaDebugLib.AddDebugLibrary(env);
+            
+            // Add libraries based on trust level
+            if (trustLevel == null || trustLevel >= 1) // Sandbox and above
+            {
+                LuaTableLib.AddTableLibrary(env);
+                LuaCoroutineLib.AddCoroutineLibrary(env);
+                LuaUTF8Lib.AddUTF8Library(env);
+            }
+            
+            if (trustLevel == null || trustLevel >= 2) // Restricted and above
+            {
+                LuaOSLib.AddOSLibrary(env);
+            }
+            
+            if (trustLevel == null || trustLevel >= 3) // Trusted and above
+            {
+                LuaIOLib.AddIOLibrary(env);
+            }
+            
+            if (trustLevel == null || trustLevel >= 4) // FullTrust only
+            {
+                LuaDebugLib.AddDebugLibrary(env);
+            }
             
             // Add package library and require function
-            LuaPackageLib.AddPackageLibrary(env);
+            if (includePackageLibrary)
+            {
+                LuaPackageLib.AddPackageLibrary(env);
+            }
             
             return env;
         }

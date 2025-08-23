@@ -19,29 +19,29 @@ namespace FLua.Runtime
         /// <summary>
         /// Gets a numeric value from a LuaValue, handling both integer and float types
         /// </summary>
-        public static double? GetNumber(LuaValue value)
+        public static double GetNumber(LuaValue value)
         {
             if (value.TryGetNumber(out var number))
                 return number;
-            return null;
+            throw new InvalidOperationException($"Cannot convert {value.Type} to number");
         }
 
         /// <summary>
         /// Gets an integer value from a LuaValue, with conversion from float if applicable
         /// </summary>
-        public static long? GetInteger(LuaValue value)
+        public static long GetInteger(LuaValue value)
         {
             if (value.TryGetIntegerValue(out var integer))
                 return integer;
-            return null;
+            throw new InvalidOperationException($"Cannot convert {value.Type} to integer");
         }
 
         /// <summary>
-        /// Creates a numeric LuaValue, choosing integer or float based on the value
+        /// Creates a numeric LuaValue, always returning Float for double input
         /// </summary>
         public static LuaValue CreateNumber(double value)
         {
-            return LuaValue.Number(value);
+            return LuaValue.Float(value);
         }
 
         /// <summary>
