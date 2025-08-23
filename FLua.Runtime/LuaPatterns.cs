@@ -484,6 +484,11 @@ namespace FLua.Runtime
                             // For quantified captures, we typically add the last match
                             captureInfos.Add((capture.CaptureNumber, matches[count - 1]));
                         }
+                        else
+                        {
+                            // For zero matches with optional quantifier, add empty capture
+                            captureInfos.Add((capture.CaptureNumber, ""));
+                        }
                         
                         var totalConsumed = matches.Take(count).Sum(m => m.Length);
                         var nextMatch = TryMatchInternal(text, textPos + totalConsumed, patternPos + 1, captureInfos, captureStack);
@@ -491,7 +496,7 @@ namespace FLua.Runtime
                             return nextMatch;
                             
                         // Remove the capture we added for backtracking
-                        if (count > 0 && captureInfos.Count > 0 && captureInfos.Last().CaptureNumber == capture.CaptureNumber)
+                        if (captureInfos.Count > 0 && captureInfos.Last().CaptureNumber == capture.CaptureNumber)
                         {
                             captureInfos.RemoveAt(captureInfos.Count - 1);
                         }
@@ -508,6 +513,11 @@ namespace FLua.Runtime
                             // For quantified captures, we typically add the last match
                             captureInfos.Add((capture.CaptureNumber, matches[count - 1]));
                         }
+                        else
+                        {
+                            // For zero matches with optional quantifier, add empty capture
+                            captureInfos.Add((capture.CaptureNumber, ""));
+                        }
                         
                         var totalConsumed = matches.Take(count).Sum(m => m.Length);
                         var nextMatch = TryMatchInternal(text, textPos + totalConsumed, patternPos + 1, captureInfos, captureStack);
@@ -515,7 +525,7 @@ namespace FLua.Runtime
                             return nextMatch;
                             
                         // Remove the capture we added for backtracking
-                        if (count > 0 && captureInfos.Count > 0 && captureInfos.Last().CaptureNumber == capture.CaptureNumber)
+                        if (captureInfos.Count > 0 && captureInfos.Last().CaptureNumber == capture.CaptureNumber)
                         {
                             captureInfos.RemoveAt(captureInfos.Count - 1);
                         }
@@ -560,6 +570,11 @@ namespace FLua.Runtime
                     {
                         // For quantified captures, we typically add the last match
                         captureInfos.Add((capture.CaptureNumber, matches[count - 1]));
+                    }
+                    else
+                    {
+                        // For zero matches with optional quantifier, add empty capture
+                        captureInfos.Add((capture.CaptureNumber, ""));
                     }
                     
                     var totalConsumed = matches.Take(count).Sum(m => m.Length);
