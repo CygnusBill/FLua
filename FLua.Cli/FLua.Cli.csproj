@@ -8,6 +8,12 @@
     <RootNamespace>FLua.Cli</RootNamespace>
     <AssemblyName>flua</AssemblyName>
     <PublishAot>true</PublishAot>
+    <Version>1.0.0</Version>
+    <AssemblyVersion>1.0.0.0</AssemblyVersion>
+    <FileVersion>1.0.0.0</FileVersion>
+    <Authors>FLua Team</Authors>
+    <Product>FLua</Product>
+    <Description>Command-line interface for FLua, a complete Lua 5.4 implementation for .NET</Description>
   </PropertyGroup>
 
   <ItemGroup>

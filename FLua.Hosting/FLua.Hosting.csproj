@@ -12,6 +12,16 @@
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <Version>1.0.0</Version>
+    <AssemblyVersion>1.0.0.0</AssemblyVersion>
+    <FileVersion>1.0.0.0</FileVersion>
+    <PackageVersion>1.0.0</PackageVersion>
+    <Authors>FLua Team</Authors>
+    <Description>High-level hosting API for Lua scripting in .NET applications. Provides easy integration with security controls and module loading.</Description>
+    <PackageTags>Lua;Hosting;Scripting;.NET;Integration;Security</PackageTags>
+    <RepositoryUrl>https://github.com/your-repo/flua</RepositoryUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
 
 </Project>

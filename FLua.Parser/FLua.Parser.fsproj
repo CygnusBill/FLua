@@ -4,6 +4,16 @@
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <Version>1.0.0</Version>
+    <AssemblyVersion>1.0.0.0</AssemblyVersion>
+    <FileVersion>1.0.0.0</FileVersion>
+    <PackageVersion>1.0.0</PackageVersion>
+    <Authors>FLua Team</Authors>
+    <Description>F# parser for Lua 5.4 syntax using FParsec. Converts Lua source code to FLua AST.</Description>
+    <PackageTags>Lua;Parser;FParsec;AST;Compiler</PackageTags>
+    <RepositoryUrl>https://github.com/your-repo/flua</RepositoryUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
 
   <ItemGroup>

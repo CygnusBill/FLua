@@ -148,9 +148,9 @@ Choose based on your needs:
 
 ## Going Further
 
-- See [FLua.Hosting API docs](../docs/hosting-api.md) for detailed reference
-- Check [FLua.Compiler docs](../docs/compiler.md) for compilation options
-- Read [Security Guide](../docs/security.md) for production deployments
+- See [FLua.Hosting source code](../FLua.Hosting/) for API details
+- Check [FLua.Compiler source code](../FLua.Compiler/) for compilation options
+- Read [Security Levels documentation](../docs/project-docs/ARCHITECTURAL_LIMITATIONS.md) for deployment considerations
 
 ## Contributing
 

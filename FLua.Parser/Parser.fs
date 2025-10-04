@@ -451,60 +451,68 @@ let pPrimaryBase : Parser<Expr, unit> =
         attempt pParenExpr
     ] .>> ws
 
-// Table access and function call postfix operations
-// TODO: Review parser ordering and overlapping conditions - potential technical debt
-// The order of these parsers is critical and fragile. Consider refactoring to make
-// the precedence and conflicts more explicit and maintainable.
-let pPostfixOp =
+// ============================================================================
+// POSTFIX OPERATIONS - Refactored for maintainability
+// ============================================================================
+
+// Helper for method calls with different argument types
+let pMethodCall methodName =
     choice [
-        // Method syntax - must be followed by arguments
-        attempt (
-            pstring ":" >>. ws >>. identifier >>= fun methodName ->
-                choice [
-                    // Method call with parentheses: :identifier(args)
-                    between (pstring "(" >>. ws) (ws >>. pstring ")" >>. ws) (opt (sepBy1 expr (symbol ",")))
-                    |>> fun argsOpt -> fun expr ->
-                        let args = argsOpt |> Option.defaultValue []
-                        Expr.MethodCall(expr, methodName, args)
-                    
-                    // Method call with string literal (no parentheses): :identifier "string" or :identifier [[string]]
-                    // Note: No ws consumption before pLiteral to allow [[
-                    attempt pLiteral
-                    >>= fun lit ->
-                        match lit with
-                        | Expr.Literal (Literal.String s) -> 
-                            preturn (fun expr -> Expr.MethodCall(expr, methodName, [Expr.Literal (Literal.String s)]))
-                        | _ -> fail "Expected string literal"
-                    
-                    // Method call with table constructor (no parentheses): :identifier {table}
-                    pTableConstructor
-                    |>> fun arg -> fun expr ->
-                        Expr.MethodCall(expr, methodName, [arg])
-                ]
-        )
-        
-        // Dot access: .identifier
-        pstring "." >>. ws >>. identifier .>> ws
-        |>> fun key -> fun expr -> Expr.TableAccess(expr, Expr.Literal (Literal.String key))
-        
-        // Function call with string literal (no parentheses): func "string" or func [[string]]
-        // Must come before bracket access to handle long strings [[...]]
+        // Method call with parentheses: :identifier(args)
+        between (pstring "(" >>. ws) (ws >>. pstring ")" >>. ws) (opt (sepBy1 expr (symbol ",")))
+        |>> fun argsOpt -> fun expr ->
+            let args = argsOpt |> Option.defaultValue []
+            Expr.MethodCall(expr, methodName, args)
+
+        // Method call with string literal (no parentheses): :identifier "string" or :identifier [[string]]
+        // Note: No ws consumption before pLiteral to allow [[
         attempt pLiteral
         >>= fun lit ->
             match lit with
-            | Expr.Literal (Literal.String s) as stringLit -> 
+            | Expr.Literal (Literal.String s) ->
+                preturn (fun expr -> Expr.MethodCall(expr, methodName, [Expr.Literal (Literal.String s)]))
+            | _ -> fail "Expected string literal"
+
+        // Method call with table constructor (no parentheses): :identifier {table}
+        pTableConstructor
+        |>> fun arg -> fun expr ->
+            Expr.MethodCall(expr, methodName, [arg])
+    ]
+
+// Helper for function calls with single arguments (no parentheses)
+let pFunctionCallSingleArg =
+    choice [
+        // Function call with string literal: func "string" or func [[string]]
+        attempt pLiteral
+        >>= fun lit ->
+            match lit with
+            | Expr.Literal (Literal.String s) as stringLit ->
                 preturn (fun expr -> Expr.FunctionCall(expr, [stringLit]))
             | _ -> fail "Expected string literal"
-        
-        // Bracket access: [expr] - but not [[
-        attempt (pstring "[" >>. notFollowedBy (pstring "[") >>. ws >>. expr .>> ws .>> pstring "]" .>> ws)
-        |>> fun key -> fun expr -> Expr.TableAccess(expr, key)
-        
-        // Function call with table constructor (no parentheses): func {table}
+
+        // Function call with table constructor: func {table}
         attempt pTableConstructor
         |>> fun arg -> fun expr -> Expr.FunctionCall(expr, [arg])
-        
-        // Function call: (args)
+    ]
+
+// Main postfix operations parser - ordered by precedence/specificity
+let pPostfixOp =
+    choice [
+        // 1. Method calls (highest precedence) - :identifier(args)
+        attempt (pstring ":" >>. ws >>. identifier >>= pMethodCall)
+
+        // 2. Dot access - .identifier
+        pstring "." >>. ws >>. identifier .>> ws
+        |>> fun key -> fun expr -> Expr.TableAccess(expr, Expr.Literal (Literal.String key))
+
+        // 3. Bracket access - [expr] (but not [[ for long strings)
+        attempt (pstring "[" >>. notFollowedBy (pstring "[") >>. ws >>. expr .>> ws .>> pstring "]" .>> ws)
+        |>> fun key -> fun expr -> Expr.TableAccess(expr, key)
+
+        // 4. Function calls with single arguments (no parentheses)
+        attempt pFunctionCallSingleArg
+
+        // 5. Standard function calls - (args) (lowest precedence)
         between (pstring "(" >>. ws) (ws >>. pstring ")" >>. ws) (opt (sepBy1 expr (symbol ",")))
         |>> fun argsOpt -> fun expr ->
             let args = argsOpt |> Option.defaultValue []
@@ -760,11 +768,22 @@ let pFunctionDefComplex =
         (pstring ":" >>. ws >>. identifier |>> fun name -> ":" + name)
     ) .>>. pFunctionDefBody .>> keyword "end"
     |>> fun ((first, rest), def) ->
+        // Check if this uses : syntax (method definition)
+        let usesColonSyntax = rest |> List.exists (fun s -> s.[0] = ':')
+
+        // If using colon syntax, add 'self' parameter automatically
+        let parameters = if usesColonSyntax then
+                            Parameter.Named("self", Attribute.NoAttribute) :: def.Parameters
+                         else
+                            def.Parameters
+
+        let modifiedDef = { def with Parameters = parameters }
+
         // Process the path (tbl.a.b or tbl:c)
-        let path = first :: (rest |> List.map (fun s -> 
+        let path = first :: (rest |> List.map (fun s ->
             if s.[0] = '.' then s.[1..] else s.[1..]
         ))
-        Statement.FunctionDef(path, def)
+        Statement.FunctionDef(path, modifiedDef)
 
 // Local function definition: local function name(params) body end
 let pLocalFunctionDef =

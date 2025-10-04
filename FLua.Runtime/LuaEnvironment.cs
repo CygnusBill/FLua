@@ -194,7 +194,7 @@ namespace FLua.Runtime
             // Metatable functions
             env.SetVariable("setmetatable", new BuiltinFunction(SetMetatable));
             env.SetVariable("getmetatable", new BuiltinFunction(GetMetatable));
-        
+            
         // Lua 5.4 functions
         env.SetVariable("warn", new BuiltinFunction(Warn));
             
@@ -218,7 +218,7 @@ namespace FLua.Runtime
             // Add libraries based on trust level
             if (trustLevel == null || trustLevel >= 1) // Sandbox and above
             {
-                LuaTableLib.AddTableLibrary(env);
+            LuaTableLib.AddTableLibrary(env);
                 LuaCoroutineLib.AddCoroutineLibrary(env);
                 LuaUTF8Lib.AddUTF8Library(env);
             }
@@ -230,7 +230,7 @@ namespace FLua.Runtime
             
             if (trustLevel == null || trustLevel >= 3) // Trusted and above
             {
-                LuaIOLib.AddIOLibrary(env);
+            LuaIOLib.AddIOLibrary(env);
             }
             
             if (trustLevel == null || trustLevel >= 4) // FullTrust only
@@ -299,7 +299,7 @@ namespace FLua.Runtime
                     if (toStringMethod.IsFunction)
                 {
                         var func = toStringMethod.AsFunction<LuaFunction>();
-                        return func.Call(new[] { args[0] });
+                    return func.Call(new[] { args[0] });
                     }
                 }
             }
