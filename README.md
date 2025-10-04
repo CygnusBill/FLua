@@ -4,13 +4,19 @@ A comprehensive Lua 5.4 implementation for .NET with multiple execution backends
 
 ## 🚀 Quick Start
 
+### **Install FLua CLI Tool**
+```bash
+# Install the FLua command-line tool globally
+dotnet tool install --global flua --version 1.0.0-alpha.0
+
+# Verify installation
+flua --version
+```
+
 ### **Interactive REPL (Recommended)**
 ```bash
 # Start the interactive Lua REPL
-dotnet run --project FLua.Cli
-
-# Or after building:
-./flua
+flua repl
 
 # Try some Lua code:
 lua> 1 + 2 * 3
@@ -57,6 +63,55 @@ dotnet script.dll
 
 # Compile to library for use from other .NET code
 ./flua compile script.lua -o script.dll --target Library
+```
+
+## 📦 NuGet Packages
+
+FLua is available as modular NuGet packages for integration into your .NET projects:
+
+### **Core Packages**
+```xml
+<!-- Core AST and parsing -->
+<PackageReference Include="FLua.Ast" Version="1.0.0-alpha.0" />
+<PackageReference Include="FLua.Parser" Version="1.0.0-alpha.0" />
+
+<!-- Runtime and execution -->
+<PackageReference Include="FLua.Runtime" Version="1.0.0-alpha.0" />
+<PackageReference Include="FLua.Interpreter" Version="1.0.0-alpha.0" />
+
+<!-- Compilation backends -->
+<PackageReference Include="FLua.Compiler" Version="1.0.0-alpha.0" />
+
+<!-- Hosting API for embedding -->
+<PackageReference Include="FLua.Hosting" Version="1.0.0-alpha.0" />
+```
+
+### **CLI Tool**
+```bash
+# Install command-line tool globally
+dotnet tool install --global flua --version 1.0.0-alpha.0
+
+# Use in CI/CD pipelines
+flua run your-script.lua
+```
+
+### **Integration Example**
+```csharp
+using FLua.Hosting;
+
+// Create a Lua environment
+var environment = LuaEnvironment.CreateStandardEnvironment();
+
+// Execute Lua code
+var result = environment.ExecuteScript(@"
+    local sum = 0
+    for i = 1, 10 do
+        sum = sum + i
+    end
+    return sum
+");
+
+Console.WriteLine($"Sum: {result[0].AsInteger()}"); // Output: Sum: 55
 ```
 
 ## 🎯 Usage Examples
