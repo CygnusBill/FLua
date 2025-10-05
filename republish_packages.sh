@@ -30,6 +30,7 @@ PACKAGES=(
     "FLua.Parser.1.0.0-alpha.2.nupkg"
     "FLua.Runtime.1.0.0-alpha.2.nupkg"
     "FLua.Compiler.1.0.0-alpha.2.nupkg"
+    "FLua.Interpreter.1.0.0-alpha.2.nupkg"
     "FLua.Hosting.1.0.0-alpha.2.nupkg"
     "flua.1.0.0-alpha.2.nupkg"
 )
@@ -84,9 +85,9 @@ if [ ${#SUCCESSFUL_PACKAGES[@]} -gt 0 ]; then
     echo "- FLua.Parser (F# Lua parser)"
     echo "- FLua.Runtime (Runtime & stdlib)"
     echo "- FLua.Compiler (Compilation backends)"
+    echo "- FLua.Interpreter (Lua interpreter)"
     echo "- FLua.Hosting (Hosting API)"
     echo "- flua (CLI tool)"
-    echo "- FLua.Interpreter (already published as 1.0.0)"
 fi
 
 # Exit with error if any packages failed
