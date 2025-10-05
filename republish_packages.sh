@@ -25,13 +25,13 @@ echo ""
 
 # Array of packages to publish
 PACKAGES=(
-    "FLua.Ast.1.0.0-alpha.0.nupkg"
-    "FLua.Common.1.0.0-alpha.0.nupkg"
-    "FLua.Parser.1.0.0-alpha.0.nupkg"
-    "FLua.Runtime.1.0.0-alpha.0.nupkg"
-    "FLua.Compiler.1.0.0-alpha.0.nupkg"
-    "FLua.Interpreter.1.0.0-alpha.0.nupkg"
-    "FLua.Hosting.1.0.0-alpha.0.nupkg"
+    "FLua.Ast.1.0.0-alpha.1.nupkg"
+    "FLua.Common.1.0.0-alpha.1.nupkg"
+    "FLua.Parser.1.0.0-alpha.1.nupkg"
+    "FLua.Runtime.1.0.0-alpha.1.nupkg"
+    "FLua.Compiler.1.0.0-alpha.1.nupkg"
+    "FLua.Interpreter.1.0.0.nupkg"
+    "FLua.Hosting.1.0.0-alpha.1.nupkg"
     "flua.1.0.0-alpha.0.nupkg"
 )
 
