@@ -41,7 +41,7 @@ FLua is a comprehensive Lua 5.4 implementation for .NET that provides:
 
 ```bash
 # Install CLI tool
-dotnet tool install --global flua --version 1.0.0-alpha.1
+dotnet tool install --global flua --version 1.0.0-alpha.2
 
 # Try the REPL
 flua repl

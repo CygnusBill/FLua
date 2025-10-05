@@ -4,10 +4,10 @@
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>1.0.0-alpha.1</Version>
+    <Version>1.0.0-alpha.2</Version>
     <AssemblyVersion>1.0.0.0</AssemblyVersion>
     <FileVersion>1.0.0.0</FileVersion>
-    <PackageVersion>1.0.0-alpha.1</PackageVersion>
+    <PackageVersion>1.0.0-alpha.2</PackageVersion>
     <Authors>FLua Team</Authors>
     <Description>Lua-to-.NET compiler with multiple backends. Compiles Lua AST to C# code, lambdas, or expression trees.</Description>
     <PackageTags>Lua;Compiler;CSharp;IL;Scripting;AOT;JIT</PackageTags>

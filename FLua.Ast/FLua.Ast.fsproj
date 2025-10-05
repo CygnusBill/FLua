@@ -5,10 +5,10 @@
     <TargetFramework>net8.0</TargetFramework>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>1.0.0-alpha.1</Version>
+    <Version>1.0.0-alpha.2</Version>
     <AssemblyVersion>1.0.0.0</AssemblyVersion>
     <FileVersion>1.0.0.0</FileVersion>
-    <PackageVersion>1.0.0-alpha.1</PackageVersion>
+    <PackageVersion>1.0.0-alpha.2</PackageVersion>
     <Authors>FLua Team</Authors>
     <Description>Abstract Syntax Tree definitions for FLua, a complete Lua 5.4 implementation for .NET.</Description>
     <PackageTags>Lua;AST;Parser;Compiler;Scripting</PackageTags>

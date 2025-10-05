@@ -5,6 +5,20 @@ All notable changes to FLua will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.0-alpha.2] - 2025-10-04
+
+### 🧹 **Code Cleanup**
+
+#### **Debug Statements Removed**
+- **Cleaned up all debug output** from REPL troubleshooting
+- **Removed 25+ lines** of debug statements added during development
+- **Production-ready code** with no debug artifacts
+
+#### **Technical Improvements**
+- **Cleaner codebase** ready for production use
+- **All tests passing** - no regressions introduced
+- **Consistent code quality** across the project
+
 ## [1.0.0-alpha.1] - 2025-10-04
 
 ### 🐛 **Bug Fixes**
