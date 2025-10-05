@@ -32,7 +32,7 @@ PACKAGES=(
     "FLua.Compiler.1.0.0-alpha.1.nupkg"
     "FLua.Interpreter.1.0.0.nupkg"
     "FLua.Hosting.1.0.0-alpha.1.nupkg"
-    "flua.1.0.0-alpha.0.nupkg"
+    "flua.1.0.0-alpha.1.nupkg"
 )
 
 # Publish each package

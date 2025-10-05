@@ -7,7 +7,7 @@ A comprehensive Lua 5.4 implementation for .NET with multiple execution backends
 ### **Install FLua CLI Tool**
 ```bash
 # Install the FLua command-line tool globally
-dotnet tool install --global flua --version 1.0.0-alpha.0
+dotnet tool install --global flua --version 1.0.0-alpha.1
 
 # Verify installation
 flua --version
