@@ -30,7 +30,7 @@ PACKAGES=(
     "FLua.Parser.1.0.0-alpha.2.nupkg"
     "FLua.Runtime.1.0.0-alpha.2.nupkg"
     "FLua.Compiler.1.0.0-alpha.2.nupkg"
-    "FLua.Interpreter.1.0.0.nupkg"
+    "FLua.Interpreter.1.0.0-alpha.2.nupkg"
     "FLua.Hosting.1.0.0-alpha.2.nupkg"
     "flua.1.0.0-alpha.2.nupkg"
 )
