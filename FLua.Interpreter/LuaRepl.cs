@@ -377,22 +377,50 @@ namespace FLua.Interpreter
                     // Cannot parse as statements, will try as expression later
                 }
 
-                // Additional check: if input looks like an expression, prefer expression evaluation
-                bool looksLikeExpression = LooksLikeExpression(input);
+                // If parsing as statements succeeded, execute as statements
+                // Don't try expression evaluation for things that parse as statements
 
-                // If input looks like an expression and can be parsed as statements,
-                // but is just a single expression-like statement, evaluate as expression
-                if (looksLikeExpression && canParseAsStatements && statements != null && statements.Length == 1)
+                // Special case: if input is a simple variable name and can be parsed as a statement,
+                // try expression evaluation first (variables should show their values)
+                string trimmedInput = input.Trim();
+                bool isSimpleVar = System.Text.RegularExpressions.Regex.IsMatch(trimmedInput, @"^[a-zA-Z_][a-zA-Z0-9_]*$");
+
+                if (trimmedInput == "x")
                 {
-                    try
+                    _output.WriteLine($"DEBUG: x detected - canParseAsStatements: {canParseAsStatements}, statements.Length: {statements?.Length}, isSimpleVar: {isSimpleVar}");
+                }
+
+                if (canParseAsStatements && statements != null && statements.Length == 1 && isSimpleVar)
+                {
+                    // Debug: check what's happening
+                    if (trimmedInput == "x" || trimmedInput == "z")
                     {
-                        var expressionResult = _interpreter.EvaluateExpression(input);
-                        _output.WriteLine($"= {expressionResult}");
-                        return;
+                        _output.WriteLine($"DEBUG: Trying to evaluate '{trimmedInput}' as expression");
+                        try
+                        {
+                            var expressionResult = _interpreter.EvaluateExpression(trimmedInput);
+                            _output.WriteLine($"DEBUG: Expression result = {expressionResult}");
+                            _output.WriteLine($"= {expressionResult}");
+                            return;
+                        }
+                        catch (Exception ex)
+                        {
+                            _output.WriteLine($"DEBUG: Expression evaluation failed: {ex.Message}");
+                            // Fall back to statement execution
+                        }
                     }
-                    catch
+                    else
                     {
-                        // Fall back to statement execution
+                        try
+                        {
+                            var expressionResult = _interpreter.EvaluateExpression(input);
+                            _output.WriteLine($"= {expressionResult}");
+                            return;
+                        }
+                        catch
+                        {
+                            // Fall back to statement execution
+                        }
                     }
                 }
 
@@ -419,7 +447,7 @@ namespace FLua.Interpreter
 
                     // Execute the statements
                     var results = _interpreter.ExecuteCode(input);
-                    
+
                     if (results.Length > 0)
                     {
                         // Statement returned explicit values (like return statement)
@@ -567,7 +595,7 @@ namespace FLua.Interpreter
             if (statements.Length == 1)
             {
                 var statement = statements.Head;
-                
+
                 switch (statement.Tag)
                 {
                     case FLua.Ast.Statement.Tags.Assignment:
