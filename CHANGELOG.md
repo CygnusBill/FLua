@@ -5,6 +5,33 @@ All notable changes to FLua will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.0-alpha.1] - 2025-10-04
+
+### 🐛 **Bug Fixes**
+
+#### **REPL Expression Evaluation**
+- **Fixed critical REPL bug** where expressions and statements were incorrectly mixed
+- **Assignments now return nothing** (correct Lua behavior) instead of being evaluated as expressions
+- **Variable access now works correctly** in REPL (e.g., `x = 5; x` now shows `= 5`)
+- **Complex expressions work properly** (e.g., `z = x + y; z` shows `= 14`)
+- **Parser logic simplified** - statements execute, expressions evaluate, no confusion
+
+#### **Technical Improvements**
+- **All 1,222 tests passing** across the entire codebase
+- **REPL behavior now matches Lua specification**
+- **Expression evaluation is reliable and predictable**
+
+### 📦 **Packages Updated**
+All packages updated to version `1.0.0-alpha.1`:
+- `FLua.Ast.1.0.0-alpha.1`
+- `FLua.Common.1.0.0-alpha.1`
+- `FLua.Parser.1.0.0-alpha.1`
+- `FLua.Runtime.1.0.0-alpha.1`
+- `FLua.Compiler.1.0.0-alpha.1`
+- `FLua.Interpreter.1.0.0` (unchanged)
+- `FLua.Hosting.1.0.0-alpha.1`
+- `flua.1.0.0-alpha.0` (CLI tool, unchanged)
+
 ## [1.0.0-alpha.0] - 2025-10-04
 
 ### 🎉 **Initial Alpha Release**
