@@ -84,7 +84,7 @@ namespace FLua.Interpreter
         {
             var ast = ParserHelper.ParseString(code);
             var result = ExecuteStatementsWithResult(ast);
-            return result.ReturnValues ?? [LuaValue.Nil];
+            return result.ReturnValues ?? []; // Return empty array, not [Nil]
         }
 
         /// <summary>

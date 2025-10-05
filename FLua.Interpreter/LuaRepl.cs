@@ -344,6 +344,25 @@ namespace FLua.Interpreter
         {
             try
             {
+                // Handle explicit expression evaluation with '=' prefix
+                if (input.Trim().StartsWith("="))
+                {
+                    var expressionText = input.Trim().Substring(1).Trim();
+                    if (!string.IsNullOrEmpty(expressionText))
+                    {
+                        try
+                        {
+                            var expressionResult = _interpreter.EvaluateExpression(expressionText);
+                            _output.WriteLine($"= {expressionResult}");
+                        }
+                        catch (Exception ex)
+                        {
+                            _output.WriteLine($"Error: {ex.Message}");
+                        }
+                        return;
+                    }
+                }
+
                 // Parse the input to understand its structure
                 Microsoft.FSharp.Collections.FSharpList<FLua.Ast.Statement>? statements = null;
                 bool canParseAsStatements = false;
@@ -357,9 +376,47 @@ namespace FLua.Interpreter
                 {
                     // Cannot parse as statements, will try as expression later
                 }
-                
+
+                // Additional check: if input looks like an expression, prefer expression evaluation
+                bool looksLikeExpression = LooksLikeExpression(input);
+
+                // If input looks like an expression and can be parsed as statements,
+                // but is just a single expression-like statement, evaluate as expression
+                if (looksLikeExpression && canParseAsStatements && statements != null && statements.Length == 1)
+                {
+                    try
+                    {
+                        var expressionResult = _interpreter.EvaluateExpression(input);
+                        _output.WriteLine($"= {expressionResult}");
+                        return;
+                    }
+                    catch
+                    {
+                        // Fall back to statement execution
+                    }
+                }
+
                 if (canParseAsStatements && statements != null)
                 {
+                    // Special handling for REPL: if this is a single function call that returns a value,
+                    // treat it as an expression to show the result
+                    if (statements.Length == 1 &&
+                        statements[0].Tag == FLua.Ast.Statement.Tags.FunctionCall &&
+                        !IsSideEffectFunctionCall(statements[0]))
+                    {
+                        // This is a pure function call - evaluate it as an expression to show the result
+                        try
+                        {
+                            var expressionResult = _interpreter.EvaluateExpression(input);
+                            _output.WriteLine($"= {expressionResult}");
+                            return;
+                        }
+                        catch
+                        {
+                            // Fallback: execute as statement
+                        }
+                    }
+
                     // Execute the statements
                     var results = _interpreter.ExecuteCode(input);
                     
@@ -375,7 +432,7 @@ namespace FLua.Interpreter
                     {
                         // Analyze the AST to determine output behavior
                         var outputBehavior = AnalyzeStatementOutputBehavior(statements);
-                        
+
                         switch (outputBehavior)
                         {
                             case OutputBehavior.ShowNil:
@@ -614,14 +671,14 @@ namespace FLua.Interpreter
         {
             if (statement.Tag != FLua.Ast.Statement.Tags.FunctionCall)
                 return false;
-            
+
             // Extract the function call statement
             var functionCallStatement = statement as FLua.Ast.Statement.FunctionCall;
             if (functionCallStatement?.Item == null)
                 return false;
-            
+
             var expr = functionCallStatement.Item;
-            
+
             // Check if it's a call to a known side-effect function
             if (expr.Tag == FLua.Ast.Expr.Tags.FunctionCall)
             {
@@ -636,7 +693,51 @@ namespace FLua.Interpreter
                     }
                 }
             }
-            
+
+            return false;
+        }
+
+        private bool LooksLikeExpression(string input)
+        {
+            var trimmed = input.Trim();
+
+            // First check if this looks like a statement that should not be treated as expression
+            if (HasSideEffects(trimmed))
+            {
+                return false; // Side-effect statements should be executed as statements
+            }
+
+            // Check for expression-like patterns
+            if (trimmed.Contains("+") || trimmed.Contains("-") || trimmed.Contains("*") || trimmed.Contains("/")) return true; // Arithmetic
+            if (trimmed.Contains("==") || trimmed.Contains("~=") || trimmed.Contains("<") || trimmed.Contains(">") || trimmed.Contains("<=") || trimmed.Contains(">=")) return true; // Comparisons
+            if (trimmed.Contains("and") || trimmed.Contains("or") || trimmed.Contains("not")) return true; // Logical operators
+            if (trimmed.Contains(".") && !trimmed.Contains(" = ")) return true; // Table access (but not assignments)
+            if (trimmed.Contains("[") && trimmed.Contains("]")) return true; // Array access
+            if (trimmed.StartsWith("#")) return true; // Length operator
+
+            // Function calls that don't have side effects
+            if (trimmed.Contains("(") && trimmed.Contains(")"))
+            {
+                // Check if it's a side-effect function call - if not, it might be an expression
+                if (!HasSideEffects(trimmed))
+                {
+                    return true;
+                }
+            }
+
+            // Variables and literals that aren't statements
+            if (!trimmed.Contains(" = ") && !trimmed.Contains("local ") && !trimmed.StartsWith("if ") &&
+                !trimmed.StartsWith("while ") && !trimmed.StartsWith("for ") && !trimmed.StartsWith("function ") &&
+                !trimmed.StartsWith("return ") && !trimmed.StartsWith("break") && !trimmed.StartsWith("do"))
+            {
+                // If it looks like a variable name or number or string, it's probably an expression
+                return System.Text.RegularExpressions.Regex.IsMatch(trimmed, @"^[a-zA-Z_][a-zA-Z0-9_]*$") || // Variable
+                       System.Text.RegularExpressions.Regex.IsMatch(trimmed, @"^[0-9]+(\.[0-9]+)?$") || // Number
+                       (trimmed.StartsWith("\"") && trimmed.EndsWith("\"")) || // String
+                       (trimmed.StartsWith("'") && trimmed.EndsWith("'")) || // String
+                       trimmed == "true" || trimmed == "false" || trimmed == "nil"; // Literals
+            }
+
             return false;
         }
 
