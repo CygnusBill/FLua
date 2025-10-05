@@ -385,42 +385,17 @@ namespace FLua.Interpreter
                 string trimmedInput = input.Trim();
                 bool isSimpleVar = System.Text.RegularExpressions.Regex.IsMatch(trimmedInput, @"^[a-zA-Z_][a-zA-Z0-9_]*$");
 
-                if (trimmedInput == "x")
-                {
-                    _output.WriteLine($"DEBUG: x detected - canParseAsStatements: {canParseAsStatements}, statements.Length: {statements?.Length}, isSimpleVar: {isSimpleVar}");
-                }
-
                 if (canParseAsStatements && statements != null && statements.Length == 1 && isSimpleVar)
                 {
-                    // Debug: check what's happening
-                    if (trimmedInput == "x" || trimmedInput == "z")
+                    try
                     {
-                        _output.WriteLine($"DEBUG: Trying to evaluate '{trimmedInput}' as expression");
-                        try
-                        {
-                            var expressionResult = _interpreter.EvaluateExpression(trimmedInput);
-                            _output.WriteLine($"DEBUG: Expression result = {expressionResult}");
-                            _output.WriteLine($"= {expressionResult}");
-                            return;
-                        }
-                        catch (Exception ex)
-                        {
-                            _output.WriteLine($"DEBUG: Expression evaluation failed: {ex.Message}");
-                            // Fall back to statement execution
-                        }
+                        var expressionResult = _interpreter.EvaluateExpression(input);
+                        _output.WriteLine($"= {expressionResult}");
+                        return;
                     }
-                    else
+                    catch
                     {
-                        try
-                        {
-                            var expressionResult = _interpreter.EvaluateExpression(input);
-                            _output.WriteLine($"= {expressionResult}");
-                            return;
-                        }
-                        catch
-                        {
-                            // Fall back to statement execution
-                        }
+                        // Fall back to statement execution
                     }
                 }
 
