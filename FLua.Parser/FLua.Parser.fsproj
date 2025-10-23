@@ -12,8 +12,8 @@
     <Authors>FLua Team</Authors>
     <Description>F# parser for Lua 5.4 syntax using FParsec. Converts Lua source code to FLua AST.</Description>
     <PackageTags>Lua;Parser;FParsec;AST;Compiler</PackageTags>
-    <RepositoryUrl>https://github.com/your-repo/flua</RepositoryUrl>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <RepositoryUrl>https://github.com/CygnusBill/FLua</RepositoryUrl>
+    <PackageLicenseExpression>GPL-3.0</PackageLicenseExpression>
   </PropertyGroup>
 
   <ItemGroup>

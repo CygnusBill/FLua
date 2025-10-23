@@ -12,8 +12,8 @@
     <Authors>FLua Team</Authors>
     <Description>Abstract Syntax Tree definitions for FLua, a complete Lua 5.4 implementation for .NET.</Description>
     <PackageTags>Lua;AST;Parser;Compiler;Scripting</PackageTags>
-    <RepositoryUrl>https://github.com/your-repo/flua</RepositoryUrl>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <RepositoryUrl>https://github.com/CygnusBill/FLua</RepositoryUrl>
+    <PackageLicenseExpression>GPL-3.0</PackageLicenseExpression>
   </PropertyGroup>
 
   <ItemGroup>

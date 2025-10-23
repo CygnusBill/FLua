@@ -21,8 +21,8 @@
     <Authors>FLua Team</Authors>
     <Description>High-level hosting API for Lua scripting in .NET applications. Provides easy integration with security controls and module loading.</Description>
     <PackageTags>Lua;Hosting;Scripting;.NET;Integration;Security</PackageTags>
-    <RepositoryUrl>https://github.com/your-repo/flua</RepositoryUrl>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <RepositoryUrl>https://github.com/CygnusBill/FLua</RepositoryUrl>
+    <PackageLicenseExpression>GPL-3.0</PackageLicenseExpression>
   </PropertyGroup>
 
 </Project>

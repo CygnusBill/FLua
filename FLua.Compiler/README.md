@@ -142,4 +142,4 @@ var query = data.Where(expr);
 
 ## License
 
-MIT
+GPL-3.0

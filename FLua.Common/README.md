@@ -35,4 +35,4 @@ None - this is a foundational package.
 
 ## License
 
-MIT
+GPL-3.0

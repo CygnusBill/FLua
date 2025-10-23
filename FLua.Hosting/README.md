@@ -179,4 +179,4 @@ var transformer = host.CompileToFunction<RawData, ProcessedData>(@"
 
 ## License
 
-MIT
+GPL-3.0

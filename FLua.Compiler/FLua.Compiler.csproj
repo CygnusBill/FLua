@@ -11,8 +11,8 @@
     <Authors>FLua Team</Authors>
     <Description>Lua-to-.NET compiler with multiple backends. Compiles Lua AST to C# code, lambdas, or expression trees.</Description>
     <PackageTags>Lua;Compiler;CSharp;IL;Scripting;AOT;JIT</PackageTags>
-    <RepositoryUrl>https://github.com/your-repo/flua</RepositoryUrl>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <RepositoryUrl>https://github.com/CygnusBill/FLua</RepositoryUrl>
+    <PackageLicenseExpression>GPL-3.0</PackageLicenseExpression>
   </PropertyGroup>
 
   <ItemGroup>

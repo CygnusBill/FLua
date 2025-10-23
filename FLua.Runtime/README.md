@@ -99,4 +99,4 @@ The runtime is designed with clean separation:
 
 ## License
 
-MIT
+GPL-3.0

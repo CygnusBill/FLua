@@ -77,4 +77,4 @@ flua compile myscript.lua --output MyApp.exe --executable
 
 ## License
 
-MIT
+GPL-3.0

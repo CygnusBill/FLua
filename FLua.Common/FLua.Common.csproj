@@ -13,8 +13,8 @@
     <Authors>FLua Team</Authors>
     <Description>Common utilities and infrastructure for FLua, a complete Lua 5.4 implementation for .NET.</Description>
     <PackageTags>Lua;Utilities;Diagnostics;Common</PackageTags>
-    <RepositoryUrl>https://github.com/your-repo/flua</RepositoryUrl>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <RepositoryUrl>https://github.com/CygnusBill/FLua</RepositoryUrl>
+    <PackageLicenseExpression>GPL-3.0</PackageLicenseExpression>
   </PropertyGroup>
 
   <ItemGroup>

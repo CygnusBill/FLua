@@ -67,4 +67,4 @@ The parser uses FParsec's efficient backtracking algorithms and maintains good p
 
 ## License
 
-MIT
+GPL-3.0

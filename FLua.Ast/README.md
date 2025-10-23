@@ -33,4 +33,4 @@ var assignment = Statement.CreateAssignment(
 
 ## License
 
-MIT
+GPL-3.0
