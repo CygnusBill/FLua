@@ -5,6 +5,27 @@ All notable changes to FLua will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.0-alpha.3] - 2025-10-23
+
+### 📦 **Package Updates**
+
+#### **Repository and License Configuration**
+- **Updated repository URL** to https://github.com/CygnusBill/FLua
+- **Fixed license identifier** from GPL-3.0 to GPL-3.0-only (correct SPDX format)
+- **All NuGet packages** now have correct metadata for publishing
+
+#### **Version Bump**
+- All packages updated to version `1.0.0-alpha.3`
+- Ready for NuGet.org publication
+
+### 🧪 **Test Suite Status**
+- **1,222 tests passing** with zero failures
+- **11 tests skipped** - documented known limitations:
+  - Pattern matching edge cases in string library (5)
+  - Lua 5.4 const attribute syntax (1)
+  - REPL multi-line function definition (1)
+  - Hosting features not yet implemented (4)
+
 ## [1.0.0-alpha.2] - 2025-10-04
 
 ### 🧹 **Code Cleanup**

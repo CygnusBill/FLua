@@ -7,7 +7,7 @@ A comprehensive Lua 5.4 implementation for .NET with multiple execution backends
 ### **Install FLua CLI Tool**
 ```bash
 # Install the FLua command-line tool globally
-dotnet tool install --global flua --version 1.0.0-alpha.2
+dotnet tool install --global flua --version 1.0.0-alpha.3
 
 # Verify installation
 flua --version
@@ -72,24 +72,24 @@ FLua is available as modular NuGet packages for integration into your .NET proje
 ### **Core Packages**
 ```xml
 <!-- Core AST and parsing -->
-<PackageReference Include="FLua.Ast" Version="1.0.0-alpha.0" />
-<PackageReference Include="FLua.Parser" Version="1.0.0-alpha.0" />
+<PackageReference Include="FLua.Ast" Version="1.0.0-alpha.3" />
+<PackageReference Include="FLua.Parser" Version="1.0.0-alpha.3" />
 
 <!-- Runtime and execution -->
-<PackageReference Include="FLua.Runtime" Version="1.0.0-alpha.0" />
-<PackageReference Include="FLua.Interpreter" Version="1.0.0-alpha.0" />
+<PackageReference Include="FLua.Runtime" Version="1.0.0-alpha.3" />
+<PackageReference Include="FLua.Interpreter" Version="1.0.0-alpha.3" />
 
 <!-- Compilation backends -->
-<PackageReference Include="FLua.Compiler" Version="1.0.0-alpha.0" />
+<PackageReference Include="FLua.Compiler" Version="1.0.0-alpha.3" />
 
 <!-- Hosting API for embedding -->
-<PackageReference Include="FLua.Hosting" Version="1.0.0-alpha.0" />
+<PackageReference Include="FLua.Hosting" Version="1.0.0-alpha.3" />
 ```
 
 ### **CLI Tool**
 ```bash
 # Install command-line tool globally
-dotnet tool install --global flua --version 1.0.0-alpha.0
+dotnet tool install --global flua --version 1.0.0-alpha.3
 
 # Use in CI/CD pipelines
 flua run your-script.lua
