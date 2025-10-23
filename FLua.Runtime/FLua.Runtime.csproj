@@ -16,7 +16,7 @@
     <Description>Lua 5.4 runtime and standard library implementation for .NET. Includes all Lua built-in functions and value types.</Description>
     <PackageTags>Lua;Runtime;StandardLibrary;Scripting;Interpreter</PackageTags>
     <RepositoryUrl>https://github.com/CygnusBill/FLua</RepositoryUrl>
-    <PackageLicenseExpression>GPL-3.0</PackageLicenseExpression>
+    <PackageLicenseExpression>GPL-3.0-only</PackageLicenseExpression>
   </PropertyGroup>
 
   <ItemGroup>

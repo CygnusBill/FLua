@@ -13,7 +13,7 @@
     <Description>F# parser for Lua 5.4 syntax using FParsec. Converts Lua source code to FLua AST.</Description>
     <PackageTags>Lua;Parser;FParsec;AST;Compiler</PackageTags>
     <RepositoryUrl>https://github.com/CygnusBill/FLua</RepositoryUrl>
-    <PackageLicenseExpression>GPL-3.0</PackageLicenseExpression>
+    <PackageLicenseExpression>GPL-3.0-only</PackageLicenseExpression>
   </PropertyGroup>
 
   <ItemGroup>

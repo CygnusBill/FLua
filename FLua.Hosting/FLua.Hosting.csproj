@@ -22,7 +22,7 @@
     <Description>High-level hosting API for Lua scripting in .NET applications. Provides easy integration with security controls and module loading.</Description>
     <PackageTags>Lua;Hosting;Scripting;.NET;Integration;Security</PackageTags>
     <RepositoryUrl>https://github.com/CygnusBill/FLua</RepositoryUrl>
-    <PackageLicenseExpression>GPL-3.0</PackageLicenseExpression>
+    <PackageLicenseExpression>GPL-3.0-only</PackageLicenseExpression>
   </PropertyGroup>
 
 </Project>
