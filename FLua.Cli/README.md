@@ -6,7 +6,7 @@ A command-line interface for FLua, a complete Lua 5.4 implementation for .NET.
 
 ### .NET Tool (Recommended)
 ```bash
-dotnet tool install --global flua --version 1.0.0-alpha.3
+dotnet tool install --global flua --version 1.0.0-alpha.4
 ```
 
 ### Manual Installation

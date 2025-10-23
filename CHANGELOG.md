@@ -5,6 +5,20 @@ All notable changes to FLua will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.0-alpha.4] - 2025-10-23
+
+### 📦 **Package Improvements**
+
+#### **NuGet Package Enhancements**
+- **Added RepositoryType** property to all project files (set to "git")
+- **Added PublishRepositoryUrl** property to enable SourceLink support
+- **SourceLink support** allows developers to debug into FLua source code directly from NuGet packages
+- **Improved package metadata** for better discoverability on NuGet.org
+
+#### **Version Update**
+- All packages updated to version `1.0.0-alpha.4`
+- Enhanced package publishing configuration
+
 ## [1.0.0-alpha.3] - 2025-10-23
 
 ### 📦 **Package Updates**

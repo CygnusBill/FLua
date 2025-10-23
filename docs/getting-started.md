@@ -10,7 +10,7 @@ The easiest way to get started is with the FLua CLI tool:
 
 ```bash
 # Install globally
-dotnet tool install --global flua --version 1.0.0-alpha.3
+dotnet tool install --global flua --version 1.0.0-alpha.4
 
 # Verify installation
 flua --version
@@ -24,7 +24,7 @@ flua repl
 Add FLua to your .NET project:
 
 ```xml
-<PackageReference Include="FLua.Hosting" Version="1.0.0-alpha.3" />
+<PackageReference Include="FLua.Hosting" Version="1.0.0-alpha.4" />
 ```
 
 ```csharp

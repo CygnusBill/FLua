@@ -11,12 +11,18 @@
     <PackAsTool>true</PackAsTool>
     <ToolCommandName>flua</ToolCommandName>
     <PackageOutputPath>../packages</PackageOutputPath>
-    <Version>1.0.0-alpha.3</Version>
+    <Version>1.0.0-alpha.4</Version>
     <AssemblyVersion>1.0.0.0</AssemblyVersion>
     <FileVersion>1.0.0.0</FileVersion>
+    <PackageVersion>1.0.0-alpha.4</PackageVersion>
     <Authors>FLua Team</Authors>
     <Product>FLua</Product>
     <Description>Command-line interface for FLua, a complete Lua 5.4 implementation for .NET</Description>
+    <PackageTags>Lua;CLI;Tool;Scripting;Interpreter</PackageTags>
+    <RepositoryUrl>https://github.com/CygnusBill/FLua</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <PackageLicenseExpression>GPL-3.0-only</PackageLicenseExpression>
   </PropertyGroup>
 
   <ItemGroup>

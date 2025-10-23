@@ -6,10 +6,18 @@
     <Nullable>enable</Nullable>
     <OutputType>Exe</OutputType>
     <RootNamespace>FLua.Interpreter</RootNamespace>
-    <Version>1.0.0-alpha.3</Version>
+    <Version>1.0.0-alpha.4</Version>
     <AssemblyVersion>1.0.0.0</AssemblyVersion>
     <FileVersion>1.0.0.0</FileVersion>
-    <PackageVersion>1.0.0-alpha.3</PackageVersion>
+    <PackageVersion>1.0.0-alpha.4</PackageVersion>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Authors>FLua Team</Authors>
+    <Description>Lua 5.4 interpreter and evaluation engine for FLua.</Description>
+    <PackageTags>Lua;Interpreter;Scripting;Evaluation</PackageTags>
+    <RepositoryUrl>https://github.com/CygnusBill/FLua</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <PackageLicenseExpression>GPL-3.0-only</PackageLicenseExpression>
   </PropertyGroup>
 
   <ItemGroup>

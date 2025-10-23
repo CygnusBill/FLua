@@ -5,14 +5,16 @@
     <TargetFramework>net8.0</TargetFramework>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>1.0.0-alpha.3</Version>
+    <Version>1.0.0-alpha.4</Version>
     <AssemblyVersion>1.0.0.0</AssemblyVersion>
     <FileVersion>1.0.0.0</FileVersion>
-    <PackageVersion>1.0.0-alpha.3</PackageVersion>
+    <PackageVersion>1.0.0-alpha.4</PackageVersion>
     <Authors>FLua Team</Authors>
     <Description>F# parser for Lua 5.4 syntax using FParsec. Converts Lua source code to FLua AST.</Description>
     <PackageTags>Lua;Parser;FParsec;AST;Compiler</PackageTags>
     <RepositoryUrl>https://github.com/CygnusBill/FLua</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <PackageLicenseExpression>GPL-3.0-only</PackageLicenseExpression>
   </PropertyGroup>
 
